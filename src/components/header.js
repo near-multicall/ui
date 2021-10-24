@@ -7,7 +7,7 @@ export default class Header extends Component {
 
         return (
 
-            <div className="header">
+            <div className="header full-width">
                 <p>near-multicall</p>
                 <p>accountid.near</p>
             </div>

@@ -15,18 +15,26 @@
 body, html, #root {
     width: 100%;
     height: 100%;
-    background-color: color.$dark;
+    background-color: color.$light;
+}
+
+.full-width {
+    width: 100%;
+    width: -moz-available;          /* WebKit-based browsers will ignore this. */
+    width: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */
+    width: fill-available;
 }
 
 .header {
-    position: sticky;
+    position: fixed;
     display: flex;
+    z-index: 2;
     flex-flow: row nowrap;
     justify-content: space-between;
     align-items: center;
     padding: 0 size.$unit;
     height: 3 * size.$unit;
-    background: transparent;
+    background: color.$dark20;
     color: color.$text;
     font-family: font.$text;
     font-size: size.$large-text;
@@ -46,42 +54,51 @@ body, html, #root {
     flex-flow: row nowrap;
 }
 
-.ingredient {
+.pot {
     position: relative;
-    margin: 2 * size.$gap size.$gap;
-    width: 300px;
-    height: 200px;
-
-    // Neumorphism.io
-    border-radius: 48px;
-    background: #1f2933;
-    box-shadow: 10px 10px 21px #192129,
-                -10px -10px 21px #25313d;
 }
 
-.ingredient::before {
-    content: '+';
+.pot:not(:first-of-type)::before {
+    content: '';
     position: absolute;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    border-radius: 48px;
-    background: #1f2933;
+    top: calc(2 * size.$gap + 0.5 * size.$ingredient-height - 5px);
+    right: calc(size.$gap + 0.5 * size.$ingredient-width);
+    height: 10px;
+    width: calc(2 * size.$gap + size.$ingredient-width + 5px);
+    background-color: color.$dark;
+}
 
-    box-shadow: inset 10px 10px 21px #192129,
-                inset -10px -10px 21px #25313d;
-    opacity: 0;
-    transition: opacity 200ms;
+.ingredient {
+    position: relative;
+    z-index: 1;
+    width: size.$ingredient-width;
+    height: size.$ingredient-height;
+    border-radius: size.$ingredient-radius;
+    background: color.$green;
+    box-shadow: 1px 10px 20px 0 rgba(0,0,0,0.2);
+}
 
+.ingredient-pseudo {
+    position: relative;
+    margin: 2 * size.$gap size.$gap;
+}
+
+.ingredient-pseudo:not(:first-of-type)::before {
+    content: '';
+    bottom: calc(0.5 * size.$ingredient-height);
+    left: calc(0.5 * size.$ingredient-width - 5px);
+    height: calc(2 * size.$gap + size.$ingredient-height);
+    width: 10px;
+    background-color: color.$dark;
+
+    position: absolute;
+    z-index: 0;
+}
+
+.add-ingredient {
+    background: color.$dark20;
+    box-shadow: none;
     font-size: 4 * size.$unit;
     color: color.$text;
     font-family: font.$code;
-}
-
-.ingredient:hover::before {
-    opacity: 1;
 }

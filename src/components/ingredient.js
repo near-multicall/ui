@@ -23,10 +23,12 @@ export default class Ingredient extends Component {
 
         return (
 
-            <div 
-                className="ingredient"
-                { ...this.props }
-            >
+            <div className="ingredient-pseudo">
+                <div 
+                    className="ingredient"
+                    { ...this.props }
+                >
+                </div>
             </div>
         
         );
