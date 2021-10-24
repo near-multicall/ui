@@ -4,21 +4,43 @@ import './../global.scss'
 
 export default class Pot extends Component {
 
-    constructor() {
+    constructor(props) {
 
-        super();
+        super(props);
 
         this.state = {
-            ingredients: []
+            ingredients: [],
+            ...props
         };
+
+    }
+
+    componentDidUpdate() {
+
+        console.log(this.state);
 
     }
     
     addIngredient(addr, func, args, gas, depo) {
 
+        const newIngredient = <Ingredient
+            key={ this.state.ingredients.length }    
+            addr={ addr }
+            func={ func }
+            args={ args }
+            gas={ gas }
+            depo={ depo }
+        />;
+
         this.setState({
-            ingredients: this.state.ingredients.push(new Ingredient(addr, func, args, gas, depo))
+            ingredients: [...this.state.ingredients, newIngredient]
         });
+
+    }
+
+    getIngredients() {
+
+        return this.state.ingredients;
 
     }
 
@@ -29,12 +51,16 @@ export default class Pot extends Component {
         return (
 
             <div className="pot">
-                <Ingredient/>
-                <Ingredient/>
-                <Ingredient/>
-                <Ingredient/>
-                <Ingredient/>
                 { ingredients }
+                <Ingredient
+                    className="add-ingredient ingredient"
+                    onClick={ () => {
+
+                        if (CUPBOARD !== undefined)
+                            CUPBOARD.open(this);
+                    
+                    } }
+                /> 
             </div>
         
         );

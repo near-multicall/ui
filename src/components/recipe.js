@@ -3,20 +3,32 @@ import { Pot } from '../components.js'
 import './../global.scss'
 
 export default class Recipe extends Component {
+    
+    constructor(props) {
 
-    constructor() {
-
-        super();
+        super(props);
 
         this.state = {
-            pots: []
+            pots: [<Pot className="add-pot"/>]
         };
+
+    }
+
+    componentDidMount() {
+
+        window.RECIPE = this;
 
     }
     
     addPot() {
         
-        this.setState({ pots: this.state.pots.push(new Pot()) });
+        const newPot = <Pot
+            key={ this.state.pots.length }
+        />;
+
+        this.setState({ 
+            pots: [...this.state.pots, newPot] 
+        });
 
     }
 
@@ -24,18 +36,18 @@ export default class Recipe extends Component {
 
         const { pots } = this.state;
 
+        console.log(pots);
+
         return (
 
             <div className="recipe">
+
                 <div className="stove">
-                    <Pot/>
-                    <Pot/>
-                    <Pot/>
-                    <Pot/>
                     { pots }
                 </div>
-            </div>
         
+            </div>
+
         );
 
     }

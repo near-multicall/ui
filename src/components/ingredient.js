@@ -3,17 +3,19 @@ import './../global.scss'
 
 export default class Ingredient extends Component {
 
-    constructor(addr, func, args, gas, depo) {
+    constructor(props) {
 
-        super();
+        super(props);
 
         this.state = {
-            addr: addr,
-            func: func,
-            args: args,
-            gas: gas,
-            depo: depo
+            ...props
         };
+
+    }
+
+    set(state) {
+
+        this.setState(state);
 
     }
 
@@ -21,7 +23,10 @@ export default class Ingredient extends Component {
 
         return (
 
-            <div className="ingredient">
+            <div 
+                className="ingredient"
+                { ...this.props }
+            >
             </div>
         
         );
