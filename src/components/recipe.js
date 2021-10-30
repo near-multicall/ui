@@ -9,7 +9,7 @@ export default class Recipe extends Component {
         super(props);
 
         this.state = {
-            pots: [<Pot className="add-pot"/>]
+            pots: [<Pot className="add-pot" key="0"/>]
         };
 
     }
@@ -35,8 +35,6 @@ export default class Recipe extends Component {
     render() {
 
         const { pots } = this.state;
-
-        console.log(pots);
 
         return (
 

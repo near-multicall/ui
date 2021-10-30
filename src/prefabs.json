@@ -1,0 +1,82 @@
+{
+    "ingredients" : [
+        {
+            "family" : "ref-finance",
+            "name" : "withdraw",
+            "info" : "withdraws fund from ref-finance to a specified adress",
+            "icon" : "ref_finance_logo",
+            "color" : "linear-gradient(to top, #00c08b, #009289, #006474, #00384e, #001220)",
+            "addr" : "multicall.lennczar.testnet",
+            "func" : "withdraw_from_ref",
+            "args" : {
+                "ref_address" : {
+                    "type" : "String",
+                    "value" : "ref-finance-101.testnet"
+                },
+                "tokens" : {
+                    "type" : "Array",
+                    "of" : "String",
+                    "value" : [
+                        "nusdc.ft-fin.testnet"
+                    ]
+                },
+                "receiver_id" : {
+                    "type" : "String",
+                    "value" : null
+                },
+                "withdrawal_gas" : {
+                    "type" : "Number",
+                    "value" : 55000000000000,
+                    "min" : 0,
+                    "max" : 150000000000000
+                },
+                "token_transfer_gas" : {
+                    "type" : "Number",
+                    "value" : 4000000000000,
+                    "min" : 0,
+                    "max" : 150000000000000
+                }, 
+                "deposit" : {
+                    "type" : "BigInt",
+                    "value": "1",
+                    "min" : "1",
+                    "max": null
+                }
+            },
+            "gas" : {
+                "type" : "Number",
+                "value" : 95000000000000,
+                "min" : 0,
+                "max" : 270000000000000
+            },
+            "depo" : {
+                "type" : "BigInt",
+                "value" : "0",
+                "min" : "0",
+                "max" : null    
+            }
+        },
+        {
+            "family" : "native",
+            "name" : "custom",
+            "info" : "make a custom contract call",
+            "icon" : "near_logo",
+            "color" : "#ffffff",
+            "addr" : null,
+            "func" : null,
+            "args" : null,
+            "gas" : {
+                "type" : "Number",
+                "value" : 95000000000000,
+                "min" : 0,
+                "max" : 270000000000000
+            },
+            "depo" : {
+                "type" : "BigInt",
+                "value" : "0",
+                "min" : "0",
+                "max" : null    
+            }
+        }
+    ]
+}

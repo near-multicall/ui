@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import './../global.scss'
+import { Preview } from '../components.js'
+import './../global.scss';
 
 export default class Cupboard extends Component {
 
@@ -8,7 +9,8 @@ export default class Cupboard extends Component {
         super(props);
 
         this.state = {
-            pot: null
+            pot: null,
+            previews: null
         };
 
     }
@@ -21,10 +23,10 @@ export default class Cupboard extends Component {
     
     open(newPot) {
 
-        this.setState(
-            { pot: newPot }, 
-            () => this.close("","","","","")
-        );
+        this.setState({ 
+            pot: newPot,
+            previews: this.state.previews || Preview.getAll()
+        });
 
     }
 
@@ -45,12 +47,14 @@ export default class Cupboard extends Component {
 
     render() {
 
-        const { pot } = this.state;
+        const { pot, previews } = this.state;
+
+        console.log(previews);
 
         return pot !== null ? (
 
             <div className="cupboard">
-       
+                { previews }
             </div>
 
         ) : <></>;

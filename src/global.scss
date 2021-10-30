@@ -40,22 +40,37 @@ body, html, #root {
     font-size: size.$large-text;
 }
 
+.cupboard {
+    position: fixed;
+    display: grid;
+    grid-template: 1fr 1fr 1fr  1fr / 1fr 1fr 1fr 1fr;
+    gap: size.$gap;
+    padding: size.$gap;
+    width: size.$cupboard-width;
+    height: size.$cupboard-height;
+    top: calc(50% - 0.5 * size.$cupboard-width - size.$gap);
+    left: calc(50% - 0.5 * size.$cupboard-height - size.$gap);
+    border-radius: size.$ingredient-radius;
+    background-color: color.$dark20;
+}
+
 .recipe {
     display: flex;
-    padding: size.$gap;
     justify-content: center;
     align-items: center;
-    width: calc(100% - 2 * size.$gap);
-    height: calc(100% - 3 * size.$unit - 2 * size.$gap);
+    height: 100%;
 }
 
 .stove {
     display: flex;
     flex-flow: row nowrap;
+    max-width: 100%;
+    max-height: 100%;
 }
 
 .pot {
     position: relative;
+    height: max-content;
 }
 
 .pot:not(:first-of-type)::before {
@@ -101,4 +116,54 @@ body, html, #root {
     font-size: 4 * size.$unit;
     color: color.$text;
     font-family: font.$code;
+}
+
+.preview {
+    display: flex;
+    flex-flow: column nowrap;
+    border-radius: size.$ingredient-radius / 2;
+    box-shadow: 1px 10px 20px 0 rgba(0,0,0,0.2);
+    .icon-container {
+        height: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 2 * size.$unit;
+        padding-bottom: 0;
+        img {
+            height: 100%;
+            max-width: 100%;
+        }
+    }
+    .info {
+        display: none;
+        flex: 1;
+        justify-content: center;
+        align-items: center;
+        padding: size.$gap;
+        color: color.$light-text;
+        font-family: font.$text;
+        font-size: size.$small-text;
+    }
+    .name {
+        display: flex;
+        flex: 1;
+        justify-content: center;
+        align-items: center;
+        color: color.$light-text;
+        font-family: font.$text;
+        font-size: size.$large-text;
+    }
+    &:hover {
+        box-shadow: none;
+        .icon-container {
+            display: none;
+        }
+        .info {
+            display: flex;
+        }
+        .name {
+            display: none;
+        }
+    }
 }

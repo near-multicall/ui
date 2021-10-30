@@ -7,9 +7,7 @@ export default class Ingredient extends Component {
 
         super(props);
 
-        this.state = {
-            ...props
-        };
+        this.state = { };
 
     }
 
