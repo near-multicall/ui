@@ -1,6 +1,7 @@
 @use 'sass/color';
 @use 'sass/size';
 @use 'sass/font';
+@use 'sass/mixin';
 
 // displays
 // alignment
@@ -18,6 +19,22 @@ body, html, #root {
     background-color: color.$light;
 }
 
+a {
+    color: color.$blue !important;
+    cursor: pointer;
+}
+
+button {    
+    padding: 0.5 * size.$gap 2 * size.$gap;
+    background-color: color.$highlight;
+    border: none;
+    border-radius: 0.5 * size.$ingredient-radius;
+    color: color.$text;
+    font-family: font.$text;
+    font-size: size.$large-text;
+    cursor: pointer;
+}
+
 .full-width {
     width: 100%;
     width: -moz-available;          /* WebKit-based browsers will ignore this. */
@@ -26,12 +43,10 @@ body, html, #root {
 }
 
 .header {
+    @include mixin.center-items(space-between);
     position: fixed;
-    display: flex;
     z-index: 2;
     flex-flow: row nowrap;
-    justify-content: space-between;
-    align-items: center;
     padding: 0 size.$unit;
     height: 3 * size.$unit;
     background: color.$dark20;
@@ -43,6 +58,8 @@ body, html, #root {
 .cupboard {
     position: fixed;
     display: grid;
+    justify-content: center;
+    z-index: 2;
     grid-template: 1fr 1fr 1fr  1fr / 1fr 1fr 1fr 1fr;
     gap: size.$gap;
     padding: size.$gap;
@@ -52,13 +69,16 @@ body, html, #root {
     left: calc(50% - 0.5 * size.$cupboard-height - size.$gap);
     border-radius: size.$ingredient-radius;
     background-color: color.$dark20;
+    button {
+        position: absolute;
+        top: size.$gap;
+        right: size.$gap;
+    }
 }
 
 .recipe {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
+    @include mixin.full;
+    @include mixin.center-items;
 }
 
 .stove {
@@ -80,17 +100,64 @@ body, html, #root {
     right: calc(size.$gap + 0.5 * size.$ingredient-width);
     height: 10px;
     width: calc(2 * size.$gap + size.$ingredient-width + 5px);
+    border-radius: 5px;
     background-color: color.$dark;
 }
 
 .ingredient {
     position: relative;
+    display: flex;
+    flex-flow: column nowrap;
     z-index: 1;
-    width: size.$ingredient-width;
-    height: size.$ingredient-height;
+    padding: 0.5 * size.$gap;
+    width: calc(size.$ingredient-width - size.$gap);
+    height: calc(size.$ingredient-height - size.$gap);
     border-radius: size.$ingredient-radius;
     background: color.$green;
     box-shadow: 1px 10px 20px 0 rgba(0,0,0,0.2);
+    * {
+        color: color.$light-text;
+        font-family: font.$text;
+    }
+    h3 {
+        text-align: center;
+        padding-bottom: 0.5em;
+    }
+    div {
+        @include mixin.no-scrollbar;
+        flex: 1;
+        max-height: 100%;
+        overflow-y: scroll;
+        padding: size.$gap 0;
+        border-radius: size.$gap;
+        p, p > p {
+            display: flex;
+            width: 100%;
+            flex-flow: row nowrap;
+            justify-content: space-between;
+            margin-bottom: -0.3em;
+            font-size: size.$small-text;
+            p {
+                padding-left: 1em;
+                &:last-of-type {
+                    margin-bottom: 0.3em;
+                }
+            }
+            span {
+                white-space: nowrap;
+            }
+            .code {
+                @include mixin.no-wrap;
+                padding-left: 1.5em;
+                line-height: 1.85em;
+                font-family: font.$code;
+                font-size: size.$smaller-text;
+            }
+            &.expandable {
+                flex-wrap: wrap;
+            }
+        }
+    }
 }
 
 .ingredient-pseudo {
@@ -104,6 +171,7 @@ body, html, #root {
     left: calc(0.5 * size.$ingredient-width - 5px);
     height: calc(2 * size.$gap + size.$ingredient-height);
     width: 10px;
+    border-radius: 5px;
     background-color: color.$dark;
 
     position: absolute;
@@ -121,7 +189,7 @@ body, html, #root {
 .preview {
     display: flex;
     flex-flow: column nowrap;
-    border-radius: size.$ingredient-radius / 2;
+    border-radius: 0.5 * size.$ingredient-radius;
     box-shadow: 1px 10px 20px 0 rgba(0,0,0,0.2);
     .icon-container {
         height: 50%;
@@ -150,6 +218,7 @@ body, html, #root {
         flex: 1;
         justify-content: center;
         align-items: center;
+        z-index: 2;
         color: color.$light-text;
         font-family: font.$text;
         font-size: size.$large-text;

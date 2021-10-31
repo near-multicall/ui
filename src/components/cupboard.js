@@ -27,19 +27,22 @@ export default class Cupboard extends Component {
             pot: newPot,
             previews: this.state.previews || Preview.getAll()
         });
-
+        
     }
 
-    close(addr, func, args, gas, depo) {
+    close(prefab) {
+
+        if (!prefab) {
+            this.setState({ pot: null });
+            return;
+        }
         
         const { pot } = this.state;
-
-        console.log(pot);
 
         if (RECIPE && pot.getIngredients().length === 0)
             RECIPE.addPot(pot);
 
-        pot.addIngredient(addr, func, args, gas, depo);
+        pot.addIngredient(prefab);
         
         this.setState({ pot: null });
 
@@ -49,13 +52,14 @@ export default class Cupboard extends Component {
 
         const { pot, previews } = this.state;
 
-        console.log(previews);
-
         return pot !== null ? (
 
-            <div className="cupboard">
-                { previews }
-            </div>
+            <>
+                <div className="cupboard">
+                    { previews }
+                    <button onClick={ () => this.close() }>Close</button>
+                </div>
+            </>
 
         ) : <></>;
 

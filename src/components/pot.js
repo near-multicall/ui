@@ -14,22 +14,12 @@ export default class Pot extends Component {
         };
 
     }
-
-    componentDidUpdate() {
-
-        console.log(this.state);
-
-    }
     
-    addIngredient(addr, func, args, gas, depo) {
+    addIngredient(prefab) {
 
         const newIngredient = <Ingredient
             key={ this.state.ingredients.length }    
-            addr={ addr }
-            func={ func }
-            args={ args }
-            gas={ gas }
-            depo={ depo }
+            prefab={ prefab }
         />;
 
         this.setState({
