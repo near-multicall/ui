@@ -1,0 +1,6 @@
+@use 'sass/color';
+
+.themed-input {
+    background-color: color.$dark50;
+    border: none;
+}

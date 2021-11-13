@@ -1,0 +1,18 @@
+@use 'sass/size';
+@use 'sass/color';
+
+.pot {
+    position: relative;
+    height: max-content;
+}
+
+.pot:not(:first-of-type)::before {
+    content: '';
+    position: absolute;
+    top: calc(2 * size.$gap + 0.5 * size.$ingredient-height - 5px);
+    right: calc(size.$gap + 0.5 * size.$ingredient-width);
+    height: 10px;
+    width: calc(2 * size.$gap + size.$ingredient-width + 5px);
+    border-radius: 5px;
+    background-color: color.$dark;
+}

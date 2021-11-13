@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Pot } from '../components.js'
 import './../global.scss'
+import './recipe.scss'
 
 export default class Recipe extends Component {
     

@@ -1,6 +1,7 @@
 import { diffEpochValidators } from 'near-api-js/lib/validators';
 import React, { Component } from 'react'
 import './../global.scss'
+import './ingredient.scss'
 
 export default class Ingredient extends Component {
 
@@ -41,6 +42,27 @@ export default class Ingredient extends Component {
 
     }
 
+    getData() {
+
+        const {
+            name,
+            addr,
+            func,
+            args,
+            gas,
+            depo
+        } = this.state;
+
+        return {
+            addr,
+            func,
+            args,
+            gas,
+            depo
+        }
+
+    }
+
     getAllArgs() {
 
         const { args } = this.state;
@@ -75,7 +97,7 @@ export default class Ingredient extends Component {
                 >
                     { this.props.prefab && 
                         <>
-                            <h3>{ name }</h3><a onClick={ () => EDITOR.open(this) }>edit</a>
+                            <h3>{ name }</h3><a onClick={ () => BOARD.open(this) }>edit</a>
                             <div>
                                 <p><span>Contract address</span><span className="code">{ addr }</span></p>
                                 <p><span>Function name</span><span className="code">{ func }</span></p>

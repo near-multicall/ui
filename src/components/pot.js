@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Ingredient } from '../components.js'
 import './../global.scss'
+import './pot.scss'
 
 export default class Pot extends Component {
 
@@ -46,8 +47,8 @@ export default class Pot extends Component {
                     className="add-ingredient ingredient"
                     onClick={ () => {
 
-                        if (CUPBOARD !== undefined)
-                            CUPBOARD.open(this);
+                        if (FRIDGE !== undefined)
+                            FRIDGE.open(this);
                     
                     } }
                 /> 

@@ -15,10 +15,10 @@
                 },
                 "tokens" : {
                     "type" : "Array",
-                    "of" : "String",
                     "value" : [
                         "nusdc.ft-fin.testnet"
-                    ]
+                    ],
+                    "unit" : "String"
                 },
                 "receiver_id" : {
                     "type" : "String",
@@ -28,32 +28,37 @@
                     "type" : "Number",
                     "value" : 55000000000000,
                     "min" : 0,
-                    "max" : 150000000000000
+                    "max" : 150000000000000,
+                    "unit" : "gas"
                 },
                 "token_transfer_gas" : {
                     "type" : "Number",
                     "value" : 4000000000000,
                     "min" : 0,
-                    "max" : 150000000000000
+                    "max" : 150000000000000,
+                    "unit" : "gas"
                 }, 
                 "deposit" : {
                     "type" : "BigInt",
-                    "value": "1",
+                    "value" : "1",
                     "min" : "1",
-                    "max": null
+                    "max" : null,
+                    "unit" : "yocto" 
                 }
             },
             "gas" : {
                 "type" : "Number",
                 "value" : 95000000000000,
                 "min" : 0,
-                "max" : 270000000000000
+                "max" : 270000000000000,
+                "unit" : "gas"
             },
             "depo" : {
                 "type" : "BigInt",
                 "value" : "0",
                 "min" : "0",
-                "max" : null    
+                "max" : null,
+                "unit" : "yocto"
             }
         },
         {
@@ -69,13 +74,15 @@
                 "type" : "Number",
                 "value" : 95000000000000,
                 "min" : 0,
-                "max" : 270000000000000
+                "max" : 270000000000000,
+                "unit" : "gas"
             },
             "depo" : {
                 "type" : "BigInt",
                 "value" : "0",
                 "min" : "0",
-                "max" : null    
+                "max" : null,
+                "unit" : "yocto"
             }
         }
     ]

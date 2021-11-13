@@ -1,0 +1,11 @@
+@use 'sass/mixin';
+@use 'sass/color';
+
+.fridge {
+    @include mixin.popup;
+    display: grid !important;
+    grid-template: 1fr 1fr 1fr  1fr / 1fr 1fr 1fr 1fr;
+    button {
+        background-color: color.$red;
+    }
+}

@@ -1,0 +1,50 @@
+@use 'sass/size';
+@use 'sass/color';
+
+@mixin full {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+@mixin center-items($x: center, $y: center) {
+    display: flex;
+    justify-content: #{$x};
+    align-items: #{$y};
+}
+
+@mixin no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: -ms-autohiding-scrollbar;
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+@mixin no-wrap {
+    overflow: hidden; 
+    text-overflow: ellipsis;
+    white-space: nowrap;  
+}
+
+@mixin popup {
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    z-index: 2;
+    gap: size.$gap;
+    padding: size.$gap;
+    width: size.$popup-width;
+    height: size.$popup-height;
+    top: calc(50% - 0.5 * size.$popup-width - size.$gap);
+    left: calc(50% - 0.5 * size.$popup-height - size.$gap);
+    border-radius: size.$ingredient-radius;
+    background-color: #ffffff;
+    button, .button-container {
+        position: absolute;
+        bottom: size.$gap;
+        right: size.$gap;
+    }
+}

@@ -1,0 +1,44 @@
+@use 'sass/base';
+@use 'sass/mixin';
+@use 'sass/size';
+@use 'sass/color';
+@use 'sass/font';
+
+.board {
+    @include mixin.popup;
+    @include mixin.center-items(center, stretch);
+    flex-flow: column;
+    gap: size.$gap;
+    .input-container {
+        display: flex;
+        gap: size.$gap;
+        padding: 0 size.$gap;
+        span {
+            font-family: font.$text;
+        }
+        input {
+            flex: 1;
+            height: size.$text;
+            text-align: right;
+            font-family: font.$code;
+            font-size: size.$small-text;
+        }
+        &.indent-children {
+            display: flex;
+            flex-flow: column nowrap;
+            & > div {
+                padding-right: 0;
+            }
+        }
+    }
+    .button-container > button {
+        position: relative;
+        margin-left: size.$gap;
+        &:first-of-type {
+            background-color: color.$green;
+        }
+        &:last-of-type {
+            background-color:  color.$red;
+        }
+    }
+}

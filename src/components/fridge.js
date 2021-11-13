@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
 import { Preview } from '../components.js'
 import './../global.scss';
+import './fridge.scss';
 
-export default class Cupboard extends Component {
+export default class Fridge extends Component {
 
     constructor(props) {
 
@@ -17,11 +18,13 @@ export default class Cupboard extends Component {
 
     componentDidMount() {
 
-        window.CUPBOARD = this;
+        window.FRIDGE = this;
 
     }
     
     open(newPot) {
+
+        BOARD.close(false);
 
         this.setState({ 
             pot: newPot,
@@ -55,7 +58,7 @@ export default class Cupboard extends Component {
         return pot !== null ? (
 
             <>
-                <div className="cupboard">
+                <div className="fridge">
                     { previews }
                     <button onClick={ () => this.close() }>Close</button>
                 </div>

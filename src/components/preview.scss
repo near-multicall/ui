@@ -1,0 +1,54 @@
+@use 'sass/size';
+@use 'sass/color';
+@use 'sass/font';
+
+.preview {
+    display: flex;
+    flex-flow: column nowrap;
+    border-radius: 0.5 * size.$ingredient-radius;
+    box-shadow: 1px 10px 20px 0 rgba(0,0,0,0.2);
+    .icon-container {
+        height: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 2 * size.$unit;
+        padding-bottom: 0;
+        img {
+            height: 100%;
+            max-width: 100%;
+        }
+    }
+    .info {
+        display: none;
+        flex: 1;
+        justify-content: center;
+        align-items: center;
+        padding: size.$gap;
+        color: color.$light-text;
+        font-family: font.$text;
+        font-size: size.$small-text;
+    }
+    .name {
+        display: flex;
+        flex: 1;
+        justify-content: center;
+        align-items: center;
+        z-index: 2;
+        color: color.$light-text;
+        font-family: font.$text;
+        font-size: size.$large-text;
+    }
+    &:hover {
+        box-shadow: none;
+        .icon-container {
+            display: none;
+        }
+        .info {
+            display: flex;
+        }
+        .name {
+            display: none;
+        }
+    }
+}

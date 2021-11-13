@@ -1,0 +1,18 @@
+
+@use 'sass/mixin';
+@use 'sass/size';
+@use 'sass/color';
+@use 'sass/font';
+
+.header {
+    @include mixin.center-items(space-between);
+    position: fixed;
+    z-index: 2;
+    flex-flow: row nowrap;
+    padding: 0 size.$unit;
+    height: 3 * size.$unit;
+    background: color.$dark20;
+    color: color.$text;
+    font-family: font.$text;
+    font-size: size.$large-text;
+}
