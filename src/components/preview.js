@@ -30,11 +30,7 @@ export default class Preview extends Component {
 
         return allPreviews;
 
-    }
-
-    toIngredient() {
-        
-    }
+    }   
 
     render() {
 
@@ -51,7 +47,7 @@ export default class Preview extends Component {
                     <img src={ icons[prefab.icon] } />
                 </div>
                 <span className="info">{ prefab.info }</span>
-                <span className="name">{ prefab.name }</span>          
+                <span className="name">{ prefab.name.value }</span>          
             </div>
 
         );

@@ -2,48 +2,60 @@
     "ingredients" : [
         {
             "family" : "ref-finance",
-            "name" : "withdraw",
             "info" : "withdraws fund from ref-finance to a specified adress",
             "icon" : "ref_finance_logo",
             "color" : "linear-gradient(to top, #00c08b, #009289, #006474, #00384e, #001220)",
-            "addr" : "multicall.lennczar.testnet",
-            "func" : "withdraw_from_ref",
+            "name" : {
+                "type" : "String",
+                "value" : "withdraw"
+            },
+            "addr" : {
+                "type" : "String",
+                "value" : "multicall.lennczar.testnet"
+            },
+            "func" : {
+                "type" : "String",
+                "value" : "withdraw_from_ref"
+            },
             "args" : {
-                "ref_address" : {
-                    "type" : "String",
-                    "value" : "ref-finance-101.testnet"
-                },
-                "tokens" : {
-                    "type" : "Array",
-                    "value" : [
-                        "nusdc.ft-fin.testnet"
-                    ],
-                    "unit" : "String"
-                },
-                "receiver_id" : {
-                    "type" : "String",
-                    "value" : null
-                },
-                "withdrawal_gas" : {
-                    "type" : "Number",
-                    "value" : 55000000000000,
-                    "min" : 0,
-                    "max" : 150000000000000,
-                    "unit" : "gas"
-                },
-                "token_transfer_gas" : {
-                    "type" : "Number",
-                    "value" : 4000000000000,
-                    "min" : 0,
-                    "max" : 150000000000000,
-                    "unit" : "gas"
-                }, 
-                "deposit" : {
-                    "type" : "BigInt",
-                    "value" : "1",
-                    "min" : "1",
-                    "max" : null,
-                    "unit" : "yocto" 
+                "type" : "JSON",
+                "value" : {
+                    "ref_address" : {
+                        "type" : "String",
+                        "value" : "ref-finance-101.testnet"
+                    },
+                    "tokens" : {
+                        "type" : "Array",
+                        "value" : [
+                            "nusdc.ft-fin.testnet"
+                        ],
+                        "unit" : "String"
+                    },
+                    "receiver_id" : {
+                        "type" : "String",
+                        "value" : ""
+                    },
+                    "withdrawal_gas" : {
+                        "type" : "Number",
+                        "value" : 55000000000000,
+                        "min" : 0,
+                        "max" : 150000000000000,
+                        "unit" : "gas"
+                    },
+                    "token_transfer_gas" : {
+                        "type" : "Number",
+                        "value" : 4000000000000,
+                        "min" : 0,
+                        "max" : 150000000000000,
+                        "unit" : "gas"
+                    }, 
+                    "deposit" : {
+                        "type" : "BigInt",
+                        "value" : "1",
+                        "min" : "1",
+                        "max" : null,
+                        "unit" : "yocto" 
+                    }
                 }
             },
             "gas" : {
@@ -63,13 +75,25 @@
         },
         {
             "family" : "native",
-            "name" : "custom",
             "info" : "make a custom contract call",
             "icon" : "near_logo",
             "color" : "#ffffff",
-            "addr" : null,
-            "func" : null,
-            "args" : null,
+            "name" : {
+                "type" : "String",
+                "value" : "custom"
+            },
+            "addr" : {
+                "type" : "String",
+                "value" : ""
+            },
+            "func" : {
+                "type" : "String",
+                "value" : ""
+            },
+            "args" : {
+                "type" : "JSON-String",
+                "value" : ""
+            },
             "gas" : {
                 "type" : "Number",
                 "value" : 95000000000000,

@@ -1,4 +1,3 @@
-import { diffEpochValidators } from 'near-api-js/lib/validators';
 import React, { Component } from 'react'
 import './../global.scss'
 import './ingredient.scss'
@@ -38,7 +37,7 @@ export default class Ingredient extends Component {
 
     set(state) {
 
-        this.setState(state);
+        this.setState(state, () => console.log("set state", state));
 
     }
 
@@ -54,6 +53,7 @@ export default class Ingredient extends Component {
         } = this.state;
 
         return {
+            name,
             addr,
             func,
             args,
@@ -68,8 +68,8 @@ export default class Ingredient extends Component {
         const { args } = this.state;
 
         let allArgs = [];
-        for (let arg in args)
-            allArgs.push(<p key={ arg }><span>{ arg }</span><span className="code">{ args[arg].value }</span></p>);
+        for (let arg in args.value)
+            allArgs.push(<p key={ arg }><span>{ arg }</span><span className="code">{ args.value[arg].value }</span></p>);
 
         return allArgs;
 
@@ -95,12 +95,12 @@ export default class Ingredient extends Component {
                     style={{ backgroundColor: color, backgroundImage: color }}
                     { ...this.props }
                 >
-                    { this.props.prefab && 
+                    { this.props.prefab && name &&
                         <>
-                            <h3>{ name }</h3><a onClick={ () => BOARD.open(this) }>edit</a>
+                            <h3>{ name.value }</h3><a onClick={ () => BOARD.open(this) }>edit</a>
                             <div>
-                                <p><span>Contract address</span><span className="code">{ addr }</span></p>
-                                <p><span>Function name</span><span className="code">{ func }</span></p>
+                                <p><span>Contract address</span><span className="code">{ addr.value }</span></p>
+                                <p><span>Function name</span><span className="code">{ func.value }</span></p>
                                 <p className="expandable"><span>Function arguments</span>{ 
                                     showArgs 
                                     ? <>
@@ -109,8 +109,8 @@ export default class Ingredient extends Component {
                                     </>
                                     : <a onClick={ () => this.setState({ showArgs: true }) } >show</a>
                                 }</p>
-                                <p><span>Allocated gas</span><span className="code">{ gas?.value }</span></p>
-                                <p><span>Attached deposit</span><span className="code">{ depo?.value }</span></p>
+                                <p><span>Allocated gas</span><span className="code">{ gas.value }</span></p>
+                                <p><span>Attached deposit</span><span className="code">{ depo.value }</span></p>
                             </div>
                         </> 
                     }
