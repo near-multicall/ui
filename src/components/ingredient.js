@@ -52,14 +52,14 @@ export default class Ingredient extends Component {
             depo
         } = this.state;
 
-        return {
+        return JSON.parse(JSON.stringify({
             name,
             addr,
             func,
             args,
             gas,
             depo
-        }
+        }));
 
     }
 
