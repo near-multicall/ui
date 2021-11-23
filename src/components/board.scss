@@ -6,28 +6,36 @@
 
 .board {
     @include mixin.popup;
-    @include mixin.center-items(center, stretch);
-    flex-flow: column;
-    gap: size.$gap;
-    .input-container {
-        display: flex;
+    .form {
+        width: 100%;
+        @include mixin.center-items(center, stretch);
+        flex-flow: column;
         gap: size.$gap;
-        padding: 0 size.$gap;
-        span {
-            font-family: font.$text;
-        }
-        input {
-            flex: 1;
-            height: size.$text;
-            text-align: right;
-            font-family: font.$code;
-            font-size: size.$small-text;
-        }
-        &.indent-children {
+        max-width: 70rem;
+        .input-container {
             display: flex;
-            flex-flow: column nowrap;
-            & > div {
-                padding-right: 0;
+            padding: 0 size.$gap;
+            gap: size.$gap;
+            span {
+                font-family: font.$text;
+                &.name {
+                    width: 9rem;
+                    text-align: right;
+                }
+                &.unit {
+                    width: 2rem;
+                    margin-left: -0.5 * size.$gap;
+                }
+            }
+            input, textarea {
+                flex: 1;
+            }
+            &.indent-children {
+                display: flex;
+                flex-flow: column nowrap;
+                & > div {
+                    padding-right: 0;
+                }
             }
         }
     }

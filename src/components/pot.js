@@ -19,7 +19,9 @@ export default class Pot extends Component {
     addIngredient(prefab) {
 
         const newIngredient = <Ingredient
-            key={ this.state.ingredients.length }    
+            key={ this.state.ingredients.length }
+            ingredientid={ this.state.ingredients.length }
+            potid={ this.state.potid }  
             prefab={ prefab }
         />;
 
@@ -34,6 +36,28 @@ export default class Pot extends Component {
         return this.state.ingredients;
 
     }
+
+    // deleteIngredient(ingredientID) {
+
+    //     const { ingredients } = this.state;
+
+    //     if (ingredients.length <= 1)
+    //         RECIPE.deletePot(this.state.potid);
+
+    //     ingredients.splice(ingredientID, 1);
+
+    //     for (let i = ingredientID + 1; i < ingredients.length; i++)
+    //         ingredients[i].setIngredientID(i - 1);
+
+    //     this.setState({ ingredients: ingredients });
+
+    // }
+
+    // setPotID(ID) {
+
+    //     this.setState({ potid: ID });
+
+    // }
 
     render() {
 
@@ -51,7 +75,10 @@ export default class Pot extends Component {
                             FRIDGE.open(this);
                     
                     } }
-                /> 
+                    key={ -1 }
+                    ingredientid={ -1 }
+                    potid={ this.state.potid }
+                />
             </div>
         
         );

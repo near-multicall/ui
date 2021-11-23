@@ -7,7 +7,7 @@
             "color" : "linear-gradient(to top, #00c08b, #009289, #006474, #00384e, #001220)",
             "name" : {
                 "type" : "String",
-                "value" : "withdraw"
+                "value" : "ref-withdraw"
             },
             "addr" : {
                 "type" : "String",
@@ -92,7 +92,7 @@
             },
             "args" : {
                 "type" : "JSON-String",
-                "value" : ""
+                "value" : "{}"
             },
             "gas" : {
                 "type" : "Number",

@@ -4,15 +4,17 @@
 .pot {
     position: relative;
     height: max-content;
-}
-
-.pot:not(:first-of-type)::before {
-    content: '';
-    position: absolute;
-    top: calc(2 * size.$gap + 0.5 * size.$ingredient-height - 5px);
-    right: calc(size.$gap + 0.5 * size.$ingredient-width);
-    height: 10px;
-    width: calc(2 * size.$gap + size.$ingredient-width + 5px);
-    border-radius: 5px;
-    background-color: color.$dark;
+    &:not(:first-of-type)::before {
+        content: '';
+        position: absolute;
+        top: calc(2 * size.$gap + 0.5 * size.$ingredient-height - 0.5 * size.$stroke);
+        right: calc(size.$gap + 0.5 * size.$ingredient-width);
+        height: size.$stroke;
+        width: calc(2 * size.$gap + size.$ingredient-width + 0.5 * size.$stroke);
+        border-radius: 0.5 * size.$stroke;
+        background-color: color.$dark;
+    }
+    &:last-of-type::before {
+        background-color: color.$dark20solid;
+    }
 }

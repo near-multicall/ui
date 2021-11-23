@@ -1,7 +1,7 @@
 import 'regenerator-runtime/runtime'
 import React from 'react'
 import './global.scss'
-import { Header, Recipe, Fridge, Board } from './components.js'
+import { Header, Recipe, Fridge, Board, Cook } from './components.js'
 
 // import { login, logout } from './utils'
 
@@ -16,6 +16,7 @@ export default function App() {
       <Recipe/>
       <Fridge/>
       <Board/>
+      <Cook/>
     </>
   )
 }

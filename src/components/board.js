@@ -114,7 +114,7 @@ export default class Board extends Component {
                 inputContainer = <div className="input-container" key={ key }>
                     { name && <span className="name">{ name }</span> }
                     <textarea 
-                        className="themed-input"
+                        className="themed-textarea"
                         defaultValue={ value }
                         onChange={ e => BOARD.setNewData(key, e.target.value) }
                     ></textarea>
@@ -187,7 +187,9 @@ export default class Board extends Component {
             <>
                 <div className="board">
                     {/* Editable Title */}
-                    { this.createEditor() }
+                    <div className="form">
+                        { this.createEditor() }
+                    </div>
                     <div className="button-container">
                         <button onClick={ () => this.close(true) }>Save</button>
                         <button onClick={ () => this.close(false) }>Close</button>

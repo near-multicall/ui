@@ -8,27 +8,34 @@
     display: flex;
     flex-flow: column nowrap;
     z-index: 1;
-    padding: 0.5 * size.$gap;
-    width: calc(size.$ingredient-width - size.$gap);
-    height: calc(size.$ingredient-height - size.$gap);
+    width: calc(size.$ingredient-width);
+    height: calc(size.$ingredient-height);
     border-radius: size.$ingredient-radius;
     background: color.$green;
     box-shadow: 1px 10px 20px 0 rgba(0,0,0,0.2);
+    overflow: hidden;
     * {
-        color: color.$light-text;
+        color: color.$text;
         font-family: font.$text;
     }
-    h3 {
-        text-align: center;
+    .name {
+        @include mixin.center-items;
+        flex-flow: row nowrap;
+        gap: 0.25 * size.$gap;
+        padding-top: 0.5 * size.$gap;
         padding-bottom: 0.5em;
+        &, * {
+            color: color.$light-text;
+        }
     }
-    div {
+    .data-container {
         @include mixin.no-scrollbar;
         flex: 1;
         max-height: 100%;
         overflow-y: scroll;
-        padding: size.$gap 0;
-        border-radius: size.$gap;
+        padding: 0.5 * size.$gap;
+        padding-bottom: size.$gap;
+        background-color: color.$light50;
         p, p > p {
             display: flex;
             width: 100%;
@@ -62,23 +69,26 @@
 .ingredient-pseudo {
     position: relative;
     margin: 2 * size.$gap size.$gap;
-}
-
-.ingredient-pseudo:not(:first-of-type)::before {
-    content: '';
-    bottom: calc(0.5 * size.$ingredient-height);
-    left: calc(0.5 * size.$ingredient-width - 5px);
-    height: calc(2 * size.$gap + size.$ingredient-height);
-    width: 10px;
-    border-radius: 5px;
-    background-color: color.$dark;
-
-    position: absolute;
-    z-index: 0;
+    &:not(:first-of-type)::before {
+        content: '';
+        bottom: calc(0.5 * size.$ingredient-height);
+        left: calc(0.5 * size.$ingredient-width - 0.5 * size.$stroke);
+        height: calc(2 * size.$gap + size.$ingredient-height);
+        width: size.$stroke;
+        border-radius: 0.5 * size.$stroke;
+        background-color: color.$dark;
+    
+        position: absolute;
+        z-index: 0;
+    }
+    &:last-of-type::before {
+        background-color: color.$dark20solid;
+    }
 }
 
 .add-ingredient {
-    background: color.$dark20;
+    @include mixin.center-items;
+    background: color.$dark20solid;
     box-shadow: none;
     font-size: 4 * size.$unit;
     color: color.$text;

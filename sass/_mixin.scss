@@ -35,13 +35,12 @@
     justify-content: center;
     z-index: 2;
     gap: size.$gap;
-    padding: size.$gap;
-    width: size.$popup-width;
-    height: size.$popup-height;
-    top: calc(50% - 0.5 * size.$popup-width - size.$gap);
-    left: calc(50% - 0.5 * size.$popup-height - size.$gap);
-    border-radius: size.$ingredient-radius;
-    background-color: #ffffff;
+    padding: 12.5vh 12.5%;
+    width: 75%;
+    height: 75vh;
+    top: 0;
+    left: 0;
+    background-color: rgba(255, 255, 255, 0.87);
     button, .button-container {
         position: absolute;
         bottom: size.$gap;

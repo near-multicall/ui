@@ -1,6 +1,25 @@
 @use 'sass/color';
+@use 'sass/size';
+@use 'sass/font';
 
 .themed-input {
-    background-color: color.$dark50;
-    border: none;
+    background-color: #ffffff;
+    height: size.$text;
+    text-align: right;
+    font-family: font.$code;
+    font-size: size.$small-text;
+    border: 1px solid color.$dark;
+}
+
+.themed-textarea {
+    background-color: #ffffff;
+    height: 200px;
+    text-align: left;
+    font-family: font.$code;
+    font-size: size.$small-text;
+    border: 1px solid color.$dark;
+}
+
+.spacer {
+    flex: 1;
 }

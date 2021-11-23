@@ -1,14 +1,16 @@
 $unit: 16px;
 $gap: 32px;
 
+$stroke: 10px;
+
 $smaller-text: 12px;
 $small-text: 14px;
 $text: 18px;
 $large-text: 24px;
 
 $ingredient-width: 400px;
-$ingredient-height: 250px;
-$ingredient-radius: 48px;
+$ingredient-height: 300px;
+$ingredient-radius: 24px;
 
-$popup-width: 75%;
-$popup-height: 75%;
+$popup-width: 100%;
+$popup-height: 100vh;

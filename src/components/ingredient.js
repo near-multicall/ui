@@ -1,4 +1,6 @@
+import { thisExpression } from '@babel/types';
 import React, { Component } from 'react'
+import { Recipe } from '../components';
 import './../global.scss'
 import './ingredient.scss'
 
@@ -14,7 +16,11 @@ export default class Ingredient extends Component {
             args: null,
             gas: null,
             depo: null,
-            showArgs: false
+            showArgs: false,
+            pos: {
+                potID: props.potid,
+                ingredientID: props.ingredientid
+            }
         };
 
     }
@@ -29,15 +35,76 @@ export default class Ingredient extends Component {
             return;
         }
 
-        this.setState({
-            ...this.props.prefab
-        }, () => console.log(this.state));
+        console.log("prefab", this.props.prefab);
+        this.set(this.props.prefab);
 
     }
 
     set(state) {
 
-        this.setState(state, () => console.log("set state", state));
+        this.setState(state, () => RECIPE.updateMulticall(this));
+
+    }
+
+    // setIngredientID(ID) {
+
+    //     this.setState({ ingredientid: ID });
+
+    // }
+
+    toJSON() {
+
+        const {
+            addr,
+            func,
+            args,
+            gas,
+            depo
+        } = this.state;
+
+        return {
+            "addr": addr.value,
+            "func": func.value,
+            "args": this.recursiveToJSON(args),
+            "gas": gas.value,
+            "depo": depo.value
+        }
+
+    }
+
+    recursiveToJSON(args) {
+
+        let json;
+
+        switch (args.type) {
+
+            case "JSON-String":
+                
+                try {
+                    json = JSON.parse(args.value);
+                } catch (e) {
+                    console.error("invalid JSON format", "\nJSON:", args.value, "\nError:", e);
+                }
+
+            break;
+
+            case "JSON": 
+
+                json = {};
+                for (let attr in args.value)
+                    json[attr] = this.recursiveToJSON(args.value[attr]);
+
+            break;
+
+            default:
+
+                json = args.value;
+                
+            break;
+
+        }
+
+        return json;
 
     }
 
@@ -59,7 +126,13 @@ export default class Ingredient extends Component {
             args,
             gas,
             depo
-        }));
+        }))
+
+    }
+
+    getPos() {
+
+        return this.state.pos;
 
     }
 
@@ -95,24 +168,33 @@ export default class Ingredient extends Component {
                     style={{ backgroundColor: color, backgroundImage: color }}
                     { ...this.props }
                 >
-                    { this.props.prefab && name &&
-                        <>
-                            <h3>{ name.value }</h3><a onClick={ () => BOARD.open(this) }>edit</a>
-                            <div>
-                                <p><span>Contract address</span><span className="code">{ addr.value }</span></p>
-                                <p><span>Function name</span><span className="code">{ func.value }</span></p>
-                                <p className="expandable"><span>Function arguments</span>{ 
-                                    showArgs 
-                                    ? <>
-                                        <a onClick={ () => this.setState({ showArgs: false }) } >hide</a>
-                                        { this.getAllArgs() }
-                                    </>
-                                    : <a onClick={ () => this.setState({ showArgs: true }) } >show</a>
-                                }</p>
-                                <p><span>Allocated gas</span><span className="code">{ gas.value }</span></p>
-                                <p><span>Attached deposit</span><span className="code">{ depo.value }</span></p>
-                            </div>
-                        </> 
+                    { this.props.prefab
+                        ? name &&
+                            <>
+                                <div className="name">
+                                    <h3>{ name.value }</h3> 
+                                    - 
+                                    <a onClick={ () => BOARD.open(this) }>edit</a>
+                                    |
+                                    <a>delete</a>
+                                </div>
+                                <div className="data-container">
+                                    <p><span>Contract address</span><span className="code">{ addr.value }</span></p>
+                                    <p><span>Function name</span><span className="code">{ func.value }</span></p>
+                                    <p className="expandable"><span>Function arguments</span>{ 
+                                        showArgs 
+                                        ? <>
+                                            <a onClick={ () => this.setState({ showArgs: false }) } >hide</a>
+                                            { this.getAllArgs() }
+                                        </>
+                                        : <a onClick={ () => this.setState({ showArgs: true }) } >show</a>
+                                    }</p>
+                                    <p><span>Allocated gas</span><span className="code">{ gas.value }</span></p>
+                                    <p><span>Attached deposit</span><span className="code">{ depo.value }</span></p>
+                                </div>
+                            </> 
+                        : <>
+                        </>
                     }
                 </div>
             </div>
