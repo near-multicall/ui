@@ -1,0 +1,8 @@
+.column-container {
+    display: flex;
+    flex-flow: column nowrap;
+}
+
+.tasks-wrapper {
+    flex: 1;
+}

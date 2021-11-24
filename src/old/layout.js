@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import { Pot } from '../components.js'
 import './../global.scss'
-import './recipe.scss'
+import './layout.scss'
 
-export default class Recipe extends Component {
+export default class Layout extends Component {
     
     constructor(props) {
 
@@ -20,7 +20,7 @@ export default class Recipe extends Component {
 
     componentDidMount() {
 
-        window.RECIPE = this;
+        window.LAYOUT = this;
 
     }
     
@@ -93,9 +93,9 @@ export default class Recipe extends Component {
 
         return (
 
-            <div className="recipe">
+            <div className="layout">
 
-                <div className="stove">
+                <div className="dnd-container">
                     { pots }
                 </div>
         

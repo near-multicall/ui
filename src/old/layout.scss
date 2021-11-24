@@ -1,11 +1,11 @@
 @use 'sass/mixin';
 
-.recipe {
+.layout {
     @include mixin.full;
     @include mixin.center-items;
 }
 
-.stove {
+.dnd-container {
     display: flex;
     flex-flow: row nowrap;
     max-width: 100%;
