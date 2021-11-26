@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Draggable } from 'react-beautiful-dnd';
 import { Family } from '../../components';
+import './task.scss'
 
 export default class Task extends Component {
 
@@ -12,16 +13,16 @@ export default class Task extends Component {
                 index={this.props.index}
             >
                 { provided => (
-                    <Family.BaseTask>
-                        <div 
-                            className="task-container"
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                        >
+                    <div 
+                        className="task-wrapper"
+                        {...provided.dragHandleProps}
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                    >
+                        <Family.BaseTask>
                             { this.props.task.content }
-                        </div>
-                    </Family.BaseTask>
+                        </Family.BaseTask>
+                    </div>
                 )}
             </Draggable>
         );

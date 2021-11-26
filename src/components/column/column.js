@@ -11,6 +11,7 @@ export default class Column extends Component {
             <Draggable
                 draggableId={this.props.column.id}
                 index={this.props.index}
+                {...this.props}
             >
                 { provided => (
                     <div 

@@ -1,0 +1,10 @@
+@use 'sass/size';
+
+.task-wrapper {
+    background-color: red;
+    width: size.$task-width;
+    height: size.$task-height;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}

@@ -11,6 +11,9 @@
 
 * {
     margin: 0;
+    font-family: font.$text;
+    // outline: 1px solid aqua;
+    // background-color: rgba(aqua, 0.1);
 }
 
 body, html, #root {
@@ -28,16 +31,8 @@ button {
     padding: 0.5 * size.$gap 2 * size.$gap;
     background-color: color.$highlight;
     border: none;
-    border-radius: 0.5 * size.$ingredient-radius;
     color: color.$text;
     font-family: font.$text;
     font-size: size.$large-text;
     cursor: pointer;
-}
-
-.full-width {
-    width: 100%;
-    width: -moz-available;          /* WebKit-based browsers will ignore this. */
-    width: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */
-    width: fill-available;
 }

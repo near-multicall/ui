@@ -1,8 +1,18 @@
-.column-container {
-    display: flex;
-    flex-flow: column nowrap;
-}
+@use 'sass/size';
+@use 'sass/color';
+@use 'sass/mixin';
 
-.tasks-wrapper {
-    flex: 1;
+.column-container {
+    @include mixin.center-items(flex-start, center);
+    flex-flow: column nowrap;
+    height: 100%;
+    width: size.$task-width;
+    padding: 0 size.$gap;
+    margin-right: size.$gap;
+    // background-color: color.$highlight;
+    .tasks-wrapper {
+        flex: 1;
+        @include mixin.center-items(flex-start);
+        flex-flow: column nowrap;
+    }
 }

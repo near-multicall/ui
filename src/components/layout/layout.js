@@ -17,9 +17,23 @@ export default class Layout extends Component {
 
     }
 
+    componentDidMount() {
+
+        window.LAYOUT = this;
+
+    }
+
+    getTaskID = () => this.taskID;
+
+    getColumnID = () => this.columnID;
+
+    getTasks = () => this.state.tasks;
+
+    getColumns = () => this.state.columns;
+
     onDragEnd = result => {
 
-        const { destination, source, draggableId, droppableId, type } = result;
+        const { destination, source, draggableId, type } = result;
     
         if (!destination)
             return;
@@ -49,6 +63,13 @@ export default class Layout extends Component {
         const start = this.state.columns[source.droppableId];
         const finish = this.state.columns[destination.droppableId];
 
+        if (!start || !finish) {
+
+            console.warn(`Something went wrong when dragging from ${start} to ${finish}`);
+            return;
+
+        }
+
         if (start === finish) {
             
             const newTaskIds = Array.from(start.taskIds);
@@ -77,7 +98,7 @@ export default class Layout extends Component {
 
             // TODO: menu -> 0 -> menu doubs task.
 
-            if (start.id === 'menu-column') {
+            if (start.id === 'menu') {
 
                 const startTaskIds = Array.from(start.taskIds);
 
@@ -108,7 +129,7 @@ export default class Layout extends Component {
 
             }
 
-            if (droppableId === 'trash') {
+            if (finish.id === 'trash') {
 
                 const newState = {
                     ...this.state,
@@ -158,27 +179,18 @@ export default class Layout extends Component {
                     type="column"
                 >
                     { provided => (
-                        <div 
-                            className="layout-container"
-                            {...provided.droppableProps}
-                            ref={provided.innerRef}
-                        >
-                            { this.state.columnOrder.map((columnId, index) => {
-                            
-                                const column = this.state.columns[columnId];
-                                const tasks = column.taskIds.map(taskId => this.state.tasks[taskId]);
+                        <div className="layout-wrapper">
+                            <div 
+                                className="layout-container"
+                                {...provided.droppableProps}
+                                ref={provided.innerRef}
+                            >
+                                { this.state.columnOrder.map((columnId, index) => {
+                                
+                                    const column = this.state.columns[columnId];
+                                    const tasks = column.taskIds.map(taskId => this.state.tasks[taskId]);
 
-                                return column.id == 'menu-column' 
-                                    ? (
-                                        <Menu>
-                                            <Column 
-                                                key={column.id} 
-                                                column={column} 
-                                                tasks={tasks} 
-                                                index={index} 
-                                            />
-                                        </Menu>
-                                    ) : (
+                                    return (
                                         <Column 
                                             key={column.id} 
                                             column={column} 
@@ -187,11 +199,14 @@ export default class Layout extends Component {
                                         />
                                     )
 
-                            }) }
-                            { provided.placeholder }
+                                }) }
+                                { provided.placeholder }
+                            </div>
+                            <div className="empty-container"></div>
                         </div>
                     ) }
                 </Droppable>
+                <Menu layout={this}/>
             </DragDropContext>
         )
 
