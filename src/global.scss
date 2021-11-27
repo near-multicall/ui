@@ -19,7 +19,7 @@
 body, html, #root {
     width: 100%;
     height: 100%;
-    background-color: color.$light;
+    background-color: color.$white;
 }
 
 a {
@@ -29,7 +29,7 @@ a {
 
 button {    
     padding: 0.5 * size.$gap 2 * size.$gap;
-    background-color: color.$highlight;
+    background-color: color.$light;
     border: none;
     color: color.$text;
     font-family: font.$text;

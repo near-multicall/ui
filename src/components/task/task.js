@@ -12,12 +12,18 @@ export default class Task extends Component {
                 draggableId={this.props.task.id} 
                 index={this.props.index}
             >
-                { provided => (
+                { (provided, snapshot) => (
                     <div 
                         className="task-wrapper"
-                        {...provided.dragHandleProps}
                         ref={provided.innerRef}
+                        {...provided.dragHandleProps}
                         {...provided.draggableProps}
+                        style={{
+                            ...provided.draggableProps.style,
+                            zIndex: snapshot.isDragging 
+                                ? 10
+                                : 1
+                        }}
                     >
                         <Family.BaseTask>
                             { this.props.task.content }

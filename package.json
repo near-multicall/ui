@@ -28,6 +28,10 @@
     "shelljs": "~0.8.4"
   },
   "dependencies": {
+    "@emotion/react": "^11.7.0",
+    "@emotion/styled": "^11.6.0",
+    "@mui/icons-material": "^5.2.0",
+    "@mui/material": "^5.2.1",
     "near-api-js": "~0.41.0",
     "react": "~17.0.1",
     "react-beautiful-dnd": "^13.1.0",

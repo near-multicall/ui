@@ -1,5 +1,8 @@
+@use 'sass/color';
+
 .task-container {
     width: 100%;
     height: 100%;
-    background-color: skyblue;
+    background: linear-gradient(to top, #00c08b, #009289, #006474, #00384e, #001220);
+    //background-color: color.$red;
 }

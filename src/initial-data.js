@@ -5,16 +5,10 @@ export const initialData = {
         'task-i3': { id: 'task-i3', content: 'infinite-3' },
         'task-i4': { id: 'task-i4', content: 'infinite-4' },
         'task-i5': { id: 'task-i5', content: 'infinite-5' },
-        'task-t1': { id: 'task-t1', content: 'trash-1' }
     },
     columns: {
         'column-0': {
             id: 'column-0',
-            title: 'Drag here',
-            taskIds: []
-        },        
-        'column-1': {
-            id: 'column-1',
             title: 'Drag here',
             taskIds: []
         },
@@ -26,8 +20,8 @@ export const initialData = {
         'trash': {
             id: 'trash',
             title: 'Delete',
-            taskIds: ['task-t1']
+            taskIds: []
         }
     },
-    columnOrder: ['column-0', 'column-1']
+    columnOrder: ['column-0']
 }

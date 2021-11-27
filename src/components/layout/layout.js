@@ -31,6 +31,63 @@ export default class Layout extends Component {
 
     getColumns = () => this.state.columns;
 
+    // TODO delete elements after exjecting from tasklist / columnlist
+
+    deleteColumn = index => {
+
+        const newColumnOrder = Array.from(this.state.columnOrder);
+        newColumnOrder.splice(index, 1);
+
+        let newState = {
+            ...this.state,
+            columnOrder: newColumnOrder
+        }
+
+        // list should never be empty
+        if (newColumnOrder.length === 0)
+            newState = {
+                ...this.state,
+                columns: {
+                    ...this.state.columns,
+                    [`column-${this.columnID}`]: {
+                        id: `column-${this.columnID}`,
+                        title: 'Drag here',
+                        taskIds: []
+                    }
+                },
+                columnOrder: [`column-${this.columnID++}`]
+            }
+
+        this.setState(newState);
+
+    }
+
+    addColumn = () => {
+
+        const newColumn = {
+            id: `column-${this.columnID}`,
+            title: 'Drag here',
+            taskIds: []
+        };
+
+        const newColumnOrder = Array.from(this.state.columnOrder);
+        newColumnOrder.push(`column-${this.columnID}`);
+
+        const newState = {
+            ...this.state,
+            columns: {
+                ...this.state.columns,
+                [`column-${this.columnID}`]: newColumn
+            },
+            columnOrder: newColumnOrder
+        }
+
+        this.columnID++;
+
+        this.setState(newState);
+
+    }
+
     onDragEnd = result => {
 
         const { destination, source, draggableId, type } = result;
