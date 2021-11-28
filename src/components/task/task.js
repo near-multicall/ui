@@ -5,6 +5,25 @@ import './task.scss'
 
 export default class Task extends Component {
 
+    getTaskType() {
+
+        const { addr, func } = this.props.task;
+
+        switch(addr) {
+
+            case "multicall.lennczar.testnet":
+                switch(func) {
+                    case "withdraw_from_ref":
+                        return <Family.Ref.Withdraw />
+                }
+
+            default:
+                return <Family.BaseTask />
+
+        }
+
+    }
+
     render() {
 
         return (
@@ -25,7 +44,7 @@ export default class Task extends Component {
                                 : 1
                         }}
                     >
-                        <Family.Ref.Withdraw />
+                        { this.getTaskType() }
                     </div>
                 )}
             </Draggable>

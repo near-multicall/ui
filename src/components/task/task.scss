@@ -2,7 +2,7 @@
 
 .task-wrapper {
     width: size.$task-width;
-    height: size.$task-height;
+    min-height: size.$task-height;
     border-radius: size.$task-radius;
     margin-bottom: size.$gap;
     overflow: hidden;

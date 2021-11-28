@@ -6,6 +6,7 @@ import './base.scss';
 
 export default class BaseTask extends Component {
 
+    uniqueClassName = "base-task";
     call;
 
     constructor(json = null) {
@@ -48,7 +49,7 @@ export default class BaseTask extends Component {
 
         return (
             <div 
-                className="task-container"
+                className={`task-container ${this.uniqueClassName}`}
             >
                 <div className="name">
                     <h3>{ name.toString() }</h3> 

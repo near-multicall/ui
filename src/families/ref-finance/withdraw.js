@@ -2,18 +2,18 @@ import { ArgsString, ArgsAccount, ArgsNumber, ArgsArray, ArgsBig, ArgsObject } f
 import Call from "../../utils/call";
 import { toGas } from "../../utils/converter";
 import BaseTask from "../base";
+import "./withdraw.scss";
 
 export default class Withdraw extends BaseTask {
 
-    init(json = null) {
+    uniqueClassName = "ref-withdraw-task";
 
-        const token = new ArgsAccount("nusdc.ft-fin.testnet");
-        const tokens = [token];
+    init(json = null) {
 
         this.call = new Call({
             name: new ArgsString(json?.name ?? "Withdraw from Ref"),
             addr: new ArgsAccount(json?.addr ?? "multicall.lennczar.testnet"),
-            func: new ArgsString(json?.func ?? "withderaw_from_ref"),
+            func: new ArgsString(json?.func ?? "withdraw_from_ref"),
             args: new ArgsObject(json?.args 
                 ? {
                     ref_adress: new ArgsString(json?.args.ref_adress),
@@ -25,7 +25,7 @@ export default class Withdraw extends BaseTask {
                 }
                 : {
                     ref_adress: new ArgsString("ref-finance-101.testnet"),
-                    tokens: new ArgsArray<ArgsAccount>(tokens),
+                    tokens: new ArgsArray(new ArgsAccount("nusdc.ft-fin.testnet")),
                     receiver_id: new ArgsAccount(""),
                     withdrawl_gas: new ArgsNumber(toGas(55), 1, toGas(300), "gas"),
                     token_transfer_gas: new ArgsNumber(toGas(4), 1, toGas(300), "gas"),

@@ -58,8 +58,6 @@ class ArgsAccount extends Args {
 
         super("string", value);
 
-        console.log(value);
-
     }
 
     isValid = () => this.value.match(/^(?=.{2,64}$)(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_])*[a-z\d]+$/);
@@ -129,17 +127,15 @@ class ArgsObject extends Args {
 
 }
 
-class ArgsArray<T = ArgsString> extends Args {
+class ArgsArray extends Args {
 
-    constructor(value: any) {
+    constructor() {
 
-        super("array", value);
-
-        console.log(value);
+        super("array", [...arguments]);
 
     }
 
-    toString = () => console.log(this.value);// JSON.stringify(this.value.map(x => x.toString()), null, "  ");
+    toString = () => this.value.map(x => x.toString());
 
 }
 
