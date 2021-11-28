@@ -1,8 +1,67 @@
 @use 'sass/color';
+@use 'sass/size';
+@use 'sass/font';
+@use 'sass/mixin';
 
 .task-container {
+    position: relative;
+    display: flex;
+    flex-flow: column nowrap;
     width: 100%;
     height: 100%;
-    background: linear-gradient(to top, #00c08b, #009289, #006474, #00384e, #001220);
-    //background-color: color.$red;
+    border-radius: size.$task-radius;
+    background: color.$green;
+    overflow: hidden;
+    * {
+        color: color.$text;
+        font-family: font.$text;
+    }
+    .name {
+        @include mixin.center-items;
+        flex-flow: row nowrap;
+        gap: 0.25 * size.$gap;
+        padding-top: 0.5 * size.$gap;
+        padding-bottom: 0.5em;
+        &, * {
+            color: color.$light-text;
+        }
+    }
+    .data-container {
+        @include mixin.no-scrollbar;
+        flex: 1;
+        max-height: 100%;
+        overflow-y: scroll;
+        padding: 0.5 * size.$gap;
+        padding-bottom: size.$gap;
+        background-color: rgba(color.$light, 0.5);
+        pre.code {
+            padding: 0.5em;
+            margin: 0.5em;
+            background-color: rgba(color.$lightest, 1);
+            border-radius: 0.5 * size.$task-radius;
+            font-family: font.$code;
+            font-size: size.$smaller-text;
+        }
+        p {
+            display: flex;
+            width: 100%;
+            flex-flow: row nowrap;
+            justify-content: space-between;
+            margin-bottom: -0.3em;
+            font-size: size.$small-text;
+            span {
+                white-space: nowrap;
+            }
+            .code {
+                @include mixin.no-wrap;
+                padding-left: 1.5em;
+                line-height: 1.85em;
+                font-family: font.$code;
+                font-size: size.$smaller-text;
+            }
+            &.expandable {
+                flex-wrap: wrap;
+            }
+        }
+    }
 }

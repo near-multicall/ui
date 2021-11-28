@@ -33,6 +33,7 @@
         position: absolute;
         top: 0.5 * size.$gap;
         right: 0.5 * size.$gap;
+        cursor: pointer;
     }
     &:not(:last-of-type) > .add-column {
         opacity: 0;
@@ -43,6 +44,7 @@
         top: 0.5 * size.$gap;
         right: -1 * size.$gap;
         transition: opacity 200ms ease-in-out;
+        cursor: pointer;
     }
     .tasks-wrapper {
         flex: 1;
@@ -50,7 +52,7 @@
         width: 100%;
         flex-flow: column nowrap;
     }
-    // &:not(:first-of-type)[showPseudo="yes"]::before {
+    // &:not(:first-of-type)[showpseudo="yes"]::before {
     //     content: '';
     //     position: absolute;
     //     top: calc(size.$gap + 0.5 * size.$task-height - 0.5 * size.$stroke);

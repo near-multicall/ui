@@ -12,15 +12,15 @@ export default abstract class Args {
 
     type: string;
     value: any;
-    min: number | null;
-    max: number | null;
+    min: number | BigInt | null;
+    max: number | BigInt | null;
     unit: string | null;
 
     constructor(
         type: string, 
         value: any, 
-        min?: number | null, 
-        max?: number | null,
+        min?: number | BigInt | null, 
+        max?: number | BigInt | null,
         unit?: string | null
     ) {
 
@@ -37,6 +37,8 @@ export default abstract class Args {
     }
 
     toString = () => this.value.toString();
+
+    getUnit = () => this.unit;
 
 }
 
@@ -56,14 +58,13 @@ class ArgsAccount extends Args {
 
         super("string", value);
 
-        if (!ArgsAccount.isValid(value))
-            console.error(`invalid accountID ${value}`);
+        console.log(value);
 
     }
 
-    static isValid = (value: string) => value.match(/^(?=.{2,64}$)(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_])*[a-z\d]+$/);
+    isValid = () => this.value.match(/^(?=.{2,64}$)(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_])*[a-z\d]+$/);
 
-    toUrl = net => `https://wallet.near.org/profile/${super.value}`; // TODO: Add testnet
+    toUrl = net => `https://wallet.near.org/profile/${this.value}`; // TODO: Add testnet
 
 }
 
@@ -84,19 +85,22 @@ class ArgsNumber extends Args {
 
 class ArgsBig extends Args {
 
+    big: BigInt;
+
     constructor(
         value: string, 
-        min?: string | null, 
-        max?: string | null, 
+        min: string = null, 
+        max: string = null, 
         unit?: string | null
     ) {
 
-        super("big", value, null, null, unit);
+        super("big", value, (min !== null) ? BigInt(min) : null, (max !== null) ? BigInt(max) : null, unit);
 
-        if (min != null || max != null)
-            console.warn(`min & max parameter for ArgsBig not yet implemented.`);
+        this.big = BigInt(value);
 
     }
+
+    isValid = () => (!this.min || this.big >= this.min) && (!this.max || this.big <= this.max) 
 
 }
 
@@ -108,32 +112,34 @@ class ArgsObject extends Args {
 
         for (let k in value)
             if (!(value[k] instanceof Args))
-                console.error(`all childs of ArgsObject need to be of type Args (or extending Args)`)
-
+                console.error(`all children of ArgsObject need to be of type Args (or extending Args), ${value[k]} is of type ${typeof value[k]}`);
+            
     }
 
     toString = () => {
 
         let res = {};
 
-        for (let k in super.value)
-            res[k] = super.value[k].toString();
+        for (let k in this.value)
+            res[k] = this.value[k].toString();
 
-        return res;
+        return JSON.stringify(res, null, "  ");
 
     }
 
 }
 
-class ArgsArray<T = string> extends Args {
+class ArgsArray<T = ArgsString> extends Args {
 
-    constructor(value: Array<T>) {
+    constructor(value: any) {
 
         super("array", value);
 
+        console.log(value);
+
     }
 
-    toString = () => super.value.map(x => x.toString());
+    toString = () => console.log(this.value);// JSON.stringify(this.value.map(x => x.toString()), null, "  ");
 
 }
 
@@ -143,15 +149,21 @@ class ArgsJSON extends Args {
 
         super("json", value);
 
-        if (!ArgsJSON.isValid(value))
-            console.error(`invalid JSON ${value}`);
+    }
+
+    toString = () => {
+        
+        if (!this.isValid())
+            console.error(`invalid JSON ${this.value}`);
+        else
+            return JSON.stringify(JSON.parse(this.value), null, "  ");
 
     }
 
-    static isValid = (value: string) => {
+    isValid = () => {
 
         try {
-            JSON.parse(value);
+            JSON.parse(this.value);
         } catch(e) {
             return false;
         }

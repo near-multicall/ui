@@ -3,7 +3,8 @@ import {
     ArgsAccount,
     ArgsNumber,
     ArgsBig, 
-    ArgsObject
+    ArgsObject,
+    ArgsJSON
 } from './args';
 
 export default class Call {
@@ -11,18 +12,25 @@ export default class Call {
     name: ArgsString;
     addr: ArgsAccount;
     func: ArgsString;
-    args: ArgsObject;
+    args: ArgsObject | ArgsJSON;
     gas: ArgsNumber;
     depo: ArgsBig;
 
-    constructor(
+    constructor({
+        name,
+        addr,
+        func,
+        args,
+        gas,
+        depo
+    }: {
         name: ArgsString,
         addr: ArgsAccount,
         func: ArgsString,
-        args: ArgsObject,
+        args: ArgsObject | ArgsJSON,
         gas: ArgsNumber,
         depo: ArgsBig
-    ) {
+    }) {
 
         this.name = name;
         this.addr = addr;

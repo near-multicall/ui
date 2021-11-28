@@ -25,9 +25,7 @@ export default class Task extends Component {
                                 : 1
                         }}
                     >
-                        <Family.BaseTask>
-                            { this.props.task.content }
-                        </Family.BaseTask>
+                        <Family.Ref.Withdraw />
                     </div>
                 )}
             </Draggable>

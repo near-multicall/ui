@@ -19,7 +19,7 @@ export default class Column extends Component {
                 { (provided, snapshot) => 
                     <div 
                         className="column-container"
-                        showPseudo={ snapshot.isDragging
+                        showpseudo={ snapshot.isDragging
                             ? "no"
                             : "yes"
                         }
