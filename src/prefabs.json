@@ -108,6 +108,96 @@
                 "max" : null,
                 "unit" : "yocto"
             }
+        },
+        {
+            "family" : "native",
+            "info" : "ft_transfer_call for token contracts",
+            "icon" : "near_logo",
+            "color" : "#ffffff",
+            "name" : {
+                "type" : "String",
+                "value" : "transfer"
+            },
+            "addr" : {
+                "type" : "String",
+                "value" : "wrap.near"
+            },
+            "func" : {
+                "type" : "String",
+                "value" : "ft_transfer_call"
+            },
+            "args" : {
+                "type" : "JSON",
+                "value" : {
+                    "receiver_id" : {
+                        "type" : "String",
+                        "value" : "v2.ref-finance.near"
+                    },
+                    "amount" : {
+                        "type" : "BigInt",
+                        "value" : "1000000000000000000000000",
+                        "min" : "0",
+                        "max" : null,
+                        "unit" : "yocto" 
+                    },
+                    "msg" : {
+                        "type" : "JSON",
+                        "value" : {
+                            "force" : {
+                                "type" : "Number",
+                                "value" : 0,
+                                "min" : 0,
+                                "max" : null,
+                                "unit" : null
+                            },
+                            "actions" : {
+                                "type" : "Array",
+                                "value" : [
+                                    {
+                                        "pool_id" : {
+                                            "type" : "Number",
+                                            "value" : null,
+                                            "min" : 0,
+                                            "max" : null,
+                                            "unit" : null 
+                                        },
+                                        "token_in" : {
+                                            "type" : "String",
+                                            "value" : "wrap.near"
+                                        },
+                                        "token_out" : {
+                                            "type" : "String",
+                                            "value" : "marmaj.tkn.near"
+                                        },
+                                        "min_amount_out" : {
+                                            "type" : "BigInt",
+                                            "value" : null,
+                                            "min" : 0,
+                                            "max" : null,
+                                            "unit" : null
+                                        }
+                                    }
+                                ],
+                                "unit" : "JSON"
+                            }
+                        }
+                    }
+                }
+            },
+            "gas" : {
+                "type" : "Number",
+                "value" : 40000000000000,
+                "min" : 0,
+                "max" : 270000000000000,
+                "unit" : "gas"
+            },
+            "depo" : {
+                "type" : "BigInt",
+                "value" : "1",
+                "min" : "0",
+                "max" : null,
+                "unit" : "yocto"
+            }
         }
     ]
 }
