@@ -1,6 +1,7 @@
 @use 'sass/mixin';
 @use 'sass/size';
 @use 'sass/color';
+@use 'sass/animation';
 
 .layout-wrapper {
     display: flex;
@@ -15,7 +16,13 @@
         width: auto;
     }
     .empty-container {
-        flex: 0 0  calc(4 * size.$gap + size.$task-width);
+        flex-shrink: 0;
+        flex-basis: calc(4 * size.$gap + size.$task-width);
+        transition: flex-basis animation.$menu-expand-time ease-out;
+        &.expanded-empty {
+            flex-basis: calc(2 * size.$gap + animation.$menu-expand-width);
+            transition: flex-basis animation.$menu-expand-time ease-out;
+        }
     }
     &::before {
         content: '';

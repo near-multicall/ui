@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import './global.scss'
 import { Layout } from './components.js'
+import './utils/loader.ts'
 
 // import { login, logout } from './utils'
 

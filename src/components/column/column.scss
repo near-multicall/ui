@@ -2,15 +2,6 @@
 @use 'sass/color';
 @use 'sass/mixin';
 
-@mixin icon {
-    color: color.$lightish;
-    font-size: size.$large-text;
-    &:hover,
-    &:focus {
-        color: color.$dark;
-    }
-}
-
 .column-container {
     flex: 0 0 size.$task-width;
     @include mixin.center-items(flex-start, center);
@@ -24,13 +15,13 @@
     background-color: rgba(color.$lightest, 0.25);
     border-radius: size.$task-radius;
     .drag-handle {
-        @include icon;
+        @include mixin.icon;
         line-height: size.$large-text;
         padding: 0.5 * size.$gap;
         scale: 3 1;
     }
     .delete-column {
-        @include icon;
+        @include mixin.icon;
         position: absolute;
         top: 0.5 * size.$gap;
         right: 0.5 * size.$gap;
@@ -40,7 +31,7 @@
         opacity: 0;
     }
     &:last-of-type > .add-column {
-        @include icon;
+        @include mixin.icon;
         position: absolute;
         top: 0.5 * size.$gap;
         right: -1 * size.$gap;
@@ -53,14 +44,4 @@
         width: 100%;
         flex-flow: column nowrap;
     }
-    // &:not(:first-of-type)[showpseudo="yes"]::before {
-    //     content: '';
-    //     position: absolute;
-    //     top: calc(size.$gap + 0.5 * size.$task-height - 0.5 * size.$stroke);
-    //     right: calc(0.5  * size.$task-width + size.$gap );
-    //     height: size.$stroke;
-    //     width: calc(3 * size.$gap + size.$task-width + 1.5 * size.$stroke);
-    //     border-radius: 0.5 * size.$stroke;
-    //     background-color: color.$dark;
-    // }
 }

@@ -62,7 +62,9 @@ class ArgsAccount extends Args {
 
     isValid = () => this.value.match(/^(?=.{2,64}$)(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_])*[a-z\d]+$/);
 
-    toUrl = net => `https://wallet.near.org/profile/${this.value}`; // TODO: Add testnet
+    toNet = () => this.value.split(".").pop() === "testnet" ? "testnet" : "mainnet";
+
+    toUrl = (net = this.toNet()) => `https://explorer.${net}.near.org/accounts/${this.value}`;
 
 }
 

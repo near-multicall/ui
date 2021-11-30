@@ -1,12 +1,30 @@
 import React, { Component } from 'react'
 import { Droppable } from 'react-beautiful-dnd';
+import Icon from '@mui/material/Icon';
 import { Column } from '../../components.js'
 import './menu.scss';
 
 export default class Menu extends Component {
 
+    constructor(props) {
+
+        super(props);
+
+        this.state = {
+            export: false
+        }
+
+    }
+
+    componentDidMount() {
+
+        window.MENU = this;
+
+    }
 
     render() {
+
+        const { expanded } = this.state;
 
         const LAYOUT = this.props.layout; // ususally global parameter
 
@@ -14,7 +32,7 @@ export default class Menu extends Component {
             trashColumn = LAYOUT.getColumns()['trash'];
 
         return (
-            <div className="menu-container">
+            <div className={`menu-container ${expanded ? "expanded-menu" : ""}`}>
                 <div className="menu-column-wrapper">
                     <Droppable
                         droppableId="special"
@@ -48,6 +66,17 @@ export default class Menu extends Component {
                             </div>
                         ) }
                     </Droppable>
+                    <div className={`toggle-size ${expanded ? "collapse" : "expand"}`}>
+                        <Icon
+                            className="icon"
+                            onClick={ () => {
+                                LAYOUT.setExpanded(!expanded);
+                                this.setState({ expanded: !expanded });
+                            }}
+                        >
+                            navigate_before
+                        </Icon>
+                    </div>
                 </div>
             </div>
         );

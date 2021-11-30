@@ -1,6 +1,7 @@
 @use 'sass/color';
 @use 'sass/size';
 @use 'sass/mixin';
+@use 'sass/animation';
 
 .menu-container {
     position: fixed;
@@ -13,13 +14,45 @@
     box-shadow: 1px 10px 20px 0 rgba(0,0,0,0.2);
     border-radius: size.$task-radius;
     z-index: 2;
+    transition: width animation.$menu-expand-time ease-out;
     .menu-column-wrapper {
         @include mixin.center-items;
-        height: 100%;
+        height: calc(100% - 2 * size.$gap);
+        padding: size.$gap;
         & > div {
             height: 100%;
         }
     }
+}
+
+.toggle-size {
+    position: absolute;
+    left: calc(-0.5 * (size.$large-text + size.$gap));
+    top: calc(50% - 0.5 * size.$large-text);
+    width: calc(size.$large-text + size.$gap);
+    transition: transform animation.$menu-expand-time linear;
+    .icon {
+        scale: 1.2;
+    }
+    &.expand {
+        transform: scaleX(1);
+        .icon {
+            @include mixin.icon;
+            font-size: size.$large-text;
+        }
+    }
+    &.collapse {
+        transform: scaleX(-1);
+        .icon {
+            @include mixin.light-icon;
+            font-size: size.$large-text;
+        }
+    }
+}
+
+.expanded-menu {
+    width: animation.$menu-expand-width;
+    transition: width animation.$menu-expand-time ease-out;
 }
 
 .selector {
@@ -28,7 +61,6 @@
     z-index: 2;
     width: size.$task-width;
     max-height: calc(100% - 3 * #{size.$gap} - #{size.$task-height});
-    margin-top: size.$gap;
     overflow-y: scroll;
     border-radius: size.$task-radius;
     .column-container {

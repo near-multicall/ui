@@ -9,6 +9,8 @@ export default class Layout extends Component {
     taskID = 0;
     columnID = 1;
 
+    expanded = false;
+
     constructor(props) {
 
         super(props);
@@ -224,6 +226,13 @@ export default class Layout extends Component {
 
     }
 
+    setExpanded(expanded) {
+
+        this.expanded = expanded;
+        this.forceUpdate();
+
+    }
+
     render() {
 
         return (
@@ -259,7 +268,7 @@ export default class Layout extends Component {
                                 }) }
                                 { provided.placeholder }
                             </div>
-                            <div className="empty-container"></div>
+                            <div className={`empty-container ${this.expanded ? "expanded-empty" : ""}`}></div>
                         </div>
                     ) }
                 </Droppable>

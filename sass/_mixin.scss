@@ -54,3 +54,21 @@
         right: size.$gap;
     }
 }
+
+@mixin icon {
+    color: color.$lightish;
+    font-size: size.$large-text;
+    &:hover,
+    &:focus {
+        color: color.$dark;
+    }
+}
+
+@mixin light-icon {
+    color: color.$lightish;
+    font-size: size.$large-text;
+    &:hover,
+    &:focus {
+        color: color.$lightest;
+    }
+}

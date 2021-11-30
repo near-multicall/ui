@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { ArgsAccount, ArgsBig, ArgsJSON, ArgsNumber, ArgsObject, ArgsArray, ArgsString } from '../utils/args';
+import { ArgsAccount, ArgsBig, ArgsJSON, ArgsNumber, ArgsString } from '../utils/args';
 import Call from '../utils/call';
 import { toGas } from '../utils/converter';
 import './base.scss';
@@ -25,7 +25,7 @@ export default class BaseTask extends Component {
 
         this.call = new Call({
             name: new ArgsString(json?.name ?? "Custom"),
-            addr: new ArgsAccount(json?.addr ?? ""),
+            addr: new ArgsAccount(json?.addr ?? "lennczar.near"),
             func: new ArgsString(json?.func ?? ""),
             args: new ArgsJSON(json?.args ? JSON.stringify(json.args) : '{}'),
             gas: new ArgsNumber(json?.gas ?? 0, 1, toGas(300), "gas"),
@@ -57,7 +57,7 @@ export default class BaseTask extends Component {
                     <a>edit</a>
                 </div>
                 <div className="data-container">
-                    <p><span>Contract address</span><a className="code" href={ addr.toUrl() } >{ addr.toString() }</a></p>
+                    <p><span>Contract address</span><a className="code" href={ addr.toUrl() } target="_blank" rel="noopener noreferrer">{ addr.toString() }</a></p>
                     <p><span>Function name</span><span className="code">{ func.toString() }</span></p>
                     <p className="expandable"><span>Function arguments</span>{ 
                         showArgs
