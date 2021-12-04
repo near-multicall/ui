@@ -1,7 +1,13 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
 import { Droppable } from 'react-beautiful-dnd';
 import Icon from '@mui/material/Icon';
-import { Column } from '../../components.js'
+
+import TabsListUnstyled from '@mui/base/TabUnstyled';
+import TabUnstyled from '@mui/base/TabUnstyled';
+import TabsUnstyled from '@mui/base/TabsUnstyled';
+import TabPanelUnstyled from '@mui/base/TabPanelUnstyled';
+
+import { Column } from '../../components.js';
 import './menu.scss';
 
 export default class Menu extends Component {
@@ -11,7 +17,8 @@ export default class Menu extends Component {
         super(props);
 
         this.state = {
-            export: false
+            expanded: false,
+            tab: "1"
         }
 
     }
@@ -22,9 +29,11 @@ export default class Menu extends Component {
 
     }
 
+    handleChange = (event, newValue) => this.setState({tab: newValue});
+    
     render() {
 
-        const { expanded } = this.state;
+        const { expanded,tab } = this.state;
 
         const LAYOUT = this.props.layout; // ususally global parameter
 
@@ -33,51 +42,70 @@ export default class Menu extends Component {
 
         return (
             <div className={`menu-container ${expanded ? "expanded-menu" : ""}`}>
-                <div className="menu-column-wrapper">
-                    <Droppable
-                        droppableId="special"
-                        type="special"
+                <TabsUnstyled 
+                    value={tab}
+                    className="tabs"
+                >
+                    <TabsListUnstyled 
+                        onChange={this.handleChange} 
+                        aria-label="tab list" 
+                        className="tab-list"
                     >
-                        { provided => (
-                            <div
-                                {...provided.droppableProps}
-                                ref={provided.innerRef}
+                        <TabUnstyled label="Item One" value="1">Build</TabUnstyled>
+                        <TabUnstyled label="Item Two" value="2">Edit</TabUnstyled>
+                        <TabUnstyled label="Item Three" value="3">Export</TabUnstyled>
+                    </TabsListUnstyled>
+                    <TabPanelUnstyled 
+                        value="1" 
+                        className="tab-panel"
+                    >
+                        <div className="menu-column-wrapper">
+                            <Droppable
+                                droppableId="special"
+                                type="special"
                             >
-                                <div 
-                                    className="selector"
+                                { provided => (
+                                    <div
+                                        {...provided.droppableProps}
+                                        ref={provided.innerRef}
+                                    >
+                                        <div 
+                                            className="selector"
+                                        >
+                                            <Column 
+                                                key={'menu'} 
+                                                column={menuColumn} 
+                                                tasks={menuColumn.taskIds.map(taskId => LAYOUT.getTasks()[taskId])} 
+                                                index={LAYOUT.getColumnID()}
+                                            />
+                                        </div>
+                                        <div 
+                                            className="trash"
+                                        >
+                                            <Column 
+                                                key={'trash'} 
+                                                column={trashColumn} 
+                                                tasks={trashColumn.taskIds.map(taskId => LAYOUT.getTasks()[taskId])} 
+                                                index={LAYOUT.getColumnID() + 1}
+                                            />
+                                        </div>
+                                    </div>
+                                ) }
+                            </Droppable>
+                            <div className={`toggle-size ${expanded ? "collapse" : "expand"}`}>
+                                <Icon
+                                    className="icon"
+                                    onClick={ () => {
+                                        LAYOUT.setExpanded(!expanded);
+                                        this.setState({ expanded: !expanded });
+                                    }}
                                 >
-                                    <Column 
-                                        key={'menu'} 
-                                        column={menuColumn} 
-                                        tasks={menuColumn.taskIds.map(taskId => LAYOUT.getTasks()[taskId])} 
-                                        index={LAYOUT.getColumnID()}
-                                    />
-                                </div>
-                                <div 
-                                    className="trash"
-                                >
-                                    <Column 
-                                        key={'trash'} 
-                                        column={trashColumn} 
-                                        tasks={trashColumn.taskIds.map(taskId => LAYOUT.getTasks()[taskId])} 
-                                        index={LAYOUT.getColumnID() + 1}
-                                    />
-                                </div>
+                                    navigate_before
+                                </Icon>
                             </div>
-                        ) }
-                    </Droppable>
-                    <div className={`toggle-size ${expanded ? "collapse" : "expand"}`}>
-                        <Icon
-                            className="icon"
-                            onClick={ () => {
-                                LAYOUT.setExpanded(!expanded);
-                                this.setState({ expanded: !expanded });
-                            }}
-                        >
-                            navigate_before
-                        </Icon>
-                    </div>
-                </div>
+                        </div>
+                    </TabPanelUnstyled>
+                </TabsUnstyled>
             </div>
         );
 

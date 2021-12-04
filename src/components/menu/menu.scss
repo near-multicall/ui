@@ -17,10 +17,39 @@
     transition: width animation.$menu-expand-time ease-out;
     .menu-column-wrapper {
         @include mixin.center-items;
-        height: calc(100% - 2 * size.$gap);
-        padding: size.$gap;
+        height: 100%;
+        padding: 0 size.$gap;
         & > div {
+            display: flex;
+            flex-flow: column nowrap;
             height: 100%;
+        }
+    }
+    .tabs {
+        height: 100%;
+        .tab-list {
+            @include mixin.center-items(space-between);
+            background-color: rgba(color.$darkest, 0.25);
+            border-radius: size.$task-radius;
+            margin: size.$gap;
+            padding: 0;
+            width: calc(100% - 2 * size.$gap);
+            height: size.$tab-list-height;
+            button {
+                padding: 0;
+                width: 30%;
+                font-size: size.$text;
+                color: color.$light-text;
+                background-color: transparent;
+                border-radius: size.$task-radius;
+                &:focus,
+                &:hover {
+                    background-color: rgba(color.$darkest, 0.25);
+                }
+            }
+        }
+        .tab-panel {
+            height: calc(100% - size.$tab-list-height - 2 * size.$gap);
         }
     }
 }
