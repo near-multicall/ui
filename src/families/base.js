@@ -1,4 +1,6 @@
 import React, { Component } from 'react'
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import TextField from '@mui/material/TextField';
 import { ArgsAccount, ArgsBig, ArgsJSON, ArgsNumber, ArgsString } from '../utils/args';
 import Call from '../utils/call';
 import { toGas } from '../utils/converter';
@@ -9,15 +11,17 @@ export default class BaseTask extends Component {
     uniqueClassName = "base-task";
     call;
 
-    constructor(json = null) {
+    constructor(props, json = null) {
        
-        super();
+        super(props);
 
         this.state = {
             showArgs: false
         };
 
         this.init(json);
+
+        console.log(this.props);
 
     }
 
@@ -31,6 +35,167 @@ export default class BaseTask extends Component {
             gas: new ArgsNumber(json?.gas ?? 0, 1, toGas(300), "gas"),
             depo: new ArgsBig(json?.depo ?? "0", "0", null, "yocto")
         });
+
+    }
+
+    // getPos() {
+
+    //     const columns = LAYOUT.getColumns();
+
+    //     for (let col in columns)
+    //         for (let task of columns[col].taskIds)
+    //             if (task === this.props.Task.task.id)
+    //                 return {col, task};
+
+    //     return null;
+
+    // }
+
+    renderEditor() {
+
+        const {
+            name,
+            addr,
+            func,
+            args,
+            gas,
+            depo
+        } = this.call;
+
+        const gasOrTgas = [
+            {
+                value: 'gas',
+                label: 'gas'
+            },
+            {
+                value: 'Tgas',
+                label: 'Tgas'
+            },
+        ];
+
+        const yoctoOrNear = [
+            {
+                value: 'yocto',
+                label: 'yocto'
+            },
+            {
+                value: 'NEAR',
+                label: 'NEAR'
+            },
+        ];
+
+        return (
+            <div className="edit">
+                <TextField
+                    value={ name }
+                    variant="standard"
+                    margin="normal"
+                    onChange={e => {
+                        name.value = e.target.value;
+                        this.forceUpdate();
+                    }}
+                />
+                <TextField
+                    label="Contract address"
+                    value={ addr }
+                    margin="dense"
+                    size="small"
+                    onChange={e => {
+                        addr.value = e.target.value;
+                        this.forceUpdate();
+                    }}
+                />
+                <TextField
+                    label="Function name"
+                    value={ func }
+                    margin="dense"
+                    size="small"
+                    onChange={e => {
+                        func.value = e.target.value;
+                        this.forceUpdate();
+                    }}
+                />
+                <TextField
+                    label="Function arguments"
+                    value={ args }
+                    margin="dense"
+                    size="small"
+                    multiline   
+                    onChange={e => {
+                        args.value = e.target.value;
+                        this.forceUpdate();
+                    }}
+                />
+                <div className="unitInput">
+                    <TextField
+                        label="Allocated gas"
+                        value={ gas }
+                        margin="dense"
+                        size="small"
+                        type="number"
+                        onChange={e => {
+                            gas.value = e.target.value;
+                            this.forceUpdate();
+                        }}
+                    />
+                    <TextField
+                        label="Unit"
+                        value={ gas.unit }
+                        margin="dense"
+                        size="small"
+                        select
+                        onChange={e => {
+                            gas.unit = e.target.value;
+                            EDITOR.forceUpdate();
+                            this.forceUpdate();
+                        }}
+                        SelectProps={{
+                            native: true,
+                        }}
+                    >
+                        { gasOrTgas.map((option) => (
+                            <option key={option.value} value={option.value}>
+                                {option.label}
+                            </option>
+                        )) }
+                    </TextField>
+                </div>
+                <div className="unitInput">
+                    <TextField
+                        label="Attached deposit"
+                        value={ depo }
+                        margin="dense"
+                        size="small"
+                        type="number"
+                        onChange={e => {
+                            depo.value = e.target.value;
+                            this.forceUpdate();
+                        }}
+                    />
+                    <TextField
+                        label="Unit"
+                        value={ depo.unit }
+                        margin="dense"
+                        size="small"
+                        select
+                        onChange={e => {
+                            depo.unit = e.target.value;
+                            EDITOR.forceUpdate();
+                            this.forceUpdate();
+                        }}
+                        SelectProps={{
+                            native: true,
+                        }}
+                    >
+                        { yoctoOrNear.map((option) => (
+                            <option key={option.value} value={option.value}>
+                                {option.label}
+                            </option>
+                        )) }
+                    </TextField>
+                </div>
+            </div>
+        );
 
     }
 
@@ -52,9 +217,15 @@ export default class BaseTask extends Component {
                 className={`task-container ${this.uniqueClassName}`}
             >
                 <div className="name">
-                    <h3>{ name.toString() }</h3> 
-                    - 
-                    <a>edit</a>
+                    <h3>{ name.toString() }</h3>
+                    <EditOutlinedIcon 
+                        className="icon" 
+                        onClick={() => {
+                            console.log(this);
+                            EDITOR.edit(this);
+                            MENU.changeTab(1);
+                        }}
+                    />
                 </div>
                 <div className="data-container">
                     <p><span>Contract address</span><a className="code" href={ addr.toUrl() } target="_blank" rel="noopener noreferrer">{ addr.toString() }</a></p>

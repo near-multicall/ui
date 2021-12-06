@@ -1,6 +1,7 @@
 @use 'sass/color';
 @use 'sass/size';
 @use 'sass/font';
+@use 'sass/mixin';
 
 .themed-input {
     background-color: #ffffff;
@@ -22,4 +23,15 @@
 
 .spacer {
     flex: 1;
+}
+
+.tab-panel {
+    height: calc(100% - size.$tab-list-height - 3 * size.$gap);
+    @include mixin.center-items;
+    padding: 0 size.$gap size.$gap size.$gap;
+    & > div {
+        display: flex;
+        flex-flow: column nowrap;
+        height: 100%;
+    }
 }

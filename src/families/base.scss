@@ -14,17 +14,25 @@
     overflow: hidden;
     * {
         color: color.$text;
-        font-family: font.$text;
     }
     .name {
         @include mixin.center-items;
-        flex-flow: row nowrap;
         font-size: size.$text;
-        gap: 0.25 * size.$gap;
         padding-top: 0.25 * size.$gap;
         padding-bottom: 0.25 * size.$gap;
         &, * {
             color: color.$light-text;
+        }
+        .icon {
+            @include mixin.icon;
+            position: absolute;
+            right: 0.5 * size.$gap;
+            color: color.$light-text;
+            cursor: pointer;
+            &:hover,
+            &:focus {
+                color: color.$lightest;
+            }
         }
     }
     .data-container {
@@ -65,4 +73,99 @@
             }
         }
     }
+}
+
+.edit {
+    @include mixin.full;
+    @include mixin.no-scrollbar;
+    overflow-y: scroll;
+    height: calc(100% - size.$gap);
+    font-size: size.$text;
+    .unitInput {
+        @include mixin.center-items;
+        flex-flow: row nowrap;
+        .MuiTextField-root {
+            &:first-of-type {
+                flex: 2 1 auto;
+            }
+            &:last-of-type {
+                flex: 1 0 40px;
+                margin-left: 0.25 * size.$gap;
+                select {
+                    height: 2rem;
+                    line-height: 1rem;
+                    font-size: size.$small-text;
+                }
+            }
+        }
+        &:last-of-type .MuiTextField-root {
+            &:first-of-type fieldset {
+                border-radius: 0 0 0 size.$task-radius;
+            }
+            &:last-of-type fieldset {
+                border-radius: 0 0 size.$task-radius 0;
+            }
+        }
+    }
+    .MuiTextField-root {
+        label.Mui-focused {
+            color: color.$light-text;
+        }
+        .MuiOutlinedInput-root {
+            input, textarea {
+                color: color.$white;
+                font-family: font.$code;
+                font-size: size.$small-text;
+            }
+            textarea {
+                @include mixin.no-scrollbar;
+                white-space: pre;
+                overflow-x: scroll !important;
+            }
+            fieldset {
+                border-color: color.$lightish;
+                border-width: 2px;
+                background-color: rgba(color.$darkest, 0.25);
+                border-radius: 0;
+            }
+            &:hover fieldset {
+                border-color: color.$light;
+            }
+            &.Mui-focused fieldset {
+                border-color: color.$light;
+            }
+        }
+        .MuiInput-underline {
+            &:hover::before,
+            &::before {
+                border-bottom-color: color.$lightish;
+            }
+            &:hover::after,
+            &::after {
+                border-bottom-color: color.$light;
+            }
+            input {
+                font-weight: 500;
+            }
+        }
+        * {
+            color: color.$light-text;
+            font-size: size.$text;
+        }
+    }
+    & > .MuiTextField-root {
+        &:first-of-type {
+            margin-top: 0;
+        }
+        &:nth-of-type(2) > .MuiOutlinedInput-root > fieldset {
+            border-radius: size.$task-radius size.$task-radius 0 0;
+        }
+        &:last-of-type > .MuiOutlinedInput-root > fieldset {
+            border-radius: 0 0 size.$task-radius size.$task-radius;
+        }
+    }
+}
+
+option {
+    font-size: size.$text;
 }

@@ -14,11 +14,11 @@ export default class Task extends Component {
             case "multicall.lennczar.testnet":
                 switch(func) {
                     case "withdraw_from_ref":
-                        return <Family.Ref.Withdraw />
+                        return <Family.Ref.Withdraw Task={this.props}/>
                 }
 
             default:
-                return <Family.BaseTask />
+                return <Family.BaseTask Task={this.props}/>
 
         }
 

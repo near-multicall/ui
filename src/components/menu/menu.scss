@@ -15,41 +15,41 @@
     border-radius: size.$task-radius;
     z-index: 2;
     transition: width animation.$menu-expand-time ease-out;
-    .menu-column-wrapper {
-        @include mixin.center-items;
-        height: 100%;
-        padding: 0 size.$gap;
-        & > div {
-            display: flex;
-            flex-flow: column nowrap;
-            height: 100%;
-        }
-    }
     .tabs {
         height: 100%;
         .tab-list {
-            @include mixin.center-items(space-between);
+            @include mixin.center-items;
             background-color: rgba(color.$darkest, 0.25);
             border-radius: size.$task-radius;
             margin: size.$gap;
             padding: 0;
             width: calc(100% - 2 * size.$gap);
             height: size.$tab-list-height;
+            overflow: hidden;
             button {
+                flex: 1;
                 padding: 0;
                 width: 30%;
+                height: 100%;
                 font-size: size.$text;
                 color: color.$light-text;
                 background-color: transparent;
-                border-radius: size.$task-radius;
                 &:focus,
                 &:hover {
                     background-color: rgba(color.$darkest, 0.25);
                 }
+                &.active-tab {
+                    color: color.$text;
+                    background-color: color.$light;
+                }
             }
         }
-        .tab-panel {
-            height: calc(100% - size.$tab-list-height - 2 * size.$gap);
+        .hidden {
+            display: none;
+        }
+        .active-panel {
+            width: 100%;
+            height: 100%;
         }
     }
 }
@@ -82,48 +82,4 @@
 .expanded-menu {
     width: animation.$menu-expand-width;
     transition: width animation.$menu-expand-time ease-out;
-}
-
-.selector {
-    flex: 1;
-    @include mixin.no-scrollbar;
-    z-index: 2;
-    width: size.$task-width;
-    max-height: calc(100% - 3 * #{size.$gap} - #{size.$task-height});
-    overflow-y: scroll;
-    border-radius: size.$task-radius;
-    .column-container {
-        width: 100%;
-        padding: 0 !important;
-        margin: 0 !important;
-        background-color: rgba(color.$darkest, 0.25);
-        .tasks-wrapper {
-            flex: 1 1 0;
-            .task-wrapper:last-of-type {
-                margin-bottom: 0 !important;
-            }
-        }
-    }
-}
-
-.trash {
-    flex: 1;
-    z-index: 2;
-    width: 100%;
-    height: size.$task-height;
-    .column-container {
-        justify-content: center;
-        width: 100%;
-        padding: 0 !important;
-        margin-right: 0 !important;
-        background-color: rgba(color.$darkest, 0.25);
-        .tasks-wrapper {
-            flex: 0 0 size.$task-height;
-        }
-        .icon {
-            position: absolute;
-            color: color.$light-text;
-            font-size: size.$huge-text;
-        }
-    }
 }
