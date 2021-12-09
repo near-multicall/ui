@@ -226,6 +226,60 @@ export default class Layout extends Component {
 
     }
 
+    toJSON() {
+
+        let output = [];
+
+        for (let c of this.state.columnOrder) {
+        
+            if (this.state.columns[c].taskIds.length === 0)
+                continue;
+            output.push([]);
+            for (let t of this.state.columns[c].taskIds) {
+                const task = TASKS.find(task => task.id === t);
+                if (task)
+                    output[output.length -1].push(task.instance.current.call.toJSON());
+                else
+                    console.error(`no task with id ${t}`);
+            }
+        
+        }
+
+        return output;
+
+    }
+
+    toBase64() {
+
+        let output = [];
+
+        for (let c of this.state.columnOrder) {
+        
+            if (this.state.columns[c].taskIds.length === 0)
+                continue;
+            output.push([]);
+            for (let t of this.state.columns[c].taskIds) {
+                const task = TASKS.find(task => task.id === t);
+                if (task)
+                    output[output.length -1].push(task.instance.current.call.toBase64());
+                else
+                    console.error(`no task with id ${t}`);
+            }
+        
+        }
+
+        return output;
+
+    }
+
+    export() {
+
+        return JSON.stringify({
+            schedules: this.toBase64()
+        });
+
+    }
+
     setExpanded(expanded) {
 
         this.expanded = expanded;

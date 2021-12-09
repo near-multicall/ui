@@ -1,3 +1,4 @@
+import { Base64 } from 'js-base64';
 import {
     ArgsString, 
     ArgsAccount,
@@ -50,6 +51,30 @@ export default class Call {
             "gas": this.gas.toString(),
             "depo": this.depo.toString()
         });
+
+    }
+
+    toJSON() {
+
+        return {
+            "addr": this.addr.toString(),
+            "func": this.func.toString(),
+            "args": JSON.parse(this.args.toString()),
+            "gas": this.gas.toString(),
+            "depo": this.depo.toString()
+        }
+
+    }
+
+    toBase64() {
+
+        return {
+            "addr": this.addr.toString(),
+            "func": this.func.toString(),
+            "args": Base64.encode(JSON.stringify(JSON.parse(this.args.toString()))),
+            "gas": this.gas.toString(),
+            "depo": this.depo.toString()
+        }
 
     }
 

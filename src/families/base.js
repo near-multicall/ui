@@ -11,7 +11,7 @@ export default class BaseTask extends Component {
     uniqueClassName = "base-task";
     call;
 
-    constructor(props, json = null) {
+    constructor(props) {
        
         super(props);
 
@@ -19,9 +19,7 @@ export default class BaseTask extends Component {
             showArgs: false
         };
 
-        this.init(json);
-
-        console.log(this.props);
+        this.init(this.props.json);
 
     }
 
@@ -37,19 +35,6 @@ export default class BaseTask extends Component {
         });
 
     }
-
-    // getPos() {
-
-    //     const columns = LAYOUT.getColumns();
-
-    //     for (let col in columns)
-    //         for (let task of columns[col].taskIds)
-    //             if (task === this.props.Task.task.id)
-    //                 return {col, task};
-
-    //     return null;
-
-    // }
 
     renderEditor() {
 
