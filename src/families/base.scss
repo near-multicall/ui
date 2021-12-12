@@ -47,12 +47,14 @@
         padding-bottom: size.$gap;
         background-color: rgba(color.$light, 0.5);
         pre.code {
+            @include mixin.no-scrollbar;
             padding: 0.5rem;
             margin: 0.5rem;
             background-color: rgba(color.$lightest, 1);
             border-radius: 0.5 * size.$task-radius;
             font-family: font.$code;
             font-size: size.$smaller-text;
+            overflow-x: scroll;
         }
         p {
             display: flex;
