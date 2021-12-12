@@ -23,6 +23,7 @@ export default class Builder extends Component {
                 >
                     { provided => (
                         <div
+                            className="builder-container"
                             {...provided.droppableProps}
                             ref={provided.innerRef}
                         >

@@ -155,7 +155,8 @@ export default class Layout extends Component {
 
             let newStart;
 
-            // TODO: menu -> 0 -> menu doubs task.
+            if (finish.id === 'menu')
+                return;
 
             if (start.id === 'menu') {
 

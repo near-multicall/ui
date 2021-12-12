@@ -20,6 +20,9 @@
         padding: 0.5 * size.$gap;
         scale: 3 1;
     }
+    .hidden {
+        display: none;
+    }
     .delete-column {
         @include mixin.icon;
         position: absolute;

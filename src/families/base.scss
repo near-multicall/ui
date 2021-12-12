@@ -3,6 +3,10 @@
 @use 'sass/font';
 @use 'sass/mixin';
 
+.base-task {
+    background: color.$green;
+}
+
 .task-container {
     position: relative;
     display: flex;
@@ -10,7 +14,6 @@
     width: 100%;
     min-height: size.$task-height;
     border-radius: size.$task-radius;
-    background: color.$green;
     overflow: hidden;
     * {
         color: color.$text;
@@ -80,9 +83,8 @@
     @include mixin.no-scrollbar;
     overflow-y: scroll;
     height: calc(100% - size.$gap);
-    font-size: size.$text;
     .unitInput {
-        @include mixin.center-items;
+        @include mixin.center-items(center, flex-start);
         flex-flow: row nowrap;
         .MuiTextField-root {
             &:first-of-type {
@@ -108,8 +110,22 @@
         }
     }
     .MuiTextField-root {
-        label.Mui-focused {
-            color: color.$light-text;
+        p.Mui-error {
+            color: color.$red;
+            font-family: font.$text;
+            font-size: size.$small-text;
+            &::before {
+                content: 'Error: '
+            }
+        }
+        label {
+            font-family: font.$text;
+            &.Mui-focused {
+                color: color.$light-text;
+            }
+            &.Mui-error {
+                color: color.$red;
+            }
         }
         .MuiOutlinedInput-root {
             input, textarea {
@@ -124,15 +140,21 @@
             }
             fieldset {
                 border-color: color.$lightish;
-                border-width: 2px;
+                border-width: 1px;
                 background-color: rgba(color.$darkest, 0.25);
                 border-radius: 0;
+                legend > span {
+                    font-size: 0.75em;
+                }
             }
             &:hover fieldset {
                 border-color: color.$light;
             }
             &.Mui-focused fieldset {
                 border-color: color.$light;
+            }
+            &.Mui-error fieldset {
+                border-color: color.$red !important;
             }
         }
         .MuiInput-underline {
@@ -148,10 +170,11 @@
                 font-weight: 500;
             }
         }
-        * {
+        *:not(input) {
             color: color.$light-text;
-            font-size: size.$text;
+            font-size: 1em;
         }
+        font-size: 1.8rem;
     }
     & > .MuiTextField-root {
         &:first-of-type {
@@ -163,6 +186,9 @@
         &:last-of-type > .MuiOutlinedInput-root > fieldset {
             border-radius: 0 0 size.$task-radius size.$task-radius;
         }
+    }
+    .MuiError, * > .MuiError {
+        background-color: red;
     }
 }
 

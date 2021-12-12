@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import TextField from '@mui/material/TextField';
-import { ArgsAccount, ArgsBig, ArgsJSON, ArgsNumber, ArgsString } from '../utils/args';
+import { ArgsAccount, ArgsBig, ArgsJSON, ArgsNumber, ArgsString, ArgsError } from '../utils/args';
 import Call from '../utils/call';
 import { toGas } from '../utils/converter';
 import './base.scss';
@@ -10,16 +10,30 @@ export default class BaseTask extends Component {
 
     uniqueClassName = "base-task";
     call;
+    baseErrors = {
+        addr: new ArgsError("Invalid address", value => ArgsAccount.isValid(value), true),
+        func: new ArgsError("Cannot be empty", value => value != "", true),
+        args: new ArgsError("Invalid JSON", value => JSON.parse(value)),
+        gas: new ArgsError("Amount out of bounds", value => ArgsNumber.isValid(value), true),
+        depo: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value) && value.value !== "" )
+        // TODO regex check inputs, different errors?
+    };
+    errors = this.baseErrors;
 
     constructor(props) {
        
         super(props);
 
         this.state = {
-            showArgs: false
+            showArgs: false,
         };
 
-        this.init(this.props.json);
+        if (window.TEMP) {
+            this.call = TEMP.call;
+            this.state.showArgs = TEMP.showArgs;
+            this.errors = TEMP.errors;
+        } else 
+            this.init(this.props.json);
 
     }
 
@@ -27,7 +41,7 @@ export default class BaseTask extends Component {
 
         this.call = new Call({
             name: new ArgsString(json?.name ?? "Custom"),
-            addr: new ArgsAccount(json?.addr ?? "lennczar.near"),
+            addr: new ArgsAccount(json?.addr ?? ""),
             func: new ArgsString(json?.func ?? ""),
             args: new ArgsJSON(json?.args ? JSON.stringify(json.args) : '{}'),
             gas: new ArgsNumber(json?.gas ?? 0, 1, toGas(300), "gas"),
@@ -46,6 +60,8 @@ export default class BaseTask extends Component {
             gas,
             depo
         } = this.call;
+
+        const errors = this.errors;
 
         const gasOrTgas = [
             {
@@ -79,6 +95,7 @@ export default class BaseTask extends Component {
                         name.value = e.target.value;
                         this.forceUpdate();
                     }}
+                    InputLabelProps={{shrink: true}}
                 />
                 <TextField
                     label="Contract address"
@@ -87,8 +104,13 @@ export default class BaseTask extends Component {
                     size="small"
                     onChange={e => {
                         addr.value = e.target.value;
+                        errors.addr.validOrNull(addr.value);
                         this.forceUpdate();
+                        EDITOR.forceUpdate();
                     }}
+                    error={errors.addr.isBad}
+                    helperText={errors.addr.isBad && errors.addr.message}
+                    InputLabelProps={{shrink: true}}
                 />
                 <TextField
                     label="Function name"
@@ -97,19 +119,28 @@ export default class BaseTask extends Component {
                     size="small"
                     onChange={e => {
                         func.value = e.target.value;
+                        errors.func.validOrNull(func.value);
                         this.forceUpdate();
+                        EDITOR.forceUpdate();
                     }}
+                    error={errors.func.isBad}
+                    helperText={errors.func.isBad && errors.func.message}
+                    InputLabelProps={{shrink: true}}
                 />
                 <TextField
                     label="Function arguments"
-                    value={ args }
+                    value={ errors.args.validOrNull(args.value) || errors.args.intermediate }
                     margin="dense"
                     size="small"
                     multiline   
                     onChange={e => {
                         args.value = e.target.value;
                         this.forceUpdate();
+                        EDITOR.forceUpdate();
                     }}
+                    error={errors.args.isBad}
+                    helperText={errors.args.isBad && errors.args.message}
+                    InputLabelProps={{shrink: true}}
                 />
                 <div className="unitInput">
                     <TextField
@@ -120,8 +151,13 @@ export default class BaseTask extends Component {
                         type="number"
                         onChange={e => {
                             gas.value = e.target.value;
+                            errors.gas.validOrNull(gas);
                             this.forceUpdate();
+                            EDITOR.forceUpdate();
                         }}
+                        error={errors.gas.isBad}
+                        helperText={errors.gas.isBad && errors.gas.message}
+                        InputLabelProps={{shrink: true}}
                     />
                     <TextField
                         label="Unit"
@@ -131,6 +167,7 @@ export default class BaseTask extends Component {
                         select
                         onChange={e => {
                             gas.unit = e.target.value;
+                            errors.gas.validOrNull(gas);
                             EDITOR.forceUpdate();
                             this.forceUpdate();
                         }}
@@ -154,8 +191,13 @@ export default class BaseTask extends Component {
                         type="number"
                         onChange={e => {
                             depo.value = e.target.value;
+                            errors.depo.validOrNull(depo);
                             this.forceUpdate();
+                            EDITOR.forceUpdate();
                         }}
+                        error={errors.depo.isBad}
+                        helperText={errors.depo.isBad && errors.depo.message}
+                        InputLabelProps={{shrink: true}}
                     />
                     <TextField
                         label="Unit"
@@ -165,6 +207,7 @@ export default class BaseTask extends Component {
                         select
                         onChange={e => {
                             depo.unit = e.target.value;
+                            errors.depo.validOrNull(depo);
                             EDITOR.forceUpdate();
                             this.forceUpdate();
                         }}
@@ -195,7 +238,11 @@ export default class BaseTask extends Component {
             depo
         } = this.call;
 
+        const errors = this.errors;
+
         const { showArgs } = this.state;
+
+        const { id } = this.props;
 
         return (
             <div 
@@ -206,8 +253,7 @@ export default class BaseTask extends Component {
                     <EditOutlinedIcon 
                         className="icon" 
                         onClick={() => {
-                            console.log(this);
-                            EDITOR.edit(this);
+                            EDITOR.edit(id);
                             MENU.changeTab(1);
                         }}
                     />
@@ -220,7 +266,10 @@ export default class BaseTask extends Component {
                         ? <a onClick={ () => this.setState({ showArgs: false }) } >hide</a>
                         : <a onClick={ () => this.setState({ showArgs: true }) } >show</a>
                     }</p>
-                    { showArgs && <pre className="code">{ args.toString() }</pre> }
+                    { showArgs && (errors.args.validOrNull(args.value)
+                        ? <pre className="code">{ args.toString() }</pre>
+                        : <pre className="code">{ errors.args.intermediate }</pre>)
+                    }
                     <p><span>Allocated gas</span><span className="code">{ gas.toString() } <span>{ gas.getUnit() }</span></span></p>
                     <p><span>Attached deposit</span><span className="code">{ depo.toString() }  <span>{ depo.getUnit() }</span></span></p>
                 </div>

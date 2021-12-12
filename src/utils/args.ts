@@ -1,3 +1,5 @@
+import { convert } from "./converter";
+
 export default abstract class Args {
 
     private types = {
@@ -60,7 +62,9 @@ class ArgsAccount extends Args {
 
     }
 
-    isValid = () => this.value.match(/^(?=.{2,64}$)(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_])*[a-z\d]+$/);
+    static isValid = value => value.match(/^(?=.{2,64}$)(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_])*[a-z\d]+$/);
+
+    isValid = () => ArgsAccount.isValid(this.value);
 
     toNet = () => this.value.split(".").pop() === "testnet" ? "testnet" : "mainnet";
 
@@ -81,6 +85,17 @@ class ArgsNumber extends Args {
 
     }
 
+    static isValid = (value: ArgsNumber) => {
+
+        const v = convert(value.value, value.unit);
+
+        return (value.min === null || v >= value.min) 
+            && (value.max === null || v <= value.max);
+
+    }
+
+    isValid = () => ArgsNumber.isValid(this);
+
 }
 
 class ArgsBig extends Args {
@@ -100,7 +115,16 @@ class ArgsBig extends Args {
 
     }
 
-    isValid = () => (!this.min || this.big >= this.min) && (!this.max || this.big <= this.max) 
+    static isValid = (value: ArgsBig) => {
+
+        const v = convert(value.value, value.unit);
+
+        return (value.min === null || v >= value.min) 
+            && (value.max === null || v <= value.max);
+
+    }
+
+    isValid = () => ArgsBig.isValid(this);
 
 }
 
@@ -147,6 +171,9 @@ class ArgsJSON extends Args {
 
         super("json", value);
 
+        if (typeof value !== "string")
+            console.error("expected string");
+
     }
 
     toString = () => {
@@ -172,6 +199,43 @@ class ArgsJSON extends Args {
 
 }
 
+class ArgsError {
+
+    isBad: boolean;
+    intermediate: any;
+    message: string;
+    validator: (value: any) => boolean;
+
+    constructor(message: string, validator: (value: any) => boolean, isBad: boolean = false, intermediate: any = null) {
+
+        this.isBad = isBad;
+        this.intermediate = intermediate;
+        this.message = message;
+        this.validator = validator;
+
+    }
+
+    validOrNull(value: any) {
+
+        let valid = true;
+        try {
+            if (!this.validator(value))
+                valid = false;
+        } catch(e) {
+            valid = false;
+            this.intermediate = value;
+        }
+         
+        this.isBad = !valid;
+
+        return valid
+            ? value
+            : null
+
+    }
+
+}
+
 export {
     Args,
     ArgsString, 
@@ -180,5 +244,6 @@ export {
     ArgsBig, 
     ArgsObject, 
     ArgsArray,
-    ArgsJSON
+    ArgsJSON,
+    ArgsError
 }

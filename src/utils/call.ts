@@ -1,4 +1,6 @@
 import { Base64 } from 'js-base64';
+import { convert } from "./converter";
+
 import {
     ArgsString, 
     ArgsAccount,
@@ -48,8 +50,8 @@ export default class Call {
             "addr": this.addr.toString(),
             "func": this.func.toString(),
             "args": this.args.toString(),
-            "gas": this.gas.toString(),
-            "depo": this.depo.toString()
+            "gas": convert(this.gas.value, this.gas.unit).toString(),
+            "depo": convert(this.depo.value, this.depo.unit).toString()
         });
 
     }
@@ -60,8 +62,8 @@ export default class Call {
             "addr": this.addr.toString(),
             "func": this.func.toString(),
             "args": JSON.parse(this.args.toString()),
-            "gas": this.gas.toString(),
-            "depo": this.depo.toString()
+            "gas": convert(this.gas.value, this.gas.unit).toString(),
+            "depo": convert(this.depo.value, this.depo.unit).toString()
         }
 
     }
@@ -72,8 +74,8 @@ export default class Call {
             "addr": this.addr.toString(),
             "func": this.func.toString(),
             "args": Base64.encode(JSON.stringify(JSON.parse(this.args.toString()))),
-            "gas": this.gas.toString(),
-            "depo": this.depo.toString()
+            "gas": convert(this.gas.value, this.gas.unit).toString(),
+            "depo": convert(this.depo.value, this.depo.unit).toString()
         }
 
     }

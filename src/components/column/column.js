@@ -29,8 +29,8 @@ export default class Column extends Component {
                         ) }
                         ref={provided.innerRef}
                     >
-                        {!menuColumn &&
-                            <>
+                        { !menuColumn
+                            ? <>
                                 <Icon
                                     className="drag-handle"
                                     {...provided.dragHandleProps}
@@ -40,6 +40,10 @@ export default class Column extends Component {
                                     onClick={ () => LAYOUT.deleteColumn(this.props.index) }
                                 >delete_outline</Icon>
                             </>
+                            : <div 
+                                className="hidden"
+                                {...provided.dragHandleProps}
+                            ></div>
                         }
                         <Droppable 
                             droppableId={this.props.column.id}

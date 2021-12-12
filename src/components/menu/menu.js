@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Icon from '@mui/material/Icon';
-import { Builder, Editor } from '../../components';
+import { Builder, Editor, Export } from '../../components';
 import './menu.scss';
 
 export default class Menu extends Component {
@@ -59,11 +59,8 @@ export default class Menu extends Component {
                     <div className={`${tab != 1 ? "hidden" : "active-panel"}`} >
                         <Editor/>
                     </div>
-                    <div 
-                        value={2}
-                        className={`${tab != 2 ? "hidden" : "active-panel"} tab-panel`}
-                    >
-                        <p>third</p>
+                    <div className={`${tab != 2 ? "hidden" : "active-panel"}`} >
+                        <Export/>
                     </div>
                     <div className={`toggle-size ${expanded ? "collapse" : "expand"}`}>
                         <Icon

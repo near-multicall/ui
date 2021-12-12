@@ -10,7 +10,7 @@ export default class Editor extends Component {
         super(props);
 
         this.state = {
-            editing: null
+            editingID: null
         }
 
     }
@@ -21,15 +21,17 @@ export default class Editor extends Component {
 
     }
 
-    edit(task) {
+    edit(taskID) {
 
-        this.setState({editing: task});
+        this.setState({editingID: taskID});
 
     }
 
     render() {
 
-        const { editing } = this.state;
+        const { editingID } = this.state;
+
+        const editing = window?.TASKS?.find(t => t.id === editingID)?.instance.current;
 
         return (
             <div 

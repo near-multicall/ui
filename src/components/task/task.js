@@ -13,11 +13,32 @@ export default class Task extends Component {
 
         this.state = {
             addr: this.props.task.addr,
-            func: this.props.task.func,
+            func: this.props.task.func
         };
 
-        this.instance = React.createRef();
         this.id = props.task.id;
+
+        const existent = window?.TASKS?.find(t => t.id === props.task.id);
+
+        if (existent) {
+
+            this.instance = existent.instance;
+            this.child = existent.child;
+
+            window.TEMP = {
+                call: this.instance.current.call,
+                showArgs: this.instance.current.state.showArgs,
+                errors: this.instance.current.errors
+            };
+
+        } else {
+
+            this.instance = React.createRef();
+            this.child = this.getTaskType();
+
+            window.TEMP = null;
+
+        }
 
     }
 
@@ -33,6 +54,7 @@ export default class Task extends Component {
     componentWillUnmount() {
 
         TASKS.splice(TASKS.indexOf(this), 1);
+        EDITOR.forceUpdate();
 
     }
 
@@ -45,11 +67,11 @@ export default class Task extends Component {
             case "multicall.lennczar.testnet":
                 switch(func) {
                     case "withdraw_from_ref":
-                        return <Family.Ref.Withdraw ref={this.instance}/>
+                        return <Family.Ref.Withdraw ref={this.instance} id={this.id}/>
                 }
 
             default:
-                return <Family.BaseTask ref={this.instance}/>
+                return <Family.BaseTask ref={this.instance} id={this.id}/>
 
         }
 
@@ -75,7 +97,8 @@ export default class Task extends Component {
                                 : 1
                         }}
                     >
-                        { this.getTaskType() }
+                        {/* <h1 style={{paddingLeft: "20px"}}>{this.id}</h1> */}
+                        { this.child }
                     </div>
                 )}
             </Draggable>
