@@ -57,10 +57,10 @@ export default class Menu extends Component {
                         <Builder layout={LAYOUT} menu={this} />
                     </div>
                     <div className={`${tab != 1 ? "hidden" : "active-panel"}`} >
-                        <Editor/>
+                        <Editor />
                     </div>
                     <div className={`${tab != 2 ? "hidden" : "active-panel"}`} >
-                        <Export/>
+                        <Export layout={LAYOUT} />
                     </div>
                     <div className={`toggle-size ${expanded ? "collapse" : "expand"}`}>
                         <Icon

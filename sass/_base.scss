@@ -28,6 +28,8 @@
 .tab-panel {
     height: calc(100% - size.$tab-list-height - 3 * size.$gap);
     @include mixin.center-items;
+    flex-flow: column;
+    gap: size.$gap;
     padding: 0 size.$gap size.$gap size.$gap;
     & > div {
         display: flex;

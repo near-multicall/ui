@@ -1,0 +1,42 @@
+@use 'sass/base';
+@use 'sass/color';
+@use 'sass/size';
+@use 'sass/mixin';
+@use 'sass/font';
+
+.section {
+    flex: 1;
+    @include mixin.center-items(flex-start);
+    width: 100%;
+    .header {
+        width: calc(100% - size.$gap);
+        @include mixin.center-items(space-between);
+        h3 {
+            font-size: size.$text;
+            color: color.$light-text;
+            text-align: left;
+        }
+        .icon {
+            @include mixin.light-icon;
+            cursor: pointer;
+            font-size: size.$text;
+        }
+    }
+    .value {
+        flex: 1;
+        width: 100%;
+        background-color: rgba(color.$darkest, 0.25);
+        border-radius: size.$task-radius;
+        .code {
+            padding: 0.5 * size.$gap;
+            overflow: auto;
+            white-space: pre-wrap;
+            white-space: -moz-pre-wrap;
+            white-space: -o-pre-wrap;
+            word-wrap: break-word;
+            font-family: font.$code;
+            font-size: size.$small-text;
+            color: color.$light-text;
+        }
+    }
+}

@@ -11,7 +11,7 @@ export default class Withdraw extends BaseTask {
     uniqueClassName = "ref-withdraw-task";
     errors = {
         ...this.baseErrors,
-        addr: new ArgsError("Invalid address", value => ArgsAccount.isValid(value)),
+        addr: new ArgsError("Invalid address", value => ArgsAccount.isValid(value), !ArgsAccount.isValid(this.call.addr.value)),
         func: new ArgsError("Cannot be empty", value => value != ""),
         gas: new ArgsError("Amount out of bounds", value => ArgsNumber.isValid(value)),
     };
@@ -20,7 +20,7 @@ export default class Withdraw extends BaseTask {
 
         this.call = new Call({
             name: new ArgsString(json?.name ?? "Withdraw from Ref"),
-            addr: new ArgsAccount(json?.addr ?? "multicall.lennczar.testnet"),
+            addr: new ArgsAccount(window?.LAYOUT?.state.addresses.multicall ?? ""),
             func: new ArgsString(json?.func ?? "withdraw_from_ref"),
             /*args: new ArgsObject(json?.args 
                 ? {
@@ -44,6 +44,14 @@ export default class Withdraw extends BaseTask {
             gas: new ArgsNumber(json?.gas ?? toGas(95), 1, toGas(300), "gas"),
             depo: new ArgsBig(json?.depo ?? "0", "0", null, "yocto")
         });
+
+    }
+
+    onAddressesUpdated() {
+
+        this.call.addr.value = LAYOUT.state.addresses.multicall;
+        this.errors.addr.validOrNull(this.call.addr.value);
+        this.forceUpdate();
 
     }
 

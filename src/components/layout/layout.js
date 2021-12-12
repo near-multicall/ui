@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import { initialData } from '../../initial-data.js'
 import { Column, Menu } from '../../components.js'
+import { toGas } from '../../utils/converter.ts';
 import './layout.scss'
 
 export default class Layout extends Component {
@@ -15,7 +16,14 @@ export default class Layout extends Component {
 
         super(props);
         
-        this.state = initialData;
+        this.state = {
+            ...initialData,
+            addresses: {
+                user: "",
+                mutlicall: "",
+                dao: ""
+            }
+        };
 
     }
 
@@ -227,6 +235,20 @@ export default class Layout extends Component {
 
     }
 
+    setAdresses(newAdresses) {
+
+        this.setState({
+            addresses : {
+                ...this.state.addresses,
+                ...newAdresses
+            }
+        }, () => {
+            TASKS?.map(t => t.instance.current.onAddressesUpdated());
+            MENU?.forceUpdate();
+        });
+
+    }
+
     toJSON() {
 
         let output = [];
@@ -273,6 +295,15 @@ export default class Layout extends Component {
 
     }
 
+    toCLI() {
+
+        const multicallAddr = "marmaj.multicall.near";
+        const accountId = "lennczar.near";
+
+        return `near call ${multicallAddr} multicall '{"schedules":${JSON.stringify(this.toBase64())}' --accountId ${accountId} --gas ${toGas(300)}`;
+
+    }
+
     export() {
 
         return JSON.stringify({
@@ -289,6 +320,8 @@ export default class Layout extends Component {
     }
 
     render() {
+
+        console.log("layout updated");
 
         return (
             <DragDropContext

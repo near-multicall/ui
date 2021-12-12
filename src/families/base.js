@@ -50,6 +50,8 @@ export default class BaseTask extends Component {
 
     }
 
+    onAddressesUpdated() {}
+
     renderEditor() {
 
         const {
