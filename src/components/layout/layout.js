@@ -20,7 +20,7 @@ export default class Layout extends Component {
             ...initialData,
             addresses: {
                 user: "",
-                mutlicall: "",
+                multicall: "",
                 dao: ""
             }
         };
@@ -235,12 +235,12 @@ export default class Layout extends Component {
 
     }
 
-    setAdresses(newAdresses) {
+    setAddresses(newAddresses) {
 
         this.setState({
             addresses : {
                 ...this.state.addresses,
-                ...newAdresses
+                ...newAddresses
             }
         }, () => {
             TASKS?.map(t => t.instance.current.onAddressesUpdated());
@@ -297,10 +297,7 @@ export default class Layout extends Component {
 
     toCLI() {
 
-        const multicallAddr = "marmaj.multicall.near";
-        const accountId = "lennczar.near";
-
-        return `near call ${multicallAddr} multicall '{"schedules":${JSON.stringify(this.toBase64())}' --accountId ${accountId} --gas ${toGas(300)}`;
+        return `near call ${this.state.addresses.multicall} multicall '{"schedules":${JSON.stringify(this.toBase64())}}' --accountId ${this.state.addresses.user} --gas ${toGas(300)}`;
 
     }
 
@@ -320,8 +317,6 @@ export default class Layout extends Component {
     }
 
     render() {
-
-        console.log("layout updated");
 
         return (
             <DragDropContext

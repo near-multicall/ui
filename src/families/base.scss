@@ -84,7 +84,6 @@
     @include mixin.full;
     @include mixin.no-scrollbar;
     overflow-y: scroll;
-    height: calc(100% - size.$gap);
     .unitInput {
         @include mixin.center-items(center, flex-start);
         flex-flow: row nowrap;
@@ -188,9 +187,6 @@
         &:last-of-type > .MuiOutlinedInput-root > fieldset {
             border-radius: 0 0 size.$task-radius size.$task-radius;
         }
-    }
-    .MuiError, * > .MuiError {
-        background-color: red;
     }
 }
 
