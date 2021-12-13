@@ -1,4 +1,5 @@
 {
+  "homepage": "http://QuicSwap.github.io/multicall-UI",
   "name": "multicall-UI",
   "version": "0.1.0",
   "license": "UNLICENSED",
@@ -29,6 +30,7 @@
     "typescript": "^4.5.2"
   },
   "dependencies": {
+    "@babel/plugin-transform-runtime": "^7.16.4",
     "@emotion/react": "^11.7.0",
     "@emotion/styled": "^11.6.0",
     "@mui/icons-material": "^5.2.0",
@@ -44,7 +46,7 @@
     "react": "^17.0.2",
     "react-beautiful-dnd": "^13.1.0",
     "react-dom": "^17.0.2",
-    "regenerator-runtime": "~0.13.5"
+    "regenerator-runtime": "^0.13.7"
   },
   "resolutions": {
     "@babel/preset-env": "7.13.8"
