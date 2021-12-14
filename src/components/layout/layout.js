@@ -301,6 +301,29 @@ export default class Layout extends Component {
 
     }
 
+    toErrors() {
+
+        let output = [];
+
+        if (!window?.TASKS)
+            return output;
+
+        const tasks = TASKS
+            .filter(t => !this.state.columns['menu'].taskIds.includes(t.id))
+            .map(t => t.instance.current);
+
+        for (let t of tasks)
+            for (let e in t.errors)
+                if (t.errors[e].isBad)
+                    output.push({
+                        task: t,
+                        message: t.errors[e].message
+                    });
+
+        return output;
+
+    }
+
     export() {
 
         return JSON.stringify({

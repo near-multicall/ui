@@ -136,3 +136,45 @@
         }
     }
 }
+
+
+.error-container {
+    width: 100%;
+    .header {
+        padding-left: 0.5 * size.$gap;
+        h3 {
+            font-size: size.$text;
+            color: color.$red;
+            text-align: left;
+        }
+    }
+    .error-list {
+        width: 100%;
+        display: flex;
+        flex-flow: column nowrap;
+        padding-top: 0.5 * size.$gap;
+        background-color: rgba(color.$darkest, 0.25);
+        border-radius: size.$task-radius;
+        .error {
+            width: 100%;
+            max-width: calc(100% - size.$gap);
+            padding: 0.5 * size.$gap;
+            padding-top: 0;
+            @include mixin.center-items(space-between);
+            gap: 0.5 * size.$gap;
+            flex-flow: row nowrap;
+            font-size: size.$text;
+            color: color.$red;
+            .msg {
+                @include mixin.no-wrap;
+            }
+            .icon {
+                @include mixin.light-icon;
+                cursor: pointer;
+                color: color.$red;
+                font-size: size.$large-text;
+            }
+        }
+    }
+}
+
