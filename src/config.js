@@ -1,9 +1,6 @@
-const CONTRACT_NAME = process.env.CONTRACT_NAME ||'multicall-UI'
+const CONTRACT_NAME = process.env.CONTRACT_NAME || 'multicall.near';
 
 function getConfig(env) {
-
-  // temporarily hardcoding testnet environment
-  env = 'testnet';
 
   switch (env) {
 

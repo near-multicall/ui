@@ -44,7 +44,7 @@ export default class BaseTask extends Component {
             addr: new ArgsAccount(json?.addr ?? ""),
             func: new ArgsString(json?.func ?? ""),
             args: new ArgsJSON(json?.args ? JSON.stringify(json.args) : '{}'),
-            gas: new ArgsNumber(json?.gas ?? 0, 1, toGas(300), "gas"),
+            gas: new ArgsNumber(json?.gas ?? 0, 0, toGas(300), "gas"),
             depo: new ArgsBig(json?.depo ?? "0", "0", null, "yocto")
         });
 

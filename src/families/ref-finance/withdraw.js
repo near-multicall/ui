@@ -4,7 +4,7 @@ import { ArgsAccount, ArgsBig, ArgsJSON, ArgsNumber, ArgsString, ArgsError } fro
 import Call from "../../utils/call";
 import { toGas } from "../../utils/converter";
 import BaseTask from "../base";
-import "./withdraw.scss";
+import "./ref-finance.scss";
 
 export default class Withdraw extends BaseTask {
 

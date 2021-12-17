@@ -1,4 +1,5 @@
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import { ArgsError, ArgsAccount } from '../../utils/args';
 import Icon from '@mui/material/Icon';
 import TextField from '@mui/material/TextField';
 import React, { Component } from 'react';
@@ -6,16 +7,22 @@ import './export.scss';
 
 export default class Export extends Component {
 
-    updateCopyIcon(el) {
+    errors = {
+        user: new ArgsError("Invalid address", value => ArgsAccount.isValid(value), true),
+        dao: new ArgsError("Invalid address", value => ArgsAccount.isValid(value), true),
+        multicall: new ArgsError("Invalid address", value => ArgsAccount.isValid(value), true)
+    };
 
-        if (el.target.innerHTML === 'done')
+    updateCopyIcon(e) {
+
+        if (e.target.innerHTML === 'done')
             return;
 
-        const oldIcon = el.target.innerHTML;
-        el.target.innerHTML = 'done';
+        const oldIcon = e.target.innerHTML;
+        e.target.innerHTML = 'done';
 
         setTimeout(() => {
-            el.target.innerHTML = oldIcon;
+            e.target.innerHTML = oldIcon;
         }, 1000);
         
     }
@@ -24,7 +31,11 @@ export default class Export extends Component {
 
         const LAYOUT = this.props.layout; // ususally global parameter
 
-        const errors = LAYOUT.toErrors();
+        const allErrors = LAYOUT.toErrors();
+        const errors = this.errors;
+
+        for (let e in errors)
+            errors[e].validOrNull(LAYOUT.state.addresses[e]);
 
         return (
             <div 
@@ -42,8 +53,11 @@ export default class Export extends Component {
                                 LAYOUT.setAddresses({
                                     user: e.target.value
                                 });
+                                errors.user.validOrNull(e.target.value);
                                 this.forceUpdate();
                             }}
+                            error={errors.user.isBad}
+                            helperText={errors.user.isBad && errors.user.message}
                             InputLabelProps={{shrink: true}}
                         />
                         <TextField
@@ -55,8 +69,11 @@ export default class Export extends Component {
                                 LAYOUT.setAddresses({
                                     dao: e.target.value
                                 });
+                                errors.dao.validOrNull(e.target.value);
                                 this.forceUpdate();
                             }}
+                            error={errors.dao.isBad}
+                            helperText={errors.dao.isBad && errors.dao.message}
                             InputLabelProps={{shrink: true}}
                         />
                         <TextField
@@ -68,17 +85,20 @@ export default class Export extends Component {
                                 LAYOUT.setAddresses({
                                     multicall: e.target.value
                                 });
+                                errors.multicall.validOrNull(e.target.value);
                                 this.forceUpdate();
                             }}
+                            error={errors.multicall.isBad}
+                            helperText={errors.multicall.isBad && errors.multicall.message}
                             InputLabelProps={{shrink: true}}
                         />
                     </div>
-                    { errors.length > 0 && <div className="error-container">
+                    { allErrors.length > 0 && <div className="error-container">
                         <div className="header">
-                            <h3>{`Errors (${errors.length})`}</h3>
+                            <h3>{`Errors (${allErrors.length})`}</h3>
                         </div>
                         <div className="error-list">
-                            { errors.map((e, i) => 
+                            { allErrors.map((e, i) => 
                                 <div className="error" key={`error-${i}`}>
                                     <p className="msg">
                                         {`[${e.task.call.name}] Error: ${e.message}`}
@@ -99,9 +119,9 @@ export default class Export extends Component {
                             <h3>Multicall args</h3>
                             <Icon 
                                 className="icon"
-                                onClick={ (el) => {
+                                onClick={ e => {
                                     navigator.clipboard.writeText(JSON.stringify({schedules: LAYOUT.toBase64()}));
-                                    this.updateCopyIcon(el); 
+                                    this.updateCopyIcon(e); 
                                 } }
                             >content_copy</Icon> 
                         </div>

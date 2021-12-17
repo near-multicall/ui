@@ -4,7 +4,7 @@ import { ArgsAccount, ArgsBig, ArgsNumber, ArgsString, ArgsObject, ArgsError } f
 import Call from "../../utils/call";
 import { toGas } from "../../utils/converter";
 import BaseTask from "../base";
-import "./transfer.scss";
+import "./near.scss";
 
 export default class Transfer extends BaseTask {
 
@@ -37,7 +37,7 @@ export default class Transfer extends BaseTask {
                     memo: new ArgsString("")
                 }    
             ),
-            gas: new ArgsNumber(json?.gas ?? toGas(3), 0, toGas(300), "gas"),
+            gas: new ArgsNumber(json?.gas ?? toGas(7), 0, toGas(300), "gas"),
             depo: new ArgsBig("1", "1", "1", "yocto")
         });
 
@@ -165,7 +165,7 @@ export default class Transfer extends BaseTask {
                 </div>
                 <TextField
                     label="Memo"
-                    value={ memo }
+                    value={ memo.value }
                     margin="dense"
                     size="small"
                     multiline

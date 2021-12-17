@@ -122,6 +122,24 @@
             }
         }
     }
+    .checkbox {
+        @include mixin.center-items(flex-start, center);
+        flex-flow: row nowrap;
+        width: 100%;
+        p {
+            color: color.$light-text;
+            font-size: size.$small-text;
+        }
+        .MuiCheckbox-root {
+            color: color.$light;
+            &.Mui-checked {
+                color: color.$green;
+            }
+            .MuiSvgIcon-root {
+                font-size: size.$text;
+            }
+        }
+    }
     .MuiTextField-root {
         p.Mui-error {
             color: color.$red;

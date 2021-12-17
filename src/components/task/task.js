@@ -78,6 +78,12 @@ export default class Task extends Component {
                         return <Family.Near.Transfer ref={this.instance} id={this.id}/>        
                 }
 
+            case "ref-finance":
+                switch (func) {
+                    case "swap":
+                        return <Family.Ref.Swap ref={this.instance} id={this.id}/>        
+                }
+
             default:
                 return <Family.BaseTask ref={this.instance} id={this.id}/>
 
