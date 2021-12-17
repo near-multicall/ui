@@ -11,7 +11,7 @@ export default class Transfer extends BaseTask {
     uniqueClassName = "near-transfer-task";
     errors = {
         ...this.baseErrors,
-        addr: new ArgsError("Invalid address", value => ArgsAccount.isValid(value), !ArgsAccount.isValid(this.call.addr.value)),
+        addr: new ArgsError("Invalid address", value => ArgsAccount.isValid(value)),
         func: new ArgsError("Cannot be empty", value => value != ""),
         args: new ArgsError("Invalid JSON", value => true),
         receiver: new ArgsError("Invalid address", value => ArgsAccount.isValid(value), true),
@@ -23,7 +23,7 @@ export default class Transfer extends BaseTask {
 
         this.call = new Call({
             name: new ArgsString(json?.name ?? "FT Transfer"),
-            addr: new ArgsAccount(window?.LAYOUT?.state.addresses.multicall ?? ""),
+            addr: new ArgsAccount(json?.addr ?? "marmaj.tkn.near"),
             func: new ArgsString(json?.func ?? "ft_transfer"),
             args: new ArgsObject(json?.args 
                 ? {
@@ -218,14 +218,6 @@ export default class Transfer extends BaseTask {
                 </div>
             </div>
         );
-
-    }
-
-    onAddressesUpdated() {
-
-        this.call.addr.value = LAYOUT.state.addresses.multicall;
-        this.errors.addr.validOrNull(this.call.addr.value);
-        this.forceUpdate();
 
     }
 

@@ -90,8 +90,16 @@
                 border-width: 1px;
                 background-color: rgba(color.$darkest, 0.25);
                 border-radius: 0;
+                legend {
+                    background-color: color.$dark;
+                    margin-left: -2px;
+                    padding: 2px;
+                    border-radius: 20px;
+                    visibility: visible;
+                }
                 legend > span {
                     font-size: 0.75em;
+                    visibility: hidden;
                 }
             }
             &:hover fieldset {
