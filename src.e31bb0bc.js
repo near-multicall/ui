@@ -85163,7 +85163,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 class Transfer extends _base.default {
   uniqueClassName = "near-transfer-task";
   errors = { ...this.baseErrors,
-    addr: new _args.ArgsError("Invalid address", value => _args.ArgsAccount.isValid(value), !_args.ArgsAccount.isValid(this.call.addr.value)),
+    addr: new _args.ArgsError("Invalid address", value => _args.ArgsAccount.isValid(value)),
     func: new _args.ArgsError("Cannot be empty", value => value != ""),
     args: new _args.ArgsError("Invalid JSON", value => true),
     receiver: new _args.ArgsError("Invalid address", value => _args.ArgsAccount.isValid(value), true),
@@ -85175,7 +85175,7 @@ class Transfer extends _base.default {
     let json = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
     this.call = new _call.default({
       name: new _args.ArgsString(json?.name ?? "FT Transfer"),
-      addr: new _args.ArgsAccount(window?.LAYOUT?.state.addresses.multicall ?? ""),
+      addr: new _args.ArgsAccount(json?.addr ?? "marmaj.tkn.near"),
       func: new _args.ArgsString(json?.func ?? "ft_transfer"),
       args: new _args.ArgsObject(json?.args ? {
         receiver_id: new _args.ArgsAccount(json?.args.receiver_id),
@@ -85351,12 +85351,6 @@ class Transfer extends _base.default {
       key: option.value,
       value: option.value
     }, option.label)))));
-  }
-
-  onAddressesUpdated() {
-    this.call.addr.value = LAYOUT.state.addresses.multicall;
-    this.errors.addr.validOrNull(this.call.addr.value);
-    this.forceUpdate();
   }
 
 }
@@ -85644,7 +85638,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "46607" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "41985" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
