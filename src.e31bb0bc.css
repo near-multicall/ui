@@ -617,7 +617,19 @@ button {
 @import url("https://fonts.googleapis.com/css2?family=Roboto+Mono&family=Titillium+Web:ital,wght@0,200;0,400;0,600;1,400&display=swap");
 @import url("https://fonts.googleapis.com/icon?family=Material+Icons");
 .base-task {
-  background: #93c99e;
+  background: #dcefea;
+}
+.base-task .name {
+  color: #2a2a2a !important;
+}
+.base-task .name h3 {
+  color: #2a2a2a;
+}
+.base-task .name .icon {
+  fill: #2a2a2a !important;
+}
+.base-task * > a {
+  color: #5bbbe3 !important;
 }
 
 .task-container {
@@ -640,7 +652,7 @@ button {
   padding-top: 0.8rem;
   padding-bottom: 0.8rem;
 }
-.task-container .name, .task-container .name * {
+.task-container .name * {
   color: #e0e0e0;
 }
 .task-container .name .icon {
@@ -648,7 +660,7 @@ button {
   font-size: 2.4rem;
   position: absolute;
   right: 1.6rem;
-  color: #e0e0e0;
+  fill: #e0e0e0;
   cursor: pointer;
 }
 .task-container .name .icon:hover, .task-container .name .icon:focus {
@@ -785,8 +797,16 @@ button {
   background-color: rgba(47, 72, 88, 0.25);
   border-radius: 0;
 }
+.edit .MuiTextField-root .MuiOutlinedInput-root fieldset legend {
+  background-color: #4c6773;
+  margin-left: -2px;
+  padding: 2px;
+  border-radius: 20px;
+  visibility: visible;
+}
 .edit .MuiTextField-root .MuiOutlinedInput-root fieldset legend > span {
   font-size: 0.75em;
+  visibility: hidden;
 }
 .edit .MuiTextField-root .MuiOutlinedInput-root:hover fieldset {
   border-color: #b4ccca;
@@ -825,6 +845,24 @@ option {
 }
 .ref-withdraw-task {
   background: linear-gradient(to top, #00c08b, #009289, #006474, #00384e, #001220);
+}
+.multicall-transfer-task {
+  background: #2f4858;
+}
+.near-transfer-task {
+  background: #dcefea;
+}
+.near-transfer-task .name {
+  color: #2a2a2a !important;
+}
+.near-transfer-task .name h3 {
+  color: #2a2a2a;
+}
+.near-transfer-task .name .icon {
+  fill: #2a2a2a;
+}
+.near-transfer-task * > a {
+  color: #5bbbe3 !important;
 }
 
 /*# sourceMappingURL=/src.e31bb0bc.css.map */
