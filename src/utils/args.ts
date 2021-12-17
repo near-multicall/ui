@@ -145,7 +145,7 @@ class ArgsObject extends Args {
         let res = {};
 
         for (let k in this.value)
-            res[k] = this.value[k].toString();
+            res[k] = convert(this.value[k], this.value[k].unit).toString();
 
         return JSON.stringify(res, null, "  ");
 

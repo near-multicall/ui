@@ -64,10 +64,18 @@ export default class Task extends Component {
 
         switch(addr) {
 
-            case "multicall.lennczar.testnet":
+            case "multicall":
                 switch(func) {
                     case "withdraw_from_ref":
                         return <Family.Ref.Withdraw ref={this.instance} id={this.id}/>
+                    case "near_transfer":
+                        return <Family.Multicall.Transfer ref={this.instance} id={this.id}/>
+                }
+
+            case "near":
+                switch (func) {
+                    case "ft_transfer":
+                        return <Family.Near.Transfer ref={this.instance} id={this.id}/>        
                 }
 
             default:

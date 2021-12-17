@@ -3,8 +3,20 @@
 @use 'sass/font';
 @use 'sass/mixin';
 
-.base-task {
-    background: color.$green;
+.base-task  {
+    background: color.$lightest;
+    .name {
+        color: color.$text !important;
+        h3 {
+            color: color.$text;
+        }
+        .icon {
+            fill: color.$text !important;
+        }
+    }
+    * > a {
+        color: darken(color.$blue, 20%) !important;
+    }
 }
 
 .task-container {
@@ -23,14 +35,14 @@
         font-size: size.$text;
         padding-top: 0.25 * size.$gap;
         padding-bottom: 0.25 * size.$gap;
-        &, * {
+        * {
             color: color.$light-text;
         }
         .icon {
             @include mixin.icon;
             position: absolute;
             right: 0.5 * size.$gap;
-            color: color.$light-text;
+            fill: color.$light-text;
             cursor: pointer;
             &:hover,
             &:focus {
@@ -144,8 +156,16 @@
                 border-width: 1px;
                 background-color: rgba(color.$darkest, 0.25);
                 border-radius: 0;
+                legend {
+                    background-color: color.$dark;
+                    margin-left: -2px;
+                    padding: 2px;
+                    border-radius: 20px;
+                    visibility: visible;
+                }
                 legend > span {
                     font-size: 0.75em;
+                    visibility: hidden;
                 }
             }
             &:hover fieldset {
