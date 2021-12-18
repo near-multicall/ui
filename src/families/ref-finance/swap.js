@@ -1,6 +1,6 @@
 import TextField from '@mui/material/TextField';
 import React from 'react';
-import { ArgsAccount, ArgsBig, ArgsError, ArgsNumber, ArgsString, ArgsObject } from "../../utils/args";
+import { ArgsAccount, ArgsBig, ArgsError, ArgsNumber, ArgsString, ArgsObject, ArgsArray } from "../../utils/args";
 import Call from "../../utils/call";
 import { toGas } from "../../utils/converter";
 import BaseTask from "../base";
@@ -13,6 +13,7 @@ export default class Swap extends BaseTask {
         ...this.baseErrors,
         addr: new ArgsError("Invalid address", value => true),
         args: new ArgsError("Invalid JSON", value => true),
+        pool_id: new ArgsError("Invalid pool id", value => ArgsNumber.isValid(value)),
         token_in: new ArgsError("Invalid address", value => ArgsAccount.isValid(value)),
         amount_in: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value)),
         token_out: new ArgsError("Invalid address", value => ArgsAccount.isValid(value)),
@@ -27,20 +28,24 @@ export default class Swap extends BaseTask {
             name: new ArgsString(json?.name ?? "Swap on Ref"),
             addr: new ArgsAccount(json?.name ?? "ref-finance.near"),
             func: new ArgsString(json?.func ?? "swap"),
-            args: new ArgsObject(json?.args 
-                ? {
-                    token_in: new ArgsAccount(json?.args.token_in),
-                    amount_in: new ArgsBig(json?.args.amount, "0", null, null),
-                    token_out: new ArgsAccount(json?.args.token_out),
-                    min_amount_out: new ArgsBig(json?.args.min_amount_out, "0", null, null)
-                }
-                : {
-                    token_in: new ArgsAccount("marmaj.tkn.near"),
-                    amount_in: new ArgsBig("1", "0", null, null),
-                    token_out: new ArgsAccount("wrap.near"),
-                    min_amount_out: new ArgsBig("1", "0", null, null)                
-                }    
-            ),
+            args: new ArgsObject({
+                actions: new ArgsArray(json?.args?.actions
+                    ? new ArgsObject({
+                        pool_id: new ArgsNumber(json?.args.pool_id),
+                        token_in: new ArgsAccount(json?.args.token_in),
+                        amount_in: new ArgsBig(json?.args.amount, "0", null),
+                        token_out: new ArgsAccount(json?.args.token_out),
+                        min_amount_out: new ArgsBig(json?.args.min_amount_out, "0", null)
+                    })
+                    : new ArgsObject({
+                        pool_id: new ArgsNumber(11, 0, null),
+                        token_in: new ArgsAccount("marmaj.tkn.near"),
+                        amount_in: new ArgsBig("1", "0", null),
+                        token_out: new ArgsAccount("wrap.near"),
+                        min_amount_out: new ArgsBig("1", "0", null)                
+                    })
+                )
+            }),
             gas: new ArgsNumber(json?.gas ?? toGas(95), 1, toGas(300), "gas"),
             depo: new ArgsBig(json?.depo ?? "1", "1", null, "yocto")
         });
@@ -51,16 +56,16 @@ export default class Swap extends BaseTask {
 
         const {
             name,
-            addr,
             gas
         } = this.call;
 
         const {
+            pool_id,
             token_in,
             amount_in,
             token_out,
             min_amount_out
-        } = this.call.args.value;
+        } = this.call.args.value.actions.value[0].value;
 
         const errors = this.errors;
 
@@ -85,6 +90,21 @@ export default class Swap extends BaseTask {
                         name.value = e.target.value;
                         this.forceUpdate();
                     }}
+                    InputLabelProps={{shrink: true}}
+                />
+                <TextField
+                    label="Pool ID"
+                    value={ pool_id }
+                    margin="dense"
+                    size="small"
+                    onChange={e => {
+                        pool_id.value = e.target.value;
+                        errors.pool_id.validOrNull(pool_id);
+                        this.forceUpdate();
+                        EDITOR.forceUpdate();
+                    }}
+                    error={errors.pool_id.isBad}
+                    helperText={errors.pool_id.isBad && errors.pool_id.message}
                     InputLabelProps={{shrink: true}}
                 />
                 <TextField

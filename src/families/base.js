@@ -269,7 +269,7 @@ export default class BaseTask extends Component {
                         : <a onClick={ () => this.setState({ showArgs: true }) } >show</a>
                     }</p>
                     { showArgs && (errors.args.validOrNull(args.value)
-                        ? <pre className="code">{ args.toString() }</pre>
+                        ? <pre className="code">{ JSON.stringify(args.toString(), null, "  ") }</pre>
                         : <pre className="code">{ errors.args.intermediate }</pre>)
                     }
                     <p><span>Allocated gas</span><span className="code">{ gas.toString() } <span>{ gas.getUnit() }</span></span></p>

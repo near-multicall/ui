@@ -147,7 +147,7 @@ class ArgsObject extends Args {
         for (let k in this.value)
             res[k] = convert(this.value[k], this.value[k].unit).toString();
 
-        return JSON.stringify(res, null, "  ");
+        return res; // JSON.stringify(res, null, "  ");
 
     }
 
@@ -181,7 +181,7 @@ class ArgsJSON extends Args {
         if (!this.isValid())
             console.error(`invalid JSON ${this.value}`);
         else
-            return JSON.stringify(JSON.parse(this.value), null, "  ");
+            return JSON.parse(this.value);
 
     }
 

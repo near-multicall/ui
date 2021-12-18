@@ -49,7 +49,7 @@ export default class Call {
         return JSON.stringify({
             "addr": this.addr.toString(),
             "func": this.func.toString(),
-            "args": this.args.toString(),
+            "args": JSON.stringify(this.args.toString(), null, "  "),
             "gas": convert(this.gas.value, this.gas.unit).toString(),
             "depo": convert(this.depo.value, this.depo.unit).toString()
         });
@@ -61,7 +61,7 @@ export default class Call {
         return {
             "addr": this.addr.toString(),
             "func": this.func.toString(),
-            "args": JSON.parse(this.args.toString()),
+            "args": this.args.toString(),
             "gas": convert(this.gas.value, this.gas.unit).toString(),
             "depo": convert(this.depo.value, this.depo.unit).toString()
         }
@@ -73,7 +73,7 @@ export default class Call {
         return {
             "addr": this.addr.toString(),
             "func": this.func.toString(),
-            "args": Base64.encode(JSON.stringify(JSON.parse(this.args.toString()))),
+            "args": Base64.encode(JSON.stringify(this.args.toString())),
             "gas": convert(this.gas.value, this.gas.unit).toString(),
             "depo": convert(this.depo.value, this.depo.unit).toString()
         }
