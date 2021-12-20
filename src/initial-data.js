@@ -15,7 +15,7 @@ export const initialData = {
         'menu': {
             id: 'menu',
             title: 'Infinite Column',
-            taskIds: ['task-i2', 'task-i3', 'task-i4', 'task-i5']
+            taskIds: ['task-i4', 'task-i3', 'task-i2', 'task-i5']
         },
         'trash': {
             id: 'trash',
