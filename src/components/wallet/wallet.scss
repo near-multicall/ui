@@ -1,0 +1,14 @@
+@use 'sass/size';
+@use 'sass/color';
+@use 'sass/mixin';
+
+.wallet {
+    @include mixin.center-items;
+    gap: 0.5 * size.$gap;
+    height: size.$gap;
+    padding: 0 0.5 * size.$gap;
+    font-size: size.$text;
+    color: color.$text;
+    border-radius: size.$task-radius;
+    background-color: color.$light;
+}

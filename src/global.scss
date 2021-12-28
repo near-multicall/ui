@@ -11,33 +11,30 @@
 
 * {
     margin: 0;
+    font-family: font.$text;
+    // outline: 1px solid aqua;
+    // background-color: rgba(aqua, 0.1);
 }
 
 body, html, #root {
     width: 100%;
     height: 100%;
-    background-color: color.$light;
+    background-color: color.$white;
+    font-size: 62.5%;// 0.485vw; // 1rem = 10px
 }
 
 a {
     color: color.$blue !important;
+    text-decoration: none;
     cursor: pointer;
 }
 
 button {    
     padding: 0.5 * size.$gap 2 * size.$gap;
-    background-color: color.$highlight;
+    background-color: color.$light;
     border: none;
-    border-radius: 0.5 * size.$ingredient-radius;
     color: color.$text;
     font-family: font.$text;
     font-size: size.$large-text;
     cursor: pointer;
-}
-
-.full-width {
-    width: 100%;
-    width: -moz-available;          /* WebKit-based browsers will ignore this. */
-    width: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */
-    width: fill-available;
 }

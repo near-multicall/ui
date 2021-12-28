@@ -1,22 +1,19 @@
-import 'regenerator-runtime/runtime'
-import React from 'react'
+import React, { Component } from 'react'
 import './global.scss'
-import { Header, Recipe, Fridge, Board, Cook } from './components.js'
+import { Layout, Header } from './components.js'
+import './utils/loader.ts'
 
-// import { login, logout } from './utils'
+export default class App extends Component {
 
-import getConfig from './config'
-const { networkId } = getConfig(process.env.NODE_ENV || 'development')
+  render() {
 
-export default function App() {
+    return (
+      <>
+        <Header/>
+        <Layout/>
+      </>
+    );
+  
+  }
 
-  return (
-    <>
-      <Header/>
-      <Recipe/>
-      <Fridge/>
-      <Board/>
-      <Cook/>
-    </>
-  )
 }

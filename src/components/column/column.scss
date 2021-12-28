@@ -1,0 +1,50 @@
+@use 'sass/size';
+@use 'sass/color';
+@use 'sass/mixin';
+
+.column-container {
+    flex: 0 0 size.$task-width;
+    @include mixin.center-items(flex-start, center);
+    flex-flow: column nowrap;
+    position: relative;
+    min-height: calc(100% - 2 * size.$gap);
+    width: size.$task-width;
+    padding: 0 size.$gap;
+    margin-right: size.$gap;
+    margin-top: size.$gap;
+    background-color: rgba(color.$lightest, 0.25);
+    border-radius: size.$task-radius;
+    .drag-handle {
+        @include mixin.icon;
+        line-height: size.$large-text;
+        padding: 0.5 * size.$gap;
+        scale: 3 1;
+    }
+    .hidden {
+        display: none;
+    }
+    .delete-column {
+        @include mixin.icon;
+        position: absolute;
+        top: 0.5 * size.$gap;
+        right: 0.5 * size.$gap;
+        cursor: pointer;
+    }
+    &:not(:last-of-type) > .add-column {
+        opacity: 0;
+    }
+    &:last-of-type > .add-column {
+        @include mixin.icon;
+        position: absolute;
+        top: 0.5 * size.$gap;
+        right: -1 * size.$gap;
+        transition: opacity 200ms ease-in-out;
+        cursor: pointer;
+    }
+    .tasks-wrapper {
+        flex: 1;
+        @include mixin.center-items(flex-start);
+        width: 100%;
+        flex-flow: column nowrap;
+    }
+}

@@ -1,0 +1,188 @@
+@use 'sass/base';
+@use 'sass/color';
+@use 'sass/size';
+@use 'sass/mixin';
+@use 'sass/font';
+
+.export-container {
+    @include mixin.full;
+    @include mixin.no-scrollbar;
+    display: flex;
+    flex-flow: column nowrap;
+    gap: size.$gap;
+    overflow-y: scroll;
+}
+
+.section {
+    flex: 1;
+    @include mixin.center-items(flex-start);
+    flex-flow: column nowrap;
+    width: 100%;
+    max-height: 25%;
+    .header {
+        width: calc(100% - size.$gap);
+        @include mixin.center-items(space-between);
+        h3 {
+            font-size: size.$text;
+            color: color.$light-text;
+            text-align: left;
+        }
+        .icon {
+            @include mixin.light-icon;
+            cursor: pointer;
+            font-size: size.$text;
+        }
+    }
+    .value {
+        flex: 1;
+        width: 100%;
+        @include mixin.no-scrollbar;
+        background-color: rgba(color.$darkest, 0.25);
+        border-radius: size.$task-radius;
+        overflow-y: scroll;
+        .code {
+            padding: 0.5 * size.$gap;
+            overflow: auto;
+            white-space: pre-wrap;
+            white-space: -moz-pre-wrap;
+            white-space: -o-pre-wrap;
+            word-wrap: break-word;
+            font-family: font.$code;
+            font-size: size.$small-text;
+            color: color.$light-text;
+        }
+    }
+}
+
+.input-container {
+    padding-top: size.$smaller-text;
+    .MuiTextField-root {
+        p.Mui-error {
+            color: color.$red;
+            font-family: font.$text;
+            font-size: size.$small-text;
+            &::before {
+                content: 'Error: '
+            }
+        }
+        label {
+            font-family: font.$text;
+            &.Mui-focused {
+                color: color.$light-text;
+            }
+            &.Mui-error {
+                color: color.$red;
+            }
+        }
+        .MuiOutlinedInput-root {
+            input, textarea {
+                color: color.$white;
+                font-family: font.$code;
+                font-size: size.$small-text;
+            }
+            textarea {
+                @include mixin.no-scrollbar;
+                white-space: pre;
+                overflow-x: scroll !important;
+            }
+            fieldset {
+                border-color: color.$lightish;
+                border-width: 1px;
+                background-color: rgba(color.$darkest, 0.25);
+                border-radius: 0;
+                legend {
+                    background-color: color.$dark;
+                    margin-left: -2px;
+                    padding: 2px;
+                    border-radius: 20px;
+                    visibility: visible;
+                }
+                legend > span {
+                    font-size: 0.75em;
+                    visibility: hidden;
+                }
+            }
+            &:hover fieldset {
+                border-color: color.$light;
+            }
+            &.Mui-focused fieldset {
+                border-color: color.$light;
+            }
+            &.Mui-error fieldset {
+                border-color: color.$red !important;
+            }
+        }
+        .MuiInput-underline {
+            &:hover::before,
+            &::before {
+                border-bottom-color: color.$lightish;
+            }
+            &:hover::after,
+            &::after {
+                border-bottom-color: color.$light;
+            }
+            input {
+                font-weight: 500;
+            }
+        }
+        *:not(input) {
+            color: color.$light-text;
+            font-size: 1em;
+        }
+        width: 100%;
+        font-size: 1.8rem;
+    }
+    & > .MuiTextField-root {
+        &:first-of-type {
+            margin-top: 0;
+        }
+        &:first-of-type > .MuiOutlinedInput-root > fieldset {
+            border-radius: size.$task-radius size.$task-radius 0 0;
+        }
+        &:last-of-type > .MuiOutlinedInput-root > fieldset {
+            border-radius: 0 0 size.$task-radius size.$task-radius;
+        }
+    }
+}
+
+
+.error-container {
+    width: 100%;
+    .header {
+        padding-left: 0.5 * size.$gap;
+        h3 {
+            font-size: size.$text;
+            color: color.$red;
+            text-align: left;
+        }
+    }
+    .error-list {
+        width: 100%;
+        display: flex;
+        flex-flow: column nowrap;
+        padding-top: 0.5 * size.$gap;
+        background-color: rgba(color.$darkest, 0.25);
+        border-radius: size.$task-radius;
+        .error {
+            width: 100%;
+            max-width: calc(100% - size.$gap);
+            padding: 0.5 * size.$gap;
+            padding-top: 0;
+            @include mixin.center-items(space-between);
+            gap: 0.5 * size.$gap;
+            flex-flow: row nowrap;
+            font-size: size.$text;
+            color: color.$red;
+            .msg {
+                @include mixin.no-wrap;
+            }
+            .icon {
+                @include mixin.light-icon;
+                cursor: pointer;
+                color: color.$red;
+                font-size: size.$large-text;
+            }
+        }
+    }
+}
+
