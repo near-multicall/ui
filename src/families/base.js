@@ -26,7 +26,6 @@ export default class BaseTask extends Component {
 
         this.state = {
             showArgs: false,
-            showDetails: false
         };
 
         if (window.TEMP) {
@@ -243,31 +242,28 @@ export default class BaseTask extends Component {
 
         const errors = this.errors;
 
-        const { showArgs, showDetails } = this.state;
+        const { showArgs } = this.state;
 
         const { id } = this.props;
 
         return (
             <div 
                 className={`task-container ${this.uniqueClassName}`}
-                onClick={() => {
-                    EDITOR.edit(id);
-                    MENU.changeTab(1);
-                }}
-                onMouseOver={() => {
-                    this.setState({ showDetails: true })
-                }}
-                onMouseLeave={() => {
-                    this.setState({ showDetails: false })
-                }}
             >
                 <div className="name">
                     <h3>{ name.toString() }</h3>
+                    <EditOutlinedIcon 
+                        className="icon" 
+                        onClick={() => {
+                            EDITOR.edit(id);
+                            MENU.changeTab(1);
+                        }}
+                    />
                 </div>
-                <div className={`data-container ${showDetails ? "" : "hidden"}`}>
-                    <p><a className="code" href={ addr.toUrl() } target="_blank" rel="noopener noreferrer">{ addr.toString() }</a></p>
-                    <p><span className="code">{ func.toString() }</span></p>
-                    <p className="expandable">{ 
+                <div className="data-container">
+                    <p><span>Contract address</span><a className="code" href={ addr.toUrl() } target="_blank" rel="noopener noreferrer">{ addr.toString() }</a></p>
+                    <p><span>Function name</span><span className="code">{ func.toString() }</span></p>
+                    <p className="expandable"><span>Function arguments</span>{ 
                         showArgs
                         ? <a onClick={ () => this.setState({ showArgs: false }) } >hide</a>
                         : <a onClick={ () => this.setState({ showArgs: true }) } >show</a>
@@ -276,8 +272,8 @@ export default class BaseTask extends Component {
                         ? <pre className="code">{ JSON.stringify(args.toString(), null, "  ") }</pre>
                         : <pre className="code">{ errors.args.intermediate }</pre>)
                     }
-                    <p><span className="code">{ gas.toString() } <span>{ gas.getUnit() }</span></span></p>
-                    <p><span className="code">{ depo.toString() }  <span>{ depo.getUnit() }</span></span></p>
+                    <p><span>Allocated gas</span><span className="code">{ gas.toString() } <span>{ gas.getUnit() }</span></span></p>
+                    <p><span>Attached deposit</span><span className="code">{ depo.toString() }  <span>{ depo.getUnit() }</span></span></p>
                 </div>
             </div>
         );

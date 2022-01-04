@@ -22,7 +22,6 @@
 .task-container {
     position: relative;
     display: flex;
-    @include mixin.center-items;
     flex-flow: column nowrap;
     width: 100%;
     min-height: size.$task-height;
@@ -55,15 +54,15 @@
         @include mixin.no-scrollbar;
         flex: 1;
         max-height: 100%;
-        width: 80%;
         overflow-y: scroll;
         padding: 0.5 * size.$gap;
         padding-bottom: size.$gap;
+        background-color: rgba(color.$light, 0.5);
         pre.code {
             @include mixin.no-scrollbar;
             padding: 0.5rem;
             margin: 0.5rem;
-            background-color: rgba(color.$white, 1);
+            background-color: rgba(color.$lightest, 1);
             border-radius: 0.5 * size.$task-radius;
             font-family: font.$code;
             font-size: size.$smaller-text;
@@ -81,6 +80,7 @@
             }
             .code {
                 @include mixin.no-wrap;
+                padding-left: 1.5rem;
                 line-height: 1.85rem;
                 font-family: font.$code;
                 font-size: size.$smaller-text;
@@ -88,9 +88,6 @@
             &.expandable {
                 flex-wrap: wrap;
             }
-        }
-        &.hidden {
-            display: none;
         }
     }
 }
