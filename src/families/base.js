@@ -26,6 +26,7 @@ export default class BaseTask extends Component {
 
         this.state = {
             showArgs: false,
+            mini: MINIFIED
         };
 
         if (window.TEMP) {
@@ -242,13 +243,13 @@ export default class BaseTask extends Component {
 
         const errors = this.errors;
 
-        const { showArgs } = this.state;
+        const { showArgs, mini } = this.state;
 
         const { id } = this.props;
 
         return (
             <div 
-                className={`task-container ${this.uniqueClassName}`}
+                className={`${mini ? "mini-" : ""}task-container ${this.uniqueClassName}`}
             >
                 <div className="name">
                     <h3>{ name.toString() }</h3>
@@ -260,7 +261,7 @@ export default class BaseTask extends Component {
                         }}
                     />
                 </div>
-                <div className="data-container">
+                { !mini && <div className="data-container">
                     <p><span>Contract address</span><a className="code" href={ addr.toUrl() } target="_blank" rel="noopener noreferrer">{ addr.toString() }</a></p>
                     <p><span>Function name</span><span className="code">{ func.toString() }</span></p>
                     <p className="expandable"><span>Function arguments</span>{ 
@@ -274,7 +275,7 @@ export default class BaseTask extends Component {
                     }
                     <p><span>Allocated gas</span><span className="code">{ gas.toString() } <span>{ gas.getUnit() }</span></span></p>
                     <p><span>Attached deposit</span><span className="code">{ depo.toString() }  <span>{ depo.getUnit() }</span></span></p>
-                </div>
+                </div> }
             </div>
         );
 

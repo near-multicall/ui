@@ -8,3 +8,9 @@
     margin-bottom: size.$gap;
     overflow: hidden;
 }
+
+.mini-task-wrapper {
+    @extend .task-wrapper;
+    width: 0.5 * size.$task-width;
+    min-height: 0.5 * size.$task-height;
+}

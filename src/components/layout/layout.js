@@ -22,7 +22,8 @@ export default class Layout extends Component {
                 user: "",
                 multicall: "",
                 dao: ""
-            }
+            },
+            mini: MINIFIED
         };
 
     }
@@ -30,6 +31,7 @@ export default class Layout extends Component {
     componentDidMount() {
 
         window.LAYOUT = this;
+        HEADER.forceUpdate();
 
     }
 
@@ -342,6 +344,8 @@ export default class Layout extends Component {
 
     render() {
 
+        const { mini } = this.state;
+
         return (
             <DragDropContext
                 onDragEnd={this.onDragEnd}
@@ -352,7 +356,7 @@ export default class Layout extends Component {
                     type="column"
                 >
                     { provided => (
-                        <div className="layout-wrapper">
+                        <div className={`${mini ? "mini-" : ""}layout-wrapper`}>
                             <div 
                                 className="layout-container"
                                 {...provided.droppableProps}

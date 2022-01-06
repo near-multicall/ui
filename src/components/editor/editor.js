@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import AutoAwesomeOutlinedIcon from '@mui/icons-material/AutoAwesomeOutlined';
 import './editor.scss';
+import { Menu } from '@mui/material';
 
 export default class Editor extends Component {
 
@@ -24,6 +25,7 @@ export default class Editor extends Component {
     edit(taskID) {
 
         this.setState({editingID: taskID});
+        MENU.grow();
 
     }
 

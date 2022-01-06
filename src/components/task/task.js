@@ -100,7 +100,7 @@ export default class Task extends Component {
             >
                 { (provided, snapshot) => (
                     <div 
-                        className="task-wrapper"
+                        className={`${(this.instance.current?.state?.mini ?? MINIFIED) ? "mini-" : ""}task-wrapper`}
                         ref={provided.innerRef}
                         {...provided.dragHandleProps}
                         {...provided.draggableProps}

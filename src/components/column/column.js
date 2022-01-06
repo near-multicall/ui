@@ -18,7 +18,7 @@ export default class Column extends Component {
             >
                 { (provided, snapshot) => 
                     <div 
-                        className="column-container"
+                        className={`column-container ${this.props?.direction == "horizontal" ? "row" : "col"}`}
                         showpseudo={ snapshot.isDragging
                             ? "no"
                             : "yes"
@@ -47,11 +47,12 @@ export default class Column extends Component {
                         }
                         <Droppable 
                             droppableId={this.props.column.id}
+                            direction={this.props.direction}
                             type="task"
                         >
                             { provided => (
                                 <div 
-                                    className="tasks-wrapper"
+                                    className={`tasks-wrapper ${this.props?.direction == "horizontal" ? "row" : "col"}`}
                                     ref={provided.innerRef}
                                     {...provided.droppableProps}
                                 >

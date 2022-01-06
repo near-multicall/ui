@@ -7,22 +7,25 @@
     position: relative;
     display: flex;
     flex-flow: row nowrap;
-    height: calc(100% - 2 * size.$gap);
+    min-height: calc(100% - 3 * size.$gap);
     top: 2 * size.$gap;
+    padding-bottom: size.$gap;
     .layout-container {
         @include mixin.full;
         @include mixin.center-items(center, flex-start);
         flex: 1 1 0;
         flex-flow: row nowrap;
         padding-left: size.$gap;
+        padding-right: size.$gap;
         width: auto;
+        height: inherit;
     }
     .empty-container {
         flex-shrink: 0;
         flex-basis: calc(4 * size.$gap + size.$task-width);
         transition: flex-basis animation.$menu-expand-time ease-out;
         &.expanded-empty {
-            flex-basis: calc(2 * size.$gap + animation.$menu-expand-width);
+            flex-basis: calc(2 * size.$gap + animation.$menu-expand-size);
             transition: flex-basis animation.$menu-expand-time ease-out;
         }
     }
@@ -34,5 +37,21 @@
         height: calc(2.5 * size.$gap - 0.5 * (size.$gap - size.$large-text));
         min-width: 100%;
         background-color: color.$light;
+    }
+}
+
+.mini-layout-wrapper {
+    @extend .layout-wrapper;
+    flex-flow: column nowrap;
+    width: max-content;
+    min-height: calc(100% - 2 * size.$gap);
+    min-width: 100%;
+    padding-bottom: size.$gap;
+    .layout-container {
+        height: max-content;
+    }
+    .empty-container {
+        flex-shrink: 0;
+        flex-basis: 4 * size.$gap;
     }
 }

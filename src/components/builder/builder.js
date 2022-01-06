@@ -9,6 +9,8 @@ export default class Builder extends Component {
 
         const LAYOUT = this.props.layout; // ususally global parameter
 
+        const { mini } = LAYOUT.state;
+
         const menuColumn = LAYOUT.getColumns()['menu'],
             trashColumn = LAYOUT.getColumns()['trash'];
 
@@ -28,17 +30,18 @@ export default class Builder extends Component {
                             ref={provided.innerRef}
                         >
                             <div 
-                                className="selector"
+                                className={`${mini ? "mini-" : ""}selector`}
                             >
                                 <Column 
                                     key={'menu'} 
-                                    column={menuColumn} 
+                                    column={menuColumn}
+                                    direction={mini ? "horizontal" : "vertical"}
                                     tasks={menuColumn.taskIds.map(taskId => LAYOUT.getTasks()[taskId])} 
                                     index={LAYOUT.getColumnID()}
                                 />
                             </div>
                             <div 
-                                className="trash"
+                                className={`${mini ? "mini-" : ""}trash`}
                             >
                                 <Column 
                                     key={'trash'} 

@@ -22,6 +22,18 @@ export default class Menu extends Component {
 
     }
 
+    grow() {
+
+        this.setState({expanded: true});
+    
+    }
+
+    shrink() {
+
+        this.setState({expanded: false});
+
+    }
+
     changeTab = newTab => this.setState({tab: newTab});
 
     render() {
@@ -30,8 +42,20 @@ export default class Menu extends Component {
 
         const LAYOUT = this.props.layout; // ususally global parameter
 
+        const { mini } = LAYOUT.state;
+
         return (
-            <div className={`menu-container ${expanded ? "expanded-menu" : ""}`}>
+            <div 
+                className={`${mini ? "mini-" : ""}menu-container ${expanded ? "expanded-menu" : ""}`}
+                onMouseOver={() => {
+                    if (mini)
+                        this.grow();
+                }}
+                onMouseLeave={() => {
+                    if (mini)
+                        this.shrink();
+                }}
+            >
                 <div className="tabs">
                     <div className="tab-list">
                         <button 
@@ -70,7 +94,7 @@ export default class Menu extends Component {
                                 this.setState({ expanded: !expanded });
                             }}
                         >
-                            navigate_before
+                            { mini ? "expand_less" : "navigate_before"}
                         </Icon>
                     </div>
                 </div>

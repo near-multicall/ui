@@ -92,6 +92,13 @@
     }
 }
 
+.mini-task-container {
+    @extend .task-container;
+    @include mixin.center-items;
+    width: 100%;
+    min-height: 0.5 * size.$task-height;
+}
+
 .edit {
     @include mixin.full;
     @include mixin.no-scrollbar;

@@ -7,7 +7,7 @@
     position: fixed;
     top: size.$gap;
     right: size.$gap;
-    width: size.$menu-width;
+    width: size.$menu-size;
     height: calc(100% - 2 * size.$gap);
     min-width: calc(size.$task-width + 2 * size.$gap);
     background-color: color.$dark;
@@ -23,13 +23,13 @@
             border-radius: size.$task-radius;
             margin: size.$gap;
             padding: 0;
-            width: calc(100% - 2 * size.$gap);
+            width: 50%;
+            min-width: 40rem;
             height: size.$tab-list-height;
             overflow: hidden;
             button {
                 flex: 1;
                 padding: 0;
-                width: 30%;
                 height: 100%;
                 font-size: size.$text;
                 color: color.$light-text;
@@ -39,6 +39,7 @@
                     background-color: rgba(color.$darkest, 0.25);
                 }
                 &.active-tab {
+                    flex: 1 1 0;
                     color: color.$text;
                     background-color: color.$light;
                 }
@@ -52,34 +53,76 @@
             height: 100%;
         }
     }
-}
-
-.toggle-size {
-    position: absolute;
-    left: calc(-0.5 * (size.$large-text + size.$gap));
-    top: calc(50% - 0.5 * size.$large-text);
-    width: calc(size.$large-text + size.$gap);
-    transition: transform animation.$menu-expand-time linear;
-    .icon {
-        scale: 1.2;
-    }
-    &.expand {
-        transform: scaleX(1);
+    .toggle-size {
+        position: absolute;
+        left: calc(-0.5 * (size.$large-text + size.$gap));
+        top: calc(50% - 0.5 * size.$large-text);
+        width: calc(size.$large-text + size.$gap);
+        transition: transform animation.$menu-expand-time linear;
         .icon {
-            @include mixin.icon;
-            font-size: size.$large-text;
+            scale: 1.2;
+        }
+        &.expand {
+            transform: scaleX(1);
+            .icon {
+                @include mixin.icon;
+                font-size: size.$large-text;
+            }
+        }
+        &.collapse {
+            transform: scaleX(-1);
+            .icon {
+                @include mixin.light-icon;
+                font-size: size.$large-text;
+            }
         }
     }
-    &.collapse {
-        transform: scaleX(-1);
-        .icon {
-            @include mixin.light-icon;
-            font-size: size.$large-text;
-        }
+    &.expanded-menu {
+        width: animation.$menu-expand-size;
+        transition: width animation.$menu-expand-time ease-out;
     }
 }
 
-.expanded-menu {
-    width: animation.$menu-expand-width;
-    transition: width animation.$menu-expand-time ease-out;
+.mini-menu-container {
+    @extend .menu-container;
+    top: unset;
+    bottom: 0;
+    right: 2 * size.$gap;
+    left: 2 * size.$gap;
+    width: unset;
+    min-width: unset;
+    height: calc(size.$gap + size.$tab-list-height);
+    border-radius: size.$task-radius size.$task-radius 0 0;
+    min-width: calc(size.$task-width + 2 * size.$gap);
+    transition: height animation.$menu-expand-time ease-out;
+    .tabs {
+        @include mixin.center-items;
+        flex-flow: column nowrap;
+        .tab-list {
+            flex: 0 0 size.$tab-list-height;
+            box-shadow: 1px 10px 20px 0 rgba(0,0,0,0.2);
+            background-color: color.$dark;
+        }
+        .active-panel > .tab-panel > div {
+            height: 100%;
+        }
+    }
+    .toggle-size {
+        display: none;
+        top: calc(-0.5 * (size.$large-text + size.$gap));
+        left: calc(50% - 0.5 * size.$large-text);
+        height: calc(size.$large-text + size.$gap);
+        transition: transform animation.$menu-expand-time linear;
+        &.expand {
+            transform: scaleY(1);
+        }
+        &.collapse {
+            transform: scaleY(-1);
+        }
+    }
+    &.expanded-menu {
+        width: unset;
+        height: animation.$menu-expand-size;
+        transition: height animation.$menu-expand-time ease-out;
+    }
 }

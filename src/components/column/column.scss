@@ -3,17 +3,23 @@
 @use 'sass/mixin';
 
 .column-container {
-    flex: 0 0 size.$task-width;
+    flex: 0 0 0.5 * size.$task-width;
     @include mixin.center-items(flex-start, center);
     flex-flow: column nowrap;
     position: relative;
-    min-height: calc(100% - 2 * size.$gap);
-    width: size.$task-width;
+    min-height: calc(100% - size.$gap);
     padding: 0 size.$gap;
     margin-right: size.$gap;
     margin-top: size.$gap;
     background-color: rgba(color.$lightest, 0.25);
     border-radius: size.$task-radius;
+    &.row {
+        @include mixin.center-items(center, flex-start);
+        flex-flow: row nowrap;
+        min-width: calc(100% - 2 * size.$gap);
+        height: size.$task-height;
+        margin: 0;
+    }
     .drag-handle {
         @include mixin.icon;
         line-height: size.$large-text;
@@ -43,8 +49,15 @@
     }
     .tasks-wrapper {
         flex: 1;
-        @include mixin.center-items(flex-start);
-        width: 100%;
-        flex-flow: column nowrap;
+        &.row {
+            @include mixin.center-items(flex-start, flex-start);
+            flex-flow: row nowrap;
+            height: 100%;
+        }
+        &.col {
+            @include mixin.center-items(flex-start);
+            flex-flow: column nowrap;
+            width: 100%;
+        }
     }
 }

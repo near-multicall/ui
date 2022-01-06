@@ -14,7 +14,7 @@ export default class Header extends Component {
     render() {
 
         return (
-            <div className="header-wrapper">
+            <div className={`${window?.LAYOUT?.state.mini ? "mini-" : ""}header-wrapper`}>
                 <div className="header-container">
                     <div className="title">
                         <Icon className="logo">dynamic_feed</Icon>
