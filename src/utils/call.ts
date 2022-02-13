@@ -47,11 +47,13 @@ export default class Call {
     toString() {
 
         return JSON.stringify({
-            "addr": this.addr.toString(),
-            "func": this.func.toString(),
-            "args": JSON.stringify(this.args.toString(), null, "  "),
-            "gas": convert(this.gas.value, this.gas.unit).toString(),
-            "depo": convert(this.depo.value, this.depo.unit).toString()
+            "address": this.addr.toString(),
+            "actions": [{
+                "func": this.func.toString(),
+                "args": JSON.stringify(this.args.toString(), null, "  "),
+                "gas": convert(this.gas.value, this.gas.unit).toString(),
+                "depo": convert(this.depo.value, this.depo.unit).toString()
+            }]
         });
 
     }
@@ -59,11 +61,13 @@ export default class Call {
     toJSON() {
 
         return {
-            "addr": this.addr.toString(),
-            "func": this.func.toString(),
-            "args": this.args.toString(),
-            "gas": convert(this.gas.value, this.gas.unit).toString(),
-            "depo": convert(this.depo.value, this.depo.unit).toString()
+            "address": this.addr.toString(),
+            "actions": [{
+                "func": this.func.toString(),
+                "args": this.args.toString(),
+                "gas": convert(this.gas.value, this.gas.unit).toString(),
+                "depo": convert(this.depo.value, this.depo.unit).toString()
+            }]
         }
 
     }
@@ -71,11 +75,13 @@ export default class Call {
     toBase64() {
 
         return {
-            "addr": this.addr.toString(),
-            "func": this.func.toString(),
-            "args": Base64.encode(JSON.stringify(this.args.toString())),
-            "gas": convert(this.gas.value, this.gas.unit).toString(),
-            "depo": convert(this.depo.value, this.depo.unit).toString()
+            "address": this.addr.toString(),
+            "actions": [{
+                "func": this.func.toString(),
+                "args": Base64.encode(JSON.stringify(this.args.toString())),
+                "gas": convert(this.gas.value, this.gas.unit).toString(),
+                "depo": convert(this.depo.value, this.depo.unit).toString()
+            }]
         }
 
     }

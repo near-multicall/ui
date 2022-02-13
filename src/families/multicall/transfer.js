@@ -1,4 +1,3 @@
-import TextField from '@mui/material/TextField';
 import Checkbox from '@mui/material/Checkbox';
 import React from 'react';
 import { ArgsAccount, ArgsBig, ArgsNumber, ArgsString, ArgsObject, ArgsError } from "../../utils/args";
@@ -6,6 +5,7 @@ import Call from "../../utils/call";
 import { toGas } from "../../utils/converter";
 import BaseTask from "../base";
 import "./multicall.scss";
+import { TextInput, TextInputWithUnits } from '../../components/editor/elements';
 
 export default class Transfer extends BaseTask {
 
@@ -48,7 +48,6 @@ export default class Transfer extends BaseTask {
 
         const {
             name,
-            addr,
             gas
         } = this.call;
 
@@ -59,54 +58,19 @@ export default class Transfer extends BaseTask {
 
         const errors = this.errors;
 
-        const gasOrTgas = [
-            {
-                value: 'gas',
-                label: 'gas'
-            },
-            {
-                value: 'Tgas',
-                label: 'Tgas'
-            },
-        ];
-
-        const yoctoOrNear = [
-            {
-                value: 'yocto',
-                label: 'yocto'
-            },
-            {
-                value: 'NEAR',
-                label: 'NEAR'
-            },
-        ];
-
         return (
             <div className="edit">
-                <TextField
+                <TextInput 
                     value={ name }
                     variant="standard"
                     margin="normal"
-                    onChange={e => {
-                        name.value = e.target.value;
-                        this.forceUpdate();
-                    }}
-                    InputLabelProps={{shrink: true}}
+                    update={ this.updateCard }
                 />
-                <TextField
+                <TextInput 
                     label="Receiver address"
                     value={ account_id }
-                    margin="dense"
-                    size="small"
-                    onChange={e => {
-                        account_id.value = e.target.value;
-                        errors.receiver.validOrNull(account_id.value);
-                        this.forceUpdate();
-                        EDITOR.forceUpdate();
-                    }}
-                    error={errors.receiver.isBad}
-                    helperText={errors.receiver.isBad && errors.receiver.message}
-                    InputLabelProps={{shrink: true}}
+                    error={ errors.receiver }
+                    update={ this.updateCard }
                 />
                 <div className="checkbox">
                     <Checkbox
@@ -115,94 +79,26 @@ export default class Transfer extends BaseTask {
                             this.transferAll = e.target.checked;
                             amount.value = "0";
                             amount.unit = "yocto";
-                            this.forceUpdate();
-                            EDITOR.forceUpdate();
+                            this.updateCard();
                         }}
                     />
                     <p>Transfer all available funds</p>
                 </div>
-                <div className="unitInput">
-                    <TextField
-                        label="Transfer amount"
-                        value={ amount.value }
-                        margin="dense"
-                        size="small"
-                        type="number"
-                        onChange={e => {
-                            amount.value = e.target.value;
-                            errors.amount.validOrNull(amount);
-                            this.forceUpdate();
-                            EDITOR.forceUpdate();
-                        }}
-                        disabled={this.transferAll}
-                        error={errors.amount.isBad}
-                        helperText={errors.amount.isBad && errors.amount.message}
-                        InputLabelProps={{shrink: true}}
-                    />
-                    <TextField
-                        label="Unit"
-                        value={ amount.unit }
-                        margin="dense"
-                        size="small"
-                        select
-                        onChange={e => {
-                            amount.unit = e.target.value;
-                            errors.amount.validOrNull(amount);
-                            EDITOR.forceUpdate();
-                            this.forceUpdate();
-                        }}
-                        disabled={this.transferAll}
-                        SelectProps={{
-                            native: true,
-                        }}
-                    >
-                        { yoctoOrNear.map((option) => (
-                            <option key={option.value} value={option.value}>
-                                {option.label}
-                            </option>
-                        )) }
-                    </TextField>
-                </div>
-                <div className="unitInput">
-                    <TextField
-                        label="Allocated gas"
-                        value={ gas }
-                        margin="dense"
-                        size="small"
-                        type="number"
-                        onChange={e => {
-                            gas.value = e.target.value;
-                            errors.gas.validOrNull(gas);
-                            this.forceUpdate();
-                            EDITOR.forceUpdate();
-                        }}
-                        error={errors.gas.isBad}
-                        helperText={errors.gas.isBad && errors.gas.message}
-                        InputLabelProps={{shrink: true}}
-                    />
-                    <TextField
-                        label="Unit"
-                        value={ gas.unit }
-                        margin="dense"
-                        size="small"
-                        select
-                        onChange={e => {
-                            gas.unit = e.target.value;
-                            errors.gas.validOrNull(gas);
-                            EDITOR.forceUpdate();
-                            this.forceUpdate();
-                        }}
-                        SelectProps={{
-                            native: true,
-                        }}
-                    >
-                        { gasOrTgas.map((option) => (
-                            <option key={option.value} value={option.value}>
-                                {option.label}
-                            </option>
-                        )) }
-                    </TextField>
-                </div>
+                <TextInputWithUnits
+                    label="Transfer amount"
+                    value={ amount }
+                    error={ errors.amount }
+                    disabled={this.transferAll}
+                    options={[ "yocto", "NEAR" ]}
+                    update={ this.updateCard }
+                />
+                <TextInputWithUnits
+                    label="Allocated gas"
+                    value={ gas }
+                    error={ errors.gas }
+                    options={[ "gas", "Tgas" ]}
+                    update={ this.updateCard }
+                />
             </div>
         );
 

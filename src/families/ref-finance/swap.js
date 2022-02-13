@@ -1,5 +1,6 @@
-import TextField from '@mui/material/TextField';
+import { TextField } from '@mui/material';
 import React from 'react';
+import { TextInput, TextInputWithUnits } from '../../components/editor/elements';
 import { ArgsAccount, ArgsBig, ArgsError, ArgsNumber, ArgsString, ArgsObject, ArgsArray } from "../../utils/args";
 import Call from "../../utils/call";
 import { toGas } from "../../utils/converter";
@@ -69,73 +70,31 @@ export default class Swap extends BaseTask {
 
         const errors = this.errors;
 
-        const gasOrTgas = [
-            {
-                value: 'gas',
-                label: 'gas'
-            },
-            {
-                value: 'Tgas',
-                label: 'Tgas'
-            },
-        ];
-
         return (
             <div className="edit">
-                <TextField
-                    value={ name }
+                <TextInput
                     variant="standard"
                     margin="normal"
-                    onChange={e => {
-                        name.value = e.target.value;
-                        this.forceUpdate();
-                    }}
-                    InputLabelProps={{shrink: true}}
+                    value={ name }
+                    update={ this.updateCard }
                 />
-                <TextField
-                    label="Pool ID"
+                <TextInput
+                    label="Poll ID"
                     value={ pool_id }
-                    margin="dense"
-                    size="small"
-                    onChange={e => {
-                        pool_id.value = e.target.value;
-                        errors.pool_id.validOrNull(pool_id);
-                        this.forceUpdate();
-                        EDITOR.forceUpdate();
-                    }}
-                    error={errors.pool_id.isBad}
-                    helperText={errors.pool_id.isBad && errors.pool_id.message}
-                    InputLabelProps={{shrink: true}}
+                    error={ errors.pool_id }
+                    update={ this.updateCard }
                 />
-                <TextField
-                    label="Token In"
+                <TextInput
+                    label="Token ID"
                     value={ token_in }
-                    margin="dense"
-                    size="small"
-                    onChange={e => {
-                        token_in.value = e.target.value;
-                        errors.token_in.validOrNull(token_in.value);
-                        this.forceUpdate();
-                        EDITOR.forceUpdate();
-                    }}
-                    error={errors.token_in.isBad}
-                    helperText={errors.token_in.isBad && errors.token_in.message}
-                    InputLabelProps={{shrink: true}}
+                    error={ errors.token_in }
+                    update={ this.updateCard }
                 />
-                <TextField
+                <TextInput
                     label="Token Out"
                     value={ token_out }
-                    margin="dense"
-                    size="small"
-                    onChange={e => {
-                        token_out.value = e.target.value;
-                        errors.token_out.validOrNull(token_out.value);
-                        this.forceUpdate();
-                        EDITOR.forceUpdate();
-                    }}
-                    error={errors.token_out.isBad}
-                    helperText={errors.token_out.isBad && errors.token_out.message}
-                    InputLabelProps={{shrink: true}}
+                    error={ errors.token_out }
+                    update={ this.updateCard }
                 />
                 <div className="unitInput">
                     <TextField
@@ -147,8 +106,7 @@ export default class Swap extends BaseTask {
                         onChange={e => {
                             amount_in.value = e.target.value;
                             errors.amount_in.validOrNull(amount_in);
-                            this.forceUpdate();
-                            EDITOR.forceUpdate();
+                            this.updateCard();
                         }}
                         error={errors.amount_in.isBad}
                         helperText={errors.amount_in.isBad && errors.amount_in.message}
@@ -172,12 +130,12 @@ export default class Swap extends BaseTask {
                         onChange={e => {
                             min_amount_out.value = e.target.value;
                             errors.min_amount_out.validOrNull(min_amount_out);
-                            this.forceUpdate();
-                            EDITOR.forceUpdate();
+                            this.updateCard();
                         }}
                         error={errors.min_amount_out.isBad}
                         helperText={errors.min_amount_out.isBad && errors.min_amount_out.message}
                         InputLabelProps={{shrink: true}}
+                        update={ this.updateCard }
                     />
                     <TextField
                         label="Unit"
@@ -187,46 +145,13 @@ export default class Swap extends BaseTask {
                         disabled
                     />
                 </div>
-                <div className="unitInput">
-                    <TextField
-                        label="Allocated gas"
-                        value={ gas }
-                        margin="dense"
-                        size="small"
-                        type="number"
-                        onChange={e => {
-                            gas.value = e.target.value;
-                            errors.gas.validOrNull(gas);
-                            this.forceUpdate();
-                            EDITOR.forceUpdate();
-                        }}
-                        error={errors.gas.isBad}
-                        helperText={errors.gas.isBad && errors.gas.message}
-                        InputLabelProps={{shrink: true}}
-                    />
-                    <TextField
-                        label="Unit"
-                        value={ gas.unit }
-                        margin="dense"
-                        size="small"
-                        select
-                        onChange={e => {
-                            gas.unit = e.target.value;
-                            errors.gas.validOrNull(gas);
-                            EDITOR.forceUpdate();
-                            this.forceUpdate();
-                        }}
-                        SelectProps={{
-                            native: true,
-                        }}
-                    >
-                        { gasOrTgas.map((option) => (
-                            <option key={option.value} value={option.value}>
-                                {option.label}
-                            </option>
-                        )) }
-                    </TextField>
-                </div>
+                <TextInputWithUnits 
+                    label="Allocated gas"
+                    value={ gas }
+                    error={ errors.gas }
+                    options={[ "gas", "Tgas" ]}
+                    update={ this.updateCard }
+                />
             </div>
         );
 

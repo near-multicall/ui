@@ -120,14 +120,14 @@ export default class Export extends Component {
                             <Icon 
                                 className="icon"
                                 onClick={ e => {
-                                    navigator.clipboard.writeText(JSON.stringify({schedules: LAYOUT.toBase64()}));
+                                    navigator.clipboard.writeText(JSON.stringify({calls: LAYOUT.toBase64()}));
                                     this.updateCopyIcon(e); 
                                 } }
                             >content_copy</Icon> 
                         </div>
                         <div className="value">
                             <pre className="code">
-                                { JSON.stringify({schedules: LAYOUT.toBase64()}) }
+                                { JSON.stringify({calls: LAYOUT.toBase64()}) }
                             </pre>
                         </div>
                     </div>

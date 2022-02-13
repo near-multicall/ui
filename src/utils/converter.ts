@@ -12,20 +12,16 @@ const toYocto = (NEAR: string | number) => parseNearAmount(NEAR.toString());
 
 const convert = (value: string | number, unit: string) => { 
 
-    const val = typeof value === "string" 
-        ? BigInt(value).toString() 
-        : value;
-
     switch(unit) {
 
         case "Tgas":
-            return toGas(val);
+            return toGas(value);
 
         case "NEAR":
-            return toYocto(val);
+            return toYocto(value);
 
         default:
-            return val;
+            return value;
 
     }
 
