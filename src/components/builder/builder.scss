@@ -21,9 +21,10 @@
         height: 100%;
         padding: 0 !important;
         margin: 0 !important;
-        background-color: rgba(color.$darkest, 0.25);
+        background-color: transparent !important;
         .tasks-wrapper {
             flex: 1 1 0;
+            background-color: rgba(color.$darkest, 0.25);
             .task-wrapper:last-of-type {
                 margin-bottom: 0 !important;
             }

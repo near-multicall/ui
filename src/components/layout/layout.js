@@ -295,12 +295,6 @@ export default class Layout extends Component {
 
     }
 
-    toCLI() {
-
-        return `near call ${this.state.addresses.multicall} multicall '{"schedules":${JSON.stringify(this.toBase64())}}' --accountId ${this.state.addresses.user} --gas ${toGas(300)}`;
-
-    }
-
     toErrors() {
 
         let output = [];

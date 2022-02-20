@@ -109,7 +109,7 @@ class ArgsBig extends Args {
         unit?: string | null
     ) {
 
-        super("big", value, (min !== null) ? BigInt(min) : null, (max !== null) ? BigInt(max) : null, unit);
+        super("big", value, (min !== null) ? BigInt(min) : null, (max !== null) ? BigInt(max) : null, unit ?? "unknown");
 
         this.big = BigInt(value);
 
@@ -119,8 +119,8 @@ class ArgsBig extends Args {
 
         const v = convert(value.value, value.unit);
 
-        return (value.min === null || v >= value.min) 
-            && (value.max === null || v <= value.max);
+        return (value.min === null || BigInt(v) >= value.min) 
+            && (value.max === null || BigInt(v) <= value.max);
 
     }
 
