@@ -18,6 +18,28 @@ export default class Task extends Component {
 
         this.id = props.task.id;
 
+        const original = window?.COPY?.to === props.task.id ? window?.COPY?.to : undefined;
+
+        if (original) {
+
+            const from = window?.TASKS?.find(t => t.id === COPY.from)?.instance?.current;
+
+            if (from) {
+
+                COPY["payload"] = {
+                    call: from.call,
+                    showArgs: from.state.showArgs,
+                    errors: from.errors
+                }
+            
+            }
+
+        } else { 
+
+            window.COPY = null;
+
+        }
+
         const existent = window?.TASKS?.find(t => t.id === props.task.id);
 
         if (existent) {

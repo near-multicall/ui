@@ -25,18 +25,20 @@ export default class Swap extends BaseTask {
 
     init(json = null) {
 
+        const actions = json?.actions?.[0];
+
         this.call = new Call({
             name: new ArgsString(json?.name ?? "Swap on Ref"),
-            addr: new ArgsAccount(json?.name ?? "ref-finance.near"),
-            func: new ArgsString(json?.func ?? "swap"),
+            addr: new ArgsAccount(json?.address ?? "ref-finance.near"),
+            func: new ArgsString(actions?.func ?? "swap"),
             args: new ArgsObject({
-                actions: new ArgsArray(json?.args?.actions
+                actions: new ArgsArray(actions?.args?.actions?.[0]
                     ? new ArgsObject({
-                        pool_id: new ArgsNumber(json?.args.pool_id),
-                        token_in: new ArgsAccount(json?.args.token_in),
-                        amount_in: new ArgsBig(json?.args.amount, "0", null),
-                        token_out: new ArgsAccount(json?.args.token_out),
-                        min_amount_out: new ArgsBig(json?.args.min_amount_out, "0", null)
+                        pool_id: new ArgsNumber(actions.args.actions[0].pool_id),
+                        token_in: new ArgsAccount(actions.args.actions[0].token_in),
+                        amount_in: new ArgsBig(actions.args.actions[0].amount_in, "0", null),
+                        token_out: new ArgsAccount(actions.args.actions[0].token_out),
+                        min_amount_out: new ArgsBig(actions.args.actions[0].min_amount_out, "0", null)
                     })
                     : new ArgsObject({
                         pool_id: new ArgsNumber(11, 0, null),
@@ -47,8 +49,8 @@ export default class Swap extends BaseTask {
                     })
                 )
             }),
-            gas: new ArgsNumber(json?.gas ?? toGas(95), 1, toGas(300), "gas"),
-            depo: new ArgsBig(json?.depo ?? "1", "1", null, "yocto")
+            gas: new ArgsNumber(actions?.gas ?? toGas(95), 1, toGas(300), "gas"),
+            depo: new ArgsBig(actions?.depo ?? "1", "1", null, "yocto")
         });
 
     }

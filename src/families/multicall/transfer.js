@@ -24,21 +24,23 @@ export default class Transfer extends BaseTask {
 
     init(json = null) {
 
+        const actions = json?.actions?.[0];
+
         this.call = new Call({
             name: new ArgsString(json?.name ?? "Transfer Near"),
             addr: new ArgsAccount(window?.LAYOUT?.state.addresses.multicall ?? ""),
-            func: new ArgsString(json?.func ?? "near_transfer"),
-            args: new ArgsObject(json?.args 
+            func: new ArgsString(actions?.func ?? "near_transfer"),
+            args: new ArgsObject(actions?.args 
                 ? {
-                    account_id: new ArgsAccount(json?.args.account_id),
-                    amount: new ArgsBig(json?.args.amount, "0", null, "yocto")
+                    account_id: new ArgsAccount(actions.args.account_id),
+                    amount: new ArgsBig(actions.args.amount, "0", null, "yocto")
                 }
                 : {
                     account_id: new ArgsAccount(""),
                     amount: new ArgsBig("0", "0", null, "yocto")                    
                 }    
             ),
-            gas: new ArgsNumber(json?.gas ?? toGas(3), 0, toGas(300), "gas"),
+            gas: new ArgsNumber(actions?.gas ?? toGas(3), 0, toGas(300), "gas"),
             depo: new ArgsBig("0", "0", "0", "yocto")
         });
 

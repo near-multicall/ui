@@ -21,15 +21,17 @@ export default class Transfer extends BaseTask {
 
     init(json = null) {
 
+        const actions = json?.actions?.[0];
+
         this.call = new Call({
             name: new ArgsString(json?.name ?? "FT Transfer"),
-            addr: new ArgsAccount(json?.addr ?? "marmaj.tkn.near"),
-            func: new ArgsString(json?.func ?? "ft_transfer"),
-            args: new ArgsObject(json?.args 
+            addr: new ArgsAccount(json?.address ?? "marmaj.tkn.near"),
+            func: new ArgsString(actions?.func ?? "ft_transfer"),
+            args: new ArgsObject(actions?.args 
                 ? {
-                    receiver_id: new ArgsAccount(json?.args.receiver_id),
-                    amount: new ArgsBig(json?.args.amount, "0", null, "yocto"),
-                    memo: new ArgsString(json?.args.memo)
+                    receiver_id: new ArgsAccount(actions.args.receiver_id),
+                    amount: new ArgsBig(actions.args.amount, "0", null, "yocto"),
+                    memo: new ArgsString(actions.args.memo)
                 }
                 : {
                     receiver_id: new ArgsAccount(""),
@@ -37,7 +39,7 @@ export default class Transfer extends BaseTask {
                     memo: new ArgsString("")
                 }    
             ),
-            gas: new ArgsNumber(json?.gas ?? toGas(7), 0, toGas(300), "gas"),
+            gas: new ArgsNumber(actions?.gas ?? toGas(7), 0, toGas(300), "gas"),
             depo: new ArgsBig("1", "1", "1", "yocto")
         });
 

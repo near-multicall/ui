@@ -62,9 +62,9 @@ class ArgsAccount extends Args {
 
     }
 
-    static isValid = value => value.match(/^(?=.{2,64}$)(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_])*[a-z\d]+$/);
+    static isValid = (value: ArgsAccount) => value.value.match(/^(?=.{2,64}$)(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_])*[a-z\d]+$/);
 
-    isValid = () => ArgsAccount.isValid(this.value);
+    isValid = () => ArgsAccount.isValid(this);
 
     toNet = () => this.value.split(".").pop() === "testnet" ? "testnet" : "mainnet";
 
@@ -172,15 +172,15 @@ class ArgsJSON extends Args {
         super("json", value);
 
         if (typeof value !== "string")
-            console.error("expected string");
+            console.error("ArgsJSON expected string, but got", value);
 
     }
 
     toString = () => {
         
-        if (!this.isValid())
-            console.error(`invalid JSON ${this.value}`);
-        else
+        if (!this.isValid()) {
+            console.error(`invalid JSON ${this.value} on ArgsJSON`);
+        } else
             return JSON.parse(this.value);
 
     }

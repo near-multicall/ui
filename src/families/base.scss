@@ -3,6 +3,16 @@
 @use 'sass/font';
 @use 'sass/mixin';
 
+@mixin backdrop {
+    position: absolute;
+    width: 4 * size.$gap;
+    height: 4 * size.$gap;
+    top: -2 * size.$gap;
+    border-radius: 100%;
+    z-index: 0;
+    scale: 0;    
+}
+
 .base-task  {
     background: color.$lightest;
     .name {
@@ -40,15 +50,55 @@
         }
         .icon {
             @include mixin.icon;
-            position: absolute;
-            right: 0.5 * size.$gap;
             fill: color.$light-text;
             cursor: pointer;
-            &:hover,
-            &:focus {
-                color: color.$lightest;
+            opacity: 0;
+            transition: opacity 100ms ease;
+            z-index: 1;
+            &.edit {
+                position: absolute;
+                right: 0.5 * size.$gap;
+                &:hover + .edit-pseudo {
+                    scale: 1;
+                    transition: scale 300ms ease;
+                }
+            }
+            &.delete {
+                position: absolute;
+                left: 0.5 * size.$gap;
+                &:hover + .delete-pseudo {
+                    scale: 1;
+                    transition: scale 300ms ease;
+                }
+            }
+            &.duplicate {
+                position: absolute;
+                left: 1.5 * size.$gap;
+                &:hover + .duplicate-pseudo {
+                    scale: 1;
+                    transition: scale 300ms ease;
+                }
             }
         }
+        .delete-pseudo {
+            @include backdrop;
+            left: -1 * size.$gap;
+            background-color: rgba(color.$red, 0.8);
+        }
+        .edit-pseudo {
+            @include backdrop;
+            right: -1 * size.$gap;
+            background-color: rgba(color.$blue, 0.8);
+        }
+        .duplicate-pseudo {
+            @include backdrop;
+            left: 0;
+            background-color: rgba(color.$purple, 0.8);
+        }
+    }
+    &:hover > .name > .icon {
+        opacity: 1;
+        transition: opacity 100ms ease;
     }
     .data-container {
         @include mixin.no-scrollbar;
@@ -58,6 +108,7 @@
         padding: 0.5 * size.$gap;
         padding-bottom: size.$gap;
         background-color: rgba(color.$light, 0.5);
+        z-index: 1;
         pre.code {
             @include mixin.no-scrollbar;
             padding: 0.5rem;

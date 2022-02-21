@@ -10,17 +10,19 @@ export default class Withdraw extends BaseTask {
     uniqueClassName = "ref-withdraw-task";
     errors = {
         ...this.baseErrors,
-        addr: new ArgsError("Invalid address", value => ArgsAccount.isValid(value), !ArgsAccount.isValid(this.call.addr.value)),
+        addr: new ArgsError("Invalid address", value => ArgsAccount.isValid(value), !ArgsAccount.isValid(this.call.addr)),
         func: new ArgsError("Cannot be empty", value => value != ""),
         gas: new ArgsError("Amount out of bounds", value => ArgsNumber.isValid(value)),
     };
 
     init(json = null) {
 
+        const actions = json?.actions?.[0];
+
         this.call = new Call({
             name: new ArgsString(json?.name ?? "Withdraw from Ref"),
             addr: new ArgsAccount(window?.LAYOUT?.state.addresses.multicall ?? ""),
-            func: new ArgsString(json?.func ?? "withdraw_from_ref"),
+            func: new ArgsString(actions?.func ?? "withdraw_from_ref"),
             /*args: new ArgsObject(json?.args 
                 ? {
                     ref_adress: new ArgsString(json?.args.ref_adress),
@@ -39,9 +41,9 @@ export default class Withdraw extends BaseTask {
                     deposit: new ArgsBig("1", "1", null, "yocto")                    
                 }    
             ),*/
-            args: new ArgsJSON(json?.args ?? "{\n  \"ref_address\": \"ref-finance-101.testnet\",\n  \"tokens\": [\n    \"nusdc.ft-fin.testnet\"\n  ],\n  \"receiver_id\": \"\",\n  \"withdrawal_gas\": \"55000000000000\",\n  \"token_transfer_gas\": \"4000000000000\",\n  \"deposit\": \"1\"\n}"),
-            gas: new ArgsNumber(json?.gas ?? toGas(95), 1, toGas(300), "gas"),
-            depo: new ArgsBig(json?.depo ?? "0", "0", null, "yocto")
+            args: new ArgsJSON(actions?.args ? JSON.stringify(actions?.args, null, "  ") : "{\n  \"ref_address\": \"ref-finance-101.testnet\",\n  \"tokens\": [\n    \"nusdc.ft-fin.testnet\"\n  ],\n  \"receiver_id\": \"\",\n  \"withdrawal_gas\": \"55000000000000\",\n  \"token_transfer_gas\": \"4000000000000\",\n  \"deposit\": \"1\"\n}"),
+            gas: new ArgsNumber(actions?.gas ?? toGas(95), 1, toGas(300), "gas"),
+            depo: new ArgsBig(actions?.depo ?? "0", "0", null, "yocto")
         });
 
     }

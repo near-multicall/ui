@@ -43,6 +43,88 @@ export default class Layout extends Component {
 
     // TODO delete elements after exjecting from tasklist / columnlist
 
+    deleteTask = (taskId) => {
+
+        let column, index;
+
+        for (let c of this.state.columnOrder)
+            for (let i in this.state.columns[c].taskIds)
+                if (this.state.columns[c].taskIds[i] === taskId) {
+                    column = this.state.columns[c];
+                    index = i
+                }
+
+        if (column == undefined || index == undefined) {
+            console.error("Task not found");
+            return;
+        }
+
+        const taskIds = Array.from(column.taskIds);
+        taskIds.splice(index, 1);
+        const newColumn = {
+            ...column,
+            taskIds: taskIds
+        };
+
+        const newState = {
+            ...this.state,
+            columns: {
+                ...this.state.columns,
+                [newColumn.id]: newColumn,
+            }
+        }
+
+        this.setState(newState);
+
+    }
+
+    duplicateTask = (taskId) => {
+
+        let column, index;
+
+        for (let c of this.state.columnOrder)
+            for (let i in this.state.columns[c].taskIds)
+                if (this.state.columns[c].taskIds[i] === taskId) {
+                    column = this.state.columns[c];
+                    index = i
+                }
+
+        if (column == undefined || index == undefined) {
+            console.error("Task not found");
+            return;
+        }
+
+        // create new task
+        const taskClone = JSON.parse(JSON.stringify(this.state.tasks[taskId.toString()]));
+        taskClone.id = `task-${this.taskID}`;
+        this.state.tasks[taskClone.id] = taskClone;
+
+        const taskIds = Array.from(column.taskIds);
+        taskIds.splice(index, 0, `task-${this.taskID}`);
+
+        this.taskID++;
+
+        const newColumn = {
+            ...column,
+            taskIds: taskIds
+        };
+
+        const newState = {
+            ...this.state,
+            columns: {
+                ...this.state.columns,
+                [newColumn.id]: newColumn,
+            }
+        }
+
+        window.COPY = {
+            from: taskId,
+            to: taskClone.id
+        }
+        this.setState(newState);
+
+    }
+
     deleteColumn = index => {
 
         const newColumnOrder = Array.from(this.state.columnOrder);
@@ -263,7 +345,7 @@ export default class Layout extends Component {
                 if (task)
                     output[output.length -1].push(task.instance.current.call.toJSON());
                 else
-                    console.error(`no task with id ${t}`);
+                    console.warn(`no task with id ${t}`);
             }
         
         }
@@ -286,7 +368,7 @@ export default class Layout extends Component {
                 if (task)
                     output[output.length -1].push(task.instance.current.call.toBase64());
                 else
-                    console.error(`no task with id ${t}`);
+                    console.warn(`no task with id ${t}`);
             }
         
         }

@@ -17,15 +17,16 @@ class TextInput extends Component {
       <TextField
         label={label}
         value={ 
-            error !== undefined 
-                ? error.validOrNull(value.value) || error.intermediate 
-                : value
+            value.value
+            // error !== undefined 
+            //     ? error.validOrNull(value)?.value || error.intermediate?.value
+            //     : value.value
             }
         margin="dense"
         size="small"
         onChange={(e) => {
             value.value = e.target.value;
-            error?.validOrNull(value.value);
+            error?.validOrNull(value);
             update?.();
         }}
         error={error?.isBad}

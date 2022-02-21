@@ -1,10 +1,10 @@
 import React, { Component } from 'react'
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import { ArgsAccount, ArgsBig, ArgsJSON, ArgsNumber, ArgsString, ArgsError } from '../utils/args';
 import Call from '../utils/call';
 import { toGas } from '../utils/converter';
 import './base.scss';
 import { TextInput, TextInputWithUnits } from '../components/editor/elements';
+import { DeleteOutline, EditOutlined, ViewAgendaOutlined } from '@mui/icons-material';
 
 export default class BaseTask extends Component {
 
@@ -12,11 +12,11 @@ export default class BaseTask extends Component {
     call;
     baseErrors = {
         addr: new ArgsError("Invalid address", value => ArgsAccount.isValid(value), true),
-        func: new ArgsError("Cannot be empty", value => value != "", true),
+        func: new ArgsError("Cannot be empty", value => value.value != "", true),
         args: new ArgsError("Invalid JSON", value => JSON.parse(value)),
         gas: new ArgsError("Amount out of bounds", value => ArgsNumber.isValid(value), true),
         depo: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value) && value.value !== "" )
-        // TODO regex check inputs, different errors?
+        // // TODO regex check inputs, different errors?
     };
     errors = this.baseErrors;
 
@@ -32,7 +32,15 @@ export default class BaseTask extends Component {
             this.call = TEMP.call;
             this.state.showArgs = TEMP.showArgs;
             this.errors = TEMP.errors;
-        } else 
+        } else if (window.COPY?.payload) {
+            this.init({
+                name: COPY.payload.call?.name?.toString(),
+                ...COPY.payload.call.toJSON()
+            });
+            this.state.showArgs = COPY.payload.showArgs;
+            this.errors = COPY.payload.errors;
+            COPY = null;
+        } else
             this.init(this.props.json);
 
         this.updateCard = this.updateCard.bind(this);
@@ -41,13 +49,15 @@ export default class BaseTask extends Component {
 
     init(json = null) {
 
+        const actions = json?.actions?.[0];
+
         this.call = new Call({
             name: new ArgsString(json?.name ?? "Custom"),
-            addr: new ArgsAccount(json?.addr ?? ""),
-            func: new ArgsString(json?.func ?? ""),
-            args: new ArgsJSON(json?.args ? JSON.stringify(json.args) : '{}'),
-            gas: new ArgsNumber(json?.gas ?? 0, 0, toGas(300), "gas"),
-            depo: new ArgsBig(json?.depo ?? "0", "0", null, "yocto")
+            addr: new ArgsAccount(json?.address ?? ""),
+            func: new ArgsString(actions?.func ?? ""),
+            args: new ArgsJSON(actions?.args ? JSON.stringify(actions?.args, null, "  ") : '{}'),
+            gas: new ArgsNumber(actions?.gas ?? 0, 0, toGas(300), "gas"),
+            depo: new ArgsBig(actions?.depo ?? "0", "0", null, "yocto")
         });
 
     }
@@ -142,14 +152,29 @@ export default class BaseTask extends Component {
                 className={`task-container ${this.uniqueClassName}`}
             >
                 <div className="name">
+                    <DeleteOutline 
+                        className="delete icon" 
+                        onClick={() => {
+                            LAYOUT.deleteTask(id);
+                        }}
+                    />
+                    <div className="delete-pseudo"></div>
+                    <ViewAgendaOutlined
+                        className="duplicate icon" 
+                        onClick={() => {
+                            LAYOUT.duplicateTask(id);
+                        }}
+                    />
+                    <div className="duplicate-pseudo"></div>
                     <h3>{ name.toString() }</h3>
-                    <EditOutlinedIcon 
-                        className="icon" 
+                    <EditOutlined
+                        className="edit icon" 
                         onClick={() => {
                             EDITOR.edit(id);
                             MENU.changeTab(1);
                         }}
                     />
+                    <div className="edit-pseudo"></div>
                 </div>
                 <div className="data-container">
                     <p><span>Contract address</span><a className="code" href={ addr.toUrl() } target="_blank" rel="noopener noreferrer">{ addr.toString() }</a></p>
