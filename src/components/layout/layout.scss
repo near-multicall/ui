@@ -3,6 +3,18 @@
 @use 'sass/color';
 @use 'sass/animation';
 
+@mixin tutorial {
+    content: " ";
+    position: absolute;
+    height: 40vh;
+    top: 30vh;
+    background-size: contain;
+    background-repeat: no-repeat;
+    opacity: 0.15;
+    filter: none;
+    transition: all 1s ease;
+}
+
 .layout-wrapper {
     position: relative;
     display: flex;
@@ -16,6 +28,38 @@
         flex-flow: row nowrap;
         padding-left: size.$gap;
         width: auto;
+        &[tutorial="yes"]::before {
+            @include tutorial;
+            width: 28%;
+            left: 15%;
+            background-image: url("../../assets/sequence.svg");
+            background-position: left;
+        }
+        &[tutorial="no"]::before {
+            @include tutorial;
+            width: 28%;
+            left: 15%;
+            background-image: url("../../assets/sequence.svg");
+            background-position: left;
+            opacity: 0;
+            filter: blur(5px);
+        }
+        &[tutorial="yes"]::after {
+            @include tutorial;
+            width: 35%;
+            right: 15%;
+            background-image: url("../../assets/parallel.svg");
+            background-position: right;
+        }
+        &[tutorial="no"]::after {
+            @include tutorial;
+            width: 35%;
+            right: 15%;
+            background-image: url("../../assets/parallel.svg");
+            background-position: right;
+            opacity: 0;
+            filter: blur(5px);
+        }
     }
     .empty-container {
         flex-shrink: 0;

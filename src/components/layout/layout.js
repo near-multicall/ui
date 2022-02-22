@@ -408,6 +408,12 @@ export default class Layout extends Component {
 
     }
 
+    empty() {
+
+        return this.state.columnOrder.length === 1 && this.state.columns[this.state.columnOrder[0]].taskIds.length === 0
+
+    }
+
     setExpanded(expanded) {
 
         this.expanded = expanded;
@@ -431,6 +437,10 @@ export default class Layout extends Component {
                         <div className="layout-wrapper">
                             <div 
                                 className="layout-container"
+                                tutorial={ this.empty()
+                                    ? "yes"
+                                    : "no"
+                                }
                                 {...provided.droppableProps}
                                 ref={provided.innerRef}
                             >
