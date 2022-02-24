@@ -7,6 +7,7 @@ import React, { Component } from 'react';
 import { ArgsAccount, ArgsBig, ArgsError, ArgsNumber } from '../../utils/args';
 import { toGas } from '../../utils/converter';
 import { TextInput, TextInputWithUnits } from '../editor/elements';
+import getContractID from '../../utils/contractids';
 import './export.scss';
 
 
@@ -29,7 +30,7 @@ export default class Export extends Component {
 
     ft = {
         amount: new ArgsBig("0", "0", null, "yocto"),
-        token: new ArgsAccount("wrap.near")
+        token: new ArgsAccount(getContractID("wNEAR"))
     }
 
     attachFTs = false;
@@ -72,8 +73,12 @@ export default class Export extends Component {
         const allErrors = LAYOUT.toErrors();
         const errors = this.errors;
 
-        for (let e in errors)
-            errors[e].validOrNull(LAYOUT.state.addresses[e]);
+        const addresses = Object.fromEntries(Object.entries(LAYOUT.state.addresses)
+            .map(([k, v]) => {
+                const account = new ArgsAccount(v)
+                errors[k].validOrNull(account);
+                return [k, account]
+            }));
 
         return (
             <div 
@@ -82,53 +87,38 @@ export default class Export extends Component {
             >
                 <div className="export-container">
                     <div className="input-container">
-                        <TextField
+                        <TextInput
                             label="User address"
-                            value={ LAYOUT.state.addresses.user }
-                            margin="dense"
-                            size="small"
-                            onChange={e => {
+                            value={ addresses.user }
+                            error={ errors.user }
+                            update={e => {
                                 LAYOUT.setAddresses({
                                     user: e.target.value
                                 });
-                                errors.user.validOrNull(e.target.value);
                                 this.forceUpdate();
                             }}
-                            error={errors.user.isBad}
-                            helperText={errors.user.isBad && errors.user.message}
-                            InputLabelProps={{shrink: true}}
                         />
-                        <TextField
+                        <TextInput
                             label="DAO address"
-                            value={ LAYOUT.state.addresses.dao }
-                            margin="dense"
-                            size="small"
-                            onChange={e => {
+                            value={ addresses.dao }
+                            error={ errors.dao }
+                            update={e => {
                                 LAYOUT.setAddresses({
                                     dao: e.target.value
                                 });
-                                errors.dao.validOrNull(e.target.value);
                                 this.forceUpdate();
                             }}
-                            error={errors.dao.isBad}
-                            helperText={errors.dao.isBad && errors.dao.message}
-                            InputLabelProps={{shrink: true}}
                         />
-                        <TextField
+                        <TextInput
                             label="Multicall address"
-                            value={ LAYOUT.state.addresses.multicall }
-                            margin="dense"
-                            size="small"
-                            onChange={e => {
+                            value={ addresses.multicall }
+                            error={ errors.multicall }
+                            update={e => {
                                 LAYOUT.setAddresses({
                                     multicall: e.target.value
                                 });
-                                errors.multicall.validOrNull(e.target.value);
                                 this.forceUpdate();
                             }}
-                            error={errors.multicall.isBad}
-                            helperText={errors.multicall.isBad && errors.multicall.message}
-                            InputLabelProps={{shrink: true}}
                         />
                     </div>
                     <div className="input-container">

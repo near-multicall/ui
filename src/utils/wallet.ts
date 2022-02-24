@@ -2,12 +2,15 @@ import { connect, keyStores, WalletConnection, transactions } from 'near-api-js'
 import getConfig from '../config';
 import BN from 'bn.js';
 
-window["ENVIRONMENT"] = 'testnet';
-
 function initWallet() {
     return new Promise(resolve => {
+        const url = new URL(window.location.href)
+        window["ENVIRONMENT"] = url.searchParams.has("testnet")
+            ? "testnet"
+            : "mainnet"
+        window.history.replaceState(null, "", new URL(window.location.href.split("?")[0]).searchParams.set("env", ENVIRONMENT))
         connect({
-            ...getConfig(window["ENVIRONMENT"] || 'development'),
+            ...getConfig(ENVIRONMENT),
             keyStore: new keyStores.BrowserLocalStorageKeyStore()
         }).then(near => resolve(new WalletConnection(near, 'near-multicall')));
     });

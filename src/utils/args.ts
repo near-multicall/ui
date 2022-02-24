@@ -18,6 +18,8 @@ export default abstract class Args {
     max: number | BigInt | null;
     unit: string | null;
 
+    omit = false;
+
     constructor(
         type: string, 
         value: any, 
@@ -62,7 +64,7 @@ class ArgsAccount extends Args {
 
     }
 
-    static isValid = (value: ArgsAccount) => value.value.match(/^(?=.{2,64}$)(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_])*[a-z\d]+$/);
+    static isValid = (value: ArgsAccount) => /^(?=.{2,64}$)(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_])*[a-z\d]+$/.test(value.value);
 
     isValid = () => ArgsAccount.isValid(this);
 
@@ -145,7 +147,8 @@ class ArgsObject extends Args {
         let res = {};
 
         for (let k in this.value)
-            res[k] = convert(this.value[k], this.value[k].unit).toString();
+            if (!this.value[k].omit)
+                res[k] = convert(this.value[k], this.value[k].unit).toString();
 
         return res; // JSON.stringify(res, null, "  ");
 

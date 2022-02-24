@@ -27,7 +27,7 @@ class TextInput extends Component {
         onChange={(e) => {
             value.value = e.target.value;
             error?.validOrNull(value);
-            update?.();
+            update?.(e);
         }}
         error={error?.isBad}
         helperText={error?.isBad && error?.message}
@@ -69,7 +69,7 @@ class TextInputWithUnits extends Component {
                 onChange={(e) => {
                     value.value = e.target.value;
                     error?.validOrNull(value);
-                    update?.();
+                    update?.(e);
                 }}
                 error={error?.isBad}
                 helperText={error?.isBad && error?.message}
@@ -86,7 +86,7 @@ class TextInputWithUnits extends Component {
                 onChange={e => {
                     value.unit = e.target.value;
                     error?.validOrNull(value);
-                    update?.();
+                    update?.(e);
                 }}
                 SelectProps={{
                     native: true,

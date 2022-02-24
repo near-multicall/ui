@@ -1,6 +1,8 @@
-const CONTRACT_NAME = process.env.CONTRACT_NAME || 'multicall.near';
+import getContractID from "./utils/contractids";
 
 function getConfig(env) {
+
+  const CONTRACT_NAME = process.env.CONTRACT_NAME || getContractID("multicall")
 
   switch (env) {
 

@@ -1,9 +1,10 @@
 import React from 'react';
 import { TextInput, TextInputWithUnits } from '../../components/editor/elements';
-import { ArgsAccount, ArgsBig, ArgsNumber, ArgsString, ArgsObject, ArgsError } from "../../utils/args";
+import { ArgsAccount, ArgsBig, ArgsError, ArgsNumber, ArgsObject, ArgsString } from "../../utils/args";
 import Call from "../../utils/call";
 import { toGas } from "../../utils/converter";
 import BaseTask from "../base";
+import getContractID from '../../utils/contractids';
 import "./near.scss";
 
 export default class Transfer extends BaseTask {
@@ -25,7 +26,7 @@ export default class Transfer extends BaseTask {
 
         this.call = new Call({
             name: new ArgsString(json?.name ?? "FT Transfer"),
-            addr: new ArgsAccount(json?.address ?? "marmaj.tkn.near"),
+            addr: new ArgsAccount(json?.address ?? getContractID("example")),
             func: new ArgsString(actions?.func ?? "ft_transfer"),
             args: new ArgsObject(actions?.args 
                 ? {

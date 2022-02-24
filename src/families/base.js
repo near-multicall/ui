@@ -1,10 +1,10 @@
-import React, { Component } from 'react'
-import { ArgsAccount, ArgsBig, ArgsJSON, ArgsNumber, ArgsString, ArgsError } from '../utils/args';
+import { DeleteOutline, EditOutlined, ViewAgendaOutlined } from '@mui/icons-material';
+import React, { Component } from 'react';
+import { TextInput, TextInputWithUnits } from '../components/editor/elements';
+import { ArgsAccount, ArgsBig, ArgsError, ArgsJSON, ArgsNumber, ArgsString } from '../utils/args';
 import Call from '../utils/call';
 import { toGas } from '../utils/converter';
 import './base.scss';
-import { TextInput, TextInputWithUnits } from '../components/editor/elements';
-import { DeleteOutline, EditOutlined, ViewAgendaOutlined } from '@mui/icons-material';
 
 export default class BaseTask extends Component {
 
@@ -19,6 +19,7 @@ export default class BaseTask extends Component {
         // // TODO regex check inputs, different errors?
     };
     errors = this.baseErrors;
+    options = {};
 
     constructor(props) {
        
@@ -31,6 +32,7 @@ export default class BaseTask extends Component {
         if (window.TEMP) {
             this.call = TEMP.call;
             this.state.showArgs = TEMP.showArgs;
+            this.options = TEMP.options;
             this.errors = TEMP.errors;
         } else if (window.COPY?.payload) {
             this.init({
@@ -38,6 +40,7 @@ export default class BaseTask extends Component {
                 ...COPY.payload.call.toJSON()
             });
             this.state.showArgs = COPY.payload.showArgs;
+            this.options = COPY.payload.options;
             this.errors = COPY.payload.errors;
             COPY = null;
         } else

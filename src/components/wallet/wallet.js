@@ -1,9 +1,11 @@
-import React, { Component } from 'react';
 import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
+import ScienceOutlinedIcon from '@mui/icons-material/ScienceOutlined';
+import { Base64 } from 'js-base64';
+import React, { Component } from 'react';
+import getContractID from '../../utils/contractids';
+import { toGas, toYocto } from '../../utils/converter';
 import { initWallet, tx } from '../../utils/wallet';
 import './wallet.scss';
-import { toGas, toYocto } from '../../utils/converter';
-import { Base64 } from 'js-base64';
 
 export default class Wallet extends Component {
 
@@ -33,7 +35,7 @@ export default class Wallet extends Component {
 
     signIn() {
 
-        this.state.wallet.requestSignIn(ENVIRONMENT === "mainnet" ? "multicall.near" : "multicall.testnet");
+        this.state.wallet.requestSignIn(getContractID("multicall"));
 
     }
     
@@ -130,20 +132,27 @@ export default class Wallet extends Component {
         if (!wallet)
             return null;
 
+        console.log(window.ENVIRONMENT);
+
         return (
-            <button
-                className="wallet"
-                onClick={ () => wallet.isSignedIn()
-                    ? this.signOut() 
-                    : this.signIn()
-                }
-            >
-                <AccountBalanceWalletOutlinedIcon/>
-                { wallet.isSignedIn()
-                    ? `Logout ${wallet.getAccountId()}`
-                    : `Sign in`
-                }
-            </button>
+            <>
+                <button
+                    className="wallet"
+                    onClick={ () => wallet.isSignedIn()
+                        ? this.signOut() 
+                        : this.signIn()
+                    }
+                >
+                    { window.ENVIRONMENT === "testnet" 
+                        ? <ScienceOutlinedIcon/>
+                        : <AccountBalanceWalletOutlinedIcon/>
+                    }
+                    { wallet.isSignedIn()
+                        ? `Logout ${wallet.getAccountId()}`
+                        : `Sign in`
+                    }
+                </button>
+            </>
         );
 
     }

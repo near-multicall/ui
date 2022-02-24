@@ -20,7 +20,9 @@ export default class Transfer extends BaseTask {
         gas: new ArgsError("Amount out of bounds", value => ArgsNumber.isValid(value)),
     };
 
-    transferAll = false;
+    options = {
+        all: false
+    }
 
     init(json = null) {
 
@@ -78,22 +80,23 @@ export default class Transfer extends BaseTask {
                     <Checkbox
                         checked={this.transferAll}
                         onChange={e => {
-                            this.transferAll = e.target.checked;
-                            amount.value = "0";
-                            amount.unit = "yocto";
+                            this.options.all = e.target.checked;
+                            this.call.args.value.amount.omit = e.target.checked;
                             this.updateCard();
                         }}
                     />
                     <p>Transfer all available funds</p>
                 </div>
-                <TextInputWithUnits
-                    label="Transfer amount"
-                    value={ amount }
-                    error={ errors.amount }
-                    disabled={this.transferAll}
-                    options={[ "yocto", "NEAR" ]}
-                    update={ this.updateCard }
-                />
+                { !this.options.all  
+                    ? <TextInputWithUnits
+                        label="Transfer amount"
+                        value={ amount }
+                        error={ errors.amount }
+                        options={[ "yocto", "NEAR" ]}
+                        update={ this.updateCard }
+                    />
+                    : <></>
+                }
                 <TextInputWithUnits
                     label="Allocated gas"
                     value={ gas }

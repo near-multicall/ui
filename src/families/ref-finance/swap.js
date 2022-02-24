@@ -3,6 +3,7 @@ import React from 'react';
 import { TextInput, TextInputWithUnits } from '../../components/editor/elements';
 import { ArgsAccount, ArgsBig, ArgsError, ArgsNumber, ArgsString, ArgsObject, ArgsArray } from "../../utils/args";
 import Call from "../../utils/call";
+import getContractID from '../../utils/contractids';
 import { toGas } from "../../utils/converter";
 import BaseTask from "../base";
 import "./ref-finance.scss";
@@ -29,7 +30,7 @@ export default class Swap extends BaseTask {
 
         this.call = new Call({
             name: new ArgsString(json?.name ?? "Swap on Ref"),
-            addr: new ArgsAccount(json?.address ?? "ref-finance.near"),
+            addr: new ArgsAccount(json?.address ?? getContractID("ref-finance")),
             func: new ArgsString(actions?.func ?? "swap"),
             args: new ArgsObject({
                 actions: new ArgsArray(actions?.args?.actions?.[0]
@@ -42,9 +43,9 @@ export default class Swap extends BaseTask {
                     })
                     : new ArgsObject({
                         pool_id: new ArgsNumber(11, 0, null),
-                        token_in: new ArgsAccount("marmaj.tkn.near"),
+                        token_in: new ArgsAccount(getContractID("example")),
                         amount_in: new ArgsBig("1", "0", null),
-                        token_out: new ArgsAccount("wrap.near"),
+                        token_out: new ArgsAccount(getContractID("wNEAR")),
                         min_amount_out: new ArgsBig("1", "0", null)                
                     })
                 )
