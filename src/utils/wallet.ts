@@ -44,4 +44,24 @@ function tx(
 
 }
 
-export { initWallet, tx };
+function view(
+    addr: string,
+    func: string,
+    args: any
+) {
+    const account = window?.["WALLET"]?.state.wallet.account();
+
+    if (account == undefined) {
+        console.error("Wallet not connected");
+        return;
+    }
+
+    return account.viewFunction(
+        addr, 
+        func, 
+        args
+    )
+
+}
+
+export { initWallet, tx, view };

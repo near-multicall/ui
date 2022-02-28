@@ -4,7 +4,7 @@ import Icon from '@mui/material/Icon';
 import TextField from '@mui/material/TextField';
 import { Base64 } from 'js-base64';
 import React, { Component } from 'react';
-import { ArgsAccount, ArgsBig, ArgsError, ArgsNumber } from '../../utils/args';
+import { ArgsAccount, ArgsBig, ArgsError, ArgsNumber, ArgsString } from '../../utils/args';
 import { toGas } from '../../utils/converter';
 import { TextInput, TextInputWithUnits } from '../editor/elements';
 import getContractID from '../../utils/contractids';
@@ -26,6 +26,7 @@ export default class Export extends Component {
     total = {
         gas: new ArgsNumber(toGas(270), 0, toGas(270), "gas"),
         depo: new ArgsBig("0", "0", null, "yocto"),
+        desc: new ArgsString("")
     }
 
     ft = {
@@ -67,7 +68,7 @@ export default class Export extends Component {
 
         const LAYOUT = this.props.layout; // ususally global parameter
 
-        const { gas, depo } = this.total;
+        const { gas, depo, desc } = this.total;
         const { amount, token } = this.ft;
 
         const allErrors = LAYOUT.toErrors();
@@ -171,6 +172,12 @@ export default class Export extends Component {
                             </>
                             : <></>
                         }
+                        <TextInput 
+                            label="Proposal description"
+                            value={ desc }
+                            multiline
+                            update={ this.update }
+                        />
                     </div>
                     { allErrors.length > 0 && <div className="error-container">
                         <div className="header">
@@ -256,9 +263,9 @@ export default class Export extends Component {
                             className="propose button"
                             onClick={() => {
                                 if (this.attachFTs)
-                                    WALLET.proposeFT(depo.value, gas.value, token.value, amount.value)
+                                    WALLET.proposeFT(desc.value, depo.value, gas.value, token.value, amount.value)
                                 else
-                                    WALLET.propose(depo.value, gas.value)
+                                    WALLET.propose(desc.value, depo.value, gas.value)
                             }}
                         >
                             {`Propose on ${LAYOUT.state.addresses.dao}`}

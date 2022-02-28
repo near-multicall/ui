@@ -1,0 +1,50 @@
+@use 'sass/mixin';
+@use 'sass/size';
+@use 'sass/color';
+@use 'sass/animation';
+
+.dao-wrapper {
+    position: relative;
+    display: flex;
+    flex-flow: row nowrap;
+    height: calc(100% - 2 * size.$gap);
+    top: 2 * size.$gap;
+    .dao-container {
+        @include mixin.full;
+        @include mixin.center-items(center, flex-start);
+        flex: 1 1 0;
+        flex-flow: row nowrap;
+        width: auto;
+        .MuiTextField-root {
+            width: 100%;
+            text-align: left;
+            margin: calc(size.$gap - 0.5 * size.$large-text) size.$gap;
+            .MuiInputBase-root {
+                font-size: size.$large-text;
+                color: color.$lightish;
+                input {
+                    padding: 0;
+                }
+                &.Mui-error {
+                    color: darken(color.$red, 10%);
+                }
+                
+            }
+            fieldset {
+                border: none;
+            }
+            p {
+                display: none;
+            }
+        }
+    }
+    &::before {
+        content: '';
+        position: fixed;
+        top: 2 * size.$gap;
+        left: 0;
+        height: calc(2.5 * size.$gap - 0.5 * (size.$gap - size.$large-text));
+        min-width: 100%;
+        background-color: color.$light;
+    }
+}

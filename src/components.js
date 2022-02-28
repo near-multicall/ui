@@ -7,6 +7,7 @@ import Editor from './components/editor/editor.js'
 import Export from './components/export/export.js'
 import Wallet from './components/wallet/wallet.js'
 import Header from './components/header/header.js'
+import Dao from './components/dao/dao.js'
 
 import * as Family from './families/families.js'
 
@@ -20,5 +21,6 @@ export {
     Export,
     Wallet,
     Header,
+    Dao,
     Family
 }

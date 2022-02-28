@@ -1,7 +1,7 @@
-import React, { Component } from 'react'
-import './global.scss'
-import { Layout, Header } from './components.js'
-import './utils/loader.ts'
+import React, { Component } from 'react';
+import { Header } from './components.js';
+import { Outlet } from "react-router-dom";
+import './utils/loader.ts';
 
 export default class App extends Component {
 
@@ -10,7 +10,7 @@ export default class App extends Component {
     return (
       <>
         <Header/>
-        <Layout/>
+        <Outlet/>
       </>
     );
   

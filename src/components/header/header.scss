@@ -33,6 +33,28 @@
             font-size: size.$large-text;
         }
     }
+    nav {
+        font-size: size.$text;
+        border-radius: size.$task-radius;
+        outline: 1px solid color.$light;
+        a {
+            height: size.$gap;
+            padding: 0 0.5 * size.$gap;
+            font-size: size.$text;
+            color: color.$light-text !important;
+            &.active {
+                color: color.$text !important;
+                background-color: color.$light;
+                border: 1px solid color.$light;
+            }
+            &:first-of-type {
+                border-radius: size.$task-radius 0 0 size.$task-radius;
+            }
+            &:last-of-type {
+                border-radius: 0 size.$task-radius size.$task-radius 0;
+            }
+        }
+    }
 }
 
 .empty-container {

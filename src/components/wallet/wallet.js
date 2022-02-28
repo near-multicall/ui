@@ -46,7 +46,7 @@ export default class Wallet extends Component {
     
     }
 
-    propose(depo, gas) {
+    propose(desc, depo, gas) {
 
         const {
             multicall,
@@ -55,7 +55,7 @@ export default class Wallet extends Component {
 
         const args = {
             proposal: {
-                description: "multicall [ID] [Link]",
+                description: desc,
                 kind: {
                     FunctionCall: {
                         receiver_id: multicall,
@@ -82,7 +82,7 @@ export default class Wallet extends Component {
 
     }
 
-    proposeFT(depo, gas, token, amount) {
+    proposeFT(desc, depo, gas, token, amount) {
 
         const {
             multicall,
@@ -91,7 +91,7 @@ export default class Wallet extends Component {
 
         const args = {
             proposal: {
-                description: "multicall [ID] [Link]",
+                description: desc,
                 kind: {
                     FunctionCall: {
                         receiver_id: token,

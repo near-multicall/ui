@@ -254,6 +254,7 @@ option {
     position: sticky;
     bottom: 0;
     border-radius: size.$task-radius;
+    z-index: 1;
     &.propose {
         background-color: color.$green;
     }
