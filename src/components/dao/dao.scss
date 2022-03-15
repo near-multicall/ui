@@ -1,22 +1,20 @@
 @use 'sass/mixin';
 @use 'sass/size';
 @use 'sass/color';
+@use 'sass/font';
 @use 'sass/animation';
 
-.dao-wrapper {
+.dao-container {
     position: relative;
     display: flex;
-    flex-flow: row nowrap;
+    flex-flow: column nowrap;
     height: calc(100% - 2 * size.$gap);
     top: 2 * size.$gap;
-    .dao-container {
-        @include mixin.full;
-        @include mixin.center-items(center, flex-start);
-        flex: 1 1 0;
+    .address-container {
         flex-flow: row nowrap;
         width: auto;
         .MuiTextField-root {
-            width: 100%;
+            width: calc(100% - 2 * size.$gap);
             text-align: left;
             margin: calc(size.$gap - 0.5 * size.$large-text) size.$gap;
             .MuiInputBase-root {
@@ -46,5 +44,115 @@
         height: calc(2.5 * size.$gap - 0.5 * (size.$gap - size.$large-text));
         min-width: 100%;
         background-color: color.$light;
+    }
+    .info-container {
+        @include mixin.full;
+        display: grid;
+        justify-items: unset;
+        gap: size.$gap;
+        padding: size.$gap;
+        width: calc(100% - 2* size.$gap);
+        grid-template: repeat(8, 1fr) / repeat(8, 1fr);
+        &.error,
+        &.loader {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: size.$text;
+            color: color.$red;
+        }
+        .info-card {
+            display: flex;
+            position: relative;
+            flex-flow: column nowrap;
+            background-color: rgba(color.$lightest, 0.25);
+            border-radius: size.$task-radius;
+            font-size: size.$small-text;
+            overflow: hidden;
+            .title {
+                padding: 0.5 * size.$gap size.$gap;
+                font-size: size.$large-text;
+                span {
+                    float: right;
+                }
+            }
+            @for $i from 0 to 3 {
+                .MuiSvgIcon-root:nth-of-type(#{$i + 1}) {
+                    position: absolute;
+                    font-size: size.$large-text;
+                    top: 0.5 * size.$gap;
+                    right: calc(0.5 * size.$gap + $i * (size.$large-text + 0.25 * size.$gap));
+                    cursor: pointer;
+                }
+            }
+            ul {
+                display: flex;
+                flex-flow: column nowrap;
+                li {
+                    margin-right: 0.5 * size.$gap;
+                    span {
+                        position: relative;
+                        display: block;
+                        width: 100%;
+                        a {
+                            color: darken(color.$blue, 20%) !important;
+                        }
+                        .MuiSvgIcon-root {
+                            visibility: hidden;
+                            position: absolute;
+                            font-size: size.$large-text;
+                            top: auto !important;
+                            bottom: auto !important;
+                            right: 0 !important;
+                            cursor: pointer;
+                        }
+                    }
+                    &:hover {
+                        background-color: color.$lightest;
+                        span > .MuiSvgIcon-root {
+                            visibility: visible;
+                        }
+                    }
+                }
+            }
+            &.admins {
+                grid-area: 1 / 1 / 9 / 3;
+            }
+            &.tokens {
+                grid-area: 1 / 3 / 9 / 5;
+            }
+            &.jobs {
+                grid-area: 1 / 6 / 8 / 9;
+                position: relative;
+                .scroll-wrapper {
+                    @include mixin.no-scrollbar;
+                    overflow-y: scroll;
+                    position: absolute;
+                    top: calc(size.$large-text + 1.5 * size.$gap);
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    .job {
+                        position: relative;
+                        margin: size.$gap;
+                        margin-top: 0;
+                        border-radius: size.$task-radius;
+                        background-color: color.$lightest;
+                        pre {
+                            padding: 0.5 * size.$gap;
+                            font-family: font.$code;
+                            font-size: size.$small-text;
+                        }
+                    }
+                }
+            }
+            &.bond {
+                grid-area: 8 / 6 / 9 / 9;
+                .title {
+                    @include mixin.center-items(space-between, center);
+                    height: 100%;
+                }
+            }
+        }
     }
 }

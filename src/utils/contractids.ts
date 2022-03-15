@@ -11,6 +11,10 @@ const contractIDs = {
         "mainnet": "v2.ref-finance.near",
         "testnet": "ref-finance.testnet"
     },
+    "sputnik": {
+        "mainnet": "sputnik-dao.near",
+        "testnet": "sputnikv2.testnet"
+    },
     "example": {
         "mainnet": "foo.near",
         "testnet": "bar.testnet"

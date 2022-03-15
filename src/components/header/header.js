@@ -21,10 +21,10 @@ export default class Header extends Component {
                         <Icon className="logo">dynamic_feed</Icon>
                         <h1>near-multicall</h1>
                     </div>
-                    {/* <nav>
+                    <nav>
                         <NavLink className={({ isActive }) => isActive ? "active" : ""} to="/app">App</NavLink>
                         <NavLink className={({ isActive }) => isActive ? "active" : ""} to="/dao">Dao</NavLink>
-                    </nav> */}
+                    </nav>
                     <Wallet/>
                 </div>            
                 <div className={`empty-container ${window?.LAYOUT?.expanded ? "expanded-empty" : ""}`}></div>
