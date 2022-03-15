@@ -10,29 +10,29 @@ import './dao.scss';
 
 export default class Dao extends Component {
 
-    // errors = {
-    //     addr: new ArgsError("Invalid address", value => ArgsAccount.isValid(value), !ArgsAccount.isValid(window?.LAYOUT?.state?.addresses?.dao ?? "")),
-    //     isSputnik: new ArgsError("We currently only support Sputnik (v2) DAOs", value => value.value.endsWith("." + window.nearConfig.SPUTNIK_V2_FACTORY_ADDRESS)),
-    //     noContract: new ArgsError("No multicall instance found at address", value => this.errors.noContract.isBad, true),
-    //     noMethod: new ArgsError("No multicall instance found at address", value => this.errors.noMethod.isBad),
-    // }
+    errors = {
+        addr: new ArgsError("Invalid address", value => ArgsAccount.isValid(value), !ArgsAccount.isValid(window?.LAYOUT?.state?.addresses?.dao ?? "")),
+        isSputnik: new ArgsError("We currently only support Sputnik (v2) DAOs", value => value.value.endsWith("." + window.nearConfig.SPUTNIK_V2_FACTORY_ADDRESS)),
+        noContract: new ArgsError("No multicall instance found at address", value => this.errors.noContract.isBad, true),
+        noMethod: new ArgsError("No multicall instance found at address", value => this.errors.noMethod.isBad),
+    }
 
-    // constructor(props) {
+    constructor(props) {
 
-    //     super(props);
+        super(props);
 
-    //     this.state = {
-    //         addr: new ArgsAccount(window?.LAYOUT?.state?.addresses?.dao ?? ""),
-    //         loading: false,
-    //         infos: {
-    //             admins: [],
-    //             tokens: [],
-    //             jobs: [],
-    //             bond: "..."
-    //         }
-    //     }
+        this.state = {
+            addr: new ArgsAccount(window?.LAYOUT?.state?.addresses?.dao ?? ""),
+            loading: false,
+            infos: {
+                admins: [],
+                tokens: [],
+                jobs: [],
+                bond: "..."
+            }
+        }
 
-    // }
+    }
 
     // sputnikToMulticall(sputnik) {
 
@@ -173,20 +173,20 @@ export default class Dao extends Component {
 
     render() {
 
-        // const { addr } = this.state;
+        const { addr } = this.state;
 
-        // this.errors.isSputnik.validOrNull(addr);
+        this.errors.isSputnik.validOrNull(addr);
 
         return (
             <div className="dao-container">
-                {/* <div className="address-container">
+                <div className="address-container">
                     <TextInput
                         value={ addr }
                         error={ this.errors.addr }
                         // update={ () => this.loadInfos() }
                     />
                 </div>
-                { this.getContent() } */}
+                {/* { this.getContent() } */}
             </div>
         );
 
