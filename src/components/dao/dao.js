@@ -22,7 +22,7 @@ export default class Dao extends Component {
         super(props);
 
         this.state = {
-            // addr: new ArgsAccount(window?.LAYOUT?.state?.addresses?.dao ?? ""),
+            addr: new ArgsAccount(window?.LAYOUT?.state?.addresses?.dao ?? ""),
             loading: false,
             infos: {
                 admins: [],
@@ -34,92 +34,92 @@ export default class Dao extends Component {
 
     }
 
-    // sputnikToMulticall(sputnik) {
+    sputnikToMulticall(sputnik) {
 
-    //     const base = sputnik.value.split("." + window.nearConfig.SPUTNIK_V2_FACTORY_ADDRESS)[0];
-    //     return new ArgsAccount(`${base}.${window.nearConfig.MULTICALL_FACTORY_ADDRESS}`);
+        const base = sputnik.value.split("." + window.nearConfig.SPUTNIK_V2_FACTORY_ADDRESS)[0];
+        return new ArgsAccount(`${base}.${window.nearConfig.MULTICALL_FACTORY_ADDRESS}`);
 
-    // }
+    }
 
-    // toLink(address) {
+    toLink(address) {
 
-    //     const addr = new ArgsAccount(address);
+        const addr = new ArgsAccount(address);
 
-    //     return (
-    //         <span>
-    //             <a href={ addr.toUrl() } target="_blank" rel="noopener noreferrer">
-    //                 { addr.value }
-    //             </a>
-    //             <DeleteOutline/>
-    //         </span>
-    //     )
-    // }
+        return (
+            <span>
+                <a href={ addr.toUrl() } target="_blank" rel="noopener noreferrer">
+                    { addr.value }
+                </a>
+                <DeleteOutline/>
+            </span>
+        )
+    }
 
-    // job(job) {
+    job(job) {
 
-    //     console.log(job);
-    //     return (
-    //         <div class="job">
-    //             <EditOutlined/>
-    //             <DeleteOutline/>
-    //             { job.is_active
-    //                 ? <PauseOutlined/>
-    //                 : <PlayArrowOutlined/>
-    //             }
-    //             <pre>{ JSON.stringify(job, null, "  ") }</pre>
-    //         </div>
-    //     );
+        console.log(job);
+        return (
+            <div class="job">
+                <EditOutlined/>
+                <DeleteOutline/>
+                { job.is_active
+                    ? <PauseOutlined/>
+                    : <PlayArrowOutlined/>
+                }
+                <pre>{ JSON.stringify(job, null, "  ") }</pre>
+            </div>
+        );
 
-    // }
+    }
 
-    // loadInfos() {
+    loadInfos() {
 
-    //     const {
-    //         noContract,
-    //         noMethod
-    //     } = this.errors;
+        // const {
+        //     noContract,
+        //     noMethod
+        // } = this.errors;
 
-    //     const multicall = this.sputnikToMulticall(this.state.addr)
+        const multicall = this.sputnikToMulticall(this.state.addr)
         
-    //     if (!ArgsAccount.isValid(multicall)) {
-    //         this.forceUpdate();
-    //         return;
-    //     }
+        // if (!ArgsAccount.isValid(multicall)) {
+        //     this.forceUpdate();
+        //     return;
+        // }
 
-    //     noContract.isBad = false;
-    //     noMethod.isBad = false;
+        // noContract.isBad = false;
+        // noMethod.isBad = false;
 
-    //     this.setState({ loading: true });
+        this.setState({ loading: true });
 
-    //     Promise.all([
-    //         view(multicall.value, "get_admins", {}),
-    //         view(multicall.value, "get_tokens", {}),
-    //         view(multicall.value, "get_jobs", {}),
-    //         view(multicall.value, "job_get_bond", {})
-    //     ])
-    //     .then(([admins, tokens, jobs, bond]) => this.setState(
-    //         { 
-    //             infos: {
-    //                 admins: admins,
-    //                 tokens: tokens,
-    //                 jobs: jobs,
-    //                 bond: bond
-    //             },
-    //             loading: false
-    //         }
-    //     ))
-    //     .catch(e => {
-    //         if (e.type === "AccountDoesNotExist")
-    //             noContract.isBad = true;
-    //         else if (e.toString().includes("MethodNotFound"))
-    //             noMethod.isBad = true;
-    //         else
-    //             console.error(e)
+        Promise.all([
+            view(multicall.value, "get_admins", {}),
+            view(multicall.value, "get_tokens", {}),
+            view(multicall.value, "get_jobs", {}),
+            view(multicall.value, "job_get_bond", {})
+        ])
+        .then(([admins, tokens, jobs, bond]) => this.setState(
+            { 
+                infos: {
+                    admins: admins,
+                    tokens: tokens,
+                    jobs: jobs,
+                    bond: bond
+                },
+                loading: false
+            }
+        ))
+        .catch(e => {
+            if (e.type === "AccountDoesNotExist")
+                ;// noContract.isBad = true;
+            else if (e.toString().includes("MethodNotFound"))
+                ;// noMethod.isBad = true;
+            else
+                console.error(e)
 
-    //         this.setState({ loading: false });
-    //     })
+            this.setState({ loading: false });
+        })
 
-    // }
+    }
 
     getContent() {
 
@@ -145,21 +145,21 @@ export default class Dao extends Component {
                 <AddOutlined/>
                 <h1 className="title">Admins</h1>
                 <ul className="list">
-                    {/* { infos.admins.map(a => <li>{ this.toLink(a) }</li>) } */}
+                    { infos.admins.map(a => <li>{ this.toLink(a) }</li>) }
                 </ul>
             </div>
             <div className="info-card tokens">
                 <AddOutlined/>
                 <h1 className="title">Tokens</h1>
                 <ul className="list">
-                    {/* { infos.tokens.map(t => <li>{ this.toLink(t) }</li>) } */}
+                    { infos.tokens.map(t => <li>{ this.toLink(t) }</li>) }
                 </ul>
             </div>
             <div className="info-card jobs">
                 <AddOutlined/>
                 <h1 className="title">Jobs</h1>
                 <div className="scroll-wrapper">
-                    {/* { infos.jobs.map(j => this.job(j)) } */}
+                    { infos.jobs.map(j => this.job(j)) }
                 </div>
             </div>
             <div className="info-card bond">
@@ -173,7 +173,7 @@ export default class Dao extends Component {
 
     render() {
 
-        // const { addr } = this.state;
+        const { addr } = this.state;
 
         // this.errors.isSputnik.validOrNull(addr);
 
