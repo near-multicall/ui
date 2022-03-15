@@ -10,8 +10,8 @@ ReactDOM.render(
     <Routes>
       <Route path="/" element={<App />}>
         <Route path="/" element={<AppPage />} />
-        {/* <Route path="app" element={<AppPage />} /> */}
-        {/* <Route path="dao" element={<DaoPage />} /> */}
+        <Route path="app" element={<AppPage />} />
+        <Route path="dao" element={<DaoPage />} />
       </Route>
     </Routes>
   </BrowserRouter>,

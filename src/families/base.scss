@@ -4,7 +4,7 @@
 @use 'sass/mixin';
 
 @mixin backdrop {
-    display: none; // TODO: fix "party mode"
+    // display: none; // TODO: fix "party mode"
     position: absolute;
     width: 4 * size.$gap;
     height: 4 * size.$gap;
