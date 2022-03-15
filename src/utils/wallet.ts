@@ -2,9 +2,9 @@ import { connect, keyStores, WalletConnection, transactions } from 'near-api-js'
 import { getConfig } from '../near-config';
 import BN from 'bn.js';
 
-const url = new URL(window.location.href);
-window["ENVIRONMENT"] = url.searchParams.has("network")
-    ? url.searchParams.get("network")
+const searchParams = new URLSearchParams(window.location.hash.split('?')[1]);
+window["ENVIRONMENT"] = searchParams.has("network")
+    ? searchParams.get("network")
     : "testnet"
 window["nearConfig"] = getConfig(window.ENVIRONMENT);
 
