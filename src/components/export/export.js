@@ -7,7 +7,6 @@ import React, { Component } from 'react';
 import { ArgsAccount, ArgsBig, ArgsError, ArgsNumber, ArgsString } from '../../utils/args';
 import { toGas } from '../../utils/converter';
 import { TextInput, TextInputWithUnits } from '../editor/elements';
-import getContractID from '../../utils/contractids';
 import './export.scss';
 
 
@@ -25,13 +24,13 @@ export default class Export extends Component {
 
     total = {
         gas: new ArgsNumber(toGas(270), 0, toGas(270), "gas"),
-        depo: new ArgsBig("0", "0", null, "yocto"),
+        depo: new ArgsBig("1", "1", null, "yocto"),
         desc: new ArgsString("")
     }
 
     ft = {
-        amount: new ArgsBig("0", "0", null, "yocto"),
-        token: new ArgsAccount(getContractID("wNEAR"))
+        amount: new ArgsBig("1", "1", null, "yocto"),
+        token: new ArgsAccount(window.nearConfig.WNEAR_ADDRESS)
     }
 
     attachFTs = false;
@@ -88,17 +87,6 @@ export default class Export extends Component {
             >
                 <div className="export-container">
                     <div className="input-container">
-                        <TextInput
-                            label="User address"
-                            value={ addresses.user }
-                            error={ errors.user }
-                            update={e => {
-                                LAYOUT.setAddresses({
-                                    user: e.target.value
-                                });
-                                this.forceUpdate();
-                            }}
-                        />
                         <TextInput
                             label="DAO address"
                             value={ addresses.dao }
@@ -224,7 +212,12 @@ export default class Export extends Component {
                     { window?.WALLET?.state?.wallet.isSignedIn() ?
                         <button 
                             className="propose button"
-                            disabled={ errors.dao.isBad || errors.multicall.isBad }
+                            disabled={
+                                errors.dao.isBad
+                                || errors.multicall.isBad
+                                || errors.depo.isBad
+                                || (this.attachFTs && (errors.amount.isBad || errors.token.isBad))
+                            }
                             onClick={() => {
                                 if (this.attachFTs)
                                     WALLET.proposeFT(desc.value, depo.value, gas.value, token.value, amount.value)

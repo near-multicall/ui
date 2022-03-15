@@ -37,6 +37,7 @@ export default class Builder extends Component {
                                     index={LAYOUT.getColumnID()}
                                 />
                             </div>
+                            {/* TODO: delete trash
                             <div 
                                 className="trash"
                             >
@@ -46,7 +47,7 @@ export default class Builder extends Component {
                                     tasks={trashColumn.taskIds.map(taskId => LAYOUT.getTasks()[taskId])} 
                                     index={LAYOUT.getColumnID() + 1}
                                 />
-                            </div>
+                            </div> */}
                         </div>
                     ) }
                 </Droppable>
