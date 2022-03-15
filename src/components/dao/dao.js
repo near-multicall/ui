@@ -12,9 +12,9 @@ export default class Dao extends Component {
 
     errors = {
         addr: new ArgsError("Invalid address", value => ArgsAccount.isValid(value), !ArgsAccount.isValid(window?.LAYOUT?.state?.addresses?.dao ?? "")),
-        // isSputnik: new ArgsError("We currently only support Sputnik (v2) DAOs", value => value.value.endsWith("." + window.nearConfig.SPUTNIK_V2_FACTORY_ADDRESS)),
-        // noContract: new ArgsError("No multicall instance found at address", value => this.errors.noContract.isBad, true),
-        // noMethod: new ArgsError("No multicall instance found at address", value => this.errors.noMethod.isBad),
+        isSputnik: new ArgsError("We currently only support Sputnik (v2) DAOs", value => value.value.endsWith("." + window.nearConfig.SPUTNIK_V2_FACTORY_ADDRESS)),
+        noContract: new ArgsError("No multicall instance found at address", value => this.errors.noContract.isBad, true),
+        noMethod: new ArgsError("No multicall instance found at address", value => this.errors.noMethod.isBad),
     }
 
     constructor(props) {
@@ -74,10 +74,10 @@ export default class Dao extends Component {
 
     loadInfos() {
 
-        // const {
-        //     noContract,
-        //     noMethod
-        // } = this.errors;
+        const {
+            noContract,
+            noMethod
+        } = this.errors;
 
         const multicall = this.sputnikToMulticall(this.state.addr)
         
@@ -86,8 +86,8 @@ export default class Dao extends Component {
             return;
         }
 
-        // noContract.isBad = false;
-        // noMethod.isBad = false;
+        noContract.isBad = false;
+        noMethod.isBad = false;
 
         this.setState({ loading: true });
 
@@ -110,9 +110,9 @@ export default class Dao extends Component {
         ))
         .catch(e => {
             if (e.type === "AccountDoesNotExist")
-                ;// noContract.isBad = true;
+                noContract.isBad = true;
             else if (e.toString().includes("MethodNotFound"))
-                ;// noMethod.isBad = true;
+                noMethod.isBad = true;
             else
                 console.error(e)
 
@@ -129,11 +129,11 @@ export default class Dao extends Component {
         } = this.state;
 
         // error
-        // for (let e in this.errors)
-        //     if (this.errors[e].isBad)
-        //         return <div className="info-container error">
-        //             { this.errors[e].message }
-        //         </div>
+        for (let e in this.errors)
+            if (this.errors[e].isBad)
+                return <div className="info-container error">
+                    { this.errors[e].message }
+                </div>
 
         // loading ...
         if (loading) 
@@ -175,7 +175,7 @@ export default class Dao extends Component {
 
         const { addr } = this.state;
 
-        // this.errors.isSputnik.validOrNull(addr);
+        this.errors.isSputnik.validOrNull(addr);
 
         return (
             <div className="dao-container">
@@ -183,7 +183,7 @@ export default class Dao extends Component {
                     <TextInput
                         value={ addr }
                         error={ this.errors.addr }
-                        update={ () => this.loadInfos() }
+                        // update={ () => this.loadInfos() }
                     />
                 </div>
                 { this.getContent() }
