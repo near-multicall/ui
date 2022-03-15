@@ -10,29 +10,29 @@ import './dao.scss';
 
 export default class Dao extends Component {
 
-    errors = {
-        addr: new ArgsError("Invalid address", value => ArgsAccount.isValid(value), !ArgsAccount.isValid(window?.LAYOUT?.state?.addresses?.dao ?? "")),
-        isSputnik: new ArgsError("We currently only support Sputnik (v2) DAOs", value => value.value.endsWith("." + window.nearConfig.SPUTNIK_V2_FACTORY_ADDRESS)),
-        noContract: new ArgsError("No multicall instance found at address", value => this.errors.noContract.isBad, true),
-        noMethod: new ArgsError("No multicall instance found at address", value => this.errors.noMethod.isBad),
-    }
+    // errors = {
+    //     addr: new ArgsError("Invalid address", value => ArgsAccount.isValid(value), !ArgsAccount.isValid(window?.LAYOUT?.state?.addresses?.dao ?? "")),
+    //     isSputnik: new ArgsError("We currently only support Sputnik (v2) DAOs", value => value.value.endsWith("." + window.nearConfig.SPUTNIK_V2_FACTORY_ADDRESS)),
+    //     noContract: new ArgsError("No multicall instance found at address", value => this.errors.noContract.isBad, true),
+    //     noMethod: new ArgsError("No multicall instance found at address", value => this.errors.noMethod.isBad),
+    // }
 
-    constructor(props) {
+    // constructor(props) {
 
-        super(props);
+    //     super(props);
 
-        this.state = {
-            addr: new ArgsAccount(window?.LAYOUT?.state?.addresses?.dao ?? ""),
-            loading: false,
-            infos: {
-                admins: [],
-                tokens: [],
-                jobs: [],
-                bond: "..."
-            }
-        }
+    //     this.state = {
+    //         addr: new ArgsAccount(window?.LAYOUT?.state?.addresses?.dao ?? ""),
+    //         loading: false,
+    //         infos: {
+    //             admins: [],
+    //             tokens: [],
+    //             jobs: [],
+    //             bond: "..."
+    //         }
+    //     }
 
-    }
+    // }
 
     // sputnikToMulticall(sputnik) {
 
@@ -121,72 +121,72 @@ export default class Dao extends Component {
 
     // }
 
-    getContent() {
+    // getContent() {
 
-        const {
-            infos,
-            loading,
-        } = this.state;
+    //     const {
+    //         infos,
+    //         loading,
+    //     } = this.state;
 
-        // error
-        for (let e in this.errors)
-            if (this.errors[e].isBad)
-                return <div className="info-container error">
-                    { this.errors[e].message }
-                </div>
+    //     // error
+    //     for (let e in this.errors)
+    //         if (this.errors[e].isBad)
+    //             return <div className="info-container error">
+    //                 { this.errors[e].message }
+    //             </div>
 
-        // loading ...
-        if (loading) 
-            return <div className="info-container loader"></div>
+    //     // loading ...
+    //     if (loading) 
+    //         return <div className="info-container loader"></div>
 
-        // infos found
-        return <div className="info-container">
-            <div className="info-card admins">
-                <AddOutlined/>
-                <h1 className="title">Admins</h1>
-                <ul className="list">
-                    {/* { infos.admins.map(a => <li>{ this.toLink(a) }</li>) } */}
-                </ul>
-            </div>
-            <div className="info-card tokens">
-                <AddOutlined/>
-                <h1 className="title">Tokens</h1>
-                <ul className="list">
-                    {/* { infos.tokens.map(t => <li>{ this.toLink(t) }</li>) } */}
-                </ul>
-            </div>
-            <div className="info-card jobs">
-                <AddOutlined/>
-                <h1 className="title">Jobs</h1>
-                <div className="scroll-wrapper">
-                    {/* { infos.jobs.map(j => this.job(j)) } */}
-                </div>
-            </div>
-            <div className="info-card bond">
-                <h1 className="title">Job Bond
-                    <span>{`${toNEAR(infos.bond)} Ⓝ`}</span>
-                </h1>
-            </div>
-        </div>
+    //     // infos found
+    //     return <div className="info-container">
+    //         <div className="info-card admins">
+    //             <AddOutlined/>
+    //             <h1 className="title">Admins</h1>
+    //             <ul className="list">
+    //                 {/* { infos.admins.map(a => <li>{ this.toLink(a) }</li>) } */}
+    //             </ul>
+    //         </div>
+    //         <div className="info-card tokens">
+    //             <AddOutlined/>
+    //             <h1 className="title">Tokens</h1>
+    //             <ul className="list">
+    //                 {/* { infos.tokens.map(t => <li>{ this.toLink(t) }</li>) } */}
+    //             </ul>
+    //         </div>
+    //         <div className="info-card jobs">
+    //             <AddOutlined/>
+    //             <h1 className="title">Jobs</h1>
+    //             <div className="scroll-wrapper">
+    //                 {/* { infos.jobs.map(j => this.job(j)) } */}
+    //             </div>
+    //         </div>
+    //         <div className="info-card bond">
+    //             <h1 className="title">Job Bond
+    //                 <span>{`${toNEAR(infos.bond)} Ⓝ`}</span>
+    //             </h1>
+    //         </div>
+    //     </div>
 
-    }
+    // }
 
     render() {
 
-        const { addr } = this.state;
+        // const { addr } = this.state;
 
-        this.errors.isSputnik.validOrNull(addr);
+        // this.errors.isSputnik.validOrNull(addr);
 
         return (
             <div className="dao-container">
-                <div className="address-container">
+                {/* <div className="address-container">
                     <TextInput
                         value={ addr }
                         error={ this.errors.addr }
                         // update={ () => this.loadInfos() }
                     />
                 </div>
-                { this.getContent() }
+                { this.getContent() } */}
             </div>
         );
 
