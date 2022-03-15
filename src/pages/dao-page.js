@@ -4,15 +4,7 @@ import { Dao } from '../components.js';
 export default function DaoPage() {
 
     return(
-        <TestClass />
+        <Dao />
     );
-
-}
-
-class TestClass extends React.Component {
-
-    render() {
-        return <div>TestClass</div>
-    }
 
 }
