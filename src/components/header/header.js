@@ -22,8 +22,8 @@ export default class Header extends Component {
                         <h1>near-multicall</h1>
                     </div>
                     <nav>
-                        {/* <NavLink className={({ isActive }) => isActive ? "active" : ""} to="/app">App</NavLink>
-                        <NavLink className={({ isActive }) => isActive ? "active" : ""} to="/dao">Dao</NavLink> */}
+                        <NavLink className={({ isActive }) => isActive ? "active" : ""} to="/app">App</NavLink>
+                        <NavLink className={({ isActive }) => isActive ? "active" : ""} to="/dao">Dao</NavLink>
                     </nav>
                     <Wallet/>
                 </div>            
