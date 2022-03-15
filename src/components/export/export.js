@@ -221,46 +221,10 @@ export default class Export extends Component {
                             </div>
                         : <></>    
                     }
-                    <div className="section">
-                        <div className="header">
-                            <h3>Near CLI</h3>
-                            <Icon 
-                                className="icon"
-                                onClick={ (el) => {
-                                    navigator.clipboard.writeText(LAYOUT.toCLI());
-                                    this.updateCopyIcon(el);
-                                } }
-                            >content_copy</Icon> 
-                        </div>
-                        <div className="value">
-                            <pre className="code">
-                                { this.attachFTs
-                                    ?
-                                        `near call ${token.value} ft_transfer_call ` +
-                                        `'{` +
-                                            `"receiver_id":"${LAYOUT.state.addresses.multicall}",` + 
-                                            `"amount":"${amount.value}",` + 
-                                            `"msg":${JSON.stringify(JSON.stringify({
-                                                function_id: "multicall",
-                                                args: Base64.encode(JSON.stringify({"calls":LAYOUT.toBase64()}).toString())
-                                            }).toString())}` +
-                                        `}'` +
-                                        `--accountId ${LAYOUT.state.addresses.user} ` +
-                                        `--gas ${gas.value} ` +
-                                        `--amount ${depo.value}`
-                                    :
-                                        `near call ${LAYOUT.state.addresses.multicall} multicall ` +
-                                        `'{"calls":${JSON.stringify(LAYOUT.toBase64())}}' ` +
-                                        `--accountId ${LAYOUT.state.addresses.user} ` +
-                                        `--gas ${gas.value} ` +
-                                        `--amount ${depo.value}`
-                                }
-                            </pre>
-                        </div>
-                    </div>
                     { window?.WALLET?.state?.wallet.isSignedIn() ?
                         <button 
                             className="propose button"
+                            disabled={ errors.dao.isBad || errors.multicall.isBad }
                             onClick={() => {
                                 if (this.attachFTs)
                                     WALLET.proposeFT(desc.value, depo.value, gas.value, token.value, amount.value)

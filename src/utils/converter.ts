@@ -1,4 +1,7 @@
-import { formatNearAmount, parseNearAmount } from 'near-api-js/src/utils/format';
+import { utils } from 'near-api-js';
+
+
+const { formatNearAmount, parseNearAmount } = utils.format;
 
 const oneNEAR = BigInt("1000000000000000000000000");
 

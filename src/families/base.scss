@@ -4,6 +4,7 @@
 @use 'sass/mixin';
 
 @mixin backdrop {
+    @include cb-scale(0);
     // display: none; // TODO: fix "party mode"
     position: absolute;
     width: 4 * size.$gap;
@@ -11,8 +12,19 @@
     top: -2 * size.$gap;
     border-radius: 100%;
     z-index: 0;
-    scale: 0;
 }
+
+@mixin cb-scale($factor) {
+    zoom: $factor; /* IE */
+    -moz-transform: scale($factor); /* Firefox */
+    -moz-transform-origin: 0 0;
+    -o-transform: scale($factor); /* Opera */
+    -o-transform-origin: 0 0;
+    -webkit-transform: scale($factor); /* Safari And Chrome */
+    -webkit-transform-origin: 0 0;
+    transform: scale($factor); /* Standard Property */
+    transform-origin: 0 0;  /* Standard Property */
+  }
 
 .base-task  {
     background: color.$lightest;
@@ -60,24 +72,24 @@
                 position: absolute;
                 right: 0.5 * size.$gap;
                 &:hover + .edit-pseudo {
-                    scale: 1;
-                    transition: scale 300ms ease;
+                    @include cb-scale(1);
+                    transition: all 300ms ease;
                 }
             }
             &.delete {
                 position: absolute;
                 left: 0.5 * size.$gap;
                 &:hover + .delete-pseudo {
-                    scale: 1;
-                    transition: scale 300ms ease;
+                    @include cb-scale(1);
+                    transition: all 300ms ease;
                 }
             }
             &.duplicate {
                 position: absolute;
                 left: 1.5 * size.$gap;
                 &:hover + .duplicate-pseudo {
-                    scale: 1;
-                    transition: scale 300ms ease;
+                    @include cb-scale(1);
+                    transition: all 300ms ease;
                 }
             }
         }

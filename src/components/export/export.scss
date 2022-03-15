@@ -257,6 +257,10 @@ option {
     z-index: 1;
     &.propose {
         background-color: color.$green;
+        &:disabled {
+            background-color: color.$darkish;
+            cursor: not-allowed;
+        }
     }
     &.login {
         background-color: color.$light;

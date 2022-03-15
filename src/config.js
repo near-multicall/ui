@@ -63,4 +63,4 @@ function getConfig(env) {
   }
 }
 
-module.exports = getConfig
+export { getConfig }
