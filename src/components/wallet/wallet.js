@@ -42,7 +42,7 @@ export default class Wallet extends Component {
     signOut() {
 
         this.state.wallet.signOut();
-        LAYOUT.forceUpdate();
+        HEADER.forceUpdate();
     
     }
 
