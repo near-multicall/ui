@@ -11,7 +11,7 @@ ReactDOM.render(
       <Route path="/" element={<App />}>
         <Route path="/" element={<div>Base</div>} />
         <Route path="/app" element={<div>App</div>} />
-        <Route path="/dao" element={<div>Dao</div>} />
+        <Route path="/dao" element={<DaoPage />} />
       </Route>
     </Routes>
   </HashRouter>,
