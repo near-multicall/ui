@@ -8,11 +8,9 @@ import DaoPage from './pages/dao-page';
 ReactDOM.render(
   <HashRouter>
     <Routes>
-      <Route path="/" element={<App />}>
         <Route path="/" element={<AppPage />} />
         <Route path="/app" element={<AppPage />} />
         <Route path="/dao" element={<DaoPage />} />
-      </Route>
     </Routes>
   </HashRouter>,
   document.querySelector('#root')
