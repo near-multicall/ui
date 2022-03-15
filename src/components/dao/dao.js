@@ -10,12 +10,12 @@ import './dao.scss';
 
 export default class Dao extends Component {
 
-    // errors = {
-    //     addr: new ArgsError("Invalid address", value => ArgsAccount.isValid(value), !ArgsAccount.isValid(window?.LAYOUT?.state?.addresses?.dao ?? "")),
-    //     isSputnik: new ArgsError("We currently only support Sputnik (v2) DAOs", value => value.value.endsWith("." + window.nearConfig.SPUTNIK_V2_FACTORY_ADDRESS)),
-    //     noContract: new ArgsError("No multicall instance found at address", value => this.errors.noContract.isBad, true),
-    //     noMethod: new ArgsError("No multicall instance found at address", value => this.errors.noMethod.isBad),
-    // }
+    errors = {
+        addr: new ArgsError("Invalid address", value => ArgsAccount.isValid(value), !ArgsAccount.isValid(window?.LAYOUT?.state?.addresses?.dao ?? "")),
+        // isSputnik: new ArgsError("We currently only support Sputnik (v2) DAOs", value => value.value.endsWith("." + window.nearConfig.SPUTNIK_V2_FACTORY_ADDRESS)),
+        // noContract: new ArgsError("No multicall instance found at address", value => this.errors.noContract.isBad, true),
+        // noMethod: new ArgsError("No multicall instance found at address", value => this.errors.noMethod.isBad),
+    }
 
     constructor(props) {
 
@@ -81,10 +81,10 @@ export default class Dao extends Component {
 
         const multicall = this.sputnikToMulticall(this.state.addr)
         
-        // if (!ArgsAccount.isValid(multicall)) {
-        //     this.forceUpdate();
-        //     return;
-        // }
+        if (!ArgsAccount.isValid(multicall)) {
+            this.forceUpdate();
+            return;
+        }
 
         // noContract.isBad = false;
         // noMethod.isBad = false;
