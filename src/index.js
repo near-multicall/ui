@@ -6,7 +6,7 @@ import AppPage from './pages/app-page';
 import DaoPage from './pages/dao-page';
 
 ReactDOM.render(
-  <BrowserRouter>
+  <BrowserRouter basename="/multicall-UI">
     <Routes>
       <Route path="/" element={<App />}>
         <Route path="/" element={<AppPage />} />
