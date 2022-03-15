@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import TextField from '@mui/material/TextField';
+import { TextField } from '@mui/material';
 
 class TextInput extends Component {
 
@@ -21,18 +21,18 @@ class TextInput extends Component {
             // error !== undefined 
             //     ? error.validOrNull(value)?.value || error.intermediate?.value
             //     : value.value
-            }
+        }
         margin="dense"
         size="small"
-        onChange={(e) => {
-            value.value = e.target.value;
-            error?.validOrNull(value);
-            update?.(e);
-        }}
-        error={error?.isBad}
-        helperText={error?.isBad && error?.message}
+        // onChange={(e) => {
+        //     value.value = e.target.value;
+        //     error?.validOrNull(value);
+        //     update?.(e);
+        // }}
+        // error={error?.isBad}
+        // helperText={error?.isBad && error?.message}
         InputLabelProps={{ shrink: true }}
-        {...props}
+        // {...props}
       />
     );
 
