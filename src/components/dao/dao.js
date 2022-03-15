@@ -180,11 +180,11 @@ export default class Dao extends Component {
         return (
             <div className="dao-container">
                 <div className="address-container">
-                    {/* <TextInput
+                    <TextInput
                         value={ addr }
                         error={ this.errors.addr }
                         update={ () => this.loadInfos() }
-                    /> */}
+                    />
                 </div>
                 { this.getContent() }
             </div>
