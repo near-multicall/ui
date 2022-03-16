@@ -6,8 +6,6 @@ import { view } from '../../utils/wallet';
 import { TextInput } from '../editor/elements';
 import './dao.scss';
 
-
-
 export default class Dao extends Component {
 
     errors = {
