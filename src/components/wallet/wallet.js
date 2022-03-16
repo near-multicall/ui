@@ -2,7 +2,6 @@ import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalance
 import ScienceOutlinedIcon from '@mui/icons-material/ScienceOutlined';
 import { Base64 } from 'js-base64';
 import React, { Component } from 'react';
-import getContractID from '../../utils/contractids';
 import { toGas, toYocto } from '../../utils/converter';
 import { initWallet, tx } from '../../utils/wallet';
 import './wallet.scss';
@@ -35,15 +34,16 @@ export default class Wallet extends Component {
 
     signIn() {
 
-        this.state.wallet.requestSignIn(getContractID("multicall"));
+        this.state.wallet.requestSignIn();
 
     }
     
     signOut() {
 
         this.state.wallet.signOut();
-        HEADER.forceUpdate();
-    
+        LAYOUT.forceUpdate();
+        this.forceUpdate();
+        
     }
 
     propose(desc, depo, gas) {

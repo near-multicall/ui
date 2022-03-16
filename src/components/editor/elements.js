@@ -14,25 +14,25 @@ class TextInput extends Component {
     } = this.props;
 
     return (
-      <TextField
-        label={label}
-        value={ 
-            value.value
+      <div
+        // label={label}
+        // value={ 
+        //     value.value
             // error !== undefined 
             //     ? error.validOrNull(value)?.value || error.intermediate?.value
             //     : value.value
-            }
-        margin="dense"
-        size="small"
-        onChange={(e) => {
-            value.value = e.target.value;
-            error?.validOrNull(value);
-            update?.(e);
-        }}
-        error={error?.isBad}
-        helperText={error?.isBad && error?.message}
-        InputLabelProps={{ shrink: true }}
-        {...props}
+        // }
+        // margin="dense"
+        // size="small"
+        // onChange={(e) => {
+        //     value.value = e.target.value;
+        //     error?.validOrNull(value);
+        //     update?.(e);
+        // }}
+        // error={error?.isBad}
+        // helperText={error?.isBad && error?.message}
+        // InputLabelProps={{ shrink: true }}
+        // {...props}
       />
     );
 
