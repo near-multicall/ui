@@ -289,10 +289,11 @@ button {
   height: 100%;
   padding: 0 !important;
   margin: 0 !important;
-  background-color: rgba(47, 72, 88, 0.25);
+  background-color: transparent !important;
 }
 .selector .column-container .tasks-wrapper {
   flex: 1 1 0;
+  background-color: rgba(47, 72, 88, 0.25);
 }
 .selector .column-container .tasks-wrapper .task-wrapper:last-of-type {
   margin-bottom: 0 !important;
@@ -436,6 +437,12 @@ button {
 .export-container::-webkit-scrollbar {
   display: none;
 }
+.export-container::after {
+  content: " ";
+  white-space: pre;
+  visibility: hidden;
+  width: 100%;
+}
 
 .section {
   flex: 1;
@@ -492,6 +499,59 @@ button {
 
 .input-container {
   padding-top: 1.2rem;
+}
+.input-container .unitInput {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  flex-flow: row nowrap;
+}
+.input-container .unitInput .MuiTextField-root {
+  width: unset !important;
+}
+.input-container .unitInput .MuiTextField-root:first-of-type {
+  flex: 2 1 auto;
+}
+.input-container .unitInput .MuiTextField-root:last-of-type {
+  flex: 1 0 40px;
+  margin-left: 0.8rem;
+}
+.input-container .unitInput .MuiTextField-root:last-of-type select {
+  height: 2rem;
+  line-height: 1rem;
+  font-size: 1.4rem;
+}
+.input-container .unitInput:first-of-type .MuiTextField-root:first-of-type fieldset {
+  border-radius: 2.4rem 0 0 0;
+}
+.input-container .unitInput:first-of-type .MuiTextField-root:last-of-type fieldset {
+  border-radius: 0 2.4rem 0 0;
+}
+.input-container .unitInput:last-of-type .MuiTextField-root:first-of-type fieldset {
+  border-radius: 0 0 0 2.4rem;
+}
+.input-container .unitInput:last-of-type .MuiTextField-root:last-of-type fieldset {
+  border-radius: 0 0 2.4rem 0;
+}
+.input-container .checkbox {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-flow: row nowrap;
+  width: 100%;
+}
+.input-container .checkbox p {
+  color: #e0e0e0;
+  font-size: 1.4rem;
+}
+.input-container .checkbox .MuiCheckbox-root {
+  color: #b4ccca;
+}
+.input-container .checkbox .MuiCheckbox-root.Mui-checked {
+  color: #93c99e;
+}
+.input-container .checkbox .MuiCheckbox-root .MuiSvgIcon-root {
+  font-size: 1.8rem;
 }
 .input-container .MuiTextField-root {
   width: 100%;
@@ -577,6 +637,10 @@ button {
   border-radius: 0 0 2.4rem 2.4rem;
 }
 
+option {
+  font-size: 1.8rem;
+}
+
 .error-container {
   width: 100%;
 }
@@ -623,6 +687,19 @@ button {
 }
 .error-container .error-list .error .icon:hover, .error-container .error-list .error .icon:focus {
   color: #dcefea;
+}
+
+.button {
+  padding: 0.8rem 1.6rem;
+  position: sticky;
+  bottom: 0;
+  border-radius: 2.4rem;
+}
+.button.propose {
+  background-color: #93c99e;
+}
+.button.login {
+  background-color: #b4ccca;
 }
 .wallet {
   display: flex;
