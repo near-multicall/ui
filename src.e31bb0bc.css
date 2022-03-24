@@ -802,16 +802,75 @@ option {
 .task-container .name .icon {
   color: #8fa9ac;
   font-size: 2.4rem;
-  position: absolute;
-  right: 1.6rem;
   fill: #e0e0e0;
   cursor: pointer;
+  opacity: 0;
+  transition: opacity 100ms ease;
+  z-index: 1;
 }
 .task-container .name .icon:hover, .task-container .name .icon:focus {
   color: #4c6773;
 }
-.task-container .name .icon:hover, .task-container .name .icon:focus {
-  color: #dcefea;
+.task-container .name .icon.edit {
+  position: absolute;
+  right: 1.6rem;
+}
+.task-container .name .icon.edit:hover + .edit-pseudo {
+  scale: 1;
+  transition: scale 300ms ease;
+}
+.task-container .name .icon.delete {
+  position: absolute;
+  left: 1.6rem;
+}
+.task-container .name .icon.delete:hover + .delete-pseudo {
+  scale: 1;
+  transition: scale 300ms ease;
+}
+.task-container .name .icon.duplicate {
+  position: absolute;
+  left: 4.8rem;
+}
+.task-container .name .icon.duplicate:hover + .duplicate-pseudo {
+  scale: 1;
+  transition: scale 300ms ease;
+}
+.task-container .name .delete-pseudo {
+  position: absolute;
+  width: 12.8rem;
+  height: 12.8rem;
+  top: -6.4rem;
+  border-radius: 100%;
+  z-index: 0;
+  scale: 0;
+  left: -3.2rem;
+  background-color: rgba(246, 167, 178, 0.8);
+}
+.task-container .name .edit-pseudo {
+  position: absolute;
+  width: 12.8rem;
+  height: 12.8rem;
+  top: -6.4rem;
+  border-radius: 100%;
+  z-index: 0;
+  scale: 0;
+  right: -3.2rem;
+  background-color: rgba(178, 223, 242, 0.8);
+}
+.task-container .name .duplicate-pseudo {
+  position: absolute;
+  width: 12.8rem;
+  height: 12.8rem;
+  top: -6.4rem;
+  border-radius: 100%;
+  z-index: 0;
+  scale: 0;
+  left: 0;
+  background-color: rgba(216, 190, 218, 0.8);
+}
+.task-container:hover > .name > .icon {
+  opacity: 1;
+  transition: opacity 100ms ease;
 }
 .task-container .data-container {
   scrollbar-width: none;
@@ -822,6 +881,7 @@ option {
   padding: 1.6rem;
   padding-bottom: 3.2rem;
   background-color: rgba(180, 204, 202, 0.5);
+  z-index: 1;
 }
 .task-container .data-container::-webkit-scrollbar {
   display: none;
