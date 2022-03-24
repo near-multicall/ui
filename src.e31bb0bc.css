@@ -299,31 +299,6 @@
   padding: 0 3.2rem 3.2rem 3.2rem;
 }
 
-.loader {
-  display: inline-block;
-  width: 80px;
-  height: 80px;
-}
-.loader::after {
-  content: " ";
-  display: block;
-  width: 64px;
-  height: 64px;
-  margin: 8px;
-  border-radius: 50%;
-  border: 6px solid #8fa9ac;
-  border-color: #8fa9ac transparent #8fa9ac transparent;
-  animation: lds-dual-ring 1.2s linear infinite;
-}
-@keyframes lds-dual-ring {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
 .builder-container {
   display: flex;
   justify-content: flex-start;
@@ -337,7 +312,7 @@
   -ms-overflow-style: -ms-autohiding-scrollbar;
   z-index: 2;
   width: 40rem;
-  max-height: 100%;
+  max-height: calc(100% - 3.2rem - 19.2rem);
   overflow-y: scroll;
   border-radius: 2.4rem;
 }
@@ -424,31 +399,6 @@
   padding: 0 3.2rem 3.2rem 3.2rem;
 }
 
-.loader {
-  display: inline-block;
-  width: 80px;
-  height: 80px;
-}
-.loader::after {
-  content: " ";
-  display: block;
-  width: 64px;
-  height: 64px;
-  margin: 8px;
-  border-radius: 50%;
-  border: 6px solid #8fa9ac;
-  border-color: #8fa9ac transparent #8fa9ac transparent;
-  animation: lds-dual-ring 1.2s linear infinite;
-}
-@keyframes lds-dual-ring {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
 .placeholder {
   display: flex;
   justify-content: center;
@@ -504,31 +454,6 @@
   height: calc(100% - 3.2rem);
   width: calc(100% - 6.4rem);
   padding: 0 3.2rem 3.2rem 3.2rem;
-}
-
-.loader {
-  display: inline-block;
-  width: 80px;
-  height: 80px;
-}
-.loader::after {
-  content: " ";
-  display: block;
-  width: 64px;
-  height: 64px;
-  margin: 8px;
-  border-radius: 50%;
-  border: 6px solid #8fa9ac;
-  border-color: #8fa9ac transparent #8fa9ac transparent;
-  animation: lds-dual-ring 1.2s linear infinite;
-}
-@keyframes lds-dual-ring {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
 }
 
 .export-container {
@@ -809,10 +734,6 @@ option {
 .button.propose {
   background-color: #93c99e;
 }
-.button.propose:disabled {
-  background-color: #6c888f;
-  cursor: not-allowed;
-}
 .button.login {
   background-color: #b4ccca;
 }
@@ -895,41 +816,48 @@ option {
   flex-basis: calc(6.4rem + 50%);
   transition: flex-basis 200ms ease-out;
 }
-@import url("https://fonts.googleapis.com/css2?family=Roboto+Mono&family=Titillium+Web:ital,wght@0,200;0,400;0,600;1,400&display=swap");
-@import url("https://fonts.googleapis.com/icon?family=Material+Icons");
-.dao-container {
+.dao-wrapper {
   position: relative;
   display: flex;
-  flex-flow: column nowrap;
+  flex-flow: row nowrap;
   height: calc(100% - 6.4rem);
   top: 6.4rem;
 }
-.dao-container .address-container {
+.dao-wrapper .dao-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  flex: 1 1 0;
   flex-flow: row nowrap;
   width: auto;
 }
-.dao-container .address-container .MuiTextField-root {
-  width: calc(100% - 6.4rem);
+.dao-wrapper .dao-container .MuiTextField-root {
+  width: 100%;
   text-align: left;
   margin: 2rem 3.2rem;
 }
-.dao-container .address-container .MuiTextField-root .MuiInputBase-root {
+.dao-wrapper .dao-container .MuiTextField-root .MuiInputBase-root {
   font-size: 2.4rem;
   color: #8fa9ac;
 }
-.dao-container .address-container .MuiTextField-root .MuiInputBase-root input {
+.dao-wrapper .dao-container .MuiTextField-root .MuiInputBase-root input {
   padding: 0;
 }
-.dao-container .address-container .MuiTextField-root .MuiInputBase-root.Mui-error {
+.dao-wrapper .dao-container .MuiTextField-root .MuiInputBase-root.Mui-error {
   color: #f1798a;
 }
-.dao-container .address-container .MuiTextField-root fieldset {
+.dao-wrapper .dao-container .MuiTextField-root fieldset {
   border: none;
 }
-.dao-container .address-container .MuiTextField-root p {
+.dao-wrapper .dao-container .MuiTextField-root p {
   display: none;
 }
-.dao-container::before {
+.dao-wrapper::before {
   content: "";
   position: fixed;
   top: 6.4rem;
@@ -937,137 +865,6 @@ option {
   height: 7.6rem;
   min-width: 100%;
   background-color: #b4ccca;
-}
-.dao-container .info-container {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  justify-items: unset;
-  gap: 3.2rem;
-  padding: 3.2rem;
-  width: calc(100% - 6.4rem);
-  grid-template: repeat(8, 1fr)/repeat(8, 1fr);
-}
-.dao-container .info-container.error, .dao-container .info-container.loader {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 1.8rem;
-  color: #f6a7b2;
-}
-.dao-container .info-container .info-card {
-  display: flex;
-  position: relative;
-  flex-flow: column nowrap;
-  background-color: rgba(220, 239, 234, 0.25);
-  border-radius: 2.4rem;
-  font-size: 1.4rem;
-  overflow: hidden;
-}
-.dao-container .info-container .info-card .title {
-  padding: 1.6rem 3.2rem;
-  font-size: 2.4rem;
-}
-.dao-container .info-container .info-card .title span {
-  float: right;
-}
-.dao-container .info-container .info-card .MuiSvgIcon-root:nth-of-type(1) {
-  position: absolute;
-  font-size: 2.4rem;
-  top: 1.6rem;
-  right: 1.6rem;
-  cursor: pointer;
-}
-.dao-container .info-container .info-card .MuiSvgIcon-root:nth-of-type(2) {
-  position: absolute;
-  font-size: 2.4rem;
-  top: 1.6rem;
-  right: 4.8rem;
-  cursor: pointer;
-}
-.dao-container .info-container .info-card .MuiSvgIcon-root:nth-of-type(3) {
-  position: absolute;
-  font-size: 2.4rem;
-  top: 1.6rem;
-  right: 8rem;
-  cursor: pointer;
-}
-.dao-container .info-container .info-card ul {
-  display: flex;
-  flex-flow: column nowrap;
-}
-.dao-container .info-container .info-card ul li {
-  margin-right: 1.6rem;
-}
-.dao-container .info-container .info-card ul li span {
-  position: relative;
-  display: block;
-  width: 100%;
-}
-.dao-container .info-container .info-card ul li span a {
-  color: #5bbbe3 !important;
-}
-.dao-container .info-container .info-card ul li span .MuiSvgIcon-root {
-  visibility: hidden;
-  position: absolute;
-  font-size: 2.4rem;
-  top: auto !important;
-  bottom: auto !important;
-  right: 0 !important;
-  cursor: pointer;
-}
-.dao-container .info-container .info-card ul li:hover {
-  background-color: #dcefea;
-}
-.dao-container .info-container .info-card ul li:hover span > .MuiSvgIcon-root {
-  visibility: visible;
-}
-.dao-container .info-container .info-card.admins {
-  grid-area: 1/1/9/3;
-}
-.dao-container .info-container .info-card.tokens {
-  grid-area: 1/3/9/5;
-}
-.dao-container .info-container .info-card.jobs {
-  grid-area: 1/6/8/9;
-  position: relative;
-}
-.dao-container .info-container .info-card.jobs .scroll-wrapper {
-  scrollbar-width: none;
-  -ms-overflow-style: -ms-autohiding-scrollbar;
-  overflow-y: scroll;
-  position: absolute;
-  top: 7.2rem;
-  bottom: 0;
-  left: 0;
-  right: 0;
-}
-.dao-container .info-container .info-card.jobs .scroll-wrapper::-webkit-scrollbar {
-  display: none;
-}
-.dao-container .info-container .info-card.jobs .scroll-wrapper .job {
-  position: relative;
-  margin: 3.2rem;
-  margin-top: 0;
-  border-radius: 2.4rem;
-  background-color: #dcefea;
-}
-.dao-container .info-container .info-card.jobs .scroll-wrapper .job pre {
-  padding: 1.6rem;
-  font-family: "Roboto Mono", monospace;
-  font-size: 1.4rem;
-}
-.dao-container .info-container .info-card.bond {
-  grid-area: 8/6/9/9;
-}
-.dao-container .info-container .info-card.bond .title {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  height: 100%;
 }
 @import url("https://fonts.googleapis.com/css2?family=Roboto+Mono&family=Titillium+Web:ital,wght@0,200;0,400;0,600;1,400&display=swap");
 @import url("https://fonts.googleapis.com/icon?family=Material+Icons");
@@ -1127,139 +924,58 @@ option {
   right: 1.6rem;
 }
 .task-container .name .icon.edit:hover + .edit-pseudo {
-  zoom: 1;
-  /* IE */
-  -moz-transform: scale(1);
-  /* Firefox */
-  -moz-transform-origin: 0 0;
-  -o-transform: scale(1);
-  /* Opera */
-  -o-transform-origin: 0 0;
-  -webkit-transform: scale(1);
-  /* Safari And Chrome */
-  -webkit-transform-origin: 0 0;
-  transform: scale(1);
-  /* Standard Property */
-  transform-origin: 0 0;
-  /* Standard Property */
-  transition: all 300ms ease;
+  scale: 1;
+  transition: scale 300ms ease;
 }
 .task-container .name .icon.delete {
   position: absolute;
   left: 1.6rem;
 }
 .task-container .name .icon.delete:hover + .delete-pseudo {
-  zoom: 1;
-  /* IE */
-  -moz-transform: scale(1);
-  /* Firefox */
-  -moz-transform-origin: 0 0;
-  -o-transform: scale(1);
-  /* Opera */
-  -o-transform-origin: 0 0;
-  -webkit-transform: scale(1);
-  /* Safari And Chrome */
-  -webkit-transform-origin: 0 0;
-  transform: scale(1);
-  /* Standard Property */
-  transform-origin: 0 0;
-  /* Standard Property */
-  transition: all 300ms ease;
+  scale: 1;
+  transition: scale 300ms ease;
 }
 .task-container .name .icon.duplicate {
   position: absolute;
   left: 4.8rem;
 }
 .task-container .name .icon.duplicate:hover + .duplicate-pseudo {
-  zoom: 1;
-  /* IE */
-  -moz-transform: scale(1);
-  /* Firefox */
-  -moz-transform-origin: 0 0;
-  -o-transform: scale(1);
-  /* Opera */
-  -o-transform-origin: 0 0;
-  -webkit-transform: scale(1);
-  /* Safari And Chrome */
-  -webkit-transform-origin: 0 0;
-  transform: scale(1);
-  /* Standard Property */
-  transform-origin: 0 0;
-  /* Standard Property */
-  transition: all 300ms ease;
+  scale: 1;
+  transition: scale 300ms ease;
 }
 .task-container .name .delete-pseudo {
-  zoom: 0;
-  /* IE */
-  -moz-transform: scale(0);
-  /* Firefox */
-  -moz-transform-origin: 0 0;
-  -o-transform: scale(0);
-  /* Opera */
-  -o-transform-origin: 0 0;
-  -webkit-transform: scale(0);
-  /* Safari And Chrome */
-  -webkit-transform-origin: 0 0;
-  transform: scale(0);
-  /* Standard Property */
-  transform-origin: 0 0;
-  /* Standard Property */
+  display: none;
   position: absolute;
   width: 12.8rem;
   height: 12.8rem;
   top: -6.4rem;
   border-radius: 100%;
   z-index: 0;
+  scale: 0;
   left: -3.2rem;
   background-color: rgba(246, 167, 178, 0.8);
 }
 .task-container .name .edit-pseudo {
-  zoom: 0;
-  /* IE */
-  -moz-transform: scale(0);
-  /* Firefox */
-  -moz-transform-origin: 0 0;
-  -o-transform: scale(0);
-  /* Opera */
-  -o-transform-origin: 0 0;
-  -webkit-transform: scale(0);
-  /* Safari And Chrome */
-  -webkit-transform-origin: 0 0;
-  transform: scale(0);
-  /* Standard Property */
-  transform-origin: 0 0;
-  /* Standard Property */
+  display: none;
   position: absolute;
   width: 12.8rem;
   height: 12.8rem;
   top: -6.4rem;
   border-radius: 100%;
   z-index: 0;
+  scale: 0;
   right: -3.2rem;
   background-color: rgba(178, 223, 242, 0.8);
 }
 .task-container .name .duplicate-pseudo {
-  zoom: 0;
-  /* IE */
-  -moz-transform: scale(0);
-  /* Firefox */
-  -moz-transform-origin: 0 0;
-  -o-transform: scale(0);
-  /* Opera */
-  -o-transform-origin: 0 0;
-  -webkit-transform: scale(0);
-  /* Safari And Chrome */
-  -webkit-transform-origin: 0 0;
-  transform: scale(0);
-  /* Standard Property */
-  transform-origin: 0 0;
-  /* Standard Property */
+  display: none;
   position: absolute;
   width: 12.8rem;
   height: 12.8rem;
   top: -6.4rem;
   border-radius: 100%;
   z-index: 0;
+  scale: 0;
   left: 0;
   background-color: rgba(216, 190, 218, 0.8);
 }
