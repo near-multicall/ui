@@ -1,3 +1,32 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Mono&family=Titillium+Web:ital,wght@0,200;0,400;0,600;1,400&display=swap");
+@import url("https://fonts.googleapis.com/icon?family=Material+Icons");
+* {
+  margin: 0;
+  font-family: "Titillium Web", sans-serif;
+}
+
+body, html, #root {
+  width: 100%;
+  height: 100%;
+  background-color: #edfdf9;
+  font-size: 62.5%;
+}
+
+a {
+  color: #b2dff2 !important;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+button {
+  padding: 1.6rem 6.4rem;
+  background-color: #b4ccca;
+  border: none;
+  color: #2a2a2a;
+  font-family: "Titillium Web", sans-serif;
+  font-size: 2.4rem;
+  cursor: pointer;
+}
 .layout-wrapper {
   position: relative;
   display: flex;
@@ -729,7 +758,6 @@ option {
   position: sticky;
   bottom: 0;
   border-radius: 2.4rem;
-  z-index: 1;
 }
 .button.propose {
   background-color: #93c99e;
@@ -784,28 +812,6 @@ option {
   color: #e0e0e0;
   font-size: 2.4rem;
 }
-.header-container nav {
-  font-size: 1.8rem;
-  border-radius: 2.4rem;
-  outline: 1px solid #b4ccca;
-}
-.header-container nav a {
-  height: 3.2rem;
-  padding: 0 1.6rem;
-  font-size: 1.8rem;
-  color: #e0e0e0 !important;
-}
-.header-container nav a.active {
-  color: #2a2a2a !important;
-  background-color: #b4ccca;
-  border: 1px solid #b4ccca;
-}
-.header-container nav a:first-of-type {
-  border-radius: 2.4rem 0 0 2.4rem;
-}
-.header-container nav a:last-of-type {
-  border-radius: 0 2.4rem 2.4rem 0;
-}
 
 .empty-container {
   flex-shrink: 0;
@@ -815,56 +821,6 @@ option {
 .empty-container.expanded-empty {
   flex-basis: calc(6.4rem + 50%);
   transition: flex-basis 200ms ease-out;
-}
-.dao-wrapper {
-  position: relative;
-  display: flex;
-  flex-flow: row nowrap;
-  height: calc(100% - 6.4rem);
-  top: 6.4rem;
-}
-.dao-wrapper .dao-container {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  flex: 1 1 0;
-  flex-flow: row nowrap;
-  width: auto;
-}
-.dao-wrapper .dao-container .MuiTextField-root {
-  width: 100%;
-  text-align: left;
-  margin: 2rem 3.2rem;
-}
-.dao-wrapper .dao-container .MuiTextField-root .MuiInputBase-root {
-  font-size: 2.4rem;
-  color: #8fa9ac;
-}
-.dao-wrapper .dao-container .MuiTextField-root .MuiInputBase-root input {
-  padding: 0;
-}
-.dao-wrapper .dao-container .MuiTextField-root .MuiInputBase-root.Mui-error {
-  color: #f1798a;
-}
-.dao-wrapper .dao-container .MuiTextField-root fieldset {
-  border: none;
-}
-.dao-wrapper .dao-container .MuiTextField-root p {
-  display: none;
-}
-.dao-wrapper::before {
-  content: "";
-  position: fixed;
-  top: 6.4rem;
-  left: 0;
-  height: 7.6rem;
-  min-width: 100%;
-  background-color: #b4ccca;
 }
 @import url("https://fonts.googleapis.com/css2?family=Roboto+Mono&family=Titillium+Web:ital,wght@0,200;0,400;0,600;1,400&display=swap");
 @import url("https://fonts.googleapis.com/icon?family=Material+Icons");
@@ -944,7 +900,6 @@ option {
   transition: scale 300ms ease;
 }
 .task-container .name .delete-pseudo {
-  display: none;
   position: absolute;
   width: 12.8rem;
   height: 12.8rem;
@@ -956,7 +911,6 @@ option {
   background-color: rgba(246, 167, 178, 0.8);
 }
 .task-container .name .edit-pseudo {
-  display: none;
   position: absolute;
   width: 12.8rem;
   height: 12.8rem;
@@ -968,7 +922,6 @@ option {
   background-color: rgba(178, 223, 242, 0.8);
 }
 .task-container .name .duplicate-pseudo {
-  display: none;
   position: absolute;
   width: 12.8rem;
   height: 12.8rem;
