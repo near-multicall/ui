@@ -48,70 +48,6 @@ button {
   padding-left: 3.2rem;
   width: auto;
 }
-.layout-wrapper .layout-container[tutorial=yes]::before {
-  content: " ";
-  position: absolute;
-  height: 40vh;
-  top: 30vh;
-  background-size: contain;
-  background-repeat: no-repeat;
-  opacity: 0.2;
-  filter: none;
-  transition: all 1s ease;
-  width: 28%;
-  left: 15%;
-  background-image: url("/sequence.8e2986fe.svg");
-  background-position: left;
-}
-.layout-wrapper .layout-container[tutorial=no]::before {
-  content: " ";
-  position: absolute;
-  height: 40vh;
-  top: 30vh;
-  background-size: contain;
-  background-repeat: no-repeat;
-  opacity: 0.2;
-  filter: none;
-  transition: all 1s ease;
-  width: 28%;
-  left: 15%;
-  background-image: url("/sequence.8e2986fe.svg");
-  background-position: left;
-  opacity: 0;
-  filter: blur(5px);
-}
-.layout-wrapper .layout-container[tutorial=yes]::after {
-  content: " ";
-  position: absolute;
-  height: 40vh;
-  top: 30vh;
-  background-size: contain;
-  background-repeat: no-repeat;
-  opacity: 0.2;
-  filter: none;
-  transition: all 1s ease;
-  width: 35%;
-  right: 15%;
-  background-image: url("/parallel.5a45622e.svg");
-  background-position: right;
-}
-.layout-wrapper .layout-container[tutorial=no]::after {
-  content: " ";
-  position: absolute;
-  height: 40vh;
-  top: 30vh;
-  background-size: contain;
-  background-repeat: no-repeat;
-  opacity: 0.2;
-  filter: none;
-  transition: all 1s ease;
-  width: 35%;
-  right: 15%;
-  background-image: url("/parallel.5a45622e.svg");
-  background-position: right;
-  opacity: 0;
-  filter: blur(5px);
-}
 .layout-wrapper .empty-container {
   flex-shrink: 0;
   flex-basis: 52.8rem;
@@ -353,11 +289,10 @@ button {
   height: 100%;
   padding: 0 !important;
   margin: 0 !important;
-  background-color: transparent !important;
+  background-color: rgba(47, 72, 88, 0.25);
 }
 .selector .column-container .tasks-wrapper {
   flex: 1 1 0;
-  background-color: rgba(47, 72, 88, 0.25);
 }
 .selector .column-container .tasks-wrapper .task-wrapper:last-of-type {
   margin-bottom: 0 !important;
@@ -501,12 +436,6 @@ button {
 .export-container::-webkit-scrollbar {
   display: none;
 }
-.export-container::after {
-  content: " ";
-  white-space: pre;
-  visibility: hidden;
-  width: 100%;
-}
 
 .section {
   flex: 1;
@@ -563,59 +492,6 @@ button {
 
 .input-container {
   padding-top: 1.2rem;
-}
-.input-container .unitInput {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  flex-flow: row nowrap;
-}
-.input-container .unitInput .MuiTextField-root {
-  width: unset !important;
-}
-.input-container .unitInput .MuiTextField-root:first-of-type {
-  flex: 2 1 auto;
-}
-.input-container .unitInput .MuiTextField-root:last-of-type {
-  flex: 1 0 40px;
-  margin-left: 0.8rem;
-}
-.input-container .unitInput .MuiTextField-root:last-of-type select {
-  height: 2rem;
-  line-height: 1rem;
-  font-size: 1.4rem;
-}
-.input-container .unitInput:first-of-type .MuiTextField-root:first-of-type fieldset {
-  border-radius: 2.4rem 0 0 0;
-}
-.input-container .unitInput:first-of-type .MuiTextField-root:last-of-type fieldset {
-  border-radius: 0 2.4rem 0 0;
-}
-.input-container .unitInput:last-of-type .MuiTextField-root:first-of-type fieldset {
-  border-radius: 0 0 0 2.4rem;
-}
-.input-container .unitInput:last-of-type .MuiTextField-root:last-of-type fieldset {
-  border-radius: 0 0 2.4rem 0;
-}
-.input-container .checkbox {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  flex-flow: row nowrap;
-  width: 100%;
-}
-.input-container .checkbox p {
-  color: #e0e0e0;
-  font-size: 1.4rem;
-}
-.input-container .checkbox .MuiCheckbox-root {
-  color: #b4ccca;
-}
-.input-container .checkbox .MuiCheckbox-root.Mui-checked {
-  color: #93c99e;
-}
-.input-container .checkbox .MuiCheckbox-root .MuiSvgIcon-root {
-  font-size: 1.8rem;
 }
 .input-container .MuiTextField-root {
   width: 100%;
@@ -701,10 +577,6 @@ button {
   border-radius: 0 0 2.4rem 2.4rem;
 }
 
-option {
-  font-size: 1.8rem;
-}
-
 .error-container {
   width: 100%;
 }
@@ -751,19 +623,6 @@ option {
 }
 .error-container .error-list .error .icon:hover, .error-container .error-list .error .icon:focus {
   color: #dcefea;
-}
-
-.button {
-  padding: 0.8rem 1.6rem;
-  position: sticky;
-  bottom: 0;
-  border-radius: 2.4rem;
-}
-.button.propose {
-  background-color: #93c99e;
-}
-.button.login {
-  background-color: #b4ccca;
 }
 .wallet {
   display: flex;
@@ -866,75 +725,16 @@ option {
 .task-container .name .icon {
   color: #8fa9ac;
   font-size: 2.4rem;
+  position: absolute;
+  right: 1.6rem;
   fill: #e0e0e0;
   cursor: pointer;
-  opacity: 0;
-  transition: opacity 100ms ease;
-  z-index: 1;
 }
 .task-container .name .icon:hover, .task-container .name .icon:focus {
   color: #4c6773;
 }
-.task-container .name .icon.edit {
-  position: absolute;
-  right: 1.6rem;
-}
-.task-container .name .icon.edit:hover + .edit-pseudo {
-  scale: 1;
-  transition: scale 300ms ease;
-}
-.task-container .name .icon.delete {
-  position: absolute;
-  left: 1.6rem;
-}
-.task-container .name .icon.delete:hover + .delete-pseudo {
-  scale: 1;
-  transition: scale 300ms ease;
-}
-.task-container .name .icon.duplicate {
-  position: absolute;
-  left: 4.8rem;
-}
-.task-container .name .icon.duplicate:hover + .duplicate-pseudo {
-  scale: 1;
-  transition: scale 300ms ease;
-}
-.task-container .name .delete-pseudo {
-  position: absolute;
-  width: 12.8rem;
-  height: 12.8rem;
-  top: -6.4rem;
-  border-radius: 100%;
-  z-index: 0;
-  scale: 0;
-  left: -3.2rem;
-  background-color: rgba(246, 167, 178, 0.8);
-}
-.task-container .name .edit-pseudo {
-  position: absolute;
-  width: 12.8rem;
-  height: 12.8rem;
-  top: -6.4rem;
-  border-radius: 100%;
-  z-index: 0;
-  scale: 0;
-  right: -3.2rem;
-  background-color: rgba(178, 223, 242, 0.8);
-}
-.task-container .name .duplicate-pseudo {
-  position: absolute;
-  width: 12.8rem;
-  height: 12.8rem;
-  top: -6.4rem;
-  border-radius: 100%;
-  z-index: 0;
-  scale: 0;
-  left: 0;
-  background-color: rgba(216, 190, 218, 0.8);
-}
-.task-container:hover > .name > .icon {
-  opacity: 1;
-  transition: opacity 100ms ease;
+.task-container .name .icon:hover, .task-container .name .icon:focus {
+  color: #dcefea;
 }
 .task-container .data-container {
   scrollbar-width: none;
@@ -945,7 +745,6 @@ option {
   padding: 1.6rem;
   padding-bottom: 3.2rem;
   background-color: rgba(180, 204, 202, 0.5);
-  z-index: 1;
 }
 .task-container .data-container::-webkit-scrollbar {
   display: none;
