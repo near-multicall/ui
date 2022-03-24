@@ -6,7 +6,7 @@ const searchParams = new URLSearchParams(window.location.hash.split('?')[1]);
 window["ENVIRONMENT"] = searchParams.has("network")
     ? searchParams.get("network")
     : "testnet"
-window["nearConfig"] = getConfig(window.ENVIRONMENT);
+window["nearConfig"] = getConfig(window["ENVIRONMENT"]);
 
 function initWallet(): Promise<WalletConnection> {
     return new Promise(resolve =>

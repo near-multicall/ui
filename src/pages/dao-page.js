@@ -1,10 +1,13 @@
 import React from 'react';
-import { Dao } from '../components.js';
+import { Dao, Header } from '../components.js';
 
 export default function DaoPage() {
 
     return(
-        <Dao />
+        <>
+            <Header/>
+            <Dao />
+        </>
     );
 
 }
