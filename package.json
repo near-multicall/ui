@@ -1,6 +1,6 @@
 {
-  "homepage": "http://quicswap.github.io/multicall-UI",
-  "name": "multicall-UI",
+  "homepage": "http://near-multicall.github.io/ui",
+  "name": "ui",
   "version": "0.1.0",
   "license": "UNLICENSED",
   "scripts": {
