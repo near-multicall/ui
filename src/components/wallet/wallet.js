@@ -16,11 +16,7 @@ export default class Wallet extends Component {
             wallet: null
         }
 
-    }
-
-    componentDidMount() {
-
-        initWallet()
+        window.WALLET = initWallet()
             .then(wallet => this.setState({ 
                 wallet: wallet 
             }, () => {
@@ -31,6 +27,8 @@ export default class Wallet extends Component {
             }));
 
     }
+
+    then(func) { return new Promise(resolve => resolve(func())) } // mock promise
 
     signIn() {
 
@@ -43,6 +41,7 @@ export default class Wallet extends Component {
         this.state.wallet.signOut();
         LAYOUT.forceUpdate();
         this.forceUpdate();
+
     }
 
     propose(desc, depo, gas) {

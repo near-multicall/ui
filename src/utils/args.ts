@@ -64,7 +64,11 @@ class ArgsAccount extends Args {
 
     }
 
-    static isValid = (value: ArgsAccount) => /^(?=.{2,64}$)(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_])*[a-z\d]+$/.test(value.value);
+    static isValid = (value: ArgsAccount | string) => {
+        if (typeof value === "string")
+            value = new ArgsAccount(value);
+        return /^(?=.{2,64}$)(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_])*[a-z\d]+$/.test(value.value)
+    };
 
     isValid = () => ArgsAccount.isValid(this);
 

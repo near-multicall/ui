@@ -66,3 +66,7 @@
         transition: flex-basis animation.$menu-expand-time ease-out;
     }
 }
+
+.space-right {
+    width: size.$gap;
+}

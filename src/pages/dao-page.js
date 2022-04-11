@@ -5,7 +5,7 @@ export default function DaoPage() {
 
     return(
         <>
-            <Header/>
+            <Header full={true}/>
             <Dao />
         </>
     );

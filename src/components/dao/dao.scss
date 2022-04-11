@@ -56,6 +56,7 @@
         &.error,
         &.loader {
             display: flex;
+            flex-flow: column;
             justify-content: center;
             align-items: center;
             font-size: size.$text;
@@ -153,6 +154,14 @@
                     height: 100%;
                 }
             }
+        }
+        .create-multicall {
+            width: fit-content;
+            align-self: center;
+            font-size: size.$small-text;
+            padding: 0.25em 0.75em;
+            border-radius: 0.5em;
+            background-color: color.$green;
         }
     }
 }

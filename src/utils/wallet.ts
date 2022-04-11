@@ -51,12 +51,13 @@ function view(
     func: string,
     args: any
 ) {
-    const account = window?.["WALLET"]?.state.wallet.account();
-
-    if (account == undefined) {
+    
+    if (!window?.["WALLET"]?.state?.wallet) {
         console.error("Wallet not connected");
         return;
     }
+
+    const account = window["WALLET"].state.wallet.account();
 
     return account.viewFunction(
         addr, 

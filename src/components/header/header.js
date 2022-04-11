@@ -6,6 +6,16 @@ import './header.scss';
 
 export default class Header extends Component {
 
+    full = false;
+
+    constructor(props) {
+
+        super(props);
+
+        this.full = props.full ?? this.full;
+        
+    }
+
     componentDidMount() {
 
         window.HEADER = this;
@@ -26,8 +36,11 @@ export default class Header extends Component {
                         <NavLink className={({ isActive }) => isActive ? "active" : ""} to="/dao">Dao</NavLink>
                     </nav>
                     <Wallet/>
-                </div>            
-                <div className={`empty-container ${window?.LAYOUT?.expanded ? "expanded-empty" : ""}`}></div>
+                </div>
+                { !this.full 
+                    ? <div className={`empty-container ${window?.LAYOUT?.expanded ? "expanded-empty" : ""}`}></div>
+                    : <div className="space-right"></div>
+                }
             </div>
         );
 
