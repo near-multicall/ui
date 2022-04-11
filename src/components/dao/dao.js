@@ -85,8 +85,6 @@ export default class Dao extends Component {
         const multicall = `${this.state.addr.value}.${window.nearConfig.MULTICALL_FACTORY_ADDRESS}`;
         const sputnik = `${addr.value}.${window.nearConfig.SPUTNIK_V2_FACTORY_ADDRESS}`;
 
-        console.log(this.fee);
-
         const depo = BigInt(this.fee) + BigInt(toYocto(1));
 
         const args = {
@@ -261,7 +259,7 @@ export default class Dao extends Component {
                     { this.errors[e].message }
                 </p>);
 
-        if (Object.keys(this.errors).filter(e => this.errors[e].isBad).length > 0)
+        if (Object.keys(this.errors).filter(e => this.errors[e].isBad && e !== "noRights").length > 0)
             return (<>
                 <div className="info-container error">
                     <div>{ errors }</div>
