@@ -22,6 +22,7 @@
                 color: color.$lightish;
                 input {
                     padding: 0;
+                    padding-left: 0.5 * size.$gap;
                 }
                 &.Mui-error {
                     color: darken(color.$red, 10%);
@@ -30,9 +31,19 @@
             }
             fieldset {
                 border: none;
+                border-bottom: 2px solid currentColor;
+                border-radius: 0;
             }
             p {
                 display: none;
+            }
+        }
+        .MuiInputAdornment-root {
+            width: fit-content;
+            p {
+                display: block !important;
+                font-size: size.$large-text;
+                color: color.$lightish;
             }
         }
     }

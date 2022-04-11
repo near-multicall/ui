@@ -5,9 +5,10 @@ import { title } from 'process';
 import React, { Component } from 'react';
 import { info } from 'sass';
 import { ArgsAccount, ArgsError } from '../../utils/args';
-import { toNEAR } from '../../utils/converter';
+import { toNEAR, toYocto } from '../../utils/converter';
 import { view, tx } from '../../utils/wallet';
 import { TextInput } from '../editor/elements';
+import { InputAdornment } from '@mui/material'
 import './dao.scss';
 
 
@@ -86,6 +87,8 @@ export default class Dao extends Component {
 
         console.log(this.fee);
 
+        const depo = BigInt(this.fee) + BigInt(toYocto(1));
+
         const args = {
             proposal: {
                 description: `create multicall instance for this DAO at ${multicall}`,
@@ -101,7 +104,7 @@ export default class Dao extends Component {
                                     job_bond: infos.policy.proposal_bond
                                 }
                             })),
-                            deposit: this.fee,
+                            deposit: depo.toString(),
                             gas: "150000000000000"
                         }]
                     }
@@ -320,6 +323,7 @@ export default class Dao extends Component {
             <div className="dao-container">
                 <div className="address-container">
                     <TextInput
+                        placeholder="Insert DAO name here"
                         value={ addr }
                         error={ this.errors.addr }
                         update={ () => {
@@ -330,6 +334,9 @@ export default class Dao extends Component {
                             }, 500)
                             this.lastInput = new Date()
                         } }
+                        InputProps={{
+                            endAdornment: <InputAdornment position="end">{`.${window.nearConfig.SPUTNIK_V2_FACTORY_ADDRESS}`}</InputAdornment>,
+                        }}
                     />
                 </div>
                 { this.getContent() }
