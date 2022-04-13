@@ -1,1 +1,1 @@
-multicall.app
+multicall.app gh-pages -d dist/
