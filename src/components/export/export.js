@@ -73,7 +73,7 @@ export default class Export extends Component {
         const allErrors = LAYOUT.toErrors();
         const errors = this.errors;
 
-        const addresses = Object.fromEntries(Object.entries(LAYOUT.state.addresses)
+        const addresses = Object.fromEntries(Object.entries(PERSISTENT.addresses)
             .map(([k, v]) => {
                 const account = new ArgsAccount(v)
                 errors[k].validOrNull(account);
@@ -92,7 +92,7 @@ export default class Export extends Component {
                             value={ addresses.dao }
                             error={ errors.dao }
                             update={e => {
-                                LAYOUT.setAddresses({
+                                PERSISTENT.setAddresses({
                                     dao: e.target.value
                                 });
                                 this.forceUpdate();
@@ -103,7 +103,7 @@ export default class Export extends Component {
                             value={ addresses.multicall }
                             error={ errors.multicall }
                             update={e => {
-                                LAYOUT.setAddresses({
+                                PERSISTENT.setAddresses({
                                     multicall: e.target.value
                                 });
                                 this.forceUpdate();
@@ -209,7 +209,7 @@ export default class Export extends Component {
                             </div>
                         : <></>    
                     }
-                    { window?.WALLET?.state?.wallet.isSignedIn() ?
+                    { WALLET?.state?.wallet.isSignedIn() ?
                         <button 
                             className="propose button"
                             disabled={
@@ -225,7 +225,7 @@ export default class Export extends Component {
                                     WALLET.propose(desc.value, depo.value, gas.value)
                             }}
                         >
-                            {`Propose on ${LAYOUT.state.addresses.dao}`}
+                            {`Propose on ${PERSISTENT.addresses.dao}`}
                         </button>
                     :
                         <button 

@@ -4,9 +4,13 @@ import { Base64 } from 'js-base64';
 import React, { Component } from 'react';
 import { toGas, toYocto } from '../../utils/converter';
 import { initWallet, tx } from '../../utils/wallet';
+import Autocomplete from '@mui/material/Autocomplete';
+import TextField from '@mui/material/TextField';
 import './wallet.scss';
 
 export default class Wallet extends Component {
+
+    daoList = [];
 
     constructor(props) {
 
@@ -18,12 +22,17 @@ export default class Wallet extends Component {
 
         window.WALLET = initWallet()
             .then(wallet => this.setState({ 
-                wallet: wallet 
+                wallet: wallet,
             }, () => {
-                window?.LAYOUT?.setAddresses({
-                    user: this.state.wallet.getAccountId()
+                PERSISTENT.setAddresses({
+                    user: wallet.getAccountId()
                 })
                 window.WALLET = this;
+                const URL = `https://api.${window.ENVIRONMENT === "mainnet" ? "" : "testnet."}app.astrodao.com/api/v1/daos/account-daos/${this.state.wallet.getAccountId()}`;
+                fetch(URL)
+                    .then(response => response.json())
+                    .then(data => this.daoList = data.map(dao => dao.id))
+                    .then(() => this.forceUpdate())
             }));
 
     }
@@ -32,7 +41,7 @@ export default class Wallet extends Component {
 
     signIn() {
 
-        this.state.wallet.requestSignIn();
+        this.state.wallet.requestSignIn()
 
     }
     
@@ -49,7 +58,7 @@ export default class Wallet extends Component {
         const {
             multicall,
             dao
-        } = LAYOUT.state.addresses
+        } = PERSISTENT.addresses
 
         const args = {
             proposal: {
@@ -85,7 +94,7 @@ export default class Wallet extends Component {
         const {
             multicall,
             dao
-        } = LAYOUT.state.addresses
+        } = PERSISTENT.addresses
 
         const args = {
             proposal: {
@@ -97,7 +106,7 @@ export default class Wallet extends Component {
                             {
                                 method_name: "ft_transfer_call",
                                 args: Base64.encode(JSON.stringify({
-                                    receiver_id: LAYOUT.state.addresses.multicall, 
+                                    receiver_id: PERSISTENT.addresses.multicall, 
                                     amount: amount,
                                     msg: JSON.stringify({
                                         function_id: "multicall",
@@ -130,12 +139,11 @@ export default class Wallet extends Component {
         if (!wallet)
             return null;
 
-        console.log(window.ENVIRONMENT);
-
         return (
-            <>
+            <div
+                className="wallet"
+            >
                 <button
-                    className="wallet"
                     onClick={ () => wallet.isSignedIn()
                         ? this.signOut() 
                         : this.signIn()
@@ -146,11 +154,30 @@ export default class Wallet extends Component {
                         : <AccountBalanceWalletOutlinedIcon/>
                     }
                     { wallet.isSignedIn()
-                        ? `Logout ${wallet.getAccountId()}`
+                        ? wallet.getAccountId()
                         : `Sign in`
                     }
                 </button>
-            </>
+                <span className="for">for</span>
+                <Autocomplete
+                    className='dao-selector'
+                    freeSolo
+                    value={PERSISTENT.addresses.dao}
+                    options={this.daoList}
+                    renderInput={(params) => 
+                        <TextField 
+                            {...params} 
+                            placeholder="Select DAO" 
+                        />
+                    }
+                    onInputChange={(event, newValue) => {
+                        PERSISTENT.setAddresses({
+                            dao: newValue ?? "",
+                            multicall: newValue.replace(window.nearConfig.SPUTNIK_V2_FACTORY_ADDRESS, window.nearConfig.MULTICALL_FACTORY_ADDRESS)
+                        })
+                    }}
+                />
+            </div>
         );
 
     }

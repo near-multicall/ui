@@ -16,7 +16,6 @@ export default class BaseTask extends Component {
         args: new ArgsError("Invalid JSON", value => JSON.parse(value.value)),
         gas: new ArgsError("Amount out of bounds", value => ArgsNumber.isValid(value), true),
         depo: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value) && value.value !== "" )
-        // // TODO regex check inputs, different errors?
     };
     errors = this.baseErrors;
     options = {};
