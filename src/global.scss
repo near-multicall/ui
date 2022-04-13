@@ -18,9 +18,9 @@
 
 body, html, #root {
     width: 100%;
-    height: 100%;
+    height: 100vh;
     background-color: color.$white;
-    font-size: 62.5%;// 0.485vw; // 1rem = 10px
+    font-size: calc(2mm + 0.08vw);
 }
 
 a {
