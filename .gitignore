@@ -8,6 +8,7 @@
 # build
 /out
 /dist
+/.parcel-cache/
 
 # keys
 /neardev

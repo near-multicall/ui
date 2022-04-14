@@ -5,7 +5,7 @@ import TextField from '@mui/material/TextField';
 import { Base64 } from 'js-base64';
 import React, { Component } from 'react';
 import { ArgsAccount, ArgsBig, ArgsError, ArgsNumber, ArgsString } from '../../utils/args';
-import { toGas } from '../../utils/converter';
+import { toGas, convert } from '../../utils/converter';
 import { TextInput, TextInputWithUnits } from '../editor/elements';
 import './export.scss';
 
@@ -220,9 +220,9 @@ export default class Export extends Component {
                             }
                             onClick={() => {
                                 if (this.attachFTs)
-                                    WALLET.proposeFT(desc.value, depo.value, gas.value, token.value, amount.value)
+                                    WALLET.proposeFT(desc.value, convert(depo.value, depo.unit), convert(gas.value, gas.unit), token.value, amount.value)
                                 else
-                                    WALLET.propose(desc.value, depo.value, gas.value)
+                                    WALLET.propose(desc.value, convert(depo.value, depo.unit), convert(gas.value, gas.unit))
                             }}
                         >
                             {`Propose on ${PERSISTENT.addresses.dao}`}

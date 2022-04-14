@@ -6,7 +6,7 @@
   "scripts": {
     "build": "yarn build:web",
     "build:web": "parcel build src/index.html --public-url ./",
-    "deploy:pages": "echo 'multicall.app' > ./dist/CNAME gh-pages -d dist/",
+    "deploy:pages": "echo 'multicall.app' > ./dist/CNAME && gh-pages -d dist/",
     "deploy": "yarn build && yarn deploy:pages",
     "start": "echo The app is starting! It will automatically open in your browser when ready && parcel src/index.html --open",
     "dev": "nodemon --watch contract -e ts --exec \"yarn start\"",
