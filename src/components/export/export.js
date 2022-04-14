@@ -73,6 +73,10 @@ export default class Export extends Component {
         const allErrors = LAYOUT.toErrors();
         const errors = this.errors;
 
+        const walletError = window?.WALLET?.errors 
+            ? Object.entries(WALLET.errors).filter(([k, v]) => v.isBad)[0]?.[1].message
+            : null
+
         const addresses = Object.fromEntries(Object.entries(PERSISTENT.addresses)
             .map(([k, v]) => {
                 const account = new ArgsAccount(v)
@@ -209,14 +213,15 @@ export default class Export extends Component {
                             </div>
                         : <></>    
                     }
-                    { WALLET?.state?.wallet.isSignedIn() ?
-                        <button 
+                    { WALLET?.state?.wallet.isSignedIn() 
+                        ? <button 
                             className="propose button"
                             disabled={
                                 errors.dao.isBad
                                 || errors.multicall.isBad
                                 || errors.depo.isBad
                                 || (this.attachFTs && (errors.amount.isBad || errors.token.isBad))
+                                || walletError
                             }
                             onClick={() => {
                                 if (this.attachFTs)
@@ -226,14 +231,14 @@ export default class Export extends Component {
                             }}
                         >
                             {`Propose on ${PERSISTENT.addresses.dao}`}
+                            { walletError ? <p>{ walletError }</p> : <></> }
                         </button>
-                    :
-                        <button 
-                            className="login button"
-                            onClick={() => WALLET.signIn()}
-                        >
-                            Connect to Wallet
-                        </button>
+                    : <button 
+                        className="login button"
+                        onClick={() => WALLET.signIn()}
+                    >
+                        Connect to Wallet
+                    </button>
                     }
                 </div>
             </div>
