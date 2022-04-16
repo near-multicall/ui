@@ -5,6 +5,7 @@ export const initialData = {
         'task-i3': { id: 'task-i3', addr: "near", func: "ft_transfer" },
         'task-i4': { id: 'task-i4', addr: "", func: "" },
         'task-i5': { id: 'task-i5', addr: "ref-finance", func: "swap" },
+        'task-i6': { id: 'task-i6', addr: "paras", func: "buy" }
     },
     columns: {
         'column-0': {
@@ -15,7 +16,7 @@ export const initialData = {
         'menu': {
             id: 'menu',
             title: 'Infinite Column',
-            taskIds: ['task-i4', 'task-i3', 'task-i2']
+            taskIds: ['task-i4', 'task-i3', 'task-i2', 'task-i6']
         },
         'trash': {
             id: 'trash',

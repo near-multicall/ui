@@ -108,6 +108,12 @@ export default class Task extends Component {
                         return <Family.Ref.Swap ref={this.instance} id={this.id}/>        
                 }
 
+            case "paras":
+                switch (func) {
+                    case "buy":
+                        return <Family.Paras.Buy ref={this.instance} id={this.id}/>        
+                }
+
             default:
                 return <Family.BaseTask ref={this.instance} id={this.id}/>
 
