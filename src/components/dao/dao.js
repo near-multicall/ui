@@ -16,7 +16,7 @@ import './dao.scss';
 export default class Dao extends Component {
 
     errors = {
-        addr: new ArgsError("Address valid", value => ArgsAccount.isValid(value), !ArgsAccount.isValid(PERSISTENT.addresses?.dao ?? "")),
+        addr: new ArgsError("Address valid", value => ArgsAccount.isValid(value), !ArgsAccount.isValid(STORAGE.addresses?.dao ?? "")),
         noContract: new ArgsError("Multicall found", value => this.errors.noContract.isBad),
         noDao: new ArgsError("Sputnik dao found", value => this.errors.noDao.isBad),
         noRights: new ArgsError("Permission to create a proposal on this dao", value => this.errors.noRights), 
@@ -30,7 +30,7 @@ export default class Dao extends Component {
         super(props);
 
         this.state = {
-            addr: this.getBaseAddress(PERSISTENT.addresses?.dao ?? ""),
+            addr: this.getBaseAddress(STORAGE.addresses?.dao ?? ""),
             loading: false,
             infos: {
                 admins: [],
@@ -62,11 +62,11 @@ export default class Dao extends Component {
 
     onAddressesUpdated() {
 
-        console.log(this.state.addr.value, PERSISTENT.addresses.dao);
+        console.log(this.state.addr.value, STORAGE.addresses.dao);
 
-        if (this.state.addr.value === "" && this.getBaseAddress(PERSISTENT.addresses.dao) !== this.state.addr.value)
+        if (this.state.addr.value === "" && this.getBaseAddress(STORAGE.addresses.dao) !== this.state.addr.value)
             this.setState({
-                addr: this.getBaseAddress(PERSISTENT.addresses.dao)
+                addr: this.getBaseAddress(STORAGE.addresses.dao)
             }, () => {
                 this.errors.addr.validOrNull(this.state.addr);
                 this.loadInfos();

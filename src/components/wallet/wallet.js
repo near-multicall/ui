@@ -35,7 +35,7 @@ export default class Wallet extends Component {
             .then(wallet => this.setState({ 
                 wallet: wallet,
             }, () => {
-                PERSISTENT.setAddresses({
+                STORAGE.setAddresses({
                     user: wallet.getAccountId()
                 })
                 window.WALLET = this;
@@ -71,7 +71,7 @@ export default class Wallet extends Component {
         const {
             multicall,
             dao
-        } = PERSISTENT.addresses
+        } = STORAGE.addresses
 
         const args = {
             proposal: {
@@ -107,7 +107,7 @@ export default class Wallet extends Component {
         const {
             multicall,
             dao
-        } = PERSISTENT.addresses
+        } = STORAGE.addresses
 
         const args = {
             proposal: {
@@ -119,7 +119,7 @@ export default class Wallet extends Component {
                             {
                                 method_name: "ft_transfer_call",
                                 args: Base64.encode(JSON.stringify({
-                                    receiver_id: PERSISTENT.addresses.multicall, 
+                                    receiver_id: STORAGE.addresses.multicall, 
                                     amount: amount,
                                     msg: JSON.stringify({
                                         function_id: "multicall",
@@ -240,7 +240,7 @@ export default class Wallet extends Component {
                         <Autocomplete
                             className='dao-selector'
                             freeSolo
-                            value={PERSISTENT.addresses.dao}
+                            value={STORAGE.addresses.dao}
                             options={this.daoList}
                             renderInput={(params) => 
                                 <TextField 
@@ -249,7 +249,7 @@ export default class Wallet extends Component {
                                 />
                             }
                             onInputChange={(event, newValue) => {
-                                PERSISTENT.setAddresses({
+                                STORAGE.setAddresses({
                                     dao: newValue ?? "",
                                     multicall: newValue.replace(window.nearConfig.SPUTNIK_V2_FACTORY_ADDRESS, window.nearConfig.MULTICALL_FACTORY_ADDRESS)
                                 })

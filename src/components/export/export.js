@@ -77,7 +77,7 @@ export default class Export extends Component {
             ? Object.entries(WALLET.errors).filter(([k, v]) => v.isBad)[0]?.[1].message
             : null
 
-        const addresses = Object.fromEntries(Object.entries(PERSISTENT.addresses)
+        const addresses = Object.fromEntries(Object.entries(STORAGE.addresses)
             .map(([k, v]) => {
                 const account = new ArgsAccount(v)
                 errors[k].validOrNull(account);
@@ -96,7 +96,7 @@ export default class Export extends Component {
                             value={ addresses.dao }
                             error={ errors.dao }
                             update={e => {
-                                PERSISTENT.setAddresses({
+                                STORAGE.setAddresses({
                                     dao: e.target.value
                                 });
                                 this.forceUpdate();
@@ -107,7 +107,7 @@ export default class Export extends Component {
                             value={ addresses.multicall }
                             error={ errors.multicall }
                             update={e => {
-                                PERSISTENT.setAddresses({
+                                STORAGE.setAddresses({
                                     multicall: e.target.value
                                 });
                                 this.forceUpdate();
@@ -230,7 +230,7 @@ export default class Export extends Component {
                                     WALLET.propose(desc.value, convert(depo.value, depo.unit), convert(gas.value, gas.unit))
                             }}
                         >
-                            {`Propose on ${PERSISTENT.addresses.dao}`}
+                            {`Propose on ${STORAGE.addresses.dao}`}
                             { walletError ? <p>{ walletError }</p> : <></> }
                         </button>
                     : <button 

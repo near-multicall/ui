@@ -30,7 +30,7 @@ export default class Transfer extends BaseTask {
 
         this.call = new Call({
             name: new ArgsString(json?.name ?? "Transfer Near"),
-            addr: new ArgsAccount(PERSISTENT.addresses.multicall ?? ""),
+            addr: new ArgsAccount(STORAGE.addresses.multicall ?? ""),
             func: new ArgsString(actions?.func ?? "near_transfer"),
             args: new ArgsObject(actions?.args 
                 ? {
@@ -51,7 +51,7 @@ export default class Transfer extends BaseTask {
 
     onAddressesUpdated() {
 
-        this.call.addr.value = PERSISTENT.addresses.multicall;
+        this.call.addr.value = STORAGE.addresses.multicall;
         this.errors.addr.validOrNull(this.call.addr.value);
         this.forceUpdate();
 

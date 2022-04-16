@@ -20,4 +20,4 @@ class Persistent {
 
 }
 
-window["PERSISTENT"] = new Persistent();
+window["STORAGE"] = new Persistent();
