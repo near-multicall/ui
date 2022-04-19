@@ -261,6 +261,10 @@ option {
             background-color: color.$darkish;
             cursor: not-allowed;
         }
+        p {
+            font-size: size.$smaller-text;
+            color: color.$red;
+        }
     }
     &.login {
         background-color: color.$light;

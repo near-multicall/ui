@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { HashRouter, Routes, Route } from "react-router-dom";
 import AppPage from './pages/app-page';
 import DaoPage from './pages/dao-page';
+import './utils/persistent';
 
 ReactDOM.render(
   <HashRouter>

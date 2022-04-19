@@ -5,7 +5,7 @@ import TextField from '@mui/material/TextField';
 import { Base64 } from 'js-base64';
 import React, { Component } from 'react';
 import { ArgsAccount, ArgsBig, ArgsError, ArgsNumber, ArgsString } from '../../utils/args';
-import { toGas } from '../../utils/converter';
+import { toGas, convert } from '../../utils/converter';
 import { TextInput, TextInputWithUnits } from '../editor/elements';
 import './export.scss';
 
@@ -73,7 +73,11 @@ export default class Export extends Component {
         const allErrors = LAYOUT.toErrors();
         const errors = this.errors;
 
-        const addresses = Object.fromEntries(Object.entries(LAYOUT.state.addresses)
+        const walletError = window?.WALLET?.errors 
+            ? Object.entries(WALLET.errors).filter(([k, v]) => v.isBad)[0]?.[1].message
+            : null
+
+        const addresses = Object.fromEntries(Object.entries(STORAGE.addresses)
             .map(([k, v]) => {
                 const account = new ArgsAccount(v)
                 errors[k].validOrNull(account);
@@ -92,7 +96,7 @@ export default class Export extends Component {
                             value={ addresses.dao }
                             error={ errors.dao }
                             update={e => {
-                                LAYOUT.setAddresses({
+                                STORAGE.setAddresses({
                                     dao: e.target.value
                                 });
                                 this.forceUpdate();
@@ -103,7 +107,7 @@ export default class Export extends Component {
                             value={ addresses.multicall }
                             error={ errors.multicall }
                             update={e => {
-                                LAYOUT.setAddresses({
+                                STORAGE.setAddresses({
                                     multicall: e.target.value
                                 });
                                 this.forceUpdate();
@@ -209,31 +213,32 @@ export default class Export extends Component {
                             </div>
                         : <></>    
                     }
-                    { window?.WALLET?.state?.wallet.isSignedIn() ?
-                        <button 
+                    { WALLET?.state?.wallet.isSignedIn() 
+                        ? <button 
                             className="propose button"
                             disabled={
                                 errors.dao.isBad
                                 || errors.multicall.isBad
                                 || errors.depo.isBad
                                 || (this.attachFTs && (errors.amount.isBad || errors.token.isBad))
+                                || walletError
                             }
                             onClick={() => {
                                 if (this.attachFTs)
-                                    WALLET.proposeFT(desc.value, depo.value, gas.value, token.value, amount.value)
+                                    WALLET.proposeFT(desc.value, convert(depo.value, depo.unit), convert(gas.value, gas.unit), token.value, amount.value)
                                 else
-                                    WALLET.propose(desc.value, depo.value, gas.value)
+                                    WALLET.propose(desc.value, convert(depo.value, depo.unit), convert(gas.value, gas.unit))
                             }}
                         >
-                            {`Propose on ${LAYOUT.state.addresses.dao}`}
+                            {`Propose on ${STORAGE.addresses.dao}`}
+                            { walletError ? <p>{ walletError }</p> : <></> }
                         </button>
-                    :
-                        <button 
-                            className="login button"
-                            onClick={() => WALLET.signIn()}
-                        >
-                            Connect to Wallet
-                        </button>
+                    : <button 
+                        className="login button"
+                        onClick={() => WALLET.signIn()}
+                    >
+                        Connect to Wallet
+                    </button>
                     }
                 </div>
             </div>

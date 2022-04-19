@@ -1,6 +1,7 @@
 @use 'sass/size';
 @use 'sass/color';
 @use 'sass/mixin';
+@use 'sass/font';
 
 .wallet {
     @include mixin.center-items;
@@ -11,4 +12,56 @@
     color: color.$text;
     border-radius: size.$task-radius;
     background-color: color.$light;
+    button {
+        @include mixin.center-items;
+        gap: 0.5 * size.$gap;
+        height: 100%;
+        padding: 0;
+        font-size: size.$text;
+    }
+    span {
+        color: color.$lightish;
+    }
+    .dao-selector {
+        font-size: unset;
+        width: 150px;
+        height: 100%;
+        .MuiTextField-root {
+            justify-content: center;
+            height: 100%;
+            .MuiOutlinedInput-root {
+                height: 100%;
+                padding: 0;
+                input, textarea {
+                    height: 100%;
+                    padding: 0;
+                    color: color.$text;
+                    font-family: font.$text;
+                    font-size: size.$text;
+                }
+                fieldset {
+                    border: none;
+                }
+                .MuiAutocomplete-endAdornment {
+                    top: unset;
+                    right: 0;
+                    svg {
+                        fill: color.$text;
+                    }
+                }
+            }
+            *:not(input) {
+                color: color.$light-text;
+                font-size: 1em;
+            }
+            font-size: 1.8rem;
+        }
+    }
+}
+
+.MuiAutocomplete-popper {
+    width: unset !important;
+    li {
+        font-size: size.$text;
+    }
 }
