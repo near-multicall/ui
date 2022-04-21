@@ -10,6 +10,8 @@
 @import "https://fonts.googleapis.com/icon?family=Material+Icons";
 @import "https://fonts.googleapis.com/css2?family=Roboto+Mono&family=Titillium+Web:ital,wght@0,200;0,400;0,600;1,400&display=swap";
 @import "https://fonts.googleapis.com/icon?family=Material+Icons";
+@import "https://fonts.googleapis.com/css2?family=Roboto+Mono&family=Titillium+Web:ital,wght@0,200;0,400;0,600;1,400&display=swap";
+@import "https://fonts.googleapis.com/icon?family=Material+Icons";
 * {
   margin: 0;
   font-family: Titillium Web, sans-serif;
@@ -951,6 +953,11 @@ option {
   background-color: #6c888f;
 }
 
+.button.propose p {
+  color: #f6a7b2;
+  font-size: 1.2rem;
+}
+
 .button.login {
   background-color: #b4ccca;
 }
@@ -966,6 +973,71 @@ option {
   padding: 0 1.6rem;
   font-size: 1.8rem;
   display: flex;
+}
+
+.wallet button {
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+  gap: 1.6rem;
+  padding: 0;
+  font-size: 1.8rem;
+  display: flex;
+}
+
+.wallet span {
+  color: #8fa9ac;
+}
+
+.wallet .dao-selector {
+  font-size: unset;
+  width: 150px;
+  height: 100%;
+}
+
+.wallet .dao-selector .MuiTextField-root {
+  height: 100%;
+  justify-content: center;
+  font-size: 1.8rem;
+}
+
+.wallet .dao-selector .MuiTextField-root .MuiOutlinedInput-root {
+  height: 100%;
+  padding: 0;
+}
+
+.wallet .dao-selector .MuiTextField-root .MuiOutlinedInput-root input, .wallet .dao-selector .MuiTextField-root .MuiOutlinedInput-root textarea {
+  height: 100%;
+  color: #2a2a2a;
+  padding: 0;
+  font-family: Titillium Web, sans-serif;
+  font-size: 1.8rem;
+}
+
+.wallet .dao-selector .MuiTextField-root .MuiOutlinedInput-root fieldset {
+  border: none;
+}
+
+.wallet .dao-selector .MuiTextField-root .MuiOutlinedInput-root .MuiAutocomplete-endAdornment {
+  top: unset;
+  right: 0;
+}
+
+.wallet .dao-selector .MuiTextField-root .MuiOutlinedInput-root .MuiAutocomplete-endAdornment svg {
+  fill: #2a2a2a;
+}
+
+.wallet .dao-selector .MuiTextField-root :not(input) {
+  color: #e0e0e0;
+  font-size: 1em;
+}
+
+.MuiAutocomplete-popper {
+  width: unset !important;
+}
+
+.MuiAutocomplete-popper li {
+  font-size: 1.8rem;
 }
 
 .header-wrapper {
