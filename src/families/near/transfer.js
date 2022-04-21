@@ -39,7 +39,7 @@ export default class Transfer extends BaseTask {
                     memo: new ArgsString("")
                 }    
             ),
-            gas: new ArgsNumber(actions?.gas ?? toGas(7), 0, toGas(300), "gas"),
+            gas: new ArgsNumber(actions?.gas ?? toGas(7), 1, toGas(300), "gas"),
             depo: new ArgsBig("1", "1", "1", "yocto")
         });
 

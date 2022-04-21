@@ -19,11 +19,12 @@ export default class Export extends Component {
         gas: new ArgsError("Amount out of bounds", value => ArgsNumber.isValid(value)),
         depo: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value) && value.value !== ""),
         amount: new ArgsError("Invalid amount", value => ArgsBig.isValid(value) && value.value !== ""),
-        token: new ArgsError("Invalid address", value => ArgsAccount.isValid(value))
+        token: new ArgsError("Invalid address", value => ArgsAccount.isValid(value)),
+        desc: new ArgsError("Invalid proposal description", value => value.value !== "", true)
     };
 
     total = {
-        gas: new ArgsNumber(toGas(270), 0, toGas(270), "gas"),
+        gas: new ArgsNumber(toGas(270), 1, toGas(270), "gas"),
         depo: new ArgsBig("1", "1", null, "yocto"),
         desc: new ArgsString("")
     }
@@ -90,31 +91,15 @@ export default class Export extends Component {
                 className="tab-panel"
             >
                 <div className="export-container">
+
                     <div className="input-container">
-                        <TextInput
-                            label="DAO address"
-                            value={ addresses.dao }
-                            error={ errors.dao }
-                            update={e => {
-                                STORAGE.setAddresses({
-                                    dao: e.target.value
-                                });
-                                this.forceUpdate();
-                            }}
+                        <TextInput 
+                            label="Proposal description"
+                            value={ desc }
+                            error={ errors.desc }
+                            multiline
+                            update={ this.update }
                         />
-                        <TextInput
-                            label="Multicall address"
-                            value={ addresses.multicall }
-                            error={ errors.multicall }
-                            update={e => {
-                                STORAGE.setAddresses({
-                                    multicall: e.target.value
-                                });
-                                this.forceUpdate();
-                            }}
-                        />
-                    </div>
-                    <div className="input-container">
                         <TextInputWithUnits 
                             label="Total allocated gas"
                             value={ gas }
@@ -164,12 +149,6 @@ export default class Export extends Component {
                             </>
                             : <></>
                         }
-                        <TextInput 
-                            label="Proposal description"
-                            value={ desc }
-                            multiline
-                            update={ this.update }
-                        />
                     </div>
                     { allErrors.length > 0 && <div className="error-container">
                         <div className="header">
@@ -220,6 +199,7 @@ export default class Export extends Component {
                                 errors.dao.isBad
                                 || errors.multicall.isBad
                                 || errors.depo.isBad
+                                || errors.desc.isBad
                                 || (this.attachFTs && (errors.amount.isBad || errors.token.isBad))
                                 || walletError
                             }
