@@ -656,16 +656,18 @@ button {
   justify-content: flex-start;
   align-items: center;
   display: flex;
+  position: relative;
 }
 
 .section .header {
-  width: calc(100% - 3.2rem);
+  width: calc(100% - 4.8rem);
   justify-content: space-between;
   align-items: center;
   display: flex;
 }
 
 .section .header h3 {
+  cursor: pointer;
   color: #e0e0e0;
   text-align: left;
   font-size: 1.8rem;
@@ -679,6 +681,16 @@ button {
 
 .section .header .icon:hover, .section .header .icon:focus {
   color: #dcefea;
+}
+
+.section .header .collapse {
+  transition: all 50ms linear;
+  position: absolute;
+  left: 0;
+}
+
+.section .header .collapse[collapsed="yes"] {
+  transform: rotate(-90deg);
 }
 
 .section .value {
