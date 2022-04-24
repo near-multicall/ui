@@ -35,6 +35,7 @@ export default class Export extends Component {
     }
 
     attachFTs = false;
+    showArgs = false;
 
     constructor(props) {
 
@@ -56,6 +57,13 @@ export default class Export extends Component {
             e.target.innerHTML = oldIcon;
         }, 1000);
         
+    }
+
+    toggleShowArgs() {
+
+        this.showArgs = !this.showArgs;
+        this.forceUpdate();
+
     }
 
     update() {
@@ -171,27 +179,46 @@ export default class Export extends Component {
                             ) }
                         </div>
                     </div> }
-                    { !this.attachFTs 
-                        ?
-                            <div className="section">
-                                <div className="header">
-                                    <h3>Multicall args</h3>
-                                    <Icon 
-                                        className="icon"
-                                        onClick={ e => {
-                                            navigator.clipboard.writeText(JSON.stringify({calls: LAYOUT.toBase64()}));
-                                            this.updateCopyIcon(e); 
-                                        } }
-                                    >content_copy</Icon> 
-                                </div>
-                                <div className="value">
-                                    <pre className="code">
-                                        { JSON.stringify({calls: LAYOUT.toBase64()}) }
-                                    </pre>
-                                </div>
+                    <div className="section">
+                        <div className="header">
+                            <Icon 
+                                className="icon collapse"
+                                onClick={ () => this.toggleShowArgs() }
+                                collapsed={ this.showArgs ? "no" : "yes" }
+                            >expand_more</Icon> 
+                            <h3
+                                onClick={ () => this.toggleShowArgs() }
+                            >Multicall args</h3>
+                            { this.showArgs 
+                                ? <Icon 
+                                    className="icon copy"
+                                    onClick={ e => {
+                                        navigator.clipboard.writeText(JSON.stringify({calls: LAYOUT.toBase64()}));
+                                        this.updateCopyIcon(e); 
+                                    } }
+                                >content_copy</Icon>
+                                : <></>
+                            }
+                        </div>
+                        { this.showArgs 
+                            ? <div className="value">
+                                <pre className="code">
+                                    { !this.attachFTs
+                                        ? JSON.stringify({calls: LAYOUT.toBase64()}) 
+                                        : JSON.stringify({
+                                            receiver_id: STORAGE.addresses.multicall, 
+                                            amount: amount.value,
+                                            msg: JSON.stringify({
+                                                function_id: "multicall",
+                                                args: Base64.encode(JSON.stringify({"calls":LAYOUT.toBase64()}).toString())
+                                            }).toString()
+                                        })
+                                    }
+                                </pre>
                             </div>
-                        : <></>    
-                    }
+                            : <></>
+                        }
+                    </div>
                     { WALLET?.state?.wallet.isSignedIn() 
                         ? <button 
                             className="propose button"
