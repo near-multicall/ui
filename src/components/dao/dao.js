@@ -243,7 +243,7 @@ export default class Dao extends Component {
         .finally(() => {
             if (newState.infos.policy?.roles
                 .filter(r => r.kind === "Everyone" || r.kind.Group.includes(window.WALLET.state.wallet.getAccountId()))
-                .filter(r => r.permissions.includes("*:AddProposal") || r.permissions.includes("FunctionCall:AddProposal"))
+                .filter(r => r.permissions.includes("*:AddProposal") || r.permissions.includes("call:AddProposal"))
                 .length === 0) // no add proposal rights
                 noRights.isBad = true;
             // update visuals

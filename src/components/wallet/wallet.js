@@ -198,7 +198,7 @@ export default class Wallet extends Component {
 
                 if (policy.roles
                     .filter(r => r.kind === "Everyone" || r.kind.Group.includes(this.state.wallet.getAccountId()))
-                    .filter(r => r.permissions.includes("*:AddProposal") || r.permissions.includes("FunctionCall:AddProposal"))
+                    .filter(r => r.permissions.includes("*:AddProposal") || r.permissions.includes("call:AddProposal"))
                     .length === 0) // no add proposal rights
                     noRights.isBad = true;
 
