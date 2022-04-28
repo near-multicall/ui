@@ -242,19 +242,14 @@ export default class Dao extends Component {
         )
         .finally(() => {
             // can user propose FunctionCall to DAO?
-            let canPropose = false
-            const userPermissions = newState.infos.policy?.roles
+            const canPropose = newState.infos.policy?.roles
                 .filter(r => r.kind === "Everyone" || r.kind.Group.includes(window.WALLET.state.wallet.getAccountId()))
                 .map(r => r.permissions)
                 .flat()
-
-            for (let i = 0; i < userPermissions?.length; i++) {
-                const [proposalKind, action] = userPermissions[i].split(":")
-                if ((proposalKind === "*" || proposalKind === "call") && (action === "*" || action === "AddProposal")) {
-                    canPropose = true
-                    break
-                }
-            }
+                .some(permission => {
+                    const [proposalKind, action] = permission.split(":")
+                    return (proposalKind === "*" || proposalKind === "call") && (action === "*" || action === "AddProposal")
+                })
 
             if ( ! canPropose ) noRights.isBad = true; // no add proposal rights
 

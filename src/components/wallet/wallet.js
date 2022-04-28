@@ -197,19 +197,14 @@ export default class Wallet extends Component {
                 });
 
                 // can user propose FunctionCall to DAO?
-                let canPropose = false
-                const userPermissions = policy.roles
+                const canPropose = policy.roles
                     .filter(r => r.kind === "Everyone" || r.kind.Group.includes(this.state.wallet.getAccountId()))
                     .map(r => r.permissions)
                     .flat()
-
-                for (let i = 0; i < userPermissions.length; i++) {
-                    const [proposalKind, action] = userPermissions[i].split(":")
-                    if ((proposalKind === "*" || proposalKind === "call") && (action === "*" || action === "AddProposal")) {
-                        canPropose = true
-                        break
-                    }
-                }
+                    .some(permission => {
+                        const [proposalKind, action] = permission.split(":")
+                        return (proposalKind === "*" || proposalKind === "call") && (action === "*" || action === "AddProposal")
+                    })
 
                 if ( ! canPropose ) noRights.isBad = true; // no add proposal rights
 
