@@ -241,11 +241,23 @@ export default class Dao extends Component {
             }
         )
         .finally(() => {
-            if (newState.infos.policy?.roles
+            // can user propose FunctionCall to DAO?
+            let canPropose = false
+            const userPermissions = newState.infos.policy?.roles
                 .filter(r => r.kind === "Everyone" || r.kind.Group.includes(window.WALLET.state.wallet.getAccountId()))
-                .filter(r => r.permissions.includes("*:AddProposal") || r.permissions.includes("call:AddProposal"))
-                .length === 0) // no add proposal rights
-                noRights.isBad = true;
+                .map(r => r.permissions)
+                .flat()
+
+            for (let i = 0; i < userPermissions?.length; i++) {
+                const [proposalKind, action] = userPermissions[i].split(":")
+                if ((proposalKind === "*" || proposalKind === "call") && (action === "*" || action === "AddProposal")) {
+                    canPropose = true
+                    break
+                }
+            }
+
+            if ( ! canPropose ) noRights.isBad = true; // no add proposal rights
+
             // update visuals
             this.setState(newState);
         })
