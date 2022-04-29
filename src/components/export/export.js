@@ -219,6 +219,7 @@ export default class Export extends Component {
                             : <></>
                         }
                     </div>
+                    <div className="spacer"></div>
                     { WALLET?.state?.wallet.isSignedIn() 
                         ? <button 
                             className="propose button"

@@ -17,6 +17,7 @@ export default abstract class Args {
     min: number | BigInt | null;
     max: number | BigInt | null;
     unit: string | null;
+    decimals: number | null;
 
     omit = false;
 
@@ -25,7 +26,8 @@ export default abstract class Args {
         value: any, 
         min?: number | BigInt | null, 
         max?: number | BigInt | null,
-        unit?: string | null
+        unit?: string | null,
+        decimals?: number | null
     ) {
 
         // test if type is valid
@@ -37,6 +39,7 @@ export default abstract class Args {
         this.min = min;
         this.max = max;
         this.unit = unit;
+        this.decimals = decimals;
 
     }
 
@@ -84,16 +87,27 @@ class ArgsNumber extends Args {
         value: number, 
         min?: number | null, 
         max?: number | null, 
-        unit?: string | null
+        unit?: string | null,
+        decimals?: number | null
     ) {
 
-        super("number", value, min, max, unit);
+        super("number", value, min, max, unit, decimals);
 
     }
 
     static isValid = (value: ArgsNumber) => {
 
-        const v = convert(value.value, value.unit);
+        const decimals = value.decimals ?? {
+            NEAR: 24,
+            yocto: 0,
+            Tgas: 12,
+            gas: 0
+        }[value.unit]
+
+        if (decimals !== undefined && value.value.toString().split(".")[1]?.length > decimals)
+            return false;
+
+        const v = convert(value.value, value.unit, decimals);
 
         return (value.min === null || v >= value.min) 
             && (value.max === null || v <= value.max);
@@ -112,10 +126,11 @@ class ArgsBig extends Args {
         value: string, 
         min: string = null, 
         max: string = null, 
-        unit?: string | null
+        unit?: string | null,
+        decimals?: number | null
     ) {
 
-        super("big", value, (min !== null) ? BigInt(min) : null, (max !== null) ? BigInt(max) : null, unit ?? "unknown");
+        super("big", value, (min !== null) ? BigInt(min) : null, (max !== null) ? BigInt(max) : null, unit ?? "unknown", decimals);
 
         this.big = BigInt(value);
 
@@ -123,7 +138,17 @@ class ArgsBig extends Args {
 
     static isValid = (value: ArgsBig) => {
 
-        const v = convert(value.value, value.unit);
+        const decimals = value.decimals ?? {
+            NEAR: 24,
+            yocto: 0,
+            Tgas: 12,
+            gas: 0
+        }[value.unit]
+
+        if (decimals !== undefined && value.value.split(".")[1]?.length > decimals)
+            return false;
+
+        const v = convert(value.value, value.unit, decimals);
 
         return (value.min === null || BigInt(v) >= value.min) 
             && (value.max === null || BigInt(v) <= value.max);
@@ -148,11 +173,18 @@ class ArgsObject extends Args {
 
     toString = () => {
 
+        const decimals = (value: Args): number => value.decimals ?? {
+            NEAR: 24,
+            yocto: 0,
+            Tgas: 12,
+            gas: 0
+        }[value.unit]
+
         let res = {};
 
         for (let k in this.value)
             if (!this.value[k].omit)
-                res[k] = convert(this.value[k], this.value[k].unit).toString();
+                res[k] = convert(this.value[k].value, this.value[k].unit, decimals(this.value[k])).toString();
 
         return res; // JSON.stringify(res, null, "  ");
 

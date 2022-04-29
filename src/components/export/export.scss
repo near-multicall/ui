@@ -11,12 +11,6 @@
     flex-flow: column nowrap;
     gap: size.$gap;
     overflow-y: scroll;
-    &::after {
-        content: ' ';
-        white-space: pre;
-        visibility: hidden;
-        width: 100%;
-    }
 }
 
 .section {
