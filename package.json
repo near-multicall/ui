@@ -49,6 +49,7 @@
     "luxon": "^1.28.0 || ^2.0.0",
     "moment": "^2.29.1",
     "near-api-js": "^0.44.2",
+    "near-units": "^0.1.9",
     "parcel": "^2.4.0",
     "react": "^18.0.0",
     "react-beautiful-dnd": "^13.1.0",

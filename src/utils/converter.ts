@@ -1,17 +1,18 @@
 import { utils } from 'near-api-js';
+import { Gas } from 'near-units';
 
 
 const { formatNearAmount, parseNearAmount } = utils.format;
 
 const oneNEAR = BigInt("1000000000000000000000000");
 
-const toTGas = (gas: string | number) => parseFloat(gas.toString()) * 1e-12; 
+const toTGas = (gas: string | number): number => parseFloat(gas.toString()) * 1e-12; 
 
-const toGas = (Tgas: string | number) => parseFloat(Tgas.toString()) * 1e12;
+const toGas = (TgasAmount: string | number): number => parseInt( Gas.parse(`${TgasAmount} TGas`).toString() );
 
-const toNEAR = (yocto: string | number) => formatNearAmount(yocto.toString());
+const toNEAR = (yocto: string | number): string => formatNearAmount(yocto.toString());
 
-const toYocto = (NEAR: string | number) => parseNearAmount(NEAR.toString());
+const toYocto = (NEAR: string | number): string => parseNearAmount(NEAR.toString());
 
 const convert = (value: string | number, unit: string) => { 
 
