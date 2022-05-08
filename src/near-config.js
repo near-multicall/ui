@@ -20,7 +20,7 @@ function getConfig(env) {
   case 'testnet':
     return {
       networkId: 'testnet',
-      MULTICALL_FACTORY_ADDRESS: "v1_01.multicall.testnet",
+      MULTICALL_FACTORY_ADDRESS: "v1_02.multicall.testnet",
       WNEAR_ADDRESS: "wrap.testnet",
       SPUTNIK_V2_FACTORY_ADDRESS: "sputnikv2.testnet",
       EXAMPLE_ADDRESS: "example.testnet",
