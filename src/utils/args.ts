@@ -173,18 +173,11 @@ class ArgsObject extends Args {
 
     toString = () => {
 
-        const decimals = (value: Args): number => value.decimals ?? {
-            NEAR: 24,
-            yocto: 0,
-            Tgas: 12,
-            gas: 0
-        }[value.unit]
-
         let res = {};
 
         for (let k in this.value)
             if (!this.value[k].omit)
-                res[k] = convert(this.value[k].value, this.value[k].unit, decimals(this.value[k])).toString();
+                res[k] = convert(this.value[k].value, this.value[k].unit).toString();
 
         return res; // JSON.stringify(res, null, "  ");
 

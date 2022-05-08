@@ -16,20 +16,16 @@ const toYocto = (NEAR: string | number): string => parseNearAmount(NEAR.toString
 
 const convert = (value: string | number, unit: string, decimals?: number): number | string => {
 
-    switch(unit) {
+    decimals = decimals ?? {
+        NEAR: 24,
+        yocto: 0,
+        Tgas: 12,
+        gas: 0
+    }[unit]
 
-        case "Tgas":
-            return toGas(value);
-
-        case "NEAR":
-            return toYocto(value);
-
-        default:
-            return decimals !== undefined && /^\d*\.\d*$/.test(value.toString())
-                ? (toSmall((value === "" ? "0" : value).toString(), decimals)).toString()
-                : value;
-
-    }
+    return decimals !== undefined && /^\d*(\.\d*)?$/.test(value.toString())
+        ? (toSmall((value === "" ? "0" : value).toString(), decimals)).toString()
+        : value;
 
 }
 
