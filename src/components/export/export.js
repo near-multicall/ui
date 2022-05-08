@@ -1,14 +1,15 @@
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import { InputAdornment } from '@mui/material';
 import Checkbox from '@mui/material/Checkbox';
 import Icon from '@mui/material/Icon';
 import TextField from '@mui/material/TextField';
 import { Base64 } from 'js-base64';
 import React, { Component } from 'react';
 import { ArgsAccount, ArgsBig, ArgsError, ArgsNumber, ArgsString } from '../../utils/args';
-import { toGas, convert } from '../../utils/converter';
+import { convert, toGas } from '../../utils/converter';
+import { view } from "../../utils/wallet";
 import { TextInput, TextInputWithUnits } from '../editor/elements';
 import './export.scss';
-
 
 export default class Export extends Component {
 
@@ -20,7 +21,9 @@ export default class Export extends Component {
         depo: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value) && value.value !== ""),
         amount: new ArgsError("Invalid amount", value => ArgsBig.isValid(value) && value.value !== ""),
         token: new ArgsError("Invalid address", value => ArgsAccount.isValid(value)),
-        desc: new ArgsError("Invalid proposal description", value => value.value !== "", true)
+        desc: new ArgsError("Invalid proposal description", value => value.value !== "", true),
+        noToken: new ArgsError("Address does not belong to token contract", value => this.errors.noToken),
+        notWhitelisted: new ArgsError("Token not whitelisted on multicall instance", value => this.errors.notWhitelisted)
     };
 
     total = {
@@ -37,12 +40,26 @@ export default class Export extends Component {
     attachFTs = false;
     showArgs = false;
 
+    lastInput;
+
     constructor(props) {
 
         super(props);
 
         this.update = this.update.bind(this);
 
+    }
+
+    componentDidMount() {
+
+        window.EXPORT = this;
+
+    }
+
+    onAddressesUpdated() {
+
+        window.WALLET.then(() => this.updateFT());
+        
     }
 
     updateCopyIcon(e) {
@@ -69,6 +86,49 @@ export default class Export extends Component {
     update() {
 
         this.forceUpdate();
+
+    }
+
+    updateFT() {
+
+        const { token, amount } = this.ft;
+
+        this.errors.noToken.isBad = false;
+        this.errors.notWhitelisted.isBad = false;
+
+        if (this.errors.token.isBad)
+            return;
+
+        Promise.all([
+            view(
+                token.value,
+                "ft_metadata",
+                {}
+            )
+            .catch(e => {
+                if (e.type === "AccountDoesNotExist" || e.toString().includes("MethodNotFound"))
+                    this.errors.noToken.isBad = true;
+            }),
+            view(
+                STORAGE.addresses.multicall,
+                "get_tokens",
+                {}
+            )
+            .catch(e => {
+                // console.error("failed fetching token whitelist", e);
+            })
+        ])
+        .then(([metadata, whitelist]) => {
+
+            if (metadata) {
+                amount.unit = metadata.symbol;
+                amount.decimals = metadata.decimals;
+            }
+            if (whitelist)
+                this.errors.notWhitelisted.isBad = !this.errors.noToken.isBad && !whitelist.includes(token.value);
+
+            this.update()
+        })
 
     }
 
@@ -134,6 +194,19 @@ export default class Export extends Component {
                         </div>
                         { this.attachFTs
                             ? <>
+                                <TextInput
+                                    label="Token contract"
+                                    value={ token }
+                                    error={[ errors.token, errors.noToken, errors.notWhitelisted ]}
+                                    update={ () => {
+                                        this.update();
+                                        setTimeout(() => {
+                                            if (new Date() - this.lastInput > 400)
+                                                this.updateFT()
+                                        }, 500)
+                                        this.lastInput = new Date()
+                                    } }
+                                />
                                 <TextField
                                     label="Amount"
                                     value={ errors.amount.validOrNull(amount) || errors.amount.intermediate }
@@ -147,12 +220,9 @@ export default class Export extends Component {
                                     error={errors.amount.isBad}
                                     helperText={errors.amount.isBad && errors.amount.message}
                                     InputLabelProps={{ shrink: true }}
-                                />
-                                <TextInput
-                                    label="Token contract"
-                                    value={ token }
-                                    error={ errors.token }
-                                    update={ this.update }
+                                    InputProps={{
+                                        endAdornment: <InputAdornment position="end">{amount.unit}</InputAdornment>,
+                                    }}
                                 />
                             </>
                             : <></>
@@ -219,6 +289,7 @@ export default class Export extends Component {
                             : <></>
                         }
                     </div>
+                    <div className="spacer"></div>
                     { WALLET?.state?.wallet.isSignedIn() 
                         ? <button 
                             className="propose button"
@@ -232,7 +303,7 @@ export default class Export extends Component {
                             }
                             onClick={() => {
                                 if (this.attachFTs)
-                                    WALLET.proposeFT(desc.value, convert(depo.value, depo.unit), convert(gas.value, gas.unit), token.value, amount.value)
+                                    WALLET.proposeFT(desc.value, convert(depo.value, depo.unit), convert(gas.value, gas.unit), token.value, convert(amount.value, amount.unit, amount.decimals))
                                 else
                                     WALLET.propose(desc.value, convert(depo.value, depo.unit), convert(gas.value, gas.unit))
                             }}

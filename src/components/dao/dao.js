@@ -60,11 +60,9 @@ export default class Dao extends Component {
 
     }
 
-    onAddressesUpdated() {
+    onAddressesUpdated() {  
 
-        console.log(this.state.addr.value, STORAGE.addresses.dao);
-
-        if (this.state.addr.value === "" && this.getBaseAddress(STORAGE.addresses.dao) !== this.state.addr.value)
+        if (this.getBaseAddress(STORAGE.addresses.dao) !== this.state.addr.value)
             this.setState({
                 addr: this.getBaseAddress(STORAGE.addresses.dao)
             }, () => {
@@ -91,6 +89,9 @@ export default class Dao extends Component {
 
 
     createMulticall() {
+
+        if (this.fee === undefined)
+            return;
 
         const { loading, addr, infos } = this.state;
         const {
