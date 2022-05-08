@@ -113,7 +113,7 @@ export default class Transfer extends BaseTask {
                     update={ this.updateCard }
                 />
                 <TextInput 
-                    label="Contract address"
+                    label="Token address"
                     value={ addr }
                     error={[ errors.addr, errors.noToken ]}
                     update={ () => {
