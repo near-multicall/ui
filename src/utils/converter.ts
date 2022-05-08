@@ -1,7 +1,6 @@
 import { utils } from 'near-api-js';
 import { Gas } from 'near-units';
-import { ArgsBig } from './args';
-import { B_div_B, B_mul_N, isValidBigIntSyntax } from './math'
+import { B_div_B, B_mul_N } from './math'
 
 
 const { formatNearAmount, parseNearAmount } = utils.format;
@@ -26,7 +25,7 @@ const convert = (value: string | number, unit: string, decimals?: number): numbe
             return toYocto(value);
 
         default:
-            return decimals !== undefined && isValidBigIntSyntax(value.toString())
+            return decimals !== undefined && /^\d*\.\d*$/.test(value.toString())
                 ? (toSmall((value === "" ? "0" : value).toString(), decimals)).toString()
                 : value;
 
