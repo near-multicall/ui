@@ -303,7 +303,7 @@ export default class Export extends Component {
                             }
                             onClick={() => {
                                 if (this.attachFTs)
-                                    WALLET.proposeFT(desc.value, convert(depo.value, depo.unit), convert(gas.value, gas.unit), token.value, amount.value)
+                                    WALLET.proposeFT(desc.value, convert(depo.value, depo.unit), convert(gas.value, gas.unit), token.value, convert(amount.value, amount.unit, amount.decimals))
                                 else
                                     WALLET.propose(desc.value, convert(depo.value, depo.unit), convert(gas.value, gas.unit))
                             }}
