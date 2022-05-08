@@ -97,6 +97,11 @@ class ArgsNumber extends Args {
 
     static isValid = (value: ArgsNumber) => {
 
+        // test if number
+        // this shouldnt work for numbers where its string has "e" in it, but it does??
+        if (!/^\d*(\.\d*)?$/.test(value.value.toString()))
+            return;
+
         const decimals = value.decimals ?? {
             NEAR: 24,
             yocto: 0,
@@ -137,6 +142,10 @@ class ArgsBig extends Args {
     }
 
     static isValid = (value: ArgsBig) => {
+
+        // test if number
+        if (!/^\d*(\.\d*)?$/.test(value.value.toString()))
+            return;
 
         const decimals = value.decimals ?? {
             NEAR: 24,
