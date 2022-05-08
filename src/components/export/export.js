@@ -1,14 +1,15 @@
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import { InputAdornment } from '@mui/material';
 import Checkbox from '@mui/material/Checkbox';
 import Icon from '@mui/material/Icon';
 import TextField from '@mui/material/TextField';
 import { Base64 } from 'js-base64';
 import React, { Component } from 'react';
 import { ArgsAccount, ArgsBig, ArgsError, ArgsNumber, ArgsString } from '../../utils/args';
-import { toGas, convert } from '../../utils/converter';
+import { convert, toGas } from '../../utils/converter';
+import { view } from "../../utils/wallet";
 import { TextInput, TextInputWithUnits } from '../editor/elements';
 import './export.scss';
-
 
 export default class Export extends Component {
 
@@ -20,7 +21,8 @@ export default class Export extends Component {
         depo: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value) && value.value !== ""),
         amount: new ArgsError("Invalid amount", value => ArgsBig.isValid(value) && value.value !== ""),
         token: new ArgsError("Invalid address", value => ArgsAccount.isValid(value)),
-        desc: new ArgsError("Invalid proposal description", value => value.value !== "", true)
+        desc: new ArgsError("Invalid proposal description", value => value.value !== "", true),
+        noToken: new ArgsError("Address does not belong to token contract", value => this.errors.noToken)
     };
 
     total = {
@@ -37,11 +39,14 @@ export default class Export extends Component {
     attachFTs = false;
     showArgs = false;
 
+    lastInput;
+
     constructor(props) {
 
         super(props);
 
         this.update = this.update.bind(this);
+        window.WALLET.then(() => this.updateFT());
 
     }
 
@@ -69,6 +74,34 @@ export default class Export extends Component {
     update() {
 
         this.forceUpdate();
+
+    }
+
+    updateFT() {
+
+        const { token, amount } = this.ft;
+
+        this.errors.noToken.isBad = false;
+
+        if (this.errors.token.isBad)
+            return;
+
+        view(
+            token.value,
+            "ft_metadata",
+            {}
+        )
+        .catch(e => {
+            if (e.type === "AccountDoesNotExist" || e.toString().includes("MethodNotFound"))
+                this.errors.noToken.isBad = true;
+        })
+        .then(res => {
+            if (res) {
+                amount.unit = res.symbol;
+                amount.decimals = res.decimals;
+            }
+            this.update()
+        })
 
     }
 
@@ -147,12 +180,22 @@ export default class Export extends Component {
                                     error={errors.amount.isBad}
                                     helperText={errors.amount.isBad && errors.amount.message}
                                     InputLabelProps={{ shrink: true }}
+                                    InputProps={{
+                                        endAdornment: <InputAdornment position="end">{amount.unit}</InputAdornment>,
+                                    }}
                                 />
                                 <TextInput
                                     label="Token contract"
                                     value={ token }
-                                    error={ errors.token }
-                                    update={ this.update }
+                                    error={[ errors.token, errors.noToken ]}
+                                    update={ () => {
+                                        this.update();
+                                        setTimeout(() => {
+                                            if (new Date() - this.lastInput > 400)
+                                                this.updateFT()
+                                        }, 500)
+                                        this.lastInput = new Date()
+                                    } }
                                 />
                             </>
                             : <></>
