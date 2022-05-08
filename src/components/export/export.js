@@ -119,12 +119,13 @@ export default class Export extends Component {
             })
         ])
         .then(([metadata, whitelist]) => {
+
             if (metadata) {
                 amount.unit = metadata.symbol;
                 amount.decimals = metadata.decimals;
             }
             if (whitelist)
-                this.errors.notWhitelisted.isBad = !this.errors.noToken.isBad && !whitelist.includes(token);
+                this.errors.notWhitelisted.isBad = !this.errors.noToken.isBad && !whitelist.includes(token.value);
 
             this.update()
         })
