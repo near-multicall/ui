@@ -90,6 +90,9 @@ export default class Dao extends Component {
 
     createMulticall() {
 
+        if (this.fee === undefined)
+            return;
+
         const { loading, addr, infos } = this.state;
         const {
             noContract,
