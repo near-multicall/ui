@@ -115,7 +115,7 @@ export default class Export extends Component {
                 {}
             )
             .catch(e => {
-                console.error("failed fetching token whitelist", e);
+                // console.error("failed fetching token whitelist", e);
             })
         ])
         .then(([metadata, whitelist]) => {

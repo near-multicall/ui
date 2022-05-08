@@ -1,3 +1,14 @@
+function isValidBigIntSyntax(s: string): boolean {
+
+    try {
+        BigInt(s);
+        return true;
+    } catch(e) {
+        return false;
+    }
+
+}
+
 function multiply(a: bigint, b: string): bigint {
 
     if (a === 0n)
@@ -38,6 +49,7 @@ const B_div_B = (big_enum: bigint, big_deno: bigint): number => divide(big_enum,
 
 
 export {
+    isValidBigIntSyntax,
     B_mul_N,
     B_div_N,
     B_div_B
