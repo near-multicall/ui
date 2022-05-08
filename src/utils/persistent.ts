@@ -12,9 +12,11 @@ class Persistent {
             ...this.addresses,
             ...newAddresses
         }
+        
         window["TASKS"]?.map(t => t.instance.current.onAddressesUpdated());
         window["MENU"]?.forceUpdate();
         window["DAO"]?.onAddressesUpdated();
+        window["EXPORT"]?.onAddressesUpdated();
 
     }
 

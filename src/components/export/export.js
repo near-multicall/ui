@@ -22,7 +22,8 @@ export default class Export extends Component {
         amount: new ArgsError("Invalid amount", value => ArgsBig.isValid(value) && value.value !== ""),
         token: new ArgsError("Invalid address", value => ArgsAccount.isValid(value)),
         desc: new ArgsError("Invalid proposal description", value => value.value !== "", true),
-        noToken: new ArgsError("Address does not belong to token contract", value => this.errors.noToken)
+        noToken: new ArgsError("Address does not belong to token contract", value => this.errors.noToken),
+        notWhitelisted: new ArgsError("Token not whitelisted on multicall instance", value => this.errors.notWhitelisted)
     };
 
     total = {
@@ -46,8 +47,19 @@ export default class Export extends Component {
         super(props);
 
         this.update = this.update.bind(this);
-        window.WALLET.then(() => this.updateFT());
 
+    }
+
+    componentDidMount() {
+
+        window.EXPORT = this;
+
+    }
+
+    onAddressesUpdated() {
+
+        window.WALLET.then(() => this.updateFT());
+        
     }
 
     updateCopyIcon(e) {
@@ -82,24 +94,38 @@ export default class Export extends Component {
         const { token, amount } = this.ft;
 
         this.errors.noToken.isBad = false;
+        this.errors.notWhitelisted.isBad = false;
 
         if (this.errors.token.isBad)
             return;
 
-        view(
-            token.value,
-            "ft_metadata",
-            {}
-        )
-        .catch(e => {
-            if (e.type === "AccountDoesNotExist" || e.toString().includes("MethodNotFound"))
-                this.errors.noToken.isBad = true;
-        })
-        .then(res => {
-            if (res) {
-                amount.unit = res.symbol;
-                amount.decimals = res.decimals;
+        Promise.all([
+            view(
+                token.value,
+                "ft_metadata",
+                {}
+            )
+            .catch(e => {
+                if (e.type === "AccountDoesNotExist" || e.toString().includes("MethodNotFound"))
+                    this.errors.noToken.isBad = true;
+            }),
+            view(
+                STORAGE.addresses.multicall,
+                "get_tokens",
+                {}
+            )
+            .catch(e => {
+                console.error("failed fetching token whitelist", e);
+            })
+        ])
+        .then(([metadata, whitelist]) => {
+            if (metadata) {
+                amount.unit = metadata.symbol;
+                amount.decimals = metadata.decimals;
             }
+            if (whitelist)
+                this.errors.notWhitelisted.isBad = !this.errors.noToken.isBad && !whitelist.includes(token);
+
             this.update()
         })
 
@@ -170,7 +196,7 @@ export default class Export extends Component {
                                 <TextInput
                                     label="Token contract"
                                     value={ token }
-                                    error={[ errors.token, errors.noToken ]}
+                                    error={[ errors.token, errors.noToken, errors.notWhitelisted ]}
                                     update={ () => {
                                         this.update();
                                         setTimeout(() => {
