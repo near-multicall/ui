@@ -167,6 +167,19 @@ export default class Export extends Component {
                         </div>
                         { this.attachFTs
                             ? <>
+                                <TextInput
+                                    label="Token contract"
+                                    value={ token }
+                                    error={[ errors.token, errors.noToken ]}
+                                    update={ () => {
+                                        this.update();
+                                        setTimeout(() => {
+                                            if (new Date() - this.lastInput > 400)
+                                                this.updateFT()
+                                        }, 500)
+                                        this.lastInput = new Date()
+                                    } }
+                                />
                                 <TextField
                                     label="Amount"
                                     value={ errors.amount.validOrNull(amount) || errors.amount.intermediate }
@@ -183,19 +196,6 @@ export default class Export extends Component {
                                     InputProps={{
                                         endAdornment: <InputAdornment position="end">{amount.unit}</InputAdornment>,
                                     }}
-                                />
-                                <TextInput
-                                    label="Token contract"
-                                    value={ token }
-                                    error={[ errors.token, errors.noToken ]}
-                                    update={ () => {
-                                        this.update();
-                                        setTimeout(() => {
-                                            if (new Date() - this.lastInput > 400)
-                                                this.updateFT()
-                                        }, 500)
-                                        this.lastInput = new Date()
-                                    } }
                                 />
                             </>
                             : <></>
