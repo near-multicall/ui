@@ -29,8 +29,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
 
       - name: Setup Node.js v16
         uses: actions/setup-node@v2
@@ -52,12 +50,6 @@ jobs:
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
 
-      # copy CNAME from gh-pages branch to current ./dist
-      - name: copy CNAME
-        run: |
-          git checkout gh-pages "CNAME"
-          mv ./CNAME ./dist/
-
       # Deploy, only runs on "push" event on main branch
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
@@ -66,3 +58,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist/
           publish_branch: gh-pages
+          cname: multicall.app
