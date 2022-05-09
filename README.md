@@ -1,5 +1,5 @@
 ## Website
-Try our UI at https://www.multicall.app.
+Try our UI at https://multicall.app.
 Use it to build your [multicalls](https://github.com/QuicSwap/near-multicall/tree/main).
 
 ## Quickstart
