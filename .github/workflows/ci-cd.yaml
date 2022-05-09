@@ -35,20 +35,26 @@ jobs:
         with:
           node-version: '16'
 
+      # install dependencies and apply patches (if any exist)
+      - name: install dependencies
+        run: yarn
+
       # Initializes the CodeQL tools for scanning.
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
         with:
           languages: javascript
 
-      # install dependencies and build
-      - name: Build
-        run: |
-          yarn
-          yarn build
+      # Autobuild attempts to build any compiled languages (C/C++, C#, or Java).
+      # If this step fails, then you should remove it and run the build manually.
+      - name: CodeQL Autobuild
+        uses: github/codeql-action/autobuild@v2
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
+
+      - name: Build
+        run: yarn build
 
       # Deploy, only runs on "push" event on main branch
       - name: Deploy
