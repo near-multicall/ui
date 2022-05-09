@@ -18,11 +18,6 @@ export default class Layout extends Component {
         
         this.state = {
             ...initialData,
-            addresses: {
-                user: "",
-                multicall: "",
-                dao: ""
-            }
         };
 
     }
@@ -314,20 +309,6 @@ export default class Layout extends Component {
             this.setState(newState);
 
         }
-
-    }
-
-    setAddresses(newAddresses) {
-
-        this.setState({
-            addresses : {
-                ...this.state.addresses,
-                ...newAddresses
-            }
-        }, () => {
-            TASKS?.map(t => t.instance.current.onAddressesUpdated());
-            MENU?.forceUpdate();
-        });
 
     }
 

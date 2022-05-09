@@ -2,10 +2,13 @@
 name: Bug report
 about: Create a report to help us improve
 title: ''
-labels: ''
+labels: 'bug'
 assignees: ''
 
 ---
+
+**Discord or Telegram handle**
+If feedback eligible for reward, we'll reach out to ask for your near wallet address 
 
 **Describe the bug**
 A clear and concise description of what the bug is.

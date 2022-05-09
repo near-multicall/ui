@@ -16,7 +16,6 @@ export default class BaseTask extends Component {
         args: new ArgsError("Invalid JSON", value => JSON.parse(value.value)),
         gas: new ArgsError("Amount out of bounds", value => ArgsNumber.isValid(value), true),
         depo: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value) && value.value !== "" )
-        // // TODO regex check inputs, different errors?
     };
     errors = this.baseErrors;
     options = {};
@@ -59,7 +58,7 @@ export default class BaseTask extends Component {
             addr: new ArgsAccount(json?.address ?? ""),
             func: new ArgsString(actions?.func ?? ""),
             args: new ArgsJSON(actions?.args ? JSON.stringify(actions?.args, null, "  ") : '{}'),
-            gas: new ArgsNumber(actions?.gas ?? 0, 0, toGas(300), "gas"),
+            gas: new ArgsNumber(actions?.gas ?? 0, 1, toGas(300), "gas"),
             depo: new ArgsBig(actions?.depo ?? "0", "0", null, "yocto")
         });
 

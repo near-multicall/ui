@@ -21,7 +21,7 @@ export default class Withdraw extends BaseTask {
 
         this.call = new Call({
             name: new ArgsString(json?.name ?? "Withdraw from Ref"),
-            addr: new ArgsAccount(window?.LAYOUT?.state.addresses.multicall ?? ""),
+            addr: new ArgsAccount(STORAGE.addresses.multicall ?? ""),
             func: new ArgsString(actions?.func ?? "withdraw_from_ref"),
             /*args: new ArgsObject(json?.args 
                 ? {
@@ -50,7 +50,7 @@ export default class Withdraw extends BaseTask {
 
     onAddressesUpdated() {
 
-        this.call.addr.value = LAYOUT.state.addresses.multicall;
+        this.call.addr.value = STORAGE.addresses.multicall;
         this.errors.addr.validOrNull(this.call.addr.value);
         this.forceUpdate();
 

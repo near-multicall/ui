@@ -1,14 +1,15 @@
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import { InputAdornment } from '@mui/material';
 import Checkbox from '@mui/material/Checkbox';
 import Icon from '@mui/material/Icon';
 import TextField from '@mui/material/TextField';
 import { Base64 } from 'js-base64';
 import React, { Component } from 'react';
 import { ArgsAccount, ArgsBig, ArgsError, ArgsNumber, ArgsString } from '../../utils/args';
-import { toGas } from '../../utils/converter';
+import { convert, toGas } from '../../utils/converter';
+import { view } from "../../utils/wallet";
 import { TextInput, TextInputWithUnits } from '../editor/elements';
 import './export.scss';
-
 
 export default class Export extends Component {
 
@@ -19,11 +20,14 @@ export default class Export extends Component {
         gas: new ArgsError("Amount out of bounds", value => ArgsNumber.isValid(value)),
         depo: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value) && value.value !== ""),
         amount: new ArgsError("Invalid amount", value => ArgsBig.isValid(value) && value.value !== ""),
-        token: new ArgsError("Invalid address", value => ArgsAccount.isValid(value))
+        token: new ArgsError("Invalid address", value => ArgsAccount.isValid(value)),
+        desc: new ArgsError("Invalid proposal description", value => value.value !== "", true),
+        noToken: new ArgsError("Address does not belong to token contract", value => this.errors.noToken),
+        notWhitelisted: new ArgsError("Token not whitelisted on multicall instance", value => this.errors.notWhitelisted)
     };
 
     total = {
-        gas: new ArgsNumber(toGas(270), 0, toGas(270), "gas"),
+        gas: new ArgsNumber(toGas(270), 1, toGas(270), "gas"),
         depo: new ArgsBig("1", "1", null, "yocto"),
         desc: new ArgsString("")
     }
@@ -34,6 +38,9 @@ export default class Export extends Component {
     }
 
     attachFTs = false;
+    showArgs = false;
+
+    lastInput;
 
     constructor(props) {
 
@@ -41,6 +48,18 @@ export default class Export extends Component {
 
         this.update = this.update.bind(this);
 
+    }
+
+    componentDidMount() {
+
+        window.EXPORT = this;
+
+    }
+
+    onAddressesUpdated() {
+
+        window.WALLET.then(() => this.updateFT());
+        
     }
 
     updateCopyIcon(e) {
@@ -57,9 +76,59 @@ export default class Export extends Component {
         
     }
 
+    toggleShowArgs() {
+
+        this.showArgs = !this.showArgs;
+        this.forceUpdate();
+
+    }
+
     update() {
 
         this.forceUpdate();
+
+    }
+
+    updateFT() {
+
+        const { token, amount } = this.ft;
+
+        this.errors.noToken.isBad = false;
+        this.errors.notWhitelisted.isBad = false;
+
+        if (this.errors.token.isBad)
+            return;
+
+        Promise.all([
+            view(
+                token.value,
+                "ft_metadata",
+                {}
+            )
+            .catch(e => {
+                if (e.type === "AccountDoesNotExist" || e.toString().includes("MethodNotFound"))
+                    this.errors.noToken.isBad = true;
+            }),
+            view(
+                STORAGE.addresses.multicall,
+                "get_tokens",
+                {}
+            )
+            .catch(e => {
+                // console.error("failed fetching token whitelist", e);
+            })
+        ])
+        .then(([metadata, whitelist]) => {
+
+            if (metadata) {
+                amount.unit = metadata.symbol;
+                amount.decimals = metadata.decimals;
+            }
+            if (whitelist)
+                this.errors.notWhitelisted.isBad = !this.errors.noToken.isBad && !whitelist.includes(token.value);
+
+            this.update()
+        })
 
     }
 
@@ -73,7 +142,11 @@ export default class Export extends Component {
         const allErrors = LAYOUT.toErrors();
         const errors = this.errors;
 
-        const addresses = Object.fromEntries(Object.entries(LAYOUT.state.addresses)
+        const walletError = window?.WALLET?.errors 
+            ? Object.entries(WALLET.errors).filter(([k, v]) => v.isBad)[0]?.[1].message
+            : null
+
+        const addresses = Object.fromEntries(Object.entries(STORAGE.addresses)
             .map(([k, v]) => {
                 const account = new ArgsAccount(v)
                 errors[k].validOrNull(account);
@@ -86,31 +159,15 @@ export default class Export extends Component {
                 className="tab-panel"
             >
                 <div className="export-container">
+
                     <div className="input-container">
-                        <TextInput
-                            label="DAO address"
-                            value={ addresses.dao }
-                            error={ errors.dao }
-                            update={e => {
-                                LAYOUT.setAddresses({
-                                    dao: e.target.value
-                                });
-                                this.forceUpdate();
-                            }}
+                        <TextInput 
+                            label="Proposal description"
+                            value={ desc }
+                            error={ errors.desc }
+                            multiline
+                            update={ this.update }
                         />
-                        <TextInput
-                            label="Multicall address"
-                            value={ addresses.multicall }
-                            error={ errors.multicall }
-                            update={e => {
-                                LAYOUT.setAddresses({
-                                    multicall: e.target.value
-                                });
-                                this.forceUpdate();
-                            }}
-                        />
-                    </div>
-                    <div className="input-container">
                         <TextInputWithUnits 
                             label="Total allocated gas"
                             value={ gas }
@@ -137,6 +194,19 @@ export default class Export extends Component {
                         </div>
                         { this.attachFTs
                             ? <>
+                                <TextInput
+                                    label="Token contract"
+                                    value={ token }
+                                    error={[ errors.token, errors.noToken, errors.notWhitelisted ]}
+                                    update={ () => {
+                                        this.update();
+                                        setTimeout(() => {
+                                            if (new Date() - this.lastInput > 400)
+                                                this.updateFT()
+                                        }, 500)
+                                        this.lastInput = new Date()
+                                    } }
+                                />
                                 <TextField
                                     label="Amount"
                                     value={ errors.amount.validOrNull(amount) || errors.amount.intermediate }
@@ -150,22 +220,13 @@ export default class Export extends Component {
                                     error={errors.amount.isBad}
                                     helperText={errors.amount.isBad && errors.amount.message}
                                     InputLabelProps={{ shrink: true }}
-                                />
-                                <TextInput
-                                    label="Token contract"
-                                    value={ token }
-                                    error={ errors.token }
-                                    update={ this.update }
+                                    InputProps={{
+                                        endAdornment: <InputAdornment position="end">{amount.unit}</InputAdornment>,
+                                    }}
                                 />
                             </>
                             : <></>
                         }
-                        <TextInput 
-                            label="Proposal description"
-                            value={ desc }
-                            multiline
-                            update={ this.update }
-                        />
                     </div>
                     { allErrors.length > 0 && <div className="error-container">
                         <div className="header">
@@ -188,52 +249,74 @@ export default class Export extends Component {
                             ) }
                         </div>
                     </div> }
-                    { !this.attachFTs 
-                        ?
-                            <div className="section">
-                                <div className="header">
-                                    <h3>Multicall args</h3>
-                                    <Icon 
-                                        className="icon"
-                                        onClick={ e => {
-                                            navigator.clipboard.writeText(JSON.stringify({calls: LAYOUT.toBase64()}));
-                                            this.updateCopyIcon(e); 
-                                        } }
-                                    >content_copy</Icon> 
-                                </div>
-                                <div className="value">
-                                    <pre className="code">
-                                        { JSON.stringify({calls: LAYOUT.toBase64()}) }
-                                    </pre>
-                                </div>
+                    <div className="section">
+                        <div className="header">
+                            <Icon 
+                                className="icon collapse"
+                                onClick={ () => this.toggleShowArgs() }
+                                collapsed={ this.showArgs ? "no" : "yes" }
+                            >expand_more</Icon> 
+                            <h3
+                                onClick={ () => this.toggleShowArgs() }
+                            >Multicall args</h3>
+                            { this.showArgs 
+                                ? <Icon 
+                                    className="icon copy"
+                                    onClick={ e => {
+                                        navigator.clipboard.writeText(JSON.stringify({calls: LAYOUT.toBase64()}));
+                                        this.updateCopyIcon(e); 
+                                    } }
+                                >content_copy</Icon>
+                                : <></>
+                            }
+                        </div>
+                        { this.showArgs 
+                            ? <div className="value">
+                                <pre className="code">
+                                    { !this.attachFTs
+                                        ? JSON.stringify({calls: LAYOUT.toBase64()}) 
+                                        : JSON.stringify({
+                                            receiver_id: STORAGE.addresses.multicall, 
+                                            amount: amount.value,
+                                            msg: JSON.stringify({
+                                                function_id: "multicall",
+                                                args: Base64.encode(JSON.stringify({"calls":LAYOUT.toBase64()}).toString())
+                                            }).toString()
+                                        })
+                                    }
+                                </pre>
                             </div>
-                        : <></>    
-                    }
-                    { window?.WALLET?.state?.wallet.isSignedIn() ?
-                        <button 
+                            : <></>
+                        }
+                    </div>
+                    <div className="spacer"></div>
+                    { WALLET?.state?.wallet.isSignedIn() 
+                        ? <button 
                             className="propose button"
                             disabled={
                                 errors.dao.isBad
                                 || errors.multicall.isBad
                                 || errors.depo.isBad
+                                || errors.desc.isBad
                                 || (this.attachFTs && (errors.amount.isBad || errors.token.isBad))
+                                || walletError
                             }
                             onClick={() => {
                                 if (this.attachFTs)
-                                    WALLET.proposeFT(desc.value, depo.value, gas.value, token.value, amount.value)
+                                    WALLET.proposeFT(desc.value, convert(depo.value, depo.unit), convert(gas.value, gas.unit), token.value, convert(amount.value, amount.unit, amount.decimals))
                                 else
-                                    WALLET.propose(desc.value, depo.value, gas.value)
+                                    WALLET.propose(desc.value, convert(depo.value, depo.unit), convert(gas.value, gas.unit))
                             }}
                         >
-                            {`Propose on ${LAYOUT.state.addresses.dao}`}
+                            {`Propose on ${STORAGE.addresses.dao}`}
+                            { walletError ? <p>{ walletError }</p> : <></> }
                         </button>
-                    :
-                        <button 
-                            className="login button"
-                            onClick={() => WALLET.signIn()}
-                        >
-                            Connect to Wallet
-                        </button>
+                    : <button 
+                        className="login button"
+                        onClick={() => WALLET.signIn()}
+                    >
+                        Connect to Wallet
+                    </button>
                     }
                 </div>
             </div>

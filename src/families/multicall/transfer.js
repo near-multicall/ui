@@ -30,7 +30,7 @@ export default class Transfer extends BaseTask {
 
         this.call = new Call({
             name: new ArgsString(json?.name ?? "Transfer Near"),
-            addr: new ArgsAccount(window?.LAYOUT?.state.addresses.multicall ?? ""),
+            addr: new ArgsAccount(STORAGE.addresses.multicall ?? ""),
             func: new ArgsString(actions?.func ?? "near_transfer"),
             args: new ArgsObject(actions?.args 
                 ? {
@@ -42,9 +42,18 @@ export default class Transfer extends BaseTask {
                     amount: new ArgsBig("0", "0", null, "yocto")                    
                 }    
             ),
-            gas: new ArgsNumber(actions?.gas ?? toGas(3), 0, toGas(300), "gas"),
+            gas: new ArgsNumber(actions?.gas ?? toGas(3), 1, toGas(300), "gas"),
             depo: new ArgsBig("0", "0", "0", "yocto")
         });
+
+    }
+
+
+    onAddressesUpdated() {
+
+        this.call.addr.value = STORAGE.addresses.multicall;
+        this.errors.addr.validOrNull(this.call.addr.value);
+        this.forceUpdate();
 
     }
 
