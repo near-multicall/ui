@@ -15,7 +15,7 @@ export default class Transfer extends BaseTask {
         addr: new ArgsError("Invalid address", value => true),
         func: new ArgsError("Cannot be empty", value => value != ""),
         args: new ArgsError("Invalid JSON", value => true),
-        receiver: new ArgsError("Invalid address", value => ArgsAccount.isValid(value), true),
+        receiver: new ArgsError("Invalid address", value => ArgsAccount.isValid(value), !ArgsAccount.isValid(this.call.args.value.account_id)),
         amount: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value)),
         gas: new ArgsError("Amount out of bounds", value => ArgsNumber.isValid(value)),
     };
