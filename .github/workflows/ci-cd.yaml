@@ -62,6 +62,6 @@ jobs:
         if: ${{ github.event_name == 'push' }}
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist/
+          publish_dir: ./dist
           publish_branch: gh-pages
           cname: multicall.app
