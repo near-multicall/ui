@@ -1,9 +1,6 @@
 import { DeleteOutline, EditOutlined, AddOutlined, PauseOutlined, PlayArrowOutlined } from '@mui/icons-material';
 import { Base64 } from 'js-base64';
-import { FunctionCall } from 'near-api-js/lib/transaction';
-import { title } from 'process';
 import React, { Component } from 'react';
-import { info } from 'sass';
 import { ArgsAccount, ArgsError } from '../../utils/args';
 import { toNEAR, toYocto } from '../../utils/converter';
 import { view, tx } from '../../utils/wallet';
