@@ -2,7 +2,7 @@ import Checkbox from '@mui/material/Checkbox';
 import React from 'react';
 import { ArgsAccount, ArgsBig, ArgsNumber, ArgsString, ArgsObject, ArgsError } from "../../utils/args";
 import Call from "../../utils/call";
-import { toGas } from "../../utils/converter";
+import { toGas, toLarge } from "../../utils/converter";
 import BaseTask from "../base";
 import "./multicall.scss";
 import { TextInput, TextInputWithUnits } from '../../components/editor/elements';
@@ -27,6 +27,7 @@ export default class Transfer extends BaseTask {
     init(json = null) {
 
         const actions = json?.actions?.[0];
+        const units = json?.units?.actions?.[0];
 
         this.call = new Call({
             name: new ArgsString(json?.name ?? "Transfer Near"),
@@ -35,14 +36,26 @@ export default class Transfer extends BaseTask {
             args: new ArgsObject(actions?.args 
                 ? {
                     account_id: new ArgsAccount(actions.args.account_id),
-                    amount: new ArgsBig(actions.args.amount, "0", null, "yocto")
+                    amount: new ArgsBig(
+                        toLarge(actions.args.amount, units.args.amount.decimals), 
+                        "0", 
+                        null, 
+                        units.args.amount.unit, 
+                        units.args.amount.decimals
+                    )
                 }
                 : {
                     account_id: new ArgsAccount(""),
                     amount: new ArgsBig("0", "0", null, "yocto")                    
                 }    
             ),
-            gas: new ArgsNumber(actions?.gas ?? toGas(3), 1, toGas(300), "gas"),
+            gas: new ArgsNumber(
+                parseInt(toLarge(actions?.gas ?? toGas(3), units?.gas.decimals)), 
+                1, 
+                toGas(300), 
+                units?.gas?.unit ?? "gas", 
+                units?.gas?.decimals
+            ),
             depo: new ArgsBig("0", "0", "0", "yocto")
         });
 
@@ -54,7 +67,7 @@ export default class Transfer extends BaseTask {
         this.call.addr.value = STORAGE.addresses.multicall;
         this.errors.addr.validOrNull(this.call.addr.value);
         this.forceUpdate();
-
+        
     }
 
     renderEditor() {

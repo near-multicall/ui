@@ -42,6 +42,7 @@
     "@mui/lab": "^5.0.0-alpha.58",
     "@mui/material": "^5.0.0",
     "@types/react": "^18.0.0",
+    "big.js": "^6.1.1",
     "bn.js": "^5.2.0",
     "date-fns": "^2.25.0",
     "dayjs": "^1.10.7",

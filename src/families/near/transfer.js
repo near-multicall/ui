@@ -3,7 +3,7 @@ import React from 'react';
 import { TextInput, TextInputWithUnits } from '../../components/editor/elements';
 import { ArgsAccount, ArgsBig, ArgsError, ArgsNumber, ArgsObject, ArgsString } from "../../utils/args";
 import Call from "../../utils/call";
-import { toGas } from "../../utils/converter";
+import { toGas, toLarge } from "../../utils/converter";
 import { view } from "../../utils/wallet";
 import BaseTask from "../base";
 import "./near.scss";
@@ -36,6 +36,7 @@ export default class Transfer extends BaseTask {
     init(json = null) {
 
         const actions = json?.actions?.[0];
+        const units = json?.units?.actions?.[0];
 
         this.call = new Call({
             name: new ArgsString(json?.name ?? "FT Transfer"),
@@ -44,7 +45,13 @@ export default class Transfer extends BaseTask {
             args: new ArgsObject(actions?.args 
                 ? {
                     receiver_id: new ArgsAccount(actions.args.receiver_id),
-                    amount: new ArgsBig(actions.args.amount, "0", null, "yocto"),
+                    amount: new ArgsBig(
+                        toLarge(actions.args.amount, units.amount.decimals),
+                        "0",
+                        null,
+                        units.args.amount.unit,
+                        units.args.amount.decimals
+                    ),
                     memo: new ArgsString(actions.args.memo)
                 }
                 : {
@@ -53,7 +60,13 @@ export default class Transfer extends BaseTask {
                     memo: new ArgsString("")
                 }    
             ),
-            gas: new ArgsNumber(actions?.gas ?? toGas(7), 1, toGas(300), "gas"),
+            gas: new ArgsNumber(
+                toLarge(actions?.gas ?? toGas(7), units?.gas.decimals), 
+                1, 
+                toGas(300), 
+                units?.gas?.unit ?? "gas",
+                units?.gas?.decimals
+            ),
             depo: new ArgsBig("1", "1", "1", "yocto")
         });
 

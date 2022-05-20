@@ -1,4 +1,4 @@
-import { convert } from "./converter";
+import { convert, unitToDecimals } from "./converter";
 
 export default abstract class Args {
 
@@ -45,7 +45,10 @@ export default abstract class Args {
 
     toString = () => this.value.toString();
 
-    getUnit = () => this.unit;
+    getUnit = (): {} => ({
+        unit: this.unit,
+        decimals: this.decimals ??  unitToDecimals(this.unit)
+    });
 
 }
 
@@ -102,12 +105,7 @@ class ArgsNumber extends Args {
         if (!/^\d*(\.\d*)?$/.test(value.value.toString()))
             return;
 
-        const decimals = value.decimals ?? {
-            NEAR: 24,
-            yocto: 0,
-            Tgas: 12,
-            gas: 0
-        }[value.unit]
+        const decimals = value.decimals ?? unitToDecimals(value.unit)
 
         if (decimals !== undefined && value.value.toString().split(".")[1]?.length > decimals)
             return false;
@@ -147,12 +145,7 @@ class ArgsBig extends Args {
         if (!/^\d*(\.\d*)?$/.test(value.value.toString()))
             return;
 
-        const decimals = value.decimals ?? {
-            NEAR: 24,
-            yocto: 0,
-            Tgas: 12,
-            gas: 0
-        }[value.unit]
+        const decimals = value.decimals ?? unitToDecimals(value.unit)
 
         if (decimals !== undefined && value.value.split(".")[1]?.length > decimals)
             return false;
@@ -192,6 +185,18 @@ class ArgsObject extends Args {
 
     }
 
+    getUnit = () => {
+
+        let res = {};
+
+        for (let k in this.value)
+            if (!this.value[k].omit)
+                res[k] = this.value[k].getUnit();
+
+        return res;
+
+    }
+
 }
 
 class ArgsArray extends Args {
@@ -203,6 +208,8 @@ class ArgsArray extends Args {
     }
 
     toString = () => this.value.map(x => x.toString());
+
+    // getUnit: () => this.value.map(x => x.getUnit());
 
 }
 

@@ -86,4 +86,18 @@ export default class Call {
 
     }
 
+    toUnits() {
+
+        return {
+            "address": this.addr.getUnit(),
+            "actions": [{
+                "func": this.func.getUnit(),
+                "args": this.args.getUnit(),
+                "gas": this.gas.getUnit(),
+                "depo": this.depo.getUnit()
+            }]
+        }
+
+    }
+
 }

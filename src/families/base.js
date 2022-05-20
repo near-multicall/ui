@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { TextInput, TextInputWithUnits } from '../components/editor/elements';
 import { ArgsAccount, ArgsBig, ArgsError, ArgsJSON, ArgsNumber, ArgsString } from '../utils/args';
 import Call from '../utils/call';
-import { toGas } from '../utils/converter';
+import { toGas, toLarge } from '../utils/converter';
 import './base.scss';
 
 export default class BaseTask extends Component {
@@ -36,7 +36,8 @@ export default class BaseTask extends Component {
         } else if (window.COPY?.payload) {
             this.init({
                 name: COPY.payload.call?.name?.toString(),
-                ...COPY.payload.call.toJSON()
+                ...COPY.payload.call.toJSON(),
+                units: COPY.payload.call.toUnits()
             });
             this.state.showArgs = COPY.payload.showArgs;
             this.options = COPY.payload.options;
@@ -52,14 +53,27 @@ export default class BaseTask extends Component {
     init(json = null) {
 
         const actions = json?.actions?.[0];
+        const units = json?.units?.actions?.[0];
 
         this.call = new Call({
             name: new ArgsString(json?.name ?? "Custom"),
             addr: new ArgsAccount(json?.address ?? ""),
             func: new ArgsString(actions?.func ?? ""),
             args: new ArgsJSON(actions?.args ? JSON.stringify(actions?.args, null, "  ") : '{}'),
-            gas: new ArgsNumber(actions?.gas ?? 0, 1, toGas(300), "gas"),
-            depo: new ArgsBig(actions?.depo ?? "0", "0", null, "yocto")
+            gas: new ArgsNumber(
+                toLarge(actions?.gas ?? 0, units?.gas.decimals), 
+                1, 
+                toGas(300),
+                units?.gas?.unit ?? "gas", 
+                units?.gas?.decimals
+            ),
+            depo: new ArgsBig(
+                toLarge(actions?.depo ?? "0", units?.depo.decimals), 
+                "0", 
+                null, 
+                units?.depo?.unit ?? "yocto",
+                units?.gas?.decimals
+            )
         });
 
     }
@@ -190,8 +204,8 @@ export default class BaseTask extends Component {
                         ? <pre className="code">{ JSON.stringify(args.toString(), null, "  ") }</pre>
                         : <pre className="code">{ errors.args.intermediate }</pre>)
                     }
-                    <p><span>Allocated gas</span><span className="code">{ gas.toString() } <span>{ gas.getUnit() }</span></span></p>
-                    <p><span>Attached deposit</span><span className="code">{ depo.toString() }  <span>{ depo.getUnit() }</span></span></p>
+                    <p><span>Allocated gas</span><span className="code">{ gas.toString() } <span>{ gas.unit }</span></span></p>
+                    <p><span>Attached deposit</span><span className="code">{ depo.toString() }  <span>{ depo.unit }</span></span></p>             
                 </div>
             </div>
         );
