@@ -26,7 +26,7 @@ const toYocto = (amount: string | number): string => parseTokenAmount(amount.toS
 
 const convert = (amount: string | number, unit: string, decimals?: number): number | string => {
     // empty string considered 0
-    amount === "" ? "0" : amount
+    amount = (amount === "") ? "0" : amount;
 
     decimals = decimals ?? {
         NEAR: 24,
