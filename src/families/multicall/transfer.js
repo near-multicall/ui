@@ -61,12 +61,14 @@ export default class Transfer extends BaseTask {
             depo: new ArgsBig("0", "0", "0", "yocto")
         });
 
-        if ((actions?.args?.account_id !== undefined && actions.args.amount === undefined) || json?.options?.all)
+        if ((actions?.args?.account_id !== undefined && actions.args.amount === undefined) || json?.options?.all) {
             this.call.args.value.amount.omit = true;
+            this.options.all = true;
+        }
 
         if (json?.errors)
             this.errors = json.errors
-
+    
     }
 
 

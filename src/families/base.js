@@ -29,21 +29,36 @@ export default class BaseTask extends Component {
         };
 
         if (window.TEMP) {
+
             this.call = TEMP.call;
             this.state.showArgs = TEMP.showArgs;
             this.options = TEMP.options;
             this.errors = TEMP.errors;
+
         } else if (window.COPY?.payload) {
+
+            const errorsDeepCopy = {};
+            Object.keys(COPY.payload.errors).map(key => {
+                errorsDeepCopy[key] = Object.assign(
+                    Object.create(Object.getPrototypeOf(COPY.payload.errors[key])), 
+                    COPY.payload.errors[key]
+                )
+            })
+
+            const optionsDeepCopy = JSON.parse(JSON.stringify(COPY.payload.options))
+
             this.init({
                 name: COPY.payload.call?.name?.toString(),
                 ...COPY.payload.call.toJSON(),
                 units: COPY.payload.call.toUnits(),
-                options: {...COPY.payload.options},
-                errors: {...COPY.payload.errors}
+                options: optionsDeepCopy,
+                errors: errorsDeepCopy
             });
             this.state.showArgs = COPY.payload.showArgs;
             COPY = null;
+
         } else
+
             this.init(this.props.json);
 
         this.updateCard = this.updateCard.bind(this);
