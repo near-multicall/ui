@@ -36,13 +36,15 @@ export default class Transfer extends BaseTask {
             args: new ArgsObject(actions?.args 
                 ? {
                     account_id: new ArgsAccount(actions.args.account_id),
-                    amount: new ArgsBig(
-                        toLarge(actions.args.amount, units.args.amount.decimals), 
-                        "0", 
-                        null, 
-                        units.args.amount.unit, 
-                        units.args.amount.decimals
-                    )
+                    amount: actions.args.amount 
+                        ? new ArgsBig(
+                            toLarge(actions.args.amount, units.args.amount.decimals), 
+                            "0", 
+                            null, 
+                            units.args.amount.unit, 
+                            units.args.amount.decimals
+                        )
+                        : new ArgsBig("0", "0", "0")
                 }
                 : {
                     account_id: new ArgsAccount(""),
@@ -58,6 +60,12 @@ export default class Transfer extends BaseTask {
             ),
             depo: new ArgsBig("0", "0", "0", "yocto")
         });
+
+        if ((actions?.args?.account_id !== undefined && actions.args.amount === undefined) || json?.options?.all)
+            this.call.args.value.amount.omit = true;
+
+        if (json?.errors)
+            this.errors = json.errors
 
     }
 

@@ -37,11 +37,11 @@ export default class BaseTask extends Component {
             this.init({
                 name: COPY.payload.call?.name?.toString(),
                 ...COPY.payload.call.toJSON(),
-                units: COPY.payload.call.toUnits()
+                units: COPY.payload.call.toUnits(),
+                options: {...COPY.payload.options},
+                errors: {...COPY.payload.errors}
             });
             this.state.showArgs = COPY.payload.showArgs;
-            this.options = COPY.payload.options;
-            this.errors = COPY.payload.errors;
             COPY = null;
         } else
             this.init(this.props.json);
@@ -75,6 +75,9 @@ export default class BaseTask extends Component {
                 units?.gas?.decimals
             )
         });
+
+        if (json?.errors)
+            this.errors = json.errors
 
     }
 

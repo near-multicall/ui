@@ -46,7 +46,7 @@ export default class Transfer extends BaseTask {
                 ? {
                     receiver_id: new ArgsAccount(actions.args.receiver_id),
                     amount: new ArgsBig(
-                        toLarge(actions.args.amount, units.amount.decimals),
+                        toLarge(actions.args.amount, units.args.amount.decimals),
                         "0",
                         null,
                         units.args.amount.unit,
@@ -69,6 +69,9 @@ export default class Transfer extends BaseTask {
             ),
             depo: new ArgsBig("1", "1", "1", "yocto")
         });
+
+        if (json?.errors)
+            this.errors = json.errors
 
     }
 
