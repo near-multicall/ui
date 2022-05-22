@@ -1,11 +1,10 @@
-import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
-import ScienceOutlinedIcon from '@mui/icons-material/ScienceOutlined';
 import { Base64 } from 'js-base64';
 import React, { Component } from 'react';
 import { toGas } from '../../utils/converter';
 import { initWallet, tx, view } from '../../utils/wallet';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
+import { Icon } from '@mui/material';
 import './wallet.scss';
 import { ArgsAccount, ArgsError } from '../../utils/args';
 
@@ -28,7 +27,11 @@ export default class Wallet extends Component {
 
         this.state = {
             wallet: null,
-            bond: "0"
+            bond: "0",
+            expanded: {
+                user: true,
+                dao: true
+            }
         }
 
         window.WALLET = initWallet()
@@ -214,9 +217,35 @@ export default class Wallet extends Component {
 
     }
 
+    toggleExpandedDao() {
+
+        const { expanded } = this.state;
+
+        this.setState({
+            expanded: {
+                user: expanded.user,
+                dao: !expanded.dao
+            }
+        })
+
+    }
+
+    toggleExpandedUser() {
+
+        const { expanded } = this.state;
+
+        this.setState({
+            expanded: {
+                user: !expanded.user,
+                dao: expanded.dao
+            }
+        })
+
+    }
+
     render() {
 
-        const { wallet } = this.state;
+        const { wallet, expanded } = this.state;
 
         if (!wallet)
             return null;
@@ -225,24 +254,37 @@ export default class Wallet extends Component {
             <div
                 className="wallet"
             >
-                <button
-                    onClick={ () => wallet.isSignedIn()
-                        ? this.signOut() 
-                        : this.signIn()
-                    }
-                >
-                    { window.ENVIRONMENT === "testnet" 
-                        ? <ScienceOutlinedIcon/>
-                        : <AccountBalanceWalletOutlinedIcon/>
-                    }
-                    { wallet.isSignedIn()
-                        ? wallet.getAccountId()
-                        : `Sign in`
-                    }
-                </button>
-                { wallet.isSignedIn()
-                    ? <>
-                        <span className="for">for</span>
+                <div className="user" expand={ expanded.user || !wallet.isSignedIn() ? "yes" : "no" }>
+                    <Icon 
+                        className="icon" 
+                        onClick={() => this.toggleExpandedUser() }
+                    >
+                        { expanded.user && wallet.isSignedIn()  ? "chevron_left" : "person" }
+                    </Icon>
+                    <div className="expand">
+                        { wallet.isSignedIn()
+                            ? <>
+                                { wallet.getAccountId() } 
+                                <button 
+                                    className="logout" 
+                                    onClick={ () => this.signOut() }
+                                >
+                                    sign out
+                                </button>
+                              </>
+                            : <button onClick={ () => this.signIn() }>sign in</button>
+                        }
+                    </div>
+                </div>
+                <span>for</span>
+                <div className="dao" expand={ expanded.dao || STORAGE.addresses.dao === "" ? "yes" : "no" }>
+                    <Icon 
+                        className="icon" 
+                        onClick={() => this.toggleExpandedDao() }
+                    >
+                        { expanded.dao && STORAGE.addresses.dao !== "" ? "chevron_left" : "groups" }
+                    </Icon>
+                    <div className="expand">
                         <Autocomplete
                             className='dao-selector'
                             freeSolo
@@ -251,7 +293,7 @@ export default class Wallet extends Component {
                             renderInput={(params) => 
                                 <TextField 
                                     {...params} 
-                                    placeholder="Select DAO" 
+                                    placeholder="Select DAO"
                                 />
                             }
                             onInputChange={(event, newValue) => {
@@ -266,9 +308,8 @@ export default class Wallet extends Component {
                                 this.lastInput = new Date()
                             }}
                         />
-                    </>
-                    : <></>
-                }
+                    </div>
+                </div>
             </div>
         );
 

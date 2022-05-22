@@ -399,7 +399,7 @@ export default class Layout extends Component {
 
         this.expanded = expanded;
         this.forceUpdate();
-        HEADER.forceUpdate();
+        SIDEBAR.forceUpdate();
 
     }
 

@@ -13,7 +13,7 @@ function initWallet(): Promise<WalletConnection> {
         connect({
             ...window["nearConfig"],
             keyStore: new keyStores.BrowserLocalStorageKeyStore(),
-            headers: {}
+            sidebars: {}
         }).then(near => resolve(new WalletConnection(near, 'near-multicall')))
     );
 }

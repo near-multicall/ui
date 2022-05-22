@@ -1,0 +1,78 @@
+@use 'sass/mixin';
+@use 'sass/color';
+@use 'sass/size';
+@use 'sass/animation';
+
+.sidebar-wrapper {
+    position: fixed;
+    display: flex;
+    flex-flow: column nowrap;
+    height: 100%;
+    width: size.$sidebar-width;
+    background-color: color.$black;
+    box-shadow: 1px 10px 20px 0 rgba(0,0,0,0.2);
+    z-index: 2;
+}
+
+.sidebar-container {
+    flex: 1;
+    @include mixin.center-items(flex-start);
+    flex-flow: column nowrap;
+    .title {
+        position: relative;
+        cursor: pointer;
+        padding: 0.5 * size.$gap 0;
+        .logo {
+            color: color.$light-text;
+            font-size: 1.5 * size.$large-text;
+        }
+        .env {
+            visibility: hidden;
+            position: absolute;
+            left: 60%;
+            top: 50%;
+            .icon {
+                color: color.$yellow;
+                font-size: size.$text;
+            }
+        }
+        .env[env="testnet"] {
+            visibility: visible;
+        }
+    }
+    nav {
+        display: flex;
+        flex-flow: column nowrap;
+        font-size: size.$text;
+        a {
+            text-align: center;
+            line-height: size.$sidebar-width;
+            vertical-align: middle;
+            width: size.$sidebar-width;
+            height: size.$sidebar-width;
+            font-size: size.$text;
+            color: color.$light-text !important;
+            &.active {
+                color: color.$text !important;
+                background-color: color.$white;
+            }
+            &:not(.active):hover {
+                background-color: rgba(color.$light, 0.1);
+            }
+        }
+    }
+    hr {
+        width: 40%;
+    }
+    img {
+        padding: 0.25 * size.$sidebar-width;
+        width: 0.5 * size.$sidebar-width;
+        height: 0.5 * size.$sidebar-width;
+        fill: color.$light;
+        cursor: pointer;
+        opacity: 0.25;
+        &:hover {
+            opacity: 1;
+        }
+    }
+}
