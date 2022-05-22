@@ -23,7 +23,8 @@ export default class Export extends Component {
         token: new ArgsError("Invalid address", value => ArgsAccount.isValid(value)),
         desc: new ArgsError("Invalid proposal description", value => value.value !== "", true),
         noToken: new ArgsError("Address does not belong to token contract", value => this.errors.noToken),
-        notWhitelisted: new ArgsError("Token not whitelisted on multicall instance", value => this.errors.notWhitelisted)
+        notWhitelisted: new ArgsError("Token not whitelisted on multicall instance", value => this.errors.notWhitelisted),
+        hasErrors: new ArgsError("You have unfixed errors", value => this.errors.hasErrors)
     };
 
     total = {
@@ -141,6 +142,8 @@ export default class Export extends Component {
 
         const allErrors = LAYOUT.toErrors();
         const errors = this.errors;
+
+        errors.hasErrors.isBad = allErrors.length > 0;
 
         const walletError = window?.WALLET?.errors 
             ? Object.entries(WALLET.errors).filter(([k, v]) => v.isBad)[0]?.[1].message
@@ -298,6 +301,7 @@ export default class Export extends Component {
                                 || errors.multicall.isBad
                                 || errors.depo.isBad
                                 || errors.desc.isBad
+                                || errors.hasErrors.isBad
                                 || (this.attachFTs && (errors.amount.isBad || errors.token.isBad))
                                 || walletError
                             }
