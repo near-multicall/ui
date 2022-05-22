@@ -186,7 +186,7 @@ export default class BaseTask extends Component {
                         ? <a onClick={ () => this.setState({ showArgs: false }) } >hide</a>
                         : <a onClick={ () => this.setState({ showArgs: true }) } >show</a>
                     }</p>
-                    { showArgs && (errors.args.validOrNull(args.value)
+                    { showArgs && (errors.args.validOrNull(args)
                         ? <pre className="code">{ JSON.stringify(args.toString(), null, "  ") }</pre>
                         : <pre className="code">{ errors.args.intermediate }</pre>)
                     }

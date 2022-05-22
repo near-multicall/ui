@@ -263,7 +263,7 @@ class ArgsError {
                 valid = false;
         } catch(e) {
             valid = false;
-            this.intermediate = value;
+            this.intermediate = value.value;
         }
          
         this.isBad = !valid;
