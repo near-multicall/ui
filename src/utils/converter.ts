@@ -2,7 +2,7 @@ import { Big } from 'big.js';
 
 
 // config for Big.js behavior. see: https://mikemcl.github.io/big.js/
-Big.RM = 0;
+Big.RM = Big.roundDown;
 Big.DP = 40;
 Big.NE = -40;
 Big.PE = 40;
@@ -38,7 +38,6 @@ const convert = (amount: string | number, unit: string, decimals?: number): numb
     return decimals !== undefined && /^\d*(\.\d*)?$/.test(amount.toString())
         ? parseTokenAmount((amount).toString(), decimals)
         : amount;
-
 }
 
 export {
@@ -48,5 +47,6 @@ export {
     toGas,
     toNEAR,
     toYocto,
-    convert
+    convert,
+    Big  // re-export Big.js to preserve library config
 }

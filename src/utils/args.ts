@@ -1,4 +1,4 @@
-import { convert } from "./converter";
+import { convert, Big } from "./converter";
 
 export default abstract class Args {
 
@@ -14,8 +14,8 @@ export default abstract class Args {
 
     type: string;
     value: any;
-    min: number | BigInt | null;
-    max: number | BigInt | null;
+    min: number | Big | null;
+    max: number | Big | null;
     unit: string | null;
     decimals: number | null;
 
@@ -24,15 +24,16 @@ export default abstract class Args {
     constructor(
         type: string, 
         value: any, 
-        min?: number | BigInt | null, 
-        max?: number | BigInt | null,
-        unit?: string | null,
-        decimals?: number | null
+        min: number | Big | null = null, 
+        max: number | Big | null = null,
+        unit: string | null = null,
+        decimals: number | null = null
     ) {
 
         // test if type is valid
-        if (!Object.keys(this.types).includes(type))
+        if ( !Object.keys(this.types).includes(type) ) {
             console.error(`invalid args type ${type}.`);
+        }
         
         this.type = type;
         this.value = value;
@@ -75,9 +76,7 @@ class ArgsAccount extends Args {
 
     isValid = () => ArgsAccount.isValid(this);
 
-    toNet = () => this.value.split(".").pop() === "testnet" ? "testnet" : "mainnet";
-
-    toUrl = (net = this.toNet()) => `https://explorer.${net}.near.org/accounts/${this.value}`;
+    toUrl = (network: string) => `https://explorer.${network}.near.org/accounts/${this.value}`;
 
 }
 
@@ -102,7 +101,7 @@ class ArgsNumber extends Args {
         if (!/^\d*(\.\d*)?$/.test(value.value.toString()))
             return;
 
-        const decimals = value.decimals ?? {
+        const decimals: number = value.decimals ?? {
             NEAR: 24,
             yocto: 0,
             Tgas: 12,
@@ -114,8 +113,8 @@ class ArgsNumber extends Args {
 
         const v = convert(value.value, value.unit, decimals);
 
-        return (value.min === null || v >= value.min) 
-            && (value.max === null || v <= value.max);
+        return (value.min === null || Big(v).gte(value.min)) 
+            && (value.max === null || Big(v).lte(value.max));
 
     }
 
@@ -125,19 +124,19 @@ class ArgsNumber extends Args {
 
 class ArgsBig extends Args {
 
-    big: BigInt;
+    big: Big;
 
     constructor(
         value: string, 
-        min: string = null, 
-        max: string = null, 
+        min: string | null = null, 
+        max: string | null = null, 
         unit?: string | null,
         decimals?: number | null
     ) {
 
-        super("big", value, (min !== null) ? BigInt(min) : null, (max !== null) ? BigInt(max) : null, unit ?? "unknown", decimals);
+        super("big", value, (min !== null) ? Big(min) : null, (max !== null) ? Big(max) : null, unit ?? "unknown", decimals);
 
-        this.big = BigInt(value);
+        this.big = Big(value);
 
     }
 
@@ -147,7 +146,7 @@ class ArgsBig extends Args {
         if (!/^\d*(\.\d*)?$/.test(value.value.toString()))
             return;
 
-        const decimals = value.decimals ?? {
+        const decimals: number = value.decimals ?? {
             NEAR: 24,
             yocto: 0,
             Tgas: 12,
@@ -159,8 +158,8 @@ class ArgsBig extends Args {
 
         const v = convert(value.value, value.unit, decimals);
 
-        return (value.min === null || BigInt(v) >= value.min) 
-            && (value.max === null || BigInt(v) <= value.max);
+        return (value.min === null || Big(v).gte(value.min)) 
+            && (value.max === null || Big(v).lte(value.max));
 
     }
 
