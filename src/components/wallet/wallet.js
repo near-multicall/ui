@@ -261,6 +261,9 @@ export default class Wallet extends Component {
                     >
                         { expanded.user && wallet.isSignedIn()  ? "chevron_left" : "person" }
                     </Icon>
+                    <div className="peek">
+                        { wallet.getAccountId() }
+                    </div>
                     <div className="expand">
                         { wallet.isSignedIn()
                             ? <>
@@ -308,6 +311,9 @@ export default class Wallet extends Component {
                                 this.lastInput = new Date()
                             }}
                         />
+                    </div>
+                    <div className="peek">
+                        { STORAGE?.addresses?.dao ?? "" }
                     </div>
                 </div>
             </div>

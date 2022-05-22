@@ -34,65 +34,94 @@
         background-color: color.$black;
         border-radius: 0 size.$task-radius size.$task-radius 0;
     }
+    .peek {
+        position: absolute;
+        left: calc(0.7 * size.$sidebar-width + 2px);
+        top: calc(-0.125 * size.$gap - 1px);
+        padding: 0.25 * size.$gap size.$gap;
+        color: rgba(color.$text, 0.25);
+        font-size: size.$text;
+    }
     .user {
         @include avatar;
         position: relative;
-        &[expand="no"] > .expand {
-            display: none;
+        &[expand="no"] {
+            .expand {
+                display: none;
+            }
+            .peek {
+                display: block;
+            }
         }
-        &[expand="yes"] > .expand {
-            button {
-                &.logout {
-                    margin-left: 1ch;
-                }
-                padding: 0 0.5 * size.$gap;
-                width: unset;
+        &[expand="yes"] {
+            .expand {
                 font-size: size.$text;
-                background-color: color.$light;
-                color: color.$text;
-                border-radius: size.$task-radius;
+                button {
+                    &.logout {
+                        margin-left: 1ch;
+                    }
+                    padding: 0 0.5 * size.$gap;
+                    width: unset;
+                    font-size: size.$text;
+                    background-color: color.$light;
+                    color: color.$text;
+                    border-radius: size.$task-radius;
+                }
+            }
+            .peek {
+                display: none;
             }
         }
     }
     .dao {
         @include avatar;
         position: relative;
-        &[expand="no"] > .expand {
-            display: none;
+        &[expand="no"] {
+            .expand {
+                display: none;
+            }
+            .peek {
+                display: block;
+            }
         }
-        &[expand="yes"] > .expand {
-            .MuiTextField-root {
-                justify-content: center;
-                vertical-align: baseline;
-                height: 100%;
-                .MuiOutlinedInput-root {
+        &[expand="yes"] {
+            .expand {
+                .MuiTextField-root {
+                    justify-content: center;
+                    vertical-align: baseline;
                     height: 100%;
-                    padding: 0;
-                    input, textarea {
+                    .MuiOutlinedInput-root {
                         height: 100%;
-                        width: 200px;
                         padding: 0;
-                        padding-right: 17.5px;
-                        color: color.$light-text;
-                        font-family: font.$text;
-                        font-size: size.$text;
-                    }
-                    fieldset {
-                        border: none;
-                    }
-                    .MuiAutocomplete-endAdornment {
-                        top: unset;
-                        right: 0;
-                        svg {
-                            fill: color.$light-text;
+                        input, textarea {
+                            height: 100%;
+                            width: 200px;
+                            padding: 0;
+                            padding-right: 17.5px;
+                            color: color.$light-text;
+                            font-family: font.$text;
+                            font-size: size.$text;
+                        }
+                        fieldset {
+                            border: none;
+                        }
+                        .MuiAutocomplete-endAdornment {
+                            top: unset;
+                            right: 0;
+                            svg {
+                                fill: color.$light-text;
+                            }
                         }
                     }
+                    *:not(input) {
+                        color: color.$light-text;
+                        font-size: 1em;
+                    }
+                    font-size: 1.8rem;
                 }
-                *:not(input) {
-                    color: color.$light-text;
-                    font-size: 1em;
-                }
-                font-size: 1.8rem;
+            }
+            .peek {
+                display: none;
             }
         }
     }
