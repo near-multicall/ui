@@ -173,6 +173,9 @@
             padding: 0.25em 0.75em;
             border-radius: 0.5em;
             background-color: color.$green;
+            &.proposal-exists {
+                background-color: color.$blue;
+            }
         }
     }
 }

@@ -11,8 +11,6 @@ import { TextInput } from '../editor/elements';
 import { InputAdornment } from '@mui/material'
 import './dao.scss';
 
-
-
 export default class Dao extends Component {
 
     errors = {
@@ -32,6 +30,7 @@ export default class Dao extends Component {
         this.state = {
             addr: this.getBaseAddress(STORAGE.addresses?.dao ?? ""),
             loading: false,
+            proposed: -1,
             infos: {
                 admins: [],
                 tokens: [],
@@ -57,6 +56,40 @@ export default class Dao extends Component {
     componentDidMount() {
 
         window.DAO = this;
+
+    }
+
+    proposalAlreadyExists() {
+
+        const { addr } = this.state;
+        const multicall = `${this.state.addr.value}.${window.nearConfig.MULTICALL_FACTORY_ADDRESS}`;
+        const sputnik = `${addr.value}.${window.nearConfig.SPUTNIK_V2_FACTORY_ADDRESS}`;
+
+        return view(
+            sputnik,
+            "get_last_proposal_id",
+            {}
+        )
+            .then(res => view(
+                sputnik,
+                "get_proposals",
+                {
+                    from_index: res < 100 ? 0 : res - 100,
+                    limit: 100
+                }
+            ))
+            .then(res => {
+
+                const proposals = res.filter(p => 
+                    p.description === `create multicall instance for this DAO at ${multicall}` &&
+                    p.status === 'InProgress'
+                )
+
+                return proposals.length > 0
+                    ? proposals.pop().id
+                    : -1
+                    
+            })
 
     }
 
@@ -93,7 +126,7 @@ export default class Dao extends Component {
         if (this.fee === undefined)
             return;
 
-        const { loading, addr, infos } = this.state;
+        const { loading, addr, infos, proposed } = this.state;
         const {
             noContract,
             noDao,
@@ -132,12 +165,15 @@ export default class Dao extends Component {
             }
         };
 
+        console.log(proposed === -1)
+
         if (noContract.isBad 
             && !noDao.isBad // base.sputnik.near does not exist
             && !noRights.isBad // user is not permissioned
             && !loading
             && this.lastAddr === document.querySelector(".address-container input")._valueTracker.getValue()) // disappear while debouncing
-            return (
+            return proposed === -1 
+            ? (
                 <button 
                     className="create-multicall"
                     onClick={() => {
@@ -151,6 +187,18 @@ export default class Dao extends Component {
                     }}
                 >
                     {`create a multicall for ${sputnik}`}
+                </button>
+            ) : (
+                <button 
+                    className="create-multicall proposal-exists"
+                    onClick={() => {
+                        const sub = window.ENVIRONMENT === "testnet" 
+                            ? "testnet-v2"
+                            : "v2"
+                        window.open(`https://${sub}.sputnik.fund/#/${sputnik}/${proposed}`)}
+                    }
+                >
+                    {`vote on creating a multicall instance`}
                 </button>
             )
 
@@ -208,6 +256,7 @@ export default class Dao extends Component {
             noContract.isBad = true;
             noDao.isBad = true;
             noRights.isBad = true;
+            this.setState({ proposed: -1 })
         }
 
         this.setState({ loading: true });
@@ -228,8 +277,9 @@ export default class Dao extends Component {
                     if (e.type === "AccountDoesNotExist" && e.toString().includes(` ${sputnik} `))
                         noDao.isBad = true;
                 }),
+            this.proposalAlreadyExists()
         ])
-        .then(([admins, tokens, jobs, bond, policy]) => 
+        .then(([admins, tokens, jobs, bond, policy, proposed]) =>
             newState = { 
                 infos: {
                     admins: admins,
@@ -238,7 +288,8 @@ export default class Dao extends Component {
                     bond: bond,
                     policy: policy
                 },
-                loading: false
+                loading: false,
+                proposed: proposed
             }
         )
         .finally(() => {
