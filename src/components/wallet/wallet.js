@@ -94,7 +94,7 @@ export default class Wallet extends Component {
             dao,
             "add_proposal",
             args,
-            toGas(15),
+            toGas("15"),
             this.state.bond
         )
 
@@ -137,7 +137,7 @@ export default class Wallet extends Component {
             dao,
             "add_proposal",
             args,
-            toGas(15),
+            toGas("15"),
             this.state.bond
         )
 

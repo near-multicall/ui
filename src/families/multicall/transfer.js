@@ -1,6 +1,6 @@
 import Checkbox from '@mui/material/Checkbox';
 import React from 'react';
-import { ArgsAccount, ArgsBig, ArgsNumber, ArgsString, ArgsObject, ArgsError } from "../../utils/args";
+import { ArgsAccount, ArgsBig, ArgsString, ArgsObject, ArgsError } from "../../utils/args";
 import Call from "../../utils/call";
 import { toGas } from "../../utils/converter";
 import BaseTask from "../base";
@@ -17,7 +17,7 @@ export default class Transfer extends BaseTask {
         args: new ArgsError("Invalid JSON", value => true),
         receiver: new ArgsError("Invalid address", value => ArgsAccount.isValid(value), !ArgsAccount.isValid(this.call.args.value.account_id)),
         amount: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value)),
-        gas: new ArgsError("Amount out of bounds", value => ArgsNumber.isValid(value)),
+        gas: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value)),
     };
 
     options = {
@@ -42,7 +42,7 @@ export default class Transfer extends BaseTask {
                     amount: new ArgsBig("0", "0", null, "yocto")                    
                 }    
             ),
-            gas: new ArgsNumber(actions?.gas ?? toGas(3), 1, toGas(300), "gas"),
+            gas: new ArgsBig(actions?.gas ?? toGas("3"), 1, toGas("300"), "gas"),
             depo: new ArgsBig("0", "0", "0", "yocto")
         });
 

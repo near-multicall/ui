@@ -1,4 +1,5 @@
 import { convert, Big } from "./converter";
+import { BigSource } from "big.js";
 
 export default abstract class Args {
 
@@ -127,9 +128,9 @@ class ArgsBig extends Args {
     big: Big;
 
     constructor(
-        value: string, 
-        min: string | null = null, 
-        max: string | null = null, 
+        value: BigSource, 
+        min: BigSource | null = null, 
+        max: BigSource | null = null, 
         unit?: string | null,
         decimals?: number | null
     ) {

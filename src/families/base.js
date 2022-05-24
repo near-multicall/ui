@@ -1,7 +1,7 @@
 import { DeleteOutline, EditOutlined, ViewAgendaOutlined } from '@mui/icons-material';
 import React, { Component } from 'react';
 import { TextInput, TextInputWithUnits } from '../components/editor/elements';
-import { ArgsAccount, ArgsBig, ArgsError, ArgsJSON, ArgsNumber, ArgsString } from '../utils/args';
+import { ArgsAccount, ArgsBig, ArgsError, ArgsJSON, ArgsString } from '../utils/args';
 import Call from '../utils/call';
 import { toGas } from '../utils/converter';
 import './base.scss';
@@ -14,7 +14,7 @@ export default class BaseTask extends Component {
         addr: new ArgsError("Invalid address", value => ArgsAccount.isValid(value), true),
         func: new ArgsError("Cannot be empty", value => value.value != "", true),
         args: new ArgsError("Invalid JSON", value => JSON.parse(value.value)),
-        gas: new ArgsError("Amount out of bounds", value => ArgsNumber.isValid(value), true),
+        gas: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value), true),
         depo: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value) && value.value !== "" )
     };
     errors = this.baseErrors;
@@ -58,7 +58,7 @@ export default class BaseTask extends Component {
             addr: new ArgsAccount(json?.address ?? ""),
             func: new ArgsString(actions?.func ?? ""),
             args: new ArgsJSON(actions?.args ? JSON.stringify(actions?.args, null, "  ") : '{}'),
-            gas: new ArgsNumber(actions?.gas ?? 0, 1, toGas(300), "gas"),
+            gas: new ArgsBig(actions?.gas ?? "0", 1, toGas("300"), "Tgas"),
             depo: new ArgsBig(actions?.depo ?? "0", "0", null, "yocto")
         });
 
@@ -117,14 +117,14 @@ export default class BaseTask extends Component {
                     label="Allocated gas"
                     value={ gas }
                     error={ errors.gas }
-                    options={[ "gas", "Tgas" ]}
+                    options={[ "Tgas", "gas" ]}
                     update={ this.updateCard }
                 />
                 <TextInputWithUnits 
                     label="Attached deposit"
                     value={ depo }
                     error={ errors.depo }
-                    options={[ "yocto", "NEAR" ]}
+                    options={[ "NEAR", "yocto" ]}
                     update={ this.updateCard }
                 />
             </div>

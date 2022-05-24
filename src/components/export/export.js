@@ -5,8 +5,8 @@ import Icon from '@mui/material/Icon';
 import TextField from '@mui/material/TextField';
 import { Base64 } from 'js-base64';
 import React, { Component } from 'react';
-import { ArgsAccount, ArgsBig, ArgsError, ArgsNumber, ArgsString } from '../../utils/args';
-import { convert, toGas } from '../../utils/converter';
+import { ArgsAccount, ArgsBig, ArgsError, ArgsString } from '../../utils/args';
+import { convert, toGas, toNEAR } from '../../utils/converter';
 import { view } from "../../utils/wallet";
 import { TextInput, TextInputWithUnits } from '../editor/elements';
 import './export.scss';
@@ -17,19 +17,19 @@ export default class Export extends Component {
         user: new ArgsError("Invalid address", value => ArgsAccount.isValid(value), true),
         dao: new ArgsError("Invalid address", value => ArgsAccount.isValid(value), true),
         multicall: new ArgsError("Invalid address", value => ArgsAccount.isValid(value), true),
-        gas: new ArgsError("Amount out of bounds", value => ArgsNumber.isValid(value)),
+        gas: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value) && value.value !== ""),
         depo: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value) && value.value !== ""),
         amount: new ArgsError("Invalid amount", value => ArgsBig.isValid(value) && value.value !== ""),
         token: new ArgsError("Invalid address", value => ArgsAccount.isValid(value)),
         desc: new ArgsError("Invalid proposal description", value => value.value !== "", true),
         noToken: new ArgsError("Address does not belong to token contract", value => this.errors.noToken),
         notWhitelisted: new ArgsError("Token not whitelisted on multicall instance", value => this.errors.notWhitelisted),
-        hasErrors: new ArgsError("You have unfixed errors", value => this.errors.hasErrors)
+        hasErrors: new ArgsError("Please fix all errors", value => this.errors.hasErrors)
     };
 
     total = {
-        gas: new ArgsNumber(toGas(270), 1, toGas(270), "gas"),
-        depo: new ArgsBig("1", "1", null, "yocto"),
+        gas: new ArgsBig("270", toGas("1"), toGas("270"), "Tgas"),
+        depo: new ArgsBig(toNEAR("1"), toNEAR("1"), null, "NEAR"),
         desc: new ArgsString("")
     }
 
@@ -175,14 +175,14 @@ export default class Export extends Component {
                             label="Total allocated gas"
                             value={ gas }
                             error={ errors.gas }
-                            options={[ "gas", "Tgas" ]}
+                            options={[ "Tgas", "gas" ]}
                             update={ this.update }
                         />
                         <TextInputWithUnits 
                             label="Total attached deposit"
                             value={ depo }
                             error={ errors.depo }
-                            options={[ "yocto", "NEAR" ]}
+                            options={[ "NEAR", "yocto" ]}
                             update={ this.update }
                         />
                         <div className="checkbox">

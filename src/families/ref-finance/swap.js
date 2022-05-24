@@ -20,7 +20,7 @@ export default class Swap extends BaseTask {
         token_out: new ArgsError("Invalid address", value => ArgsAccount.isValid(value)),
         min_amount_out: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value)),
         func: new ArgsError("Cannot be empty", value => value != ""),
-        gas: new ArgsError("Amount out of bounds", value => ArgsNumber.isValid(value)),
+        gas: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value)),
     };
 
     init(json = null) {
@@ -49,7 +49,7 @@ export default class Swap extends BaseTask {
                     })
                 )
             }),
-            gas: new ArgsNumber(actions?.gas ?? toGas(95), 1, toGas(300), "gas"),
+            gas: new ArgsBig(actions?.gas ?? toGas("95"), 1, toGas("300"), "gas"),
             depo: new ArgsBig(actions?.depo ?? "1", "1", null, "yocto")
         });
 
