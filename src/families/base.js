@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { TextInput, TextInputWithUnits } from '../components/editor/elements';
 import { ArgsAccount, ArgsBig, ArgsError, ArgsJSON, ArgsString } from '../utils/args';
 import Call from '../utils/call';
-import { toGas } from '../utils/converter';
+import { toGas, toYocto } from '../utils/converter';
 import './base.scss';
 
 export default class BaseTask extends Component {
@@ -59,7 +59,7 @@ export default class BaseTask extends Component {
             func: new ArgsString(actions?.func ?? ""),
             args: new ArgsJSON(actions?.args ? JSON.stringify(actions?.args, null, "  ") : '{}'),
             gas: new ArgsBig(actions?.gas ?? "0", 1, toGas("300"), "Tgas"),
-            depo: new ArgsBig(actions?.depo ?? "0", "0", null, "yocto")
+            depo: new ArgsBig(actions?.depo ?? "0", toYocto("0"), null, "NEAR")
         });
 
     }
