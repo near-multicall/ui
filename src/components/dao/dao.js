@@ -80,8 +80,11 @@ export default class Dao extends Component {
             ))
             .then(res => {
 
+                console.log(res);
+
                 const proposals = res.filter(p => 
-                    p.description === `create multicall instance for this DAO at ${multicall}` &&
+                    p.kind?.FunctionCall?.receiver_id === window.nearConfig.MULTICALL_FACTORY_ADDRESS &&
+                    p.kind?.FunctionCall?.actions?.[0]?.method_name === "create" &&
                     p.status === 'InProgress'
                 )
 
@@ -164,8 +167,6 @@ export default class Dao extends Component {
                 }
             }
         };
-
-        console.log(proposed === -1)
 
         if (noContract.isBad 
             && !noDao.isBad // base.sputnik.near does not exist
