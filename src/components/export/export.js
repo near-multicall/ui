@@ -29,7 +29,7 @@ export default class Export extends Component {
 
     total = {
         gas: new ArgsBig("270", toGas("1"), toGas("270"), "Tgas"),
-        depo: new ArgsBig(toNEAR("1"), toNEAR("1"), null, "NEAR"),
+        depo: new ArgsBig(toNEAR("1"), "1", null, "NEAR"),
         desc: new ArgsString("")
     }
 

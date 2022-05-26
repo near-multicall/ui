@@ -42,7 +42,7 @@ export default class Withdraw extends BaseTask {
                 }    
             ),*/
             args: new ArgsJSON(actions?.args ? JSON.stringify(actions?.args, null, "  ") : "{\n  \"ref_address\": \"ref-finance-101.testnet\",\n  \"tokens\": [\n    \"nusdc.ft-fin.testnet\"\n  ],\n  \"receiver_id\": \"\",\n  \"withdrawal_gas\": \"55000000000000\",\n  \"token_transfer_gas\": \"4000000000000\",\n  \"deposit\": \"1\"\n}"),
-            gas: new ArgsBig(actions?.gas ?? toGas("95"), 1, toGas("300"), "gas"),
+            gas: new ArgsBig(actions?.gas ?? "95", toGas("1"), toGas("300"), "Tgas"),
             depo: new ArgsBig(actions?.depo ?? "0", "0", null, "yocto")
         });
 

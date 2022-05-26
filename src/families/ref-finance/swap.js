@@ -49,7 +49,7 @@ export default class Swap extends BaseTask {
                     })
                 )
             }),
-            gas: new ArgsBig(actions?.gas ?? toGas("95"), 1, toGas("300"), "gas"),
+            gas: new ArgsBig(actions?.gas ?? "95", toGas("1"), toGas("300"), "Tgas"),
             depo: new ArgsBig(actions?.depo ?? "1", "1", null, "yocto")
         });
 
@@ -151,7 +151,7 @@ export default class Swap extends BaseTask {
                     label="Allocated gas"
                     value={ gas }
                     error={ errors.gas }
-                    options={[ "gas", "Tgas" ]}
+                    options={[ "Tgas", "gas" ]}
                     update={ this.updateCard }
                 />
             </div>

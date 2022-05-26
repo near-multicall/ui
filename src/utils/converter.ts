@@ -14,6 +14,7 @@ const unitToDecimals: Record<string, number> = {
     "gas": 0
 }
 
+// only match basic integers & flaots. Reject exponentials, scientific notations ...
 const SIMPLE_NUM_REGEX: RegExp = /^\d+(\.\d+)?$/;
 
 const removeTrailingZeros = (amount: string): string => amount.replace(/\.?0*$/, '');

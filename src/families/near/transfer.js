@@ -53,7 +53,7 @@ export default class Transfer extends BaseTask {
                     memo: new ArgsString("")
                 }    
             ),
-            gas: new ArgsBig(actions?.gas ?? toGas("7"), 1, toGas("300"), "gas"),
+            gas: new ArgsBig(actions?.gas ?? "7", toGas("1"), toGas("300"), "Tgas"),
             depo: new ArgsBig("1", "1", "1", "yocto")
         });
 
@@ -150,7 +150,7 @@ export default class Transfer extends BaseTask {
                     label="Allocated gas"
                     value={ gas }
                     error={ errors.gas }
-                    options={[ "gas", "Tgas" ]}
+                    options={[ "Tgas", "gas" ]}
                     update={ this.updateCard }
                 />
             </div>
