@@ -20,7 +20,12 @@ window.NEAR_ENV = searchParams.has("network")
     : "testnet"
 window.nearConfig = getConfig(window.NEAR_ENV);
 
-// TODO: this will replace initWallet()
+/**
+ * init connection to NEAR
+ * init wallet based account
+ * 
+ * @returns wallet connection object
+ */
 async function initNear (): Promise<nearAPI.WalletConnection> {
     // Initializing connection to the NEAR node.
     window.near = await nearAPI.connect(

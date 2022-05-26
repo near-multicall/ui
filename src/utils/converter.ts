@@ -7,6 +7,15 @@ Big.DP = 40;
 Big.NE = -40;
 Big.PE = 40;
 
+const unitToDecimals: Record<string, number> = {
+    "NEAR": 24,
+    "yocto": 0,
+    "Tgas": 12,
+    "gas": 0
+}
+
+const SIMPLE_NUM_REGEX: RegExp = /^\d+(\.\d+)?$/;
+
 const removeTrailingZeros = (amount: string): string => amount.replace(/\.?0*$/, '');
 // token amount -> indivisible units
 const parseTokenAmount = (amount: BigSource, decimals: number): string => Big(amount).times(Big(10).pow(decimals)).toFixed();
@@ -26,19 +35,16 @@ const toYocto = (amount: string | number): string => parseTokenAmount(amount.toS
 
 const convert = (amount: string | number, unit: string, decimals?: number): number | string => {
 
-    decimals = decimals ?? {
-        NEAR: 24,
-        yocto: 0,
-        Tgas: 12,
-        gas: 0
-    }[unit]
+    decimals = decimals ?? unitToDecimals[unit];
 
-    return decimals !== undefined && /^\d*(\.\d*)?$/.test(amount.toString())
+    return decimals !== undefined && SIMPLE_NUM_REGEX.test(amount.toString())
         ? parseTokenAmount((amount === "" ? "0" : amount).toString(), decimals)
         : amount;
 }
 
 export {
+    unitToDecimals,
+    SIMPLE_NUM_REGEX,
     parseTokenAmount,
     formatTokenAmount,
     toTGas,

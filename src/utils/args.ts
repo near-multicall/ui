@@ -1,5 +1,7 @@
-import { convert, Big } from "./converter";
+import { unitToDecimals, SIMPLE_NUM_REGEX, convert, Big } from "./converter";
 import { BigSource } from "big.js";
+
+
 
 export default abstract class Args {
 
@@ -63,19 +65,24 @@ class ArgsString extends Args {
 
 class ArgsAccount extends Args {
 
+    // Regexp for NEAR account IDs. See: https://github.com/near/nearcore/blob/180e5dda991ad7bdbb389a931e84d24e31fb0674/core/account-id/src/lib.rs#L240
+    static ACCOUNT_ID_REGEX: RegExp = /^(?=.{2,64}$)(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_])*[a-z\d]+$/;
+
     constructor(value: string) {
 
         super("string", value);
 
     }
 
-    static isValid = (value: ArgsAccount | string) => {
-        if (typeof value === "string")
+    static isValid = (value: ArgsAccount | string): boolean => {
+        if (typeof value === "string") {
             value = new ArgsAccount(value);
-        return /^(?=.{2,64}$)(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_])*[a-z\d]+$/.test(value.value)
+        }
+
+        return this.ACCOUNT_ID_REGEX.test(value.value)
     };
 
-    isValid = () => ArgsAccount.isValid(this);
+    isValid = (): boolean => ArgsAccount.isValid(this);
 
     toUrl = (network: string) => `https://explorer.${network}.near.org/accounts/${this.value}`;
 
@@ -95,31 +102,28 @@ class ArgsNumber extends Args {
 
     }
 
-    static isValid = (value: ArgsNumber) => {
+    static isValid = (value: ArgsNumber): boolean => {
 
         // test if number
         // this shouldnt work for numbers where its string has "e" in it, but it does??
-        if (!/^\d*(\.\d*)?$/.test(value.value.toString()))
-            return;
-
-        const decimals: number = value.decimals ?? {
-            NEAR: 24,
-            yocto: 0,
-            Tgas: 12,
-            gas: 0
-        }[value.unit]
-
-        if (decimals !== undefined && value.value.toString().split(".")[1]?.length > decimals)
+        if ( ! SIMPLE_NUM_REGEX.test(value.value.toString()) ) {
             return false;
+        }
+
+        // Try to initialize, otherwise assign an invalid value (-1)
+        let decimals: number = value.decimals ?? (value.unit ? unitToDecimals[value.unit] : -1);
+
+        if (decimals !== -1 && value.value.toString().split(".")[1]?.length > decimals) {
+            return false;
+        }
 
         const v = convert(value.value, value.unit, decimals);
 
         return (value.min === null || Big(v).gte(value.min)) 
             && (value.max === null || Big(v).lte(value.max));
-
     }
 
-    isValid = () => ArgsNumber.isValid(this);
+    isValid = (): boolean => ArgsNumber.isValid(this);
 
 }
 
@@ -141,21 +145,19 @@ class ArgsBig extends Args {
 
     }
 
-    static isValid = (value: ArgsBig) => {
+    static isValid = (value: ArgsBig): boolean => {
 
         // test if number
-        if (!/^\d*(\.\d*)?$/.test(value.value.toString()))
-            return;
-
-        const decimals: number = value.decimals ?? {
-            NEAR: 24,
-            yocto: 0,
-            Tgas: 12,
-            gas: 0
-        }[value.unit]
-
-        if (decimals !== undefined && value.value.split(".")[1]?.length > decimals)
+        if ( ! SIMPLE_NUM_REGEX.test(value.value.toString()) ) {
             return false;
+        }
+
+        // Try to initialize, otherwise assign an invalid value (-1)
+        let decimals: number = value.decimals ?? (value.unit ? unitToDecimals[value.unit] : -1);
+
+        if ((decimals !== -1) && (value.value.split(".")[1]?.length > decimals)) {
+            return false;
+        }
 
         const v = convert(value.value, value.unit, decimals);
 
@@ -164,7 +166,7 @@ class ArgsBig extends Args {
 
     }
 
-    isValid = () => ArgsBig.isValid(this);
+    isValid = (): boolean => ArgsBig.isValid(this);
 
 }
 
@@ -226,7 +228,7 @@ class ArgsJSON extends Args {
 
     }
 
-    isValid = () => {
+    isValid = (): boolean => {
 
         try {
             JSON.parse(this.value);
@@ -235,7 +237,6 @@ class ArgsJSON extends Args {
         }
 
         return true;
-
     }
 
 }
@@ -258,12 +259,10 @@ class ArgsError {
 
     validOrNull(value: any) {
 
-        let valid = true;
+        let valid = false;
         try {
-            if (!this.validator(value))
-                valid = false;
+            if (this.validator(value)) valid = true;
         } catch(e) {
-            valid = false;
             this.intermediate = value.value;
         }
          
