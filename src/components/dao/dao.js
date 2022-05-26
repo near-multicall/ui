@@ -1,16 +1,16 @@
 import { DeleteOutline, EditOutlined, AddOutlined, PauseOutlined, PlayArrowOutlined } from '@mui/icons-material';
 import { Base64 } from 'js-base64';
-import { FunctionCall } from 'near-api-js/lib/transaction';
-import { title } from 'process';
 import React, { Component } from 'react';
-import { info } from 'sass';
 import { ArgsAccount, ArgsError } from '../../utils/args';
-import { toNEAR, toYocto } from '../../utils/converter';
+import { toNEAR, toYocto, Big } from '../../utils/converter';
 import { view, tx } from '../../utils/wallet';
 import { TextInput } from '../editor/elements';
 import { InputAdornment } from '@mui/material'
 import './dao.scss';
 
+
+// minimum balance a multicall instance needs for storage + state.
+const MIN_INSTANCE_BALANCE = toYocto(1); // 1 NEAR
 
 
 export default class Dao extends Component {
@@ -107,7 +107,7 @@ export default class Dao extends Component {
         const multicall = `${this.state.addr.value}.${window.nearConfig.MULTICALL_FACTORY_ADDRESS}`;
         const sputnik = `${addr.value}.${window.nearConfig.SPUTNIK_V2_FACTORY_ADDRESS}`;
 
-        const depo = BigInt(this.fee) + BigInt(toYocto(1));
+        const depo = Big(this.fee).plus(MIN_INSTANCE_BALANCE);
 
         const args = {
             proposal: {
@@ -124,7 +124,7 @@ export default class Dao extends Component {
                                     job_bond: infos.policy.proposal_bond
                                 }
                             })),
-                            deposit: depo.toString(),
+                            deposit: depo.toFixed(),
                             gas: "150000000000000"
                         }]
                     }
@@ -162,7 +162,7 @@ export default class Dao extends Component {
 
         return (
             <span>
-                <a href={ addr.toUrl() } target="_blank" rel="noopener noreferrer">
+                <a href={ addr.toUrl(window.nearConfig.networkId) } target="_blank" rel="noopener noreferrer">
                     { addr.value }
                 </a>
                 <DeleteOutline/>
