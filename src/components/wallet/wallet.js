@@ -3,7 +3,7 @@ import ScienceOutlinedIcon from '@mui/icons-material/ScienceOutlined';
 import { Base64 } from 'js-base64';
 import React, { Component } from 'react';
 import { toGas } from '../../utils/converter';
-import { initWallet, tx, view } from '../../utils/wallet';
+import { initNear, tx, view } from '../../utils/wallet';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import './wallet.scss';
@@ -15,7 +15,6 @@ export default class Wallet extends Component {
         noDao: new ArgsError(`No sputnik dao found at address`, value => this.errors.noDao.isBad),
         noRights: new ArgsError("No permission to create a proposal on this dao", value => this.errors.noRights),
         noContract: new ArgsError("Dao does not have a multicall instance", value => this.errors.noContract.isBad),
-
     }
 
     daoList = [];
@@ -31,22 +30,21 @@ export default class Wallet extends Component {
             bond: "0"
         }
 
-        window.WALLET = initWallet()
-            .then(wallet => this.setState({ 
-                wallet: wallet,
-            }, () => {
-                STORAGE.setAddresses({
-                    user: wallet.getAccountId()
-                })
-                window.WALLET = this;
-                if (wallet.getAccountId() !== "") {
-                    const URL = `https://api.${window.ENVIRONMENT === "mainnet" ? "" : "testnet."}app.astrodao.com/api/v1/daos/account-daos/${this.state.wallet.getAccountId()}`;
-                    fetch(URL)
-                        .then(response => response.json())
-                        .then(data => this.daoList = data.map(dao => dao.id))
-                        .then(() => this.forceUpdate())
+        window.WALLET = initNear()
+            .then( wallet => this.setState({
+                    wallet: wallet,
+                }, () => {
+                    STORAGE.setAddresses({ user: wallet.getAccountId() })
+                    window.WALLET = this;
+                    if (wallet.getAccountId() !== "") {
+                        const URL = `https://api.${window.NEAR_ENV === "mainnet" ? "" : "testnet."}app.astrodao.com/api/v1/daos/account-daos/${this.state.wallet.getAccountId()}`;
+                        fetch(URL)
+                            .then(response => response.json())
+                            .then(data => this.daoList = data.map(dao => dao.id))
+                            .then(() => this.forceUpdate())
+                    }
                 }
-            }));
+            ));
 
     }
 
@@ -96,7 +94,7 @@ export default class Wallet extends Component {
             dao,
             "add_proposal",
             args,
-            toGas(15),
+            toGas("15"),
             this.state.bond
         )
 
@@ -139,7 +137,7 @@ export default class Wallet extends Component {
             dao,
             "add_proposal",
             args,
-            toGas(15),
+            toGas("15"),
             this.state.bond
         )
 
@@ -231,7 +229,7 @@ export default class Wallet extends Component {
                         : this.signIn()
                     }
                 >
-                    { window.ENVIRONMENT === "testnet" 
+                    { window.NEAR_ENV === "testnet" 
                         ? <ScienceOutlinedIcon/>
                         : <AccountBalanceWalletOutlinedIcon/>
                     }

@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import { initialData } from '../../initial-data.js'
 import { Column, Menu } from '../../components.js'
-import { toGas } from '../../utils/converter.ts';
 import './layout.scss'
 
 export default class Layout extends Component {
