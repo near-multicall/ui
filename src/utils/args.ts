@@ -105,15 +105,14 @@ class ArgsNumber extends Args {
     static isValid = (value: ArgsNumber): boolean => {
 
         // test if number
-        // this shouldnt work for numbers where its string has "e" in it, but it does??
         if ( ! SIMPLE_NUM_REGEX.test(value.value.toString()) ) {
             return false;
         }
 
-        // Try to initialize, otherwise assign an invalid value (-1)
-        let decimals: number = value.decimals ?? (value.unit ? unitToDecimals[value.unit] : -1);
+        // Try to initialize, otherwise assign undefined
+        let decimals: number | undefined = value.decimals ?? (value.unit ? unitToDecimals[value.unit] : undefined);
 
-        if (decimals !== -1 && value.value.toString().split(".")[1]?.length > decimals) {
+        if ((decimals !== undefined) && (value.value.toString().split(".")[1]?.length > decimals)) {
             return false;
         }
 
@@ -152,10 +151,10 @@ class ArgsBig extends Args {
             return false;
         }
 
-        // Try to initialize, otherwise assign an invalid value (-1)
-        let decimals: number = value.decimals ?? (value.unit ? unitToDecimals[value.unit] : -1);
+        // Try to initialize, otherwise assign undefined
+        let decimals: number | undefined = value.decimals ?? (value.unit ? unitToDecimals[value.unit] : undefined);
 
-        if ((decimals !== -1) && (value.value.split(".")[1]?.length > decimals)) {
+        if ((decimals !== undefined) && (value.value.split(".")[1]?.length > decimals)) {
             return false;
         }
 
@@ -163,7 +162,6 @@ class ArgsBig extends Args {
 
         return (value.min === null || Big(v).gte(value.min)) 
             && (value.max === null || Big(v).lte(value.max));
-
     }
 
     isValid = (): boolean => ArgsBig.isValid(this);
