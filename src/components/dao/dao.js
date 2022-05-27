@@ -80,8 +80,6 @@ export default class Dao extends Component {
             ))
             .then(res => {
 
-                console.log(res);
-
                 const proposals = res.filter(p => 
                     p.kind?.FunctionCall?.receiver_id === window.nearConfig.MULTICALL_FACTORY_ADDRESS &&
                     p.kind?.FunctionCall?.actions?.[0]?.method_name === "create" &&
@@ -92,7 +90,7 @@ export default class Dao extends Component {
                     ? proposals.pop().id
                     : -1
                     
-            })
+            }).catch(e => {})
 
     }
 
@@ -293,7 +291,7 @@ export default class Dao extends Component {
                 proposed: proposed
             }
         )
-        .finally(() => {
+        .then(() => {
             // can user propose FunctionCall to DAO?
             const canPropose = newState.infos.policy?.roles
                 .filter(r => r.kind === "Everyone" || r.kind.Group.includes(window.WALLET.state.wallet.getAccountId()))
