@@ -3,22 +3,35 @@
 @use 'sass/font';
 @use 'sass/mixin';
 
-.themed-input {
-    background-color: #ffffff;
-    height: size.$text;
-    text-align: right;
-    font-family: font.$code;
-    font-size: size.$small-text;
-    border: 1px solid color.$dark;
-}
-
-.themed-textarea {
-    background-color: #ffffff;
-    height: 200px;
-    text-align: left;
-    font-family: font.$code;
-    font-size: size.$small-text;
-    border: 1px solid color.$dark;
+.light-textfield {
+    &.MuiTextField-root {
+        .MuiInputLabel-root, .MuiFilledInput-root.Mui-focused {
+            color: color.$light-text !important;
+        }
+        .MuiFilledInput-root, .MuiFilledInput-root:hover {
+            background-color: rgba(color.$white, 0.06) !important;
+            &::before, &:hover::before {
+                border-bottom: 1px solid rgba(color.$white, 0.42);
+            }
+            &::after {
+                border-bottom: 2px solid color.$white;
+            }
+            input, textarea {
+                color: color.$white;
+                font-size: size.$text;
+            }
+            textarea {
+                @include mixin.no-scrollbar;
+                white-space: pre;
+                overflow-x: scroll !important;
+            }
+        }
+        *:not(input) {
+            color: color.$light-text;
+            font-size: 1em;
+        }
+        font-size: 1.8rem;
+    }
 }
 
 .spacer {

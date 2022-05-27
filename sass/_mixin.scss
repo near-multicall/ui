@@ -9,6 +9,22 @@
     padding: 0;
 }
 
+@mixin page-wrapper {
+    position: relative;
+    height: 100%;
+    width: calc(100% - size.$sidebar-width);
+    left: size.$sidebar-width;
+    &::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: calc(2.5 * size.$gap - 0.5 * (size.$gap - size.$large-text));
+        min-width: 100%;
+        background-color: color.$light;
+    }
+}
+
 @mixin available-width {
     width: 100%;
     width: -moz-available;          /* WebKit-based browsers will ignore this. */

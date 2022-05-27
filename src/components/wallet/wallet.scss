@@ -3,58 +3,126 @@
 @use 'sass/mixin';
 @use 'sass/font';
 
+@mixin avatar {
+    margin-left: -1px;
+    height: 0.7 * size.$sidebar-width;
+    width: 0.7 * size.$sidebar-width;
+    line-height: 0.7 * size.$sidebar-width;
+    font-size: size.$large-text;
+    border-radius: 100%;
+}
+
 .wallet {
     @include mixin.center-items;
+    flex-flow: column nowrap;
     gap: 0.5 * size.$gap;
-    height: size.$gap;
-    padding: 0 0.5 * size.$gap;
+    margin-bottom: size.$gap;
+    margin-top: auto;
     font-size: size.$text;
-    color: color.$text;
-    border-radius: size.$task-radius;
-    background-color: color.$light;
-    button {
-        @include mixin.center-items;
-        gap: 0.5 * size.$gap;
-        height: 100%;
-        padding: 0;
+    color: color.$light-text;
+    .icon {
+        @include avatar;
+        border: 1px solid color.$light;
+        cursor: pointer;
+    }
+    .expand {
+        position: absolute;
+        left: calc(0.7 * size.$sidebar-width + 2px);
+        top: calc(-0.125 * size.$gap - 1px);
+        padding: 0.25 * size.$gap 0.5 * size.$gap;
+        width: max-content;
+        background-color: color.$black;
+        border-radius: 0 size.$task-radius size.$task-radius 0;
+    }
+    .peek {
+        position: absolute;
+        left: calc(0.7 * size.$sidebar-width + 2px);
+        top: calc(-0.125 * size.$gap - 1px);
+        padding: 0.25 * size.$gap size.$gap;
+        color: rgba(color.$text, 0.25);
         font-size: size.$text;
     }
-    span {
-        color: color.$lightish;
-    }
-    .dao-selector {
-        font-size: unset;
-        width: 150px;
-        height: 100%;
-        .MuiTextField-root {
-            justify-content: center;
-            height: 100%;
-            .MuiOutlinedInput-root {
-                height: 100%;
-                padding: 0;
-                input, textarea {
-                    height: 100%;
-                    padding: 0;
-                    color: color.$text;
-                    font-family: font.$text;
-                    font-size: size.$text;
-                }
-                fieldset {
-                    border: none;
-                }
-                .MuiAutocomplete-endAdornment {
-                    top: unset;
-                    right: 0;
-                    svg {
-                        fill: color.$text;
+    .user {
+        @include avatar;
+        position: relative;
+        &[expand="no"] {
+            .expand {
+                display: none;
+            }
+            .peek {
+                display: block;
+            }
+        }
+        &[expand="yes"] {
+            .expand {
+                font-size: size.$text;
+                button {
+                    &.logout {
+                        margin-left: 1ch;
                     }
+                    padding: 0 0.5 * size.$gap;
+                    width: unset;
+                    font-size: size.$text;
+                    background-color: color.$light;
+                    color: color.$text;
+                    border-radius: size.$task-radius;
                 }
             }
-            *:not(input) {
-                color: color.$light-text;
-                font-size: 1em;
+            .peek {
+                display: none;
             }
-            font-size: 1.8rem;
+        }
+    }
+    .dao {
+        @include avatar;
+        position: relative;
+        &[expand="no"] {
+            .expand {
+                display: none;
+            }
+            .peek {
+                display: block;
+            }
+        }
+        &[expand="yes"] {
+            .expand {
+                .MuiTextField-root {
+                    justify-content: center;
+                    vertical-align: baseline;
+                    height: 100%;
+                    .MuiOutlinedInput-root {
+                        height: 100%;
+                        padding: 0;
+                        input, textarea {
+                            height: 100%;
+                            width: 200px;
+                            padding: 0;
+                            padding-right: 17.5px;
+                            color: color.$light-text;
+                            font-family: font.$text;
+                            font-size: size.$text;
+                        }
+                        fieldset {
+                            border: none;
+                        }
+                        .MuiAutocomplete-endAdornment {
+                            top: unset;
+                            right: 0;
+                            svg {
+                                fill: color.$light-text;
+                            }
+                        }
+                    }
+                    *:not(input) {
+                        color: color.$light-text;
+                        font-size: 1em;
+                    }
+                    font-size: 1.8rem;
+                }
+            }
+            .peek {
+                display: none;
+            }
         }
     }
 }

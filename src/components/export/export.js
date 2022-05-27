@@ -232,7 +232,7 @@ export default class Export extends Component {
                         }
                     </div>
                     { allErrors.length > 0 && <div className="error-container">
-                        <div className="header">
+                        <div className="sidebar">
                             <h3>{`Errors (${allErrors.length})`}</h3>
                         </div>
                         <div className="error-list">
@@ -253,7 +253,7 @@ export default class Export extends Component {
                         </div>
                     </div> }
                     <div className="section">
-                        <div className="header">
+                        <div className="sidebar">
                             <Icon 
                                 className="icon collapse"
                                 onClick={ () => this.toggleShowArgs() }

@@ -5,6 +5,8 @@ import AppPage from './pages/app-page';
 import DaoPage from './pages/dao-page';
 import './utils/persistent';
 
+window.PAGE = "app";
+
 ReactDOM.render(
   <HashRouter>
     <Routes>

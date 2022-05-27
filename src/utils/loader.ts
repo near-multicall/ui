@@ -9,3 +9,11 @@ window.onbeforeunload = function (e) {
     // For Safari
     return 'Sure?';
 };
+
+export function saveFile(name: string, data: any) {
+    const element = document.createElement("a");
+    const file = new Blob(data, {type: 'text/plain'});
+    element.href = URL.createObjectURL(file);
+    element.download = name; 
+    element.click();
+}

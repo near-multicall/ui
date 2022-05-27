@@ -5,11 +5,9 @@
 @use 'sass/animation';
 
 .dao-container {
-    position: relative;
+    @include mixin.page-wrapper;
     display: flex;
     flex-flow: column nowrap;
-    height: calc(100% - 2 * size.$gap);
-    top: 2 * size.$gap;
     .address-container {
         flex-flow: row nowrap;
         width: auto;
@@ -50,7 +48,7 @@
     &::before {
         content: '';
         position: fixed;
-        top: 2 * size.$gap;
+        top: 0;
         left: 0;
         height: calc(2.5 * size.$gap - 0.5 * (size.$gap - size.$large-text));
         min-width: 100%;
