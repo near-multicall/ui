@@ -1,8 +1,8 @@
 import Checkbox from '@mui/material/Checkbox';
 import React from 'react';
-import { ArgsAccount, ArgsBig, ArgsNumber, ArgsString, ArgsObject, ArgsError } from "../../utils/args";
+import { ArgsAccount, ArgsBig, ArgsString, ArgsObject, ArgsError } from "../../utils/args";
 import Call from "../../utils/call";
-import { toGas, toLarge } from "../../utils/converter";
+import { toGas, toYocto } from "../../utils/converter";
 import BaseTask from "../base";
 import "./multicall.scss";
 import { TextInput, TextInputWithUnits } from '../../components/editor/elements';
@@ -17,7 +17,7 @@ export default class Transfer extends BaseTask {
         args: new ArgsError("Invalid JSON", value => true),
         receiver: new ArgsError("Invalid address", value => ArgsAccount.isValid(value), !ArgsAccount.isValid(this.call.args.value.account_id)),
         amount: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value)),
-        gas: new ArgsError("Amount out of bounds", value => ArgsNumber.isValid(value)),
+        gas: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value)),
     };
 
     options = {
@@ -38,27 +38,25 @@ export default class Transfer extends BaseTask {
                     account_id: new ArgsAccount(actions.args.account_id),
                     amount: actions.args.amount 
                         ? new ArgsBig(
-                            toLarge(actions.args.amount, units.args.amount.decimals), 
-                            "0", 
+                            actions.args.amount, 
+                            toYocto("0"), 
                             null, 
-                            units.args.amount.unit, 
-                            units.args.amount.decimals
+                            "NEAR"
                         )
                         : new ArgsBig("0", "0", "0")
                 }
                 : {
                     account_id: new ArgsAccount(""),
-                    amount: new ArgsBig("0", "0", null, "yocto")                    
+                    amount: new ArgsBig("0", toYocto("0"), null, "NEAR")                    
                 }    
             ),
-            gas: new ArgsNumber(
-                parseInt(toLarge(actions?.gas ?? toGas(3), units?.gas.decimals)), 
-                1, 
-                toGas(300), 
-                units?.gas?.unit ?? "gas", 
-                units?.gas?.decimals
+            gas: new ArgsBig(
+                actions?.gas ?? "3", 
+                toGas("1"), 
+                toGas("300"), 
+                units?.gas?.unit ?? "Tgas"
             ),
-            depo: new ArgsBig("0", "0", "0", "yocto")
+            depo: new ArgsBig("1", "1", "1", "yocto")
         });
 
         if ((actions?.args?.account_id !== undefined && actions.args.amount === undefined) || json?.options?.all) {
@@ -124,7 +122,7 @@ export default class Transfer extends BaseTask {
                         label="Transfer amount"
                         value={ amount }
                         error={ errors.amount }
-                        options={[ "yocto", "NEAR" ]}
+                        options={[ "NEAR", "yocto" ]}
                         update={ this.updateCard }
                     />
                     : <></>
@@ -133,7 +131,7 @@ export default class Transfer extends BaseTask {
                     label="Allocated gas"
                     value={ gas }
                     error={ errors.gas }
-                    options={[ "gas", "Tgas" ]}
+                    options={[ "Tgas", "gas" ]}
                     update={ this.updateCard }
                 />
             </div>

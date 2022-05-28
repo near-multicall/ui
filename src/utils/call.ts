@@ -4,7 +4,6 @@ import { convert } from "./converter";
 import {
     ArgsString, 
     ArgsAccount,
-    ArgsNumber,
     ArgsBig, 
     ArgsObject,
     ArgsJSON
@@ -16,7 +15,7 @@ export default class Call {
     addr: ArgsAccount;
     func: ArgsString;
     args: ArgsObject | ArgsJSON;
-    gas: ArgsNumber;
+    gas: ArgsBig;
     depo: ArgsBig;
 
     constructor({
@@ -31,7 +30,7 @@ export default class Call {
         addr: ArgsAccount,
         func: ArgsString,
         args: ArgsObject | ArgsJSON,
-        gas: ArgsNumber,
+        gas: ArgsBig,
         depo: ArgsBig
     }) {
 

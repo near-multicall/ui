@@ -1,7 +1,7 @@
 import { InputAdornment } from '@mui/material';
 import React from 'react';
 import { TextInput, TextInputWithUnits } from '../../components/editor/elements';
-import { ArgsAccount, ArgsBig, ArgsError, ArgsNumber, ArgsObject, ArgsString } from "../../utils/args";
+import { ArgsAccount, ArgsBig, ArgsError, ArgsObject, ArgsString } from "../../utils/args";
 import Call from "../../utils/call";
 import { toGas, toLarge } from "../../utils/converter";
 import { view } from "../../utils/wallet";
@@ -19,7 +19,7 @@ export default class Transfer extends BaseTask {
         args: new ArgsError("Invalid JSON", value => true),
         receiver: new ArgsError("Invalid address", value => ArgsAccount.isValid(value), !ArgsAccount.isValid(this.call.args.value.receiver_id)),
         amount: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value)),
-        gas: new ArgsError("Amount out of bounds", value => ArgsNumber.isValid(value)),
+        gas: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value)),
         noToken: new ArgsError("Address does not belong to token contract", value => this.errors.noToken)
     };
 
@@ -60,12 +60,11 @@ export default class Transfer extends BaseTask {
                     memo: new ArgsString("")
                 }    
             ),
-            gas: new ArgsNumber(
-                toLarge(actions?.gas ?? toGas(7), units?.gas.decimals), 
-                1, 
-                toGas(300), 
-                units?.gas?.unit ?? "gas",
-                units?.gas?.decimals
+            gas: new ArgsBig(
+                actions?.gas ?? "7", 
+                toGas("1"), 
+                toGas("300"), 
+                units?.gas?.unit ?? "Tgas"
             ),
             depo: new ArgsBig("1", "1", "1", "yocto")
         });
@@ -166,7 +165,7 @@ export default class Transfer extends BaseTask {
                     label="Allocated gas"
                     value={ gas }
                     error={ errors.gas }
-                    options={[ "gas", "Tgas" ]}
+                    options={[ "Tgas", "gas" ]}
                     update={ this.updateCard }
                 />
             </div>
