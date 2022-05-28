@@ -1,18 +1,16 @@
-import ScienceOutlinedIcon from '@mui/icons-material/ScienceOutlined';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import FileUploadOutlinedIcon from '@mui/icons-material/FileUploadOutlined';
-import { Icon, Chip } from '@mui/material';
+import ScienceOutlinedIcon from '@mui/icons-material/ScienceOutlined';
+import { Chip, Icon, TextField } from '@mui/material';
 import React, { Component } from 'react';
 import { NavLink } from "react-router-dom";
+import Discord from '../../assets/discord.svg';
+import Github from '../../assets/github.svg';
+import Twitter from '../../assets/twitter.svg';
 import { Wallet } from '../../components';
-import Discord from '../../assets/discord.svg'
-import Twitter from '../../assets/twitter.svg'
-import Telegram from '../../assets/telegram.svg'
-import Github from '../../assets/github.svg'
-import Dialog from '../dialog/dialog'
-import { TextField } from '@mui/material';
+import { readFile, saveFile } from '../../utils/loader';
+import Dialog from '../dialog/dialog';
 import './sidebar.scss';
-import { saveFile } from '../../utils/loader';
 export default class Sidebar extends Component {
 
     constructor(props) {
@@ -21,7 +19,8 @@ export default class Sidebar extends Component {
 
         this.state = {
             dialogs: {
-                saveAsJSON: false
+                saveAsJSON: false,
+                loadFromJSON: false
             }
         }
 
@@ -57,7 +56,7 @@ export default class Sidebar extends Component {
 
         return <div className="load-menu">
             <ul>
-                <li>Load from JSON</li>
+                <li onClick={ () => this.openDialog("loadFromJSON") }>Load from JSON</li>
                 <li>Load from Proposal <Chip label="coming soon!"/></li>
                 <li>Load from Link <Chip label="coming soon!"/></li>
             </ul>
@@ -112,6 +111,7 @@ export default class Sidebar extends Component {
         const { dialogs } = this.state;
 
         let fileName = "my-multicall";
+        let uploadedFile;
 
         return [
             <Dialog 
@@ -119,11 +119,11 @@ export default class Sidebar extends Component {
                 title="Save as JSON"
                 open={dialogs.saveAsJSON}
                 onClose={() => {
-                    dialogs.saveAsJSON = false
+                    dialogs.saveAsJSON = false;
                     this.forceUpdate();
                 }}
                 onCancel={() => {}}
-                onDone={() => saveFile(`${fileName}.json`, [JSON.stringify(LAYOUT.toJSON()[0], null, 2)])}
+                onDone={() => saveFile(`${fileName}.json`, [JSON.stringify(LAYOUT.toJSON(), null, 2)])}
                 doneRename="Download"
             >
                 <TextField
@@ -134,6 +134,26 @@ export default class Sidebar extends Component {
                     helperText="Please give a name to your multicall"
                     onChange={(e) => fileName = e.target.value}
                 />
+            </Dialog>,
+            <Dialog
+                key="Load from JSON"
+                title="Load from JSON"
+                open={dialogs.loadFromJSON}
+                onClose={() => {
+                    dialogs.loadFromJSON = false;
+                    this.forceUpdate();
+                }}
+                onCancel={() => {}}
+                onDone={() => readFile(uploadedFile, json => LAYOUT.fromJSON(json))}
+                doneRename="Load"
+            >
+                <input 
+                    accept=".json,application/JSON"
+                    type="file"
+                    onChange={(e) => uploadedFile = e.target.files[0]}
+                />
+                <br/>
+                <b className="warn">Your current multicall will be replaced!</b>
             </Dialog>
         ]
     }

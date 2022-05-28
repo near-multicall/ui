@@ -1,3 +1,4 @@
+import { WindPower } from '@mui/icons-material';
 import React, { Component } from 'react'
 import { Draggable } from 'react-beautiful-dnd';
 import { Family } from '../../components';
@@ -85,31 +86,32 @@ export default class Task extends Component {
     getTaskType() {
 
         const { addr, func } = this.state;
+        const { json } = this.props;
 
         switch(addr) {
 
             case "multicall":
                 switch(func) {
                     case "withdraw_from_ref":
-                        return <Family.Ref.Withdraw ref={this.instance} id={this.id}/>
+                        return <Family.Ref.Withdraw ref={this.instance} id={this.id} json={json}/>
                     case "near_transfer":
-                        return <Family.Multicall.Transfer ref={this.instance} id={this.id}/>
+                        return <Family.Multicall.Transfer ref={this.instance} id={this.id} json={json}/>
                 }
 
             case "near":
                 switch (func) {
                     case "ft_transfer":
-                        return <Family.Near.Transfer ref={this.instance} id={this.id}/>        
+                        return <Family.Near.Transfer ref={this.instance} id={this.id} json={json}/>        
                 }
 
             case "ref-finance":
                 switch (func) {
                     case "swap":
-                        return <Family.Ref.Swap ref={this.instance} id={this.id}/>        
+                        return <Family.Ref.Swap ref={this.instance} id={this.id} json={json}/>        
                 }
 
             default:
-                return <Family.BaseTask ref={this.instance} id={this.id}/>
+                return <Family.BaseTask ref={this.instance} id={this.id} json={json}/>
 
         }
 

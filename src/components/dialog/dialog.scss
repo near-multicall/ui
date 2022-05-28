@@ -13,6 +13,7 @@
     }
     .action {
         button {
+            font-size: size.$text;
             border-radius: size.$task-radius;
             padding: 0.25 * size.$gap size.$gap;
             &.cancel {

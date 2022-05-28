@@ -3,6 +3,7 @@ import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import { initialData } from '../../initial-data.js'
 import { Column, Menu } from '../../components.js'
 import './layout.scss'
+import Task from '../task/task.js';
 
 export default class Layout extends Component {
 
@@ -115,6 +116,19 @@ export default class Layout extends Component {
             from: taskId,
             to: taskClone.id
         }
+        this.setState(newState);
+
+    }
+
+    clear = () => {
+
+        let newState = {
+            ...initialData
+        }
+
+        this.taskID = 0;
+        this.columnID = 1;
+
         this.setState(newState);
 
     }
@@ -308,6 +322,54 @@ export default class Layout extends Component {
             this.setState(newState);
 
         }
+
+    }
+
+    fromJSON(json) {
+
+        this.clear();
+
+        this.columnID = 0;
+
+        let newState = {
+            ...this.state,
+            columnOrder: [],
+            columns: {
+                "trash": this.state.columns.trash,
+                "menu": this.state.columns.menu,
+            }
+        }
+
+        for (let c in json) {
+
+            const newColumn = {
+                id: `column-${this.columnID}`,
+                title: 'Drag here',
+                taskIds: []
+            };
+    
+            const newColumnOrder = Array.from(newState.columnOrder);
+            newColumnOrder.push(`column-${this.columnID}`);
+    
+            newState = {
+                ...newState,
+                columns: {
+                    ...newState.columns,
+                    [`column-${this.columnID}`]: newColumn
+                },
+                columnOrder: newColumnOrder
+            }
+    
+            this.columnID++;
+            
+            for (let t in json[c]) {
+                let task = {id: `task-${this.taskID++}`, addr: "", func: "", json: json[c][t]};
+                newState.columns[newColumn.id].taskIds.push(task.id);
+                newState.tasks[task.id] = task;
+            }
+        }
+
+        this.setState(newState);
 
     }
 
