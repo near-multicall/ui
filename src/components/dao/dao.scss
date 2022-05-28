@@ -9,15 +9,17 @@
     display: flex;
     flex-flow: column nowrap;
     .address-container {
+        @include mixin.center-items;
         flex-flow: row nowrap;
         width: auto;
         .MuiTextField-root {
             width: calc(100% - 2 * size.$gap);
+            max-width: 100ch;
             text-align: left;
             margin: calc(size.$gap - 0.5 * size.$large-text) size.$gap;
             .MuiInputBase-root {
                 font-size: size.$large-text;
-                color: color.$lightish;
+                color: color.$darkish;
                 input {
                     padding: 0;
                     padding-left: 0.5 * size.$gap;
@@ -40,8 +42,8 @@
             width: fit-content;
             p {
                 display: block !important;
-                font-size: size.$large-text;
-                color: color.$lightish;
+                font-size: size.$large-text !important;
+                color: color.$darkish;
             }
         }
     }
