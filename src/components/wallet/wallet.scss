@@ -95,7 +95,7 @@
                         padding: 0;
                         input, textarea {
                             height: 100%;
-                            width: 200px;
+                            width: 25rem;
                             padding: 0;
                             padding-right: 17.5px;
                             color: color.$light-text;
@@ -125,53 +125,6 @@
             }
         }
     }
-    // button {
-    //     @include mixin.center-items;
-    //     @include avatar;
-    //     gap: 0.5 * size.$gap;
-    //     padding: 0;
-    //     font-size: size.$text;
-    // }
-    // span {
-    //     color: color.$lightish;
-    // }
-    // .dao-selector {
-    //     @include avatar;
-    //     font-size: unset;
-    //     // width: 150px;
-    //     // height: 100%;
-    //     .MuiTextField-root {
-    //         display: none;
-    //         justify-content: center;
-    //         height: 100%;
-    //         .MuiOutlinedInput-root {
-    //             height: 100%;
-    //             padding: 0;
-    //             input, textarea {
-    //                 height: 100%;
-    //                 padding: 0;
-    //                 color: color.$text;
-    //                 font-family: font.$text;
-    //                 font-size: size.$text;
-    //             }
-    //             fieldset {
-    //                 border: none;
-    //             }
-    //             .MuiAutocomplete-endAdornment {
-    //                 top: unset;
-    //                 right: 0;
-    //                 svg {
-    //                     fill: color.$text;
-    //                 }
-    //             }
-    //         }
-    //         *:not(input) {
-    //             color: color.$light-text;
-    //             font-size: 1em;
-    //         }
-    //         font-size: 1.8rem;
-    //     }
-    // }
 }
 
 .MuiAutocomplete-popper {

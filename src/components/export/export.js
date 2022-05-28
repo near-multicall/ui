@@ -232,7 +232,7 @@ export default class Export extends Component {
                         }
                     </div>
                     { allErrors.length > 0 && <div className="error-container">
-                        <div className="sidebar">
+                        <div className="header">
                             <h3>{`Errors (${allErrors.length})`}</h3>
                         </div>
                         <div className="error-list">
