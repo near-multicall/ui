@@ -1,9 +1,5 @@
 import { Big, BigSource } from 'big.js';
 
-Big.DP = 24;
-Big.RM = Big.roundDown;
-Big.NE = -24;
-Big.PE = 1e6;
 
 // config for Big.js behavior. see: https://mikemcl.github.io/big.js/
 Big.RM = Big.roundDown;
@@ -25,7 +21,11 @@ const removeTrailingZeros = (amount: string): string => amount.replace(/\.?0*$/,
 // token amount -> indivisible units
 const parseTokenAmount = (amount: BigSource, decimals: number): string => Big(amount).times(Big(10).pow(decimals)).toFixed();
 // indivisible units -> token amount
-const formatTokenAmount = (amount: BigSource, decimals: number, precision: number): string => {
+const formatTokenAmount = (
+    amount: BigSource,
+    decimals: number = 0,
+    precision: number = Big.DP
+): string => {
     const formattedAmount: string = Big(amount).div(Big(10).pow(decimals)).toFixed(precision);
     return removeTrailingZeros(formattedAmount);
 }

@@ -2,7 +2,7 @@ import Checkbox from '@mui/material/Checkbox';
 import React from 'react';
 import { ArgsAccount, ArgsBig, ArgsString, ArgsObject, ArgsError } from "../../utils/args";
 import Call from "../../utils/call";
-import { toGas, toYocto } from "../../utils/converter";
+import { toGas, toYocto, formatTokenAmount } from "../../utils/converter";
 import BaseTask from "../base";
 import "./multicall.scss";
 import { TextInput, TextInputWithUnits } from '../../components/editor/elements';
@@ -38,10 +38,11 @@ export default class Transfer extends BaseTask {
                     account_id: new ArgsAccount(actions.args.account_id),
                     amount: actions.args.amount 
                         ? new ArgsBig(
-                            actions.args.amount, 
+                            formatTokenAmount(actions.args.amount, units.args.amount.decimals),
                             toYocto("0"), 
                             null, 
-                            "NEAR"
+                            units.args.amount.unit,
+                            units.args.amount.decimals
                         )
                         : new ArgsBig("0", "0", "0")
                 }
@@ -51,10 +52,11 @@ export default class Transfer extends BaseTask {
                 }    
             ),
             gas: new ArgsBig(
-                actions?.gas ?? "3", 
+                formatTokenAmount(actions?.gas ?? "3", units?.gas.decimals),
                 toGas("1"), 
                 toGas("300"), 
-                units?.gas?.unit ?? "Tgas"
+                units?.gas?.unit ?? "Tgas",
+                units?.gas?.decimals
             ),
             depo: new ArgsBig("1", "1", "1", "yocto")
         });

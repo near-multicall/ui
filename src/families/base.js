@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { TextInput, TextInputWithUnits } from '../components/editor/elements';
 import { ArgsAccount, ArgsBig, ArgsError, ArgsJSON, ArgsString } from '../utils/args';
 import Call from '../utils/call';
-import { toGas, toYocto } from '../utils/converter';
+import { toGas, toYocto, formatTokenAmount } from '../utils/converter';
 import './base.scss';
 
 export default class BaseTask extends Component {
@@ -76,16 +76,18 @@ export default class BaseTask extends Component {
             func: new ArgsString(actions?.func ?? ""),
             args: new ArgsJSON(actions?.args ? JSON.stringify(actions?.args, null, "  ") : '{}'),
             gas: new ArgsBig(
-                actions?.gas ?? "0", 
+                formatTokenAmount(actions?.gas ?? "0", units?.gas.decimals), 
                 "1", 
                 toGas("300"),
-                units?.gas?.unit ?? "Tgas"
+                units?.gas?.unit ?? "Tgas",
+                units?.gas?.decimals
             ),
             depo: new ArgsBig(
-                actions?.depo ?? "0", 
+                formatTokenAmount(actions?.depo ?? "0", units?.depo.decimals),
                 toYocto("0"), 
                 null, 
-                units?.depo?.unit ?? "NEAR"
+                units?.depo?.unit ?? "NEAR",
+                units?.depo?.decimals
             )
         });
 

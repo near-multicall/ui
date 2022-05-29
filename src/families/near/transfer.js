@@ -3,7 +3,7 @@ import React from 'react';
 import { TextInput, TextInputWithUnits } from '../../components/editor/elements';
 import { ArgsAccount, ArgsBig, ArgsError, ArgsObject, ArgsString } from "../../utils/args";
 import Call from "../../utils/call";
-import { toGas } from "../../utils/converter";
+import { toGas, formatTokenAmount } from "../../utils/converter";
 import { view } from "../../utils/wallet";
 import BaseTask from "../base";
 import "./near.scss";
@@ -46,7 +46,7 @@ export default class Transfer extends BaseTask {
                 ? {
                     receiver_id: new ArgsAccount(actions.args.receiver_id),
                     amount: new ArgsBig(
-                        actions.args.amount,
+                        formatTokenAmount(actions.args.amount, units.args.amount.decimals),
                         "0",
                         null,
                         units.args.amount.unit,
@@ -61,10 +61,11 @@ export default class Transfer extends BaseTask {
                 }    
             ),
             gas: new ArgsBig(
-                actions?.gas ?? "7", 
+                formatTokenAmount(actions?.gas ?? "7", units?.gas.decimals),
                 toGas("1"), 
                 toGas("300"), 
-                units?.gas?.unit ?? "Tgas"
+                units?.gas?.unit ?? "Tgas",
+                units?.gas?.decimals
             ),
             depo: new ArgsBig("1", "1", "1", "yocto")
         });
