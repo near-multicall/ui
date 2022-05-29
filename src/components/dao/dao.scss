@@ -71,7 +71,12 @@
             justify-content: center;
             align-items: center;
             font-size: size.$text;
-            color: color.$red;
+            p.red {
+                color: color.$red;
+            }
+            p.green {
+                color: color.$green;
+            }
         }
         .info-card {
             display: flex;
