@@ -2,7 +2,7 @@ import Checkbox from '@mui/material/Checkbox';
 import React from 'react';
 import { ArgsAccount, ArgsBig, ArgsString, ArgsObject, ArgsError } from "../../utils/args";
 import Call from "../../utils/call";
-import { toGas, toYocto } from "../../utils/converter";
+import { toGas, toYocto, formatTokenAmount } from "../../utils/converter";
 import BaseTask from "../base";
 import "./multicall.scss";
 import { TextInput, TextInputWithUnits } from '../../components/editor/elements';
@@ -27,6 +27,7 @@ export default class Transfer extends BaseTask {
     init(json = null) {
 
         const actions = json?.actions?.[0];
+        const units = json?.units?.actions?.[0];
 
         this.call = new Call({
             name: new ArgsString(json?.name ?? "Transfer Near"),
@@ -35,17 +36,39 @@ export default class Transfer extends BaseTask {
             args: new ArgsObject(actions?.args 
                 ? {
                     account_id: new ArgsAccount(actions.args.account_id),
-                    amount: new ArgsBig(actions.args.amount, toYocto("0"), null, "NEAR")
+                    amount: actions.args.amount 
+                        ? new ArgsBig(
+                            formatTokenAmount(actions.args.amount, units.args.amount.decimals),
+                            toYocto("0"), 
+                            null, 
+                            units.args.amount.unit,
+                            units.args.amount.decimals
+                        )
+                        : new ArgsBig("0", "0", "0")
                 }
                 : {
                     account_id: new ArgsAccount(""),
                     amount: new ArgsBig("0", toYocto("0"), null, "NEAR")                    
                 }    
             ),
-            gas: new ArgsBig(actions?.gas ?? "3", toGas("1"), toGas("300"), "Tgas"),
+            gas: new ArgsBig(
+                formatTokenAmount(actions?.gas ?? "3", units?.gas.decimals),
+                toGas("1"), 
+                toGas("300"), 
+                units?.gas?.unit ?? "Tgas",
+                units?.gas?.decimals
+            ),
             depo: new ArgsBig("1", "1", "1", "yocto")
         });
 
+        if ((actions?.args?.account_id !== undefined && actions.args.amount === undefined) || json?.options?.all) {
+            this.call.args.value.amount.omit = true;
+            this.options.all = true;
+        }
+
+        if (json?.errors)
+            this.errors = json.errors
+    
     }
 
 
@@ -54,7 +77,7 @@ export default class Transfer extends BaseTask {
         this.call.addr.value = STORAGE.addresses.multicall;
         this.errors.addr.validOrNull(this.call.addr.value);
         this.forceUpdate();
-
+        
     }
 
     renderEditor() {

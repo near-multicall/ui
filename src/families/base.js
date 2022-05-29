@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { TextInput, TextInputWithUnits } from '../components/editor/elements';
 import { ArgsAccount, ArgsBig, ArgsError, ArgsJSON, ArgsString } from '../utils/args';
 import Call from '../utils/call';
-import { toGas, toYocto } from '../utils/converter';
+import { toGas, toYocto, formatTokenAmount } from '../utils/converter';
 import './base.scss';
 
 export default class BaseTask extends Component {
@@ -29,20 +29,36 @@ export default class BaseTask extends Component {
         };
 
         if (window.TEMP) {
+
             this.call = TEMP.call;
             this.state.showArgs = TEMP.showArgs;
             this.options = TEMP.options;
             this.errors = TEMP.errors;
+
         } else if (window.COPY?.payload) {
+
+            const errorsDeepCopy = {};
+            Object.keys(COPY.payload.errors).map(key => {
+                errorsDeepCopy[key] = Object.assign(
+                    Object.create(Object.getPrototypeOf(COPY.payload.errors[key])), 
+                    COPY.payload.errors[key]
+                )
+            })
+
+            const optionsDeepCopy = JSON.parse(JSON.stringify(COPY.payload.options))
+
             this.init({
                 name: COPY.payload.call?.name?.toString(),
-                ...COPY.payload.call.toJSON()
+                ...COPY.payload.call.toJSON(),
+                units: COPY.payload.call.toUnits(),
+                options: optionsDeepCopy,
+                errors: errorsDeepCopy
             });
             this.state.showArgs = COPY.payload.showArgs;
-            this.options = COPY.payload.options;
-            this.errors = COPY.payload.errors;
             COPY = null;
+
         } else
+
             this.init(this.props.json);
 
         this.updateCard = this.updateCard.bind(this);
@@ -52,15 +68,31 @@ export default class BaseTask extends Component {
     init(json = null) {
 
         const actions = json?.actions?.[0];
+        const units = json?.units?.actions?.[0];
 
         this.call = new Call({
             name: new ArgsString(json?.name ?? "Custom"),
             addr: new ArgsAccount(json?.address ?? ""),
             func: new ArgsString(actions?.func ?? ""),
             args: new ArgsJSON(actions?.args ? JSON.stringify(actions?.args, null, "  ") : '{}'),
-            gas: new ArgsBig(actions?.gas ?? "0", 1, toGas("300"), "Tgas"),
-            depo: new ArgsBig(actions?.depo ?? "0", toYocto("0"), null, "NEAR")
+            gas: new ArgsBig(
+                formatTokenAmount(actions?.gas ?? "0", units?.gas.decimals), 
+                "1", 
+                toGas("300"),
+                units?.gas?.unit ?? "Tgas",
+                units?.gas?.decimals
+            ),
+            depo: new ArgsBig(
+                formatTokenAmount(actions?.depo ?? "0", units?.depo.decimals),
+                toYocto("0"), 
+                null, 
+                units?.depo?.unit ?? "NEAR",
+                units?.depo?.decimals
+            )
         });
+
+        if (json?.errors)
+            this.errors = json.errors
 
     }
 
@@ -190,8 +222,8 @@ export default class BaseTask extends Component {
                         ? <pre className="code">{ JSON.stringify(args.toString(), null, "  ") }</pre>
                         : <pre className="code">{ errors.args.intermediate }</pre>)
                     }
-                    <p><span>Allocated gas</span><span className="code">{ gas.toString() } <span>{ gas.getUnit() }</span></span></p>
-                    <p><span>Attached deposit</span><span className="code">{ depo.toString() }  <span>{ depo.getUnit() }</span></span></p>
+                    <p><span>Allocated gas</span><span className="code">{ gas.toString() } <span>{ gas.unit }</span></span></p>
+                    <p><span>Attached deposit</span><span className="code">{ depo.toString() }  <span>{ depo.unit }</span></span></p>             
                 </div>
             </div>
         );

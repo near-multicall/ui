@@ -49,7 +49,10 @@ export default abstract class Args {
 
     toString = () => this.value.toString();
 
-    getUnit = () => this.unit;
+    getUnit = (): {} => ({
+        unit: this.unit,
+        decimals: this.decimals ??  unitToDecimals[this.unit!]
+    });
 
 }
 
@@ -192,6 +195,18 @@ class ArgsObject extends Args {
 
     }
 
+    getUnit = () => {
+
+        let res = {};
+
+        for (let k in this.value)
+            if (!this.value[k].omit)
+                res[k] = this.value[k].getUnit();
+
+        return res;
+
+    }
+
 }
 
 class ArgsArray extends Args {
@@ -203,6 +218,8 @@ class ArgsArray extends Args {
     }
 
     toString = () => this.value.map(x => x.toString());
+
+    // getUnit: () => this.value.map(x => x.getUnit());
 
 }
 
