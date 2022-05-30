@@ -92,6 +92,7 @@ export default class BaseTask extends Component {
                     value={ name }
                     variant="standard"
                     margin="normal"
+                    autoFocus
                     update={ this.updateCard }
                 />
                 <TextInput

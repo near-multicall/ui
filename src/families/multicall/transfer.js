@@ -77,6 +77,7 @@ export default class Transfer extends BaseTask {
                     value={ name }
                     variant="standard"
                     margin="normal"
+                    autoFocus
                     update={ this.updateCard }
                 />
                 <TextInput 
