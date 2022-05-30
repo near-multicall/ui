@@ -26,6 +26,7 @@ export default class BaseTask extends Component {
 
         this.state = {
             showArgs: false,
+            isEdited: false
         };
 
         if (window.TEMP) {
@@ -65,6 +66,12 @@ export default class BaseTask extends Component {
     }
 
     onAddressesUpdated() {}
+
+    onEditFocus(taskID) {
+
+        this.setState({isEdited: taskID === this.props.id})
+
+    }
 
     updateCard() {
 
@@ -145,14 +152,18 @@ export default class BaseTask extends Component {
         } = this.call;
 
         const errors = this.errors;
+        
+        const hasErrors = Object.entries(errors)
+            .filter(([k, v]) => v.isBad)
+            .length > 0
 
-        const { showArgs } = this.state;
+        const { showArgs, isEdited } = this.state;
 
         const { id } = this.props;
 
         return (
             <div 
-                className={`task-container ${this.uniqueClassName}`}
+                className={`task-container ${this.uniqueClassName} ${hasErrors ? "has-errors" : ""} ${isEdited ? "is-edited" : ""}`}
             >
                 <div className="name">
                     <DeleteOutline 

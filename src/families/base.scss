@@ -154,6 +154,16 @@
             }
         }
     }
+    &.has-errors:not(.is-edited) {
+        outline: 8px solid color.$red;
+        outline-offset: -4px;
+        border-radius: size.$task-radius;
+    }
+    &.is-edited {
+        outline: 8px solid color.$blue;
+        outline-offset: -4px;
+        border-radius: size.$task-radius;
+    }
 }
 
 .edit {
