@@ -15,7 +15,6 @@ const parseTokenAmount = (amount: BigSource, decimals: number = 0): string => Bi
 // indivisible units -> token amount
 const formatTokenAmount = (amount: BigSource, decimals: number = 0): string => {
     const formattedAmount: string = Big(amount).div(Big(10).pow(decimals)).toFixed();
-    console.log(formattedAmount);
     return formattedAmount;
 }
 

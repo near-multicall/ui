@@ -369,7 +369,7 @@ export default class Layout extends Component {
             }
         }
 
-        this.setState(newState);
+        this.setState(newState, () => TASKS.forEach(t => t.instance.current.forceUpdate()));
 
     }
 

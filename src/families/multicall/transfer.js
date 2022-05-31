@@ -66,8 +66,15 @@ export default class Transfer extends BaseTask {
             this.options.all = true;
         }
 
-        if (json?.errors)
-            this.errors = json.errors
+        this.loadErrors = (() => {
+
+            for (let e in this.baseErrors)
+                this.errors[e].validOrNull(this.call[e])
+
+            this.errors.receiver.validOrNull(this.call.args.value.account_id);
+            this.errors.amount.validOrNull(this.call.args.value.amount);
+
+        }).bind(this)
     
     }
 

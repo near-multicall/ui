@@ -69,9 +69,18 @@ export default class Transfer extends BaseTask {
             ),
             depo: new ArgsBig("1", "1", "1", "yocto")
         });
+        
+        this.loadErrors = (() => {
 
-        if (json?.errors)
-            this.errors = json.errors
+            for (let e in this.baseErrors)
+                this.errors[e].validOrNull(this.call[e])
+
+            this.errors.receiver.validOrNull(this.call.args.value.receiver_id);
+            this.errors.amount.validOrNull(this.call.args.value.amount);
+
+            WALLET.then(() => this.updateFT());
+
+        }).bind(this)
 
     }
 
