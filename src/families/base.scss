@@ -178,11 +178,10 @@
                 flex: 2 1 auto;
             }
             &:last-of-type {
-                flex: 1 0 40px;
+                flex: 1 0 max-content;
                 margin-left: 0.25 * size.$gap;
-                select {
-                    height: 2rem;
-                    line-height: 1rem;
+                .MuiInputBase-root {
+                    width: 100% !important;
                     font-size: size.$small-text;
                 }
             }
@@ -304,6 +303,6 @@
     }
 }
 
-option {
-    font-size: size.$text;
+.MuiMenuItem-root {
+    font-size: size.$small-text !important;
 }
