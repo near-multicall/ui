@@ -124,6 +124,14 @@
                 display: none;
             }
         }
+        &.red > .icon {
+            border-color: color.$red;
+            color: color.$red;
+        }
+        &.yellow > .icon {
+            border-color: color.$yellow;
+            color: color.$yellow;
+        }
     }
 }
 
