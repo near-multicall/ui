@@ -1,4 +1,5 @@
-import { DeleteOutline, EditOutlined, FilterNone } from '@mui/icons-material';
+import { DeleteOutline, MoveDown, EditOutlined } from '@mui/icons-material';
+import { Tooltip } from '@mui/material';
 import React, { Component } from 'react';
 import { TextInput, TextInputWithUnits } from '../components/editor/elements';
 import { ArgsAccount, ArgsBig, ArgsError, ArgsJSON, ArgsString } from '../utils/args';
@@ -186,28 +187,34 @@ export default class BaseTask extends Component {
                 className={`task-container ${this.uniqueClassName}`}
             >
                 <div className="name">
-                    <DeleteOutline
-                        className="delete icon"
-                        onClick={() => {
-                            LAYOUT.deleteTask(id);
-                        }}
-                    />
+                    <Tooltip title={<h1 style={{ fontSize: "12px" }}>Delete</h1>} disableInteractive >
+                        <DeleteOutline
+                            className="delete icon"
+                            onClick={() => {
+                                LAYOUT.deleteTask(id);
+                            }}
+                        />
+                    </Tooltip>
                     <div className="delete-pseudo"></div>
-                    <FilterNone
-                        className="duplicate icon"
-                        onClick={() => {
-                            LAYOUT.duplicateTask(id);
-                        }}
-                    />
+                    <Tooltip title={<h1 style={{ fontSize: "12px" }}>Clone card</h1>} disableInteractive >
+                        <MoveDown
+                            className="duplicate icon"
+                            onClick={() => {
+                                LAYOUT.duplicateTask(id);
+                            }}
+                        />
+                    </Tooltip>
                     <div className="duplicate-pseudo"></div>
                     <h3>{name.toString()}</h3>
-                    <EditOutlined
-                        className="edit icon"
-                        onClick={() => {
-                            EDITOR.edit(id);
-                            MENU.changeTab(1);
-                        }}
-                    />
+                    <Tooltip title={<h1 style={{ fontSize: "12px" }}>Edit</h1>} disableInteractive >
+                        <EditOutlined
+                            className="edit icon"
+                            onClick={() => {
+                                EDITOR.edit(id);
+                                MENU.changeTab(1);
+                            }}
+                        />
+                    </Tooltip>
                     <div className="edit-pseudo"></div>
                 </div>
                 <div className="data-container">
