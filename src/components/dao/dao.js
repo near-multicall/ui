@@ -7,6 +7,7 @@ import React, { Component } from 'react';
 import { ArgsAccount, ArgsError } from '../../utils/args';
 import { toNEAR, toYocto, Big } from '../../utils/converter';
 import { view, tx } from '../../utils/wallet';
+import { SputnikDAO } from '../../utils/contracts/sputnik-dao';
 import { TextInput } from '../editor/elements';
 import { InputAdornment } from '@mui/material'
 import './dao.scss';
@@ -75,18 +76,17 @@ export default class Dao extends Component {
 
         const { addr } = this.state;
         const multicall = `${this.state.addr.value}.${window.nearConfig.MULTICALL_FACTORY_ADDRESS}`;
-        const sputnik = `${addr.value}.${window.nearConfig.SPUTNIK_V2_FACTORY_ADDRESS}`;
+        const dao_address = `${addr.value}.${SputnikDAO.FACTORY_ADDRESS}`;
+        const dao = new SputnikDAO(dao_address);
         // Date.now() returns timestamp in milliseconds, SputnikDAO uses nanoseconds
         const currentTime = Big( Date.now() ).times("1000000");
 
-        return view(
-                sputnik,
-                "get_proposals",
-                {
-                    from_index: lastProposalID < 100 ? 0 : lastProposalID - 100,
-                    limit: 100
-                }
-            ).then(res => {
+        return dao.get_proposals(
+            {
+                from_index: lastProposalID < 100 ? 0 : lastProposalID - 100,
+                limit: 100
+            }
+        ).then(res => {
 
                 const proposals = res.filter(p => {
                     // discard if not active proposal to create multicall instance
@@ -157,7 +157,8 @@ export default class Dao extends Component {
             return <></>;
 
         const multicall = `${this.state.addr.value}.${window.nearConfig.MULTICALL_FACTORY_ADDRESS}`;
-        const sputnik = `${addr.value}.${window.nearConfig.SPUTNIK_V2_FACTORY_ADDRESS}`;
+        const dao_address = `${addr.value}.${SputnikDAO.FACTORY_ADDRESS}`;
+        const dao = new SputnikDAO(dao_address);
 
         const depo = Big(this.fee).plus(MIN_INSTANCE_BALANCE);
 
@@ -171,7 +172,7 @@ export default class Dao extends Component {
                             method_name: "create",
                             args: Base64.encode(JSON.stringify({
                                 multicall_init_args: {
-                                    admin_accounts: [sputnik],
+                                    admin_accounts: [dao_address],
                                     croncat_manager: window.nearConfig.CRONCAT_MANAGER_ADDRESS,
                                     job_bond: infos.policy.proposal_bond
                                 }
@@ -192,21 +193,19 @@ export default class Dao extends Component {
         ) {
             // no create multicall proposal exists and user can propose FunctionCall
             if ((proposed === -1) && !noAddProposalRights.isBad) {
+                // TODO: add text to explain process. Button should only say "propose"
                 return (
-                    <button 
-                        className="create-multicall"
-                        onClick={() => {
-                            tx(
-                                sputnik,
-                                "add_proposal",
-                                args,
-                                10_000_000_000_000,
-                                infos.policy.proposal_bond
-                            )
-                        }}
-                    >
-                        {`create a multicall for ${sputnik}`}
-                    </button>
+                    <div>
+                        <span>
+                            {'haha'}
+                        </span>
+                        <button 
+                            className="create-multicall"
+                            onClick={() => { dao.add_proposal(args, infos.policy.proposal_bond); }}
+                        >
+                            {`create a multicall for ${dao_address}`}
+                        </button>
+                    </div>
                 )
             }
             // create multicall proposal exists and user can approve FunctionCall
@@ -215,11 +214,9 @@ export default class Dao extends Component {
                     <button 
                         className="create-multicall proposal-exists"
                         onClick={() => {
-                            const sub = window.NEAR_ENV === "testnet" 
-                                ? "testnet-v2"
-                                : "v2"
-                            window.open(`https://${sub}.sputnik.fund/#/${sputnik}/${proposed}`)}
-                        }
+                            // window.open(dao.get_proposal_url("ASTRO_UI", proposed));
+                            dao.act_proposal(proposed, "VoteApprove");
+                        }}
                     >
                         {`vote on creating a multicall instance`}
                     </button>
@@ -269,7 +266,8 @@ export default class Dao extends Component {
         } = this.errors;
 
         const multicall = `${this.state.addr.value}.${window.nearConfig.MULTICALL_FACTORY_ADDRESS}`;
-        const sputnik = `${this.state.addr.value}.${window.nearConfig.SPUTNIK_V2_FACTORY_ADDRESS}`;
+        const dao_address = `${this.state.addr.value}.${SputnikDAO.FACTORY_ADDRESS}`;
+        const dao = new SputnikDAO(dao_address);
 
         this.lastAddr = this.state.addr.value;
 
@@ -300,9 +298,9 @@ export default class Dao extends Component {
             view(multicall, "get_tokens", {}).catch(e => {}),
             view(multicall, "get_jobs", {}).catch(e => {}),
             view(multicall, "job_get_bond", {}).catch(e => {}),
-            view(sputnik, "get_last_proposal_id", {}).catch(e => {}),
-            view(sputnik, "get_policy", {}).catch(e => {
-                    if (e.type === "AccountDoesNotExist" && e.toString().includes(` ${sputnik} `)) {
+            dao.get_last_proposal_id().catch(e => {}),
+            dao.get_policy().catch(e => {
+                    if (e.type === "AccountDoesNotExist" && e.toString().includes(` ${dao_address} `)) {
                         noDao.isBad = true;
                     }
                 }
