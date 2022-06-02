@@ -68,7 +68,7 @@ export default class Dao extends Component {
      * 
      * @param {number} lastProposalID
      * @param {string} proposalPeriod After this duration (nanoseconds), a proposal expires.
-     * @returns {number} ID of proposal to create multicall instance,
+     * @returns {object} ID and info of proposal to create multicall instance,
      */
     proposalAlreadyExists (lastProposalID, proposalPeriod) {
 
