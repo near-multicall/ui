@@ -59,6 +59,10 @@ class SputnikDAO {
         return view(this.DAO_ADDRESS, "get_proposals", args);
     }
 
+    async get_proposal (proposal_id: number): Promise<object> {
+        return view(this.DAO_ADDRESS, "get_proposal", { id: proposal_id });
+    }
+
     async get_last_proposal_id (): Promise<number> {
         return view(this.DAO_ADDRESS, "get_last_proposal_id", {});
     }

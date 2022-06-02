@@ -1,6 +1,3 @@
-// TODO: add ability to vote
-// TODO: make sure people don't vote twice
-
 import { DeleteOutline, EditOutlined, AddOutlined, PauseOutlined, PlayArrowOutlined } from '@mui/icons-material';
 import { Base64 } from 'js-base64';
 import React, { Component } from 'react';
@@ -36,6 +33,7 @@ export default class Dao extends Component {
             addr: this.getBaseAddress(STORAGE.addresses?.dao ?? ""),
             loading: false,
             proposed: -1,
+            proposedInfo: {},
             infos: {
                 admins: [],
                 tokens: [],
@@ -103,9 +101,13 @@ export default class Dao extends Component {
                     return (expirationTime.gt(currentTime)) ? true : false;
                 })
 
-                return proposals.length > 0
-                    ? proposals.pop().id
-                    : -1
+                // If there many "Create multicall" proposals, return latest.
+                if (proposals.length > 0) {
+                    const lastProposal = proposals.pop();
+                    return { proposal_id: lastProposal.id, proposal_info: lastProposal };
+                }
+                // No "Create multicall" proposals found.
+                else return { proposal_id: -1, proposal_info: {} };
                     
             }).catch(e => {})
 
@@ -144,7 +146,7 @@ export default class Dao extends Component {
         if (this.fee === undefined)
             return;
 
-        const { loading, addr, infos, proposed } = this.state;
+        const { loading, addr, infos, proposed, proposedInfo } = this.state;
         const {
             noContract,
             noDao,
@@ -195,32 +197,45 @@ export default class Dao extends Component {
             if ((proposed === -1) && !noAddProposalRights.isBad) {
                 // TODO: add text to explain process. Button should only say "propose"
                 return (
-                    <div>
-                        <span>
-                            {'haha'}
-                        </span>
-                        <button 
-                            className="create-multicall"
-                            onClick={() => { dao.add_proposal(args, infos.policy.proposal_bond); }}
-                        >
-                            {`create a multicall for ${dao_address}`}
-                        </button>
-                    </div>
-                )
-            }
-            // create multicall proposal exists and user can approve FunctionCall
-            else if ((proposed !== -1) && !noApproveProposalRights.isBad) {
-                return (
                     <button 
-                        className="create-multicall proposal-exists"
-                        onClick={() => {
-                            // window.open(dao.get_proposal_url("ASTRO_UI", proposed));
-                            dao.act_proposal(proposed, "VoteApprove");
-                        }}
+                        className="create-multicall"
+                        onClick={() => { dao.add_proposal(args, infos.policy.proposal_bond); }}
                     >
-                        {`vote on creating a multicall instance`}
+                        {`create a multicall for ${dao_address}`}
                     </button>
                 )
+            }
+            // create multicall proposal exists
+            else if (proposed !== -1) {
+                // user does not have rights to VoteApprove
+                if ( noApproveProposalRights.isBad ) {
+                    // TODO: return proposal number along with some text
+                    // explain that user can't do anything about it, but the DAO
+                    // will get a multicall instance as soon as proposal with ID passes.
+                    // Show link to proposal with: dao.get_proposal_url()
+                    return(<></>);
+                }
+                // user can VoteApprove and already voted
+                else if ( proposedInfo.votes[window.account.accountId] ) {
+                    // TODO: explain to user that he did everything he should.
+                    // DAO will get multicall instance as soon as other DAO members
+                    // also approve the proposal. Also link to the proposal in question.
+                    return (<></>);
+                }
+                // user can VoteApprove and did NOT vote yet.
+                else {
+                    return (
+                        <button 
+                            className="create-multicall proposal-exists"
+                            onClick={() => {
+                                // window.open(dao.get_proposal_url("ASTRO_UI", proposed));
+                                dao.act_proposal(proposed, "VoteApprove");
+                            }}
+                        >
+                            {`vote on creating a multicall instance`}
+                        </button>
+                    );
+                }
             }
         }
     }
@@ -281,7 +296,7 @@ export default class Dao extends Component {
             noDao.isBad = true;
             noAddProposalRights.isBad = true;
             noApproveProposalRights.isBad = true;
-            this.setState({ proposed: -1 })
+            this.setState({ proposed: -1, proposedInfo: {} })
         }
 
         this.setState({ loading: true });
@@ -316,14 +331,23 @@ export default class Dao extends Component {
                     policy: policy
                 },
                 loading: false
-                // proposed: proposed
+                // proposed & proposedInfo will be handled in the next "then()"
             }
             if (policy !== undefined) {
                 return this.proposalAlreadyExists(lastProposalID, policy?.proposal_period).catch(e => {});
             }
         })
-        .then(( proposed ) => {
-            newState.proposed = proposed;
+        .then(( result ) => {
+            if (result !== undefined) {
+                const { proposal_id, proposal_info } = result;
+                newState.proposed = proposal_id;
+                newState.proposedInfo = proposal_info;
+            }
+            else {
+                newState.proposed = undefined;
+                newState.proposedInfo = undefined;
+            }
+            
             // can user propose or vote on FunctionCall to DAO?
             const functionCallPermissions = newState.infos.policy?.roles
                 .filter(r => r.kind === "Everyone" || r.kind.Group.includes(window.WALLET.state.wallet.getAccountId()))
