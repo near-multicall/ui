@@ -19,6 +19,9 @@ on:
     branches: [ main ]
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+  env:
+    # build & deploy gh-pages for testnet
+    NEAR_ENV: testnet
 
 jobs:
   test-deploy:
@@ -64,4 +67,4 @@ jobs:
           deploy_key: ${{ secrets.GH_PAGES_DEPLOYER }}
           publish_dir: ./dist
           publish_branch: gh-pages
-          cname: multicall.app
+          cname: testnet.multicall.app
