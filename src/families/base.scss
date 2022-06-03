@@ -70,7 +70,7 @@
             z-index: 1;
             &.edit {
                 position: absolute;
-                left: 0.5 * size.$gap;
+                right: 0.5 * size.$gap;
                 &:hover + .edit-pseudo {
                     @include cb-scale(1);
                     transition: all 300ms ease;
@@ -78,7 +78,7 @@
             }
             &.delete {
                 position: absolute;
-                right: 0.5 * size.$gap;
+                left: 0.5 * size.$gap;
                 &:hover + .delete-pseudo {
                     @include cb-scale(1);
                     transition: all 300ms ease;
@@ -86,7 +86,7 @@
             }
             &.duplicate {
                 position: absolute;
-                left: 1.5 * size.$gap;
+                right: 1.5 * size.$gap;
                 &:hover + .duplicate-pseudo {
                     @include cb-scale(1);
                     transition: all 300ms ease;
@@ -95,17 +95,17 @@
         }
         .delete-pseudo {
             @include backdrop;
-            right: -1 * size.$gap;
+            left: -1 * size.$gap;
             background-color: rgba(color.$red, 0.8);
         }
         .edit-pseudo {
             @include backdrop;
-            left: -1 * size.$gap;
+            right: -1 * size.$gap;
             background-color: rgba(color.$blue, 0.8);
         }
         .duplicate-pseudo {
             @include backdrop;
-            left: 0;
+            right: 0;
             background-color: rgba(color.$purple, 0.8);
         }
     }
