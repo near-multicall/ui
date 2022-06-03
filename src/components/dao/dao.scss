@@ -73,6 +73,14 @@
             font-size: size.$text;
             color: color.$red;
         }
+        .info-text {
+            font-size: size.$small-text;
+            color: color.$dark;
+            max-width: 40em;
+            a {
+                color: darken(color.$blue, 20%) !important;
+            }
+        }
         .info-card {
             display: flex;
             position: relative;

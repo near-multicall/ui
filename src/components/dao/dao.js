@@ -1,4 +1,4 @@
-import { DeleteOutline, EditOutlined, AddOutlined, PauseOutlined, PlayArrowOutlined } from '@mui/icons-material';
+import { DeleteOutline, EditOutlined, AddOutlined, PauseOutlined, PlayArrowOutlined, TrendingUpOutlined } from '@mui/icons-material';
 import { Base64 } from 'js-base64';
 import React, { Component } from 'react';
 import { ArgsAccount, ArgsError } from '../../utils/args';
@@ -15,7 +15,7 @@ const MIN_INSTANCE_BALANCE = toYocto(1); // 1 NEAR
 export default class Dao extends Component {
 
     errors = {
-        addr: new ArgsError("invalid NEAR address", value => ArgsAccount.isValid(value), !ArgsAccount.isValid(STORAGE.addresses?.dao ?? "")),
+        addr: new ArgsError("Invalid NEAR address", value => ArgsAccount.isValid(value), !ArgsAccount.isValid(STORAGE.addresses?.dao ?? "")),
         noDao: new ArgsError("Sputnik DAO not found on given address", value => this.errors.noDao.isBad),
         noContract: new ArgsError("DAO has no multicall instance", value => this.errors.noContract.isBad),
         noAddProposalRights: new ArgsError("Permission to create a proposal on this dao", value => this.errors.noAddProposalRights),
@@ -187,23 +187,56 @@ export default class Dao extends Component {
             }
         };
 
+        // console.log(
+        //     "noContract", noContract.isBad, "\n",
+        //     "noDao", noDao.isBad, "\n",
+        //     "proposed", proposed !== -1, "\n",
+        //     "noAddProposalRights", noAddProposalRights.isBad, "\n",
+        //     "noApproveProposalRights", noApproveProposalRights.isBad, "\n",
+        //     "user has voted", proposedInfo?.votes?.[window.account.accountId]
+        // )
+
         if (
             noContract.isBad 
             && !noDao.isBad // base.sputnik.near does not exist
             && !loading
             && this.lastAddr === document.querySelector(".address-container input")._valueTracker.getValue() // disappear while debouncing
         ) {
-            // no create multicall proposal exists and user can propose FunctionCall
-            if ((proposed === -1) && !noAddProposalRights.isBad) {
-                // TODO: add text to explain process. Button should only say "propose"
-                return (
-                    <button 
-                        className="create-multicall"
-                        onClick={() => { dao.add_proposal(args, infos.policy.proposal_bond); }}
-                    >
-                        {`create a multicall for ${dao_address}`}
-                    </button>
-                )
+            // no create multicall proposal exists
+            if (proposed === -1) {
+                // ... and user can propose FunctionCall
+                if (!noAddProposalRights.isBad) {
+                    return (
+                        <>
+                            <div className="info-text">
+                                {/* // TODO more percise and short text */}
+                                {/* hint: you can use "genesis" or "test" as DAO to get to this message */}
+                                {`A multicall instance can only be deployed for this DAO (`} 
+                                {this.toLink(dao_address, false)} 
+                                {`) if the DAO approves the decision.
+                                Clicking the button below will create a proposal on the DAO, once approved, a multicall instance will be deployed at `}
+                                {this.toLink(multicall, false)}
+                                {`. If a multicall instance exists on the DAO, you will be able to manage and inspect it from this page.`}
+                            </div>
+                            <button 
+                                className="create-multicall"
+                                onClick={() => { dao.add_proposal(args, infos.policy.proposal_bond); }}
+                            >
+                                Propose
+                            </button>
+                        </>
+                    )
+                } 
+                // ... and user cannot propose FunctionCall
+                else if (noAddProposalRights.isBad) {
+                    return (
+                        <div className="info-text">
+                            {/* // TODO more percise and short text */}
+                            {/* hint: you can use "ref-community-board-testnet" as DAO to get to this message */}
+                            {`Too bad, no propose rights.`}
+                        </div>
+                    )
+                }
             }
             // create multicall proposal exists
             else if (proposed !== -1) {
@@ -213,14 +246,28 @@ export default class Dao extends Component {
                     // explain that user can't do anything about it, but the DAO
                     // will get a multicall instance as soon as proposal with ID passes.
                     // Show link to proposal with: dao.get_proposal_url()
-                    return(<></>);
+                    return (
+                        <div className="info-text">
+                            {/* // TODO more percise and short text */}
+                            {`Proposal exists (#${proposed}), but you can't vote.`}
+                            <br/>
+                            <a href={dao.get_proposal_url("ASTRO_UI", proposed)}>Proposal on Astro</a>
+                        </div>
+                    )
                 }
                 // user can VoteApprove and already voted
                 else if ( proposedInfo.votes[window.account.accountId] ) {
                     // TODO: explain to user that he did everything he should.
                     // DAO will get multicall instance as soon as other DAO members
                     // also approve the proposal. Also link to the proposal in question.
-                    return (<></>);
+                    return (
+                        <div className="info-text">
+                            {/* // TODO more percise and short text */}
+                            {`Proposal exists, you already voted, now we wait.`}
+                            <br/>
+                            <a href={dao.get_proposal_url("ASTRO_UI", proposed)}>Proposal on Astro</a>
+                        </div>
+                    )
                 }
                 // user can VoteApprove and did NOT vote yet.
                 else {
@@ -240,7 +287,7 @@ export default class Dao extends Component {
         }
     }
 
-    toLink(address) {
+    toLink(address, deleteIcon = true) {
 
         const addr = new ArgsAccount(address);
 
@@ -249,7 +296,7 @@ export default class Dao extends Component {
                 <a href={ addr.toUrl(window.nearConfig.networkId) } target="_blank" rel="noopener noreferrer">
                     { addr.value }
                 </a>
-                <DeleteOutline/>
+                { deleteIcon ? <DeleteOutline/> : null }
             </span>
         )
     }

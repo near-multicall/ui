@@ -97,16 +97,16 @@ class SputnikDAO {
         // we have a supported UI
         const base_url: string = SputnikDAO.get_ui_base_url(ui);
         let dao_path: string = "";
-                // We have a supported UI
-                switch (ui) {
-                    case "REFERENCE_UI":
-                        dao_path = `${this.DAO_ADDRESS}`;
-                        break;
-                    case "ASTRO_UI":
-                        dao_path = `/dao/${this.DAO_ADDRESS}`;
-                        break;
-                    default: break;
-                }
+        // We have a supported UI
+        switch (ui) {
+            case "REFERENCE_UI":
+                dao_path = `${this.DAO_ADDRESS}`;
+                break;
+            case "ASTRO_UI":
+                dao_path = `/dao/${this.DAO_ADDRESS}`;
+                break;
+            default: break;
+        }
         return `${base_url}/${dao_path}`;
     }
 
@@ -117,16 +117,16 @@ class SputnikDAO {
         // we have a supported UI
         const dao_url: string = this.get_dao_url(ui);
         let proposal_path: string = "";
-                // We have a supported UI
-                switch (ui) {
-                    case "REFERENCE_UI":
-                        proposal_path = `${proposal_id}`;
-                        break;
-                    case "ASTRO_UI":
-                        proposal_path = `proposals/${this.DAO_ADDRESS}-${proposal_id}`;
-                        break;
-                    default: break;
-                }
+        // We have a supported UI
+        switch (ui) {
+            case "REFERENCE_UI":
+                proposal_path = `${proposal_id}`;
+                break;
+            case "ASTRO_UI":
+                proposal_path = `proposals/${this.DAO_ADDRESS}-${proposal_id}`;
+                break;
+            default: break;
+        }
         return `${dao_url}/${proposal_path}`;
     }
 }
