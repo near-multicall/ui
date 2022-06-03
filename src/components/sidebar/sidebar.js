@@ -24,7 +24,7 @@ export default class Sidebar extends Component {
                 <div className="sidebar-container">
                     <div className="title">
                         <Icon className="logo">dynamic_feed</Icon>
-                        <span className="env" env={window.ENVIRONMENT}>
+                        <span className="env" env={window.NEAR_ENV}>
                             <ScienceOutlinedIcon className="icon"/>
                         </span>
                     </div>
@@ -33,9 +33,15 @@ export default class Sidebar extends Component {
                         <NavLink className={({ isActive }) => isActive ? "active" : ""} to="/dao">Dao</NavLink>
                     </nav>
                     <hr/>
-                    <img src={Twitter} onClick={() => window.open('https://twitter.com/near_multicall')}/>
-                    <img src={Discord} onClick={() => window.open('https://discord.gg/wc6T6bPvdr')}/>
-                    <img src={Github} onClick={() => window.open('https://github.com/near-multicall')}/>
+                    <a target="_blank" rel="noopener" href='https://twitter.com/near_multicall'>
+                        <img src={Twitter} alt="Twitter"/>
+                    </a>
+                    <a target="_blank" rel="noopener" href='https://discord.gg/wc6T6bPvdr'>
+                        <img src={Discord} alt="Discord"/>
+                    </a>
+                    <a target="_blank" rel="noopener" href='https://github.com/near-multicall'>
+                        <img src={Github} alt="Github"/>
+                    </a>
                     {/* <img src={Telegram}/> */}
                     <Wallet/>
                 </div>
