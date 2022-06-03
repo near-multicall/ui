@@ -21,7 +21,11 @@ const removeTrailingZeros = (amount: string): string => amount.replace(/\.?0*$/,
 // token amount -> indivisible units
 const parseTokenAmount = (amount: BigSource, decimals: number): string => Big(amount).times(Big(10).pow(decimals)).toFixed();
 // indivisible units -> token amount
-const formatTokenAmount = (amount: BigSource, decimals: number, precision: number): string => {
+const formatTokenAmount = (
+    amount: BigSource,
+    decimals: number = 0,
+    precision: number = Big.DP
+): string => {
     const formattedAmount: string = Big(amount).div(Big(10).pow(decimals)).toFixed(precision);
     return removeTrailingZeros(formattedAmount);
 }
@@ -42,6 +46,7 @@ const convert = (amount: string | number, unit: string, decimals?: number): numb
         ? parseTokenAmount((amount === "" ? "0" : amount).toString(), decimals)
         : amount;
 }
+
 
 export {
     unitToDecimals,
