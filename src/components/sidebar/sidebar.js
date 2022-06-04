@@ -33,13 +33,13 @@ export default class Sidebar extends Component {
                         <NavLink className={({ isActive }) => isActive ? "active" : ""} to="/dao">Dao</NavLink>
                     </nav>
                     <hr/>
-                    <a target="_blank" rel="noopener" href='https://twitter.com/near_multicall'>
+                    <a target="_blank" rel="noopener noreferrer" href='https://twitter.com/near_multicall'>
                         <img src={Twitter} alt="Twitter"/>
                     </a>
-                    <a target="_blank" rel="noopener" href='https://discord.gg/wc6T6bPvdr'>
+                    <a target="_blank" rel="noopener noreferrer" href='https://discord.gg/wc6T6bPvdr'>
                         <img src={Discord} alt="Discord"/>
                     </a>
-                    <a target="_blank" rel="noopener" href='https://github.com/near-multicall'>
+                    <a target="_blank" rel="noopener noreferrer" href='https://github.com/near-multicall'>
                         <img src={Github} alt="Github"/>
                     </a>
                     {/* <img src={Telegram}/> */}
