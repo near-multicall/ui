@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import { ArgsAccount, ArgsError } from '../../utils/args';
 import { toNEAR, toYocto, Big } from '../../utils/converter';
 import { view, tx } from '../../utils/wallet';
-import { SputnikDAO } from '../../utils/contracts/sputnik-dao';
+import { SputnikDAO, SputnikUI } from '../../utils/contracts/sputnik-dao';
 import { TextInput } from '../editor/elements';
 import { InputAdornment } from '@mui/material'
 import './dao.scss';
@@ -251,7 +251,9 @@ export default class Dao extends Component {
                             {/* // TODO more percise and short text */}
                             {`Proposal exists (#${proposed}), but you can't vote.`}
                             <br/>
-                            <a href={dao.get_proposal_url("ASTRO_UI", proposed)}>Proposal on Astro</a>
+                            <a target="_blank" href={dao.get_proposal_url(SputnikUI.ASTRO_UI, proposed)} rel="noopener noreferrer">
+                                Proposal on Astro
+                            </a>
                         </div>
                     )
                 }
@@ -265,7 +267,9 @@ export default class Dao extends Component {
                             {/* // TODO more percise and short text */}
                             {`Proposal exists, you already voted, now we wait.`}
                             <br/>
-                            <a href={dao.get_proposal_url("ASTRO_UI", proposed)}>Proposal on Astro</a>
+                            <a target="_blank" href={dao.get_proposal_url(SputnikUI.ASTRO_UI, proposed)} rel="noopener noreferrer">
+                                Proposal on Astro
+                            </a>
                         </div>
                     )
                 }
@@ -275,7 +279,6 @@ export default class Dao extends Component {
                         <button 
                             className="create-multicall proposal-exists"
                             onClick={() => {
-                                // window.open(dao.get_proposal_url("ASTRO_UI", proposed));
                                 dao.act_proposal(proposed, "VoteApprove");
                             }}
                         >

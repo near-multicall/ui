@@ -15,10 +15,10 @@ const ASTRO_UI_URL_SELECTOR: Record<string, string> = {
     "mainnet": "https://app.astrodao.com",
     "testnet": "https://testnet.app.astrodao.com"
 };
-// what SputnikDAO UIs are supported?
-const SUPPORTED_FRONTENDS: Record<string, boolean> = {
-    "REFERENCE_UI": true,
-    "ASTRO_UI": true
+// what SputnikDAO UIs are supported? (P.S.: do NOT use const or string enum here)
+enum SputnikUI {
+    REFERENCE_UI,
+    ASTRO_UI
 }
 
 
@@ -72,16 +72,16 @@ class SputnikDAO {
     }
 
     // get base URL for UI of choice
-    static get_ui_base_url (ui: string): string {
+    static get_ui_base_url (ui: SputnikUI): string {
         let base_url: string = "";
         // exit if UI not supported
-        if ( !SUPPORTED_FRONTENDS[ui] ) return base_url;
+        if ( !(ui in SputnikUI) ) return base_url;
         // We have a supported UI
         switch (ui) {
-            case "REFERENCE_UI":
+            case SputnikUI.REFERENCE_UI:
                 base_url = this.REFERENCE_UI_BASE_URL;
                 break;
-            case "ASTRO_UI":
+            case SputnikUI.ASTRO_UI:
                 base_url = this.ASTRO_UI_BASE_URL;
                 break;
             default: break;
@@ -91,19 +91,19 @@ class SputnikDAO {
     }
 
     // get DAO page URL on UI of choice
-    get_dao_url (ui: string): string {
+    get_dao_url (ui: SputnikUI): string {
         // exit if UI not supported
-        if ( !SUPPORTED_FRONTENDS[ui] ) return "";
+        if ( !(ui in SputnikUI) ) return "";
         // we have a supported UI
         const base_url: string = SputnikDAO.get_ui_base_url(ui);
         let dao_path: string = "";
         // We have a supported UI
         switch (ui) {
-            case "REFERENCE_UI":
+            case SputnikUI.REFERENCE_UI:
                 dao_path = `${this.DAO_ADDRESS}`;
                 break;
-            case "ASTRO_UI":
-                dao_path = `/dao/${this.DAO_ADDRESS}`;
+            case SputnikUI.ASTRO_UI:
+                dao_path = `dao/${this.DAO_ADDRESS}`;
                 break;
             default: break;
         }
@@ -111,18 +111,18 @@ class SputnikDAO {
     }
 
     // get proposal page URL on UI of choice
-    get_proposal_url (ui: string, proposal_id: string): string {
+    get_proposal_url (ui: SputnikUI, proposal_id: string): string {
         // exit if UI not supported
-        if ( !SUPPORTED_FRONTENDS[ui] ) return "";
+        if ( !(ui in SputnikUI) ) return "";
         // we have a supported UI
         const dao_url: string = this.get_dao_url(ui);
         let proposal_path: string = "";
         // We have a supported UI
         switch (ui) {
-            case "REFERENCE_UI":
+            case SputnikUI.REFERENCE_UI:
                 proposal_path = `${proposal_id}`;
                 break;
-            case "ASTRO_UI":
+            case SputnikUI.ASTRO_UI:
                 proposal_path = `proposals/${this.DAO_ADDRESS}-${proposal_id}`;
                 break;
             default: break;
@@ -132,5 +132,6 @@ class SputnikDAO {
 }
 
 export{
-    SputnikDAO
+    SputnikDAO,
+    SputnikUI
 }
