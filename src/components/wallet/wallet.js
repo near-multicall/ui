@@ -28,8 +28,8 @@ export default class Wallet extends Component {
             wallet: null,
             bond: "0",
             expanded: {
-                user: true,
-                dao: true
+                user: false,
+                dao: false
             }
         }
 
@@ -216,7 +216,7 @@ export default class Wallet extends Component {
 
                 let color = "red";
 
-                if (ArgsAccount.isValid(dao))
+                if (ArgsAccount.isValid(dao) && !noDao.isBad)
                     color = "yellow";
 
                 if (!noContract.isBad)
