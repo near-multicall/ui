@@ -29,7 +29,7 @@ export default class Wallet extends Component {
             bond: "0",
             expanded: {
                 user: false,
-                dao: false
+                dao: false || (STORAGE.addresses.dao === "")
             }
         }
 
@@ -293,8 +293,8 @@ export default class Wallet extends Component {
                 <span>for</span>
                 <div 
                     className={`dao ${color}`} 
-                    expand={ expanded.dao || STORAGE.addresses.dao === "" ? "yes" : "no" 
-                }>
+                    expand={ expanded.dao ? "yes" : "no" }
+                >
                     <Icon 
                         className="icon" 
                         onClick={() => this.toggleExpandedDao() }
