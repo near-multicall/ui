@@ -27,6 +27,7 @@ export default class BaseTask extends Component {
 
         this.state = {
             showArgs: false,
+            isEdited: false
         };
 
         if (window.TEMP) {
@@ -99,6 +100,12 @@ export default class BaseTask extends Component {
 
     onAddressesUpdated() { }
 
+    onEditFocus(taskID) {
+
+        this.setState({isEdited: taskID === this.props.id})
+
+    }
+
     updateCard() {
 
         this.forceUpdate();
@@ -125,7 +132,8 @@ export default class BaseTask extends Component {
                     value={name}
                     variant="standard"
                     margin="normal"
-                    update={this.updateCard}
+                    autoFocus
+                    update={ this.updateCard }
                 />
                 <TextInput
                     label="Contract address"
@@ -177,35 +185,20 @@ export default class BaseTask extends Component {
         } = this.call;
 
         const errors = this.errors;
+        
+        const hasErrors = Object.entries(errors)
+            .filter(([k, v]) => v.isBad)
+            .length > 0
 
-        const { showArgs } = this.state;
+        const { showArgs, isEdited } = this.state;
 
         const { id } = this.props;
 
         return (
-            <div
-                className={`task-container ${this.uniqueClassName}`}
+            <div 
+                className={`task-container ${this.uniqueClassName} ${hasErrors ? "has-errors" : ""} ${isEdited ? "is-edited" : ""}`}
             >
                 <div className="name">
-                    <Tooltip title={<h1 style={{ fontSize: "12px" }}>Delete</h1>} disableInteractive >
-                        <DeleteOutline
-                            className="delete icon"
-                            onClick={() => {
-                                LAYOUT.deleteTask(id);
-                            }}
-                        />
-                    </Tooltip>
-                    <div className="delete-pseudo"></div>
-                    <Tooltip title={<h1 style={{ fontSize: "12px" }}>Clone card</h1>} disableInteractive >
-                        <MoveDown
-                            className="duplicate icon"
-                            onClick={() => {
-                                LAYOUT.duplicateTask(id);
-                            }}
-                        />
-                    </Tooltip>
-                    <div className="duplicate-pseudo"></div>
-                    <h3>{name.toString()}</h3>
                     <Tooltip title={<h1 style={{ fontSize: "12px" }}>Edit</h1>} disableInteractive >
                         <EditOutlined
                             className="edit icon"
@@ -216,6 +209,25 @@ export default class BaseTask extends Component {
                         />
                     </Tooltip>
                     <div className="edit-pseudo"></div>
+                    <Tooltip title={<h1 style={{ fontSize: "12px" }}>Clone card</h1>} disableInteractive >
+                        <MoveDown
+                            className="duplicate icon"
+                            onClick={() => {
+                                LAYOUT.duplicateTask(id);
+                            }}
+                        />
+                    </Tooltip>
+                    <div className="duplicate-pseudo"></div>
+                    <h3>{name.toString()}</h3>
+                    <Tooltip title={<h1 style={{ fontSize: "12px" }}>Delete</h1>} disableInteractive >
+                        <DeleteOutline
+                            className="delete icon"
+                            onClick={() => {
+                                LAYOUT.deleteTask(id);
+                            }}
+                        />
+                    </Tooltip>
+                    <div className="delete-pseudo"></div>
                 </div>
                 <div className="data-container">
                     <p><span>Contract address</span><a className="code" href={addr.toUrl(window.nearConfig.networkId)} target="_blank" rel="noopener noreferrer">{addr.toString()}</a></p>

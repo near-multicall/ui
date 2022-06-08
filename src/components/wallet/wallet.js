@@ -1,11 +1,10 @@
-import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
-import ScienceOutlinedIcon from '@mui/icons-material/ScienceOutlined';
 import { Base64 } from 'js-base64';
 import React, { Component } from 'react';
 import { toGas } from '../../utils/converter';
 import { initNear, tx, view } from '../../utils/wallet';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
+import { Icon } from '@mui/material';
 import './wallet.scss';
 import { ArgsAccount, ArgsError } from '../../utils/args';
 
@@ -27,7 +26,11 @@ export default class Wallet extends Component {
 
         this.state = {
             wallet: null,
-            bond: "0"
+            bond: "0",
+            expanded: {
+                user: false,
+                dao: false
+            }
         }
 
         window.WALLET = initNear()
@@ -209,12 +212,51 @@ export default class Wallet extends Component {
                 MENU.forceUpdate()
 
             })
+            .finally(() => {
+
+                let color = "red";
+
+                if (ArgsAccount.isValid(dao) && !noDao.isBad)
+                    color = "yellow";
+
+                if (!noContract.isBad)
+                    color = "";
+
+                this.setState({color: color});
+
+            })
+
+    }
+
+    toggleExpandedDao() {
+
+        const { expanded } = this.state;
+
+        this.setState({
+            expanded: {
+                user: expanded.user,
+                dao: !expanded.dao
+            }
+        })
+
+    }
+
+    toggleExpandedUser() {
+
+        const { expanded } = this.state;
+
+        this.setState({
+            expanded: {
+                user: !expanded.user,
+                dao: expanded.dao
+            }
+        })
 
     }
 
     render() {
 
-        const { wallet } = this.state;
+        const { wallet, expanded, color } = this.state;
 
         if (!wallet)
             return null;
@@ -223,24 +265,43 @@ export default class Wallet extends Component {
             <div
                 className="wallet"
             >
-                <button
-                    onClick={ () => wallet.isSignedIn()
-                        ? this.signOut() 
-                        : this.signIn()
-                    }
-                >
-                    { window.NEAR_ENV === "testnet" 
-                        ? <ScienceOutlinedIcon/>
-                        : <AccountBalanceWalletOutlinedIcon/>
-                    }
-                    { wallet.isSignedIn()
-                        ? wallet.getAccountId()
-                        : `Sign in`
-                    }
-                </button>
-                { wallet.isSignedIn()
-                    ? <>
-                        <span className="for">for</span>
+                <div className="user" expand={ expanded.user || !wallet.isSignedIn() ? "yes" : "no" }>
+                    <Icon 
+                        className="icon" 
+                        onClick={() => this.toggleExpandedUser() }
+                    >
+                        { expanded.user && wallet.isSignedIn()  ? "chevron_left" : "person" }
+                    </Icon>
+                    <div className="peek">
+                        { wallet.getAccountId() }
+                    </div>
+                    <div className="expand">
+                        { wallet.isSignedIn()
+                            ? <>
+                                { wallet.getAccountId() } 
+                                <button 
+                                    className="logout" 
+                                    onClick={ () => this.signOut() }
+                                >
+                                    sign out
+                                </button>
+                              </>
+                            : <button onClick={ () => this.signIn() }>sign in</button>
+                        }
+                    </div>
+                </div>
+                <span>for</span>
+                <div 
+                    className={`dao ${color}`} 
+                    expand={ expanded.dao || STORAGE.addresses.dao === "" ? "yes" : "no" 
+                }>
+                    <Icon 
+                        className="icon" 
+                        onClick={() => this.toggleExpandedDao() }
+                    >
+                        { expanded.dao && STORAGE.addresses.dao !== "" ? "chevron_left" : "groups" }
+                    </Icon>
+                    <div className="expand">
                         <Autocomplete
                             className='dao-selector'
                             freeSolo
@@ -249,7 +310,7 @@ export default class Wallet extends Component {
                             renderInput={(params) => 
                                 <TextField 
                                     {...params} 
-                                    placeholder="Select DAO" 
+                                    placeholder="Select DAO"
                                 />
                             }
                             onInputChange={(event, newValue) => {
@@ -258,15 +319,20 @@ export default class Wallet extends Component {
                                     multicall: newValue.replace(window.nearConfig.SPUTNIK_V2_FACTORY_ADDRESS, window.nearConfig.MULTICALL_FACTORY_ADDRESS)
                                 })
                                 setTimeout(() => {
-                                    if (new Date() - this.lastInput > 400 && ArgsAccount.isValid(newValue))
-                                        this.connectDao(newValue)
+                                    if (new Date() - this.lastInput > 400)
+                                        if (ArgsAccount.isValid(newValue))
+                                            this.connectDao(newValue);
+                                        else
+                                            this.setState({color: newValue === "" ? "" : "red"})
                                 }, 500)
                                 this.lastInput = new Date()
                             }}
                         />
-                    </>
-                    : <></>
-                }
+                    </div>
+                    <div className="peek">
+                        { STORAGE?.addresses?.dao ?? "" }
+                    </div>
+                </div>
             </div>
         );
 

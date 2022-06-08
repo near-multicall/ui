@@ -253,7 +253,7 @@ export default class Export extends Component {
                         </div>
                     </div> }
                     <div className="section">
-                        <div className="header">
+                        <div className="sidebar">
                             <Icon 
                                 className="icon collapse"
                                 onClick={ () => this.toggleShowArgs() }

@@ -17,13 +17,13 @@
 @mixin cb-scale($factor) {
     zoom: $factor; /* IE */
     -moz-transform: scale($factor); /* Firefox */
-    -moz-transform-origin: 0 0;
+    -moz-transform-origin: center center;
     -o-transform: scale($factor); /* Opera */
-    -o-transform-origin: 0 0;
+    -o-transform-origin: center center;
     -webkit-transform: scale($factor); /* Safari And Chrome */
-    -webkit-transform-origin: 0 0;
+    -webkit-transform-origin: center center;
     transform: scale($factor); /* Standard Property */
-    transform-origin: 0 0;  /* Standard Property */
+    transform-origin: center center;  /* Standard Property */
   }
 
 .base-task  {
@@ -70,7 +70,7 @@
             z-index: 1;
             &.edit {
                 position: absolute;
-                left: 0.5 * size.$gap;
+                right: 0.5 * size.$gap;
                 &:hover + .edit-pseudo {
                     @include cb-scale(1);
                     transition: all 300ms ease;
@@ -78,7 +78,7 @@
             }
             &.delete {
                 position: absolute;
-                right: 0.5 * size.$gap;
+                left: 0.5 * size.$gap;
                 &:hover + .delete-pseudo {
                     @include cb-scale(1);
                     transition: all 300ms ease;
@@ -86,7 +86,7 @@
             }
             &.duplicate {
                 position: absolute;
-                left: 1.5 * size.$gap;
+                right: 1.5 * size.$gap;
                 &:hover + .duplicate-pseudo {
                     @include cb-scale(1);
                     transition: all 300ms ease;
@@ -95,17 +95,17 @@
         }
         .delete-pseudo {
             @include backdrop;
-            right: -1 * size.$gap;
+            left: -1 * size.$gap;
             background-color: rgba(color.$red, 0.8);
         }
         .edit-pseudo {
             @include backdrop;
-            left: -1 * size.$gap;
+            right: -1 * size.$gap;
             background-color: rgba(color.$blue, 0.8);
         }
         .duplicate-pseudo {
             @include backdrop;
-            left: 0;
+            right: 0;
             background-color: rgba(color.$purple, 0.8);
         }
     }
@@ -154,6 +154,16 @@
             }
         }
     }
+    &.has-errors:not(.is-edited) {
+        outline: 8px solid color.$red;
+        outline-offset: -4px;
+        border-radius: size.$task-radius;
+    }
+    &.is-edited {
+        outline: 8px solid color.$blue;
+        outline-offset: -4px;
+        border-radius: size.$task-radius;
+    }
 }
 
 .edit {
@@ -168,11 +178,10 @@
                 flex: 2 1 auto;
             }
             &:last-of-type {
-                flex: 1 0 40px;
+                flex: 1 0 max-content;
                 margin-left: 0.25 * size.$gap;
-                select {
-                    height: 2rem;
-                    line-height: 1rem;
+                .MuiInputBase-root {
+                    width: 100% !important;
                     font-size: size.$small-text;
                 }
             }
@@ -207,6 +216,7 @@
     .MuiTextField-root {
         p.Mui-error {
             color: color.$red;
+            font-weight: 800;
             font-family: font.$text;
             font-size: size.$small-text;
             &::before {
@@ -215,6 +225,7 @@
         }
         label {
             font-family: font.$text;
+            font-weight: 800;
             &.Mui-focused {
                 color: color.$light-text;
             }
@@ -236,10 +247,10 @@
             fieldset {
                 border-color: color.$lightish;
                 border-width: 1px;
-                background-color: rgba(color.$darkest, 0.25);
+                box-shadow: inset 0px 0px 30px 0px rgba(color.$white, 0.1);
                 border-radius: 0;
                 legend {
-                    background-color: color.$dark;
+                    background-color: color.$black;
                     margin-left: -2px;
                     padding: 2px;
                     border-radius: 20px;
@@ -251,10 +262,10 @@
                 }
             }
             &:hover fieldset {
-                border-color: color.$light;
+                border-color: color.$white;
             }
             &.Mui-focused fieldset {
-                border-color: color.$light;
+                border-color: color.$white;
             }
             &.Mui-error fieldset {
                 border-color: color.$red !important;
@@ -267,7 +278,7 @@
             }
             &:hover::after,
             &::after {
-                border-bottom-color: color.$light;
+                border-bottom-color: color.$white;
             }
             input {
                 font-weight: 500;
@@ -292,6 +303,6 @@
     }
 }
 
-option {
-    font-size: size.$text;
+.MuiMenuItem-root {
+    font-size: size.$small-text !important;
 }

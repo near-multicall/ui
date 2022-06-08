@@ -24,6 +24,7 @@ export default class Editor extends Component {
     edit(taskID) {
 
         this.setState({editingID: taskID});
+        window.TASKS.forEach(t => t.instance.current.onEditFocus(taskID));
 
     }
 
