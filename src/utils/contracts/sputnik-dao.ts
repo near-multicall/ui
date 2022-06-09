@@ -20,6 +20,19 @@ enum SputnikUI {
     REFERENCE_UI,
     ASTRO_UI
 }
+// SputnikDAO contract mapping: version <-> code hashes
+const CONTRACT_CODE_HASHES_SELECTOR: Record<string, string[]> = {
+    "mainnet": [
+        "8RMeZ5cXDap6TENxaJKtigRYf3n139iHmTRe8ZUNey6N", // v2.0
+        "8jmhwSkNeAWCRqsr2KoD7d8BzDYorEz3a3iHuM9Gykrg", // v2.1 (with gas fix)
+        "2Zof1Tyy4pMeJM48mDSi5ww2QQhTz97b9S8h6W6r4HnK" // v3.0
+    ],
+    "testnet": [
+        "8RMeZ5cXDap6TENxaJKtigRYf3n139iHmTRe8ZUNey6N", // 2.0
+        "8LN56HLNjvwtiNb6pRVNSTMtPgJYqGjAgkVSHRiK5Wfv", // v2.1 (with gas fix)
+        "783vth3Fg8MBBGGFmRqrytQCWBpYzUcmHoCq4Mo8QqF5" // v3.0
+    ]
+}
 
 
 class SputnikDAO {
@@ -27,6 +40,7 @@ class SputnikDAO {
     static FACTORY_ADDRESS: string = FACTORY_ADDRESS_SELECTOR[window.NEAR_ENV];
     static REFERENCE_UI_BASE_URL: string = REFERENCE_UI_URL_SELECTOR[window.NEAR_ENV];
     static ASTRO_UI_BASE_URL: string = ASTRO_UI_URL_SELECTOR[window.NEAR_ENV];
+    static CONTRACT_CODE_HASHES: string[] = CONTRACT_CODE_HASHES_SELECTOR[window.NEAR_ENV];
     
     DAO_ADDRESS: string;
 
@@ -47,13 +61,7 @@ class SputnikDAO {
             account_id: accountId
         });
         const codeHash: string = accountInfo.code_hash;
-        return [
-            // Sputnik v2
-            "8RMeZ5cXDap6TENxaJKtigRYf3n139iHmTRe8ZUNey6N",
-            // TODO: add code hash of V2 with gas fix
-            // Sputnik v3
-            "2Zof1Tyy4pMeJM48mDSi5ww2QQhTz97b9S8h6W6r4HnK"
-        ].includes(codeHash);
+        return SputnikDAO.CONTRACT_CODE_HASHES.includes(codeHash);
     }
 
 

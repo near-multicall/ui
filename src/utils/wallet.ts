@@ -87,9 +87,7 @@ async function view (
         args_base64: encodedArgs,
     });
     // RPC returns JSON-serialized returns, needs parsing.
-    return JSON.parse(
-        response.result.map((x: any) => String.fromCharCode(x)).join('')
-    );
+    return JSON.parse( String.fromCharCode(... response.result) );
 }
 
 async function makeTransaction (
