@@ -20,7 +20,7 @@
     flex-flow: column nowrap;
     width: 100%;
     max-height: 25%;
-    .header {
+    .sidebar {
         width: calc(100% - 1.5 * size.$gap);
         @include mixin.center-items(space-between);
         h3 {
@@ -47,7 +47,7 @@
         flex: 1;
         width: 100%;
         @include mixin.no-scrollbar;
-        background-color: rgba(color.$darkest, 0.25);
+        box-shadow: inset 0px 0px 30px 0px rgba(color.$white, 0.1);
         border-radius: size.$task-radius;
         overflow-y: scroll;
         .code {
@@ -75,11 +75,10 @@
                 flex: 2 1 auto;
             }
             &:last-of-type {
-                flex: 1 0 40px;
+                flex: 1 0 max-content;
                 margin-left: 0.25 * size.$gap;
-                select {
-                    height: 2rem;
-                    line-height: 1rem;
+                .MuiInputBase-root {
+                    width: 100% !important;
                     font-size: size.$small-text;
                 }
             }
@@ -122,6 +121,7 @@
     .MuiTextField-root {
         p.Mui-error {
             color: color.$red;
+            font-weight: 800;
             font-family: font.$text;
             font-size: size.$small-text;
             &::before {
@@ -130,6 +130,7 @@
         }
         label {
             font-family: font.$text;
+            font-weight: 800;
             &.Mui-focused {
                 color: color.$light-text;
             }
@@ -151,10 +152,10 @@
             fieldset {
                 border-color: color.$lightish;
                 border-width: 1px;
-                background-color: rgba(color.$darkest, 0.25);
+                box-shadow: inset 0px 0px 30px 0px rgba(color.$white, 0.1);
                 border-radius: 0;
                 legend {
-                    background-color: color.$dark;
+                    background-color: color.$black;
                     margin-left: -2px;
                     padding: 2px;
                     border-radius: 20px;
@@ -166,10 +167,10 @@
                 }
             }
             &:hover fieldset {
-                border-color: color.$light;
+                border-color: color.$white;
             }
             &.Mui-focused fieldset {
-                border-color: color.$light;
+                border-color: color.$white;
             }
             &.Mui-error fieldset {
                 border-color: color.$red !important;
@@ -182,7 +183,7 @@
             }
             &:hover::after,
             &::after {
-                border-bottom-color: color.$light;
+                border-bottom-color: color.$white;
             }
             input {
                 font-weight: 500;
@@ -208,8 +209,8 @@
     }
 }
 
-option {
-    font-size: size.$text;
+.MuiMenuItem-root {
+    font-size: size.$small-text !important;
 }
 
 
@@ -228,7 +229,7 @@ option {
         display: flex;
         flex-flow: column nowrap;
         padding-top: 0.5 * size.$gap;
-        background-color: rgba(color.$darkest, 0.25);
+        box-shadow: inset 0px 0px 30px 0px rgba(color.$white, 0.1);
         border-radius: size.$task-radius;
         .error {
             width: 100%;
@@ -239,6 +240,7 @@ option {
             gap: 0.5 * size.$gap;
             flex-flow: row nowrap;
             font-size: size.$text;
+            font-weight: 800;
             color: color.$red;
             .msg {
                 @include mixin.no-wrap;

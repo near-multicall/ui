@@ -452,7 +452,7 @@ export default class Dao extends Component {
         const noDisplayErrors = ["noAddProposalRights", "noApproveProposalRights"]
         const displayErrors = Object.keys(this.errors)
             .filter(e => this.errors[e].isBad && !noDisplayErrors.includes(e))
-            .map(e => <p key={`p-${e}`}>
+            .map(e => <p key={`p-${e}`} className={"red"}>
                     <span>{ this.errors[e].isBad ? '\u2717' : '\u2714' }  </span>
                     { this.errors[e].message }
                 </p>);

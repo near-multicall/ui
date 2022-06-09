@@ -1,4 +1,5 @@
-import { DeleteOutline, EditOutlined, ViewAgendaOutlined } from '@mui/icons-material';
+import { DeleteOutline, MoveDown, EditOutlined } from '@mui/icons-material';
+import { Tooltip } from '@mui/material';
 import React, { Component } from 'react';
 import { TextInput, TextInputWithUnits } from '../components/editor/elements';
 import { ArgsAccount, ArgsBig, ArgsError, ArgsJSON, ArgsString } from '../utils/args';
@@ -15,17 +16,18 @@ export default class BaseTask extends Component {
         func: new ArgsError("Cannot be empty", value => value.value != "", true),
         args: new ArgsError("Invalid JSON", value => JSON.parse(value.value)),
         gas: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value), true),
-        depo: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value) && value.value !== "" )
+        depo: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value) && value.value !== "")
     };
     errors = this.baseErrors;
     options = {};
 
     constructor(props) {
-       
+
         super(props);
 
         this.state = {
             showArgs: false,
+            isEdited: false
         };
 
         if (window.TEMP) {
@@ -40,7 +42,7 @@ export default class BaseTask extends Component {
             const errorsDeepCopy = {};
             Object.keys(COPY.payload.errors).map(key => {
                 errorsDeepCopy[key] = Object.assign(
-                    Object.create(Object.getPrototypeOf(COPY.payload.errors[key])), 
+                    Object.create(Object.getPrototypeOf(COPY.payload.errors[key])),
                     COPY.payload.errors[key]
                 )
             })
@@ -76,16 +78,16 @@ export default class BaseTask extends Component {
             func: new ArgsString(actions?.func ?? ""),
             args: new ArgsJSON(actions?.args ? JSON.stringify(actions?.args, null, "  ") : '{}'),
             gas: new ArgsBig(
-                formatTokenAmount(actions?.gas ?? "0", units?.gas.decimals), 
-                "1", 
+                formatTokenAmount(actions?.gas ?? "0", units?.gas.decimals),
+                "1",
                 toGas("300"),
                 units?.gas?.unit ?? "Tgas",
                 units?.gas?.decimals
             ),
             depo: new ArgsBig(
                 formatTokenAmount(actions?.depo ?? "0", units?.depo.decimals),
-                toYocto("0"), 
-                null, 
+                toYocto("0"),
+                null,
                 units?.depo?.unit ?? "NEAR",
                 units?.depo?.decimals
             )
@@ -96,13 +98,19 @@ export default class BaseTask extends Component {
 
     }
 
-    onAddressesUpdated() {}
+    onAddressesUpdated() { }
+
+    onEditFocus(taskID) {
+
+        this.setState({isEdited: taskID === this.props.id})
+
+    }
 
     updateCard() {
 
         this.forceUpdate();
         EDITOR.forceUpdate();
-        
+
     }
 
     renderEditor() {
@@ -121,43 +129,44 @@ export default class BaseTask extends Component {
         return (
             <div className="edit">
                 <TextInput
-                    value={ name }
+                    value={name}
                     variant="standard"
                     margin="normal"
+                    autoFocus
                     update={ this.updateCard }
                 />
                 <TextInput
                     label="Contract address"
-                    value={ addr }
-                    error={ errors.addr }
-                    update={ this.updateCard }
+                    value={addr}
+                    error={errors.addr}
+                    update={this.updateCard}
                 />
-                <TextInput 
+                <TextInput
                     label="Function name"
-                    value={ func }
-                    error={ errors.func }
-                    update={ this.updateCard }
+                    value={func}
+                    error={errors.func}
+                    update={this.updateCard}
                 />
                 <TextInput
                     label="Function arguments"
-                    value={ args }
-                    error={ errors.args }
-                    update={ this.updateCard }
+                    value={args}
+                    error={errors.args}
+                    update={this.updateCard}
                     multiline
                 />
-                <TextInputWithUnits 
+                <TextInputWithUnits
                     label="Allocated gas"
-                    value={ gas }
-                    error={ errors.gas }
-                    options={[ "Tgas", "gas" ]}
-                    update={ this.updateCard }
+                    value={gas}
+                    error={errors.gas}
+                    options={["Tgas", "gas"]}
+                    update={this.updateCard}
                 />
-                <TextInputWithUnits 
+                <TextInputWithUnits
                     label="Attached deposit"
-                    value={ depo }
-                    error={ errors.depo }
-                    options={[ "NEAR", "yocto" ]}
-                    update={ this.updateCard }
+                    value={depo}
+                    error={errors.depo}
+                    options={["NEAR", "yocto"]}
+                    update={this.updateCard}
                 />
             </div>
         );
@@ -176,54 +185,64 @@ export default class BaseTask extends Component {
         } = this.call;
 
         const errors = this.errors;
+        
+        const hasErrors = Object.entries(errors)
+            .filter(([k, v]) => v.isBad)
+            .length > 0
 
-        const { showArgs } = this.state;
+        const { showArgs, isEdited } = this.state;
 
         const { id } = this.props;
 
         return (
             <div 
-                className={`task-container ${this.uniqueClassName}`}
+                className={`task-container ${this.uniqueClassName} ${hasErrors ? "has-errors" : ""} ${isEdited ? "is-edited" : ""}`}
             >
                 <div className="name">
-                    <DeleteOutline 
-                        className="delete icon" 
-                        onClick={() => {
-                            LAYOUT.deleteTask(id);
-                        }}
-                    />
-                    <div className="delete-pseudo"></div>
-                    <ViewAgendaOutlined
-                        className="duplicate icon" 
-                        onClick={() => {
-                            LAYOUT.duplicateTask(id);
-                        }}
-                    />
-                    <div className="duplicate-pseudo"></div>
-                    <h3>{ name.toString() }</h3>
-                    <EditOutlined
-                        className="edit icon" 
-                        onClick={() => {
-                            EDITOR.edit(id);
-                            MENU.changeTab(1);
-                        }}
-                    />
+                    <Tooltip title={<h1 style={{ fontSize: "12px" }}>Edit</h1>} disableInteractive >
+                        <EditOutlined
+                            className="edit icon"
+                            onClick={() => {
+                                EDITOR.edit(id);
+                                MENU.changeTab(1);
+                            }}
+                        />
+                    </Tooltip>
                     <div className="edit-pseudo"></div>
+                    <Tooltip title={<h1 style={{ fontSize: "12px" }}>Clone card</h1>} disableInteractive >
+                        <MoveDown
+                            className="duplicate icon"
+                            onClick={() => {
+                                LAYOUT.duplicateTask(id);
+                            }}
+                        />
+                    </Tooltip>
+                    <div className="duplicate-pseudo"></div>
+                    <h3>{name.toString()}</h3>
+                    <Tooltip title={<h1 style={{ fontSize: "12px" }}>Delete</h1>} disableInteractive >
+                        <DeleteOutline
+                            className="delete icon"
+                            onClick={() => {
+                                LAYOUT.deleteTask(id);
+                            }}
+                        />
+                    </Tooltip>
+                    <div className="delete-pseudo"></div>
                 </div>
                 <div className="data-container">
-                    <p><span>Contract address</span><a className="code" href={ addr.toUrl(window.nearConfig.networkId) } target="_blank" rel="noopener noreferrer">{ addr.toString() }</a></p>
-                    <p><span>Function name</span><span className="code">{ func.toString() }</span></p>
-                    <p className="expandable"><span>Function arguments</span>{ 
+                    <p><span>Contract address</span><a className="code" href={addr.toUrl(window.nearConfig.networkId)} target="_blank" rel="noopener noreferrer">{addr.toString()}</a></p>
+                    <p><span>Function name</span><span className="code">{func.toString()}</span></p>
+                    <p className="expandable"><span>Function arguments</span>{
                         showArgs
-                        ? <a onClick={ () => this.setState({ showArgs: false }) } >hide</a>
-                        : <a onClick={ () => this.setState({ showArgs: true }) } >show</a>
+                            ? <a onClick={() => this.setState({ showArgs: false })} >hide</a>
+                            : <a onClick={() => this.setState({ showArgs: true })} >show</a>
                     }</p>
-                    { showArgs && (errors.args.validOrNull(args)
-                        ? <pre className="code">{ JSON.stringify(args.toString(), null, "  ") }</pre>
-                        : <pre className="code">{ errors.args.intermediate }</pre>)
+                    {showArgs && (errors.args.validOrNull(args)
+                        ? <pre className="code">{JSON.stringify(args.toString(), null, "  ")}</pre>
+                        : <pre className="code">{errors.args.intermediate}</pre>)
                     }
-                    <p><span>Allocated gas</span><span className="code">{ gas.toString() } <span>{ gas.unit }</span></span></p>
-                    <p><span>Attached deposit</span><span className="code">{ depo.toString() }  <span>{ depo.unit }</span></span></p>             
+                    <p><span>Allocated gas</span><span className="code">{gas.toString()} <span>{gas.unit}</span></span></p>
+                    <p><span>Attached deposit</span><span className="code">{depo.toString()}  <span>{depo.unit}</span></span></p>
                 </div>
             </div>
         );

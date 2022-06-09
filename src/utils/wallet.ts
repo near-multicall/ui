@@ -15,10 +15,7 @@ declare global {
     }
 }
 
-const searchParams = new URLSearchParams(window.location.hash.split('?')[1]);
-window.NEAR_ENV = searchParams.has("network")
-    ? searchParams.get("network")!
-    : "testnet"
+window.NEAR_ENV = process.env.NEAR_ENV ?? "testnet";
 window.nearConfig = getConfig(window.NEAR_ENV);
 
 /**

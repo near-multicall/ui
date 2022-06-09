@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import TextField from '@mui/material/TextField';
+import MenuItem from '@mui/material/MenuItem';
 
 class TextInput extends Component {
 
@@ -98,17 +99,14 @@ class TextInputWithUnits extends Component {
                         errors.forEach(e => e?.validOrNull(value));
                         update?.(e);
                     }}
-                    SelectProps={{
-                        native: true,
-                    }}
                     InputLabelProps={{ shrink: true }}
                     {...unitProps}
                     {...props}
                 >
                     { options.map((o) => (
-                        <option key={o} value={o}>
+                        <MenuItem key={o} value={o}>
                             {o}
-                        </option>
+                        </MenuItem>
                     )) }
                 </TextField>
             </div>
