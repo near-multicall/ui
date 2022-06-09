@@ -34,6 +34,28 @@ class SputnikDAO {
         this.DAO_ADDRESS = dao_address;
     }
 
+    /**
+     * check of given accountId is a sputnikDAO instance.
+     * uses code_hash of the contract deployed on accountId.
+     * 
+     * @param accountId 
+     */
+    static async isSputnikDAO (accountId: string): Promise<boolean> {
+        const accountInfo: any = await window.near.connection.provider.query({
+            request_type: "view_account",
+            finality: "final",
+            account_id: accountId
+        });
+        const codeHash: string = accountInfo.code_hash;
+        return [
+            // Sputnik v2
+            "8RMeZ5cXDap6TENxaJKtigRYf3n139iHmTRe8ZUNey6N",
+            // TODO: add code hash of V2 with gas fix
+            // Sputnik v3
+            "2Zof1Tyy4pMeJM48mDSi5ww2QQhTz97b9S8h6W6r4HnK"
+        ].includes(codeHash);
+    }
+
 
     async add_proposal (args: object | Uint8Array, proposal_bond: string, ) {
         return tx(
