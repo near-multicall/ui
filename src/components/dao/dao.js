@@ -211,12 +211,11 @@ export default class Dao extends Component {
                             <div className="info-text">
                                 {/* // TODO more percise and short text */}
                                 {/* hint: you can use "genesis" or "test" as DAO to get to this message */}
-                                {`A multicall instance can only be deployed for this DAO (`} 
-                                {this.toLink(dao_address, false)} 
-                                {`) if the DAO approves the decision.
-                                Clicking the button below will create a proposal on the DAO, once approved, a multicall instance will be deployed at `}
-                                {this.toLink(multicall, false)}
-                                {`. If a multicall instance exists on the DAO, you will be able to manage and inspect it from this page.`}
+                                {`A multicall instance can only be created for `} 
+                                <a href={ dao.get_dao_url(SputnikUI.ASTRO_UI) } target="_blank" rel="noopener noreferrer">
+                                    { dao_address }
+                                </a>
+                                {` by making a proposal.`}
                             </div>
                             <button 
                                 className="create-multicall"
@@ -233,7 +232,7 @@ export default class Dao extends Component {
                         <div className="info-text">
                             {/* // TODO more percise and short text */}
                             {/* hint: you can use "ref-community-board-testnet" as DAO to get to this message */}
-                            {`Too bad, no propose rights.`}
+                            {`This DAO has no multicall instance. A DAO member with proposing permissions should make a proposal.`}
                         </div>
                     )
                 }
@@ -249,7 +248,7 @@ export default class Dao extends Component {
                     return (
                         <div className="info-text">
                             {/* // TODO more percise and short text */}
-                            {`Proposal exists (#${proposed}), but you can't vote.`}
+                            {`Proposal to create a multicall exists (#${proposed}), but you have no voting permissions on this DAO.`}
                             <br/>
                             <a target="_blank" href={dao.get_proposal_url(SputnikUI.ASTRO_UI, proposed)} rel="noopener noreferrer">
                                 Proposal on Astro
@@ -265,7 +264,7 @@ export default class Dao extends Component {
                     return (
                         <div className="info-text">
                             {/* // TODO more percise and short text */}
-                            {`Proposal exists, you already voted, now we wait.`}
+                            {`You have voted on creating a multicall instance for this DAO. It will be created as soon as the proposal passes voting.`}
                             <br/>
                             <a target="_blank" href={dao.get_proposal_url(SputnikUI.ASTRO_UI, proposed)} rel="noopener noreferrer">
                                 Proposal on Astro
@@ -276,14 +275,24 @@ export default class Dao extends Component {
                 // user can VoteApprove and did NOT vote yet.
                 else {
                     return (
-                        <button 
-                            className="create-multicall proposal-exists"
-                            onClick={() => {
-                                dao.act_proposal(proposed, "VoteApprove");
-                            }}
-                        >
-                            {`vote on creating a multicall instance`}
-                        </button>
+                        <>
+                            <div className="info-text">
+                                {/* // TODO more percise and short text */}
+                                {/* hint: you can use "genesis" or "test" as DAO to get to this message */}
+                                {`There exists a proposal (#${proposed}) to create a multicall instance for this DAO. `} 
+                                <a href={ dao.get_proposal_url(SputnikUI.ASTRO_UI, proposed) } target="_blank" rel="noopener noreferrer">
+                                    Open on AstroDAO
+                                </a>
+                            </div>
+                            <button 
+                                className="create-multicall proposal-exists"
+                                onClick={() => {
+                                    dao.act_proposal(proposed, "VoteApprove");
+                                }}
+                            >
+                                {`vote YES`}
+                            </button>
+                        </>
                     );
                 }
             }
