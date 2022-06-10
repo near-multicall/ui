@@ -46,7 +46,7 @@ export default class Sidebar extends Component {
         return <div className="save-menu">
             <ul>
                 <li onClick={ () => this.openDialog("saveAsJSON") }>Save as JSON</li>
-                {/* <li>Share as Link <Chip label="coming soon!"/></li> */}
+                <li>Share as Link <Chip label="coming soon!"/></li>
             </ul>
         </div>
 
