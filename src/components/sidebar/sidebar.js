@@ -1,19 +1,66 @@
+import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
+import FileUploadOutlinedIcon from '@mui/icons-material/FileUploadOutlined';
 import ScienceOutlinedIcon from '@mui/icons-material/ScienceOutlined';
-import { Icon } from '@mui/material';
+import { Chip, Icon, TextField } from '@mui/material';
 import React, { Component } from 'react';
 import { NavLink } from "react-router-dom";
+import Discord from '../../assets/discord.svg';
+import Github from '../../assets/github.svg';
+import Twitter from '../../assets/twitter.svg';
 import { Wallet } from '../../components';
-import Discord from '../../assets/discord.svg'
-import Twitter from '../../assets/twitter.svg'
-import Telegram from '../../assets/telegram.svg'
-import Github from '../../assets/github.svg'
+import { readFile, saveFile } from '../../utils/loader';
+import Dialog from '../dialog/dialog';
 import './sidebar.scss';
-
 export default class Sidebar extends Component {
+
+    constructor(props) {
+
+        super(props);
+
+        this.state = {
+            dialogs: {
+                saveAsJSON: false,
+                loadFromJSON: false
+            }
+        }
+
+    }
 
     componentDidMount() {
 
         window.SIDEBAR = this;
+
+    }
+
+    openDialog(name) {
+
+        const newDialogs = {...this.state.dialogs};
+        newDialogs[name] = true;
+
+        this.setState({ dialogs: newDialogs })
+
+    }
+
+    saveMenu() {
+
+        return <div className="save-menu">
+            <ul>
+                <li onClick={ () => this.openDialog("saveAsJSON") }>Save as JSON</li>
+                <li>Share as Link <Chip label="coming soon!"/></li>
+            </ul>
+        </div>
+
+    }
+
+    loadMenu() {
+
+        return <div className="load-menu">
+            <ul>
+                <li onClick={ () => this.openDialog("loadFromJSON") }>Load from JSON</li>
+                <li>Load from Proposal <Chip label="coming soon!"/></li>
+                {/* <li>Load from Link <Chip label="coming soon!"/></li> */}
+            </ul>
+        </div>
 
     }
 
@@ -33,6 +80,20 @@ export default class Sidebar extends Component {
                         <NavLink className={({ isActive }) => isActive ? "active" : ""} to="/dao">Dao</NavLink>
                     </nav>
                     <hr/>
+                    { window.PAGE === "app"
+                      ? <>
+                            <div className="save">
+                                <FileDownloadOutlinedIcon/>
+                                { this.saveMenu() }
+                            </div>
+                            <div className="load">
+                                <FileUploadOutlinedIcon/>
+                                { this.loadMenu() }
+                            </div>
+                        </>
+                      : null
+                    }
+                    <hr/>
                     <a target="_blank" rel="noopener noreferrer" href='https://twitter.com/near_multicall'>
                         <img src={Twitter} alt="Twitter"/>
                     </a>
@@ -45,9 +106,62 @@ export default class Sidebar extends Component {
                     {/* <img src={Telegram}/> */}
                     <Wallet/>
                 </div>
+                { this.dialogs() }
             </div>
         );
 
+    }
+
+    dialogs() {
+
+        const { dialogs } = this.state;
+
+        let fileName = "my-multicall";
+        let uploadedFile;
+
+        return [
+            <Dialog 
+                key="Save as JSON"
+                title="Save as JSON"
+                open={dialogs.saveAsJSON}
+                onClose={() => {
+                    dialogs.saveAsJSON = false;
+                    this.forceUpdate();
+                }}
+                onCancel={() => {}}
+                onDone={() => saveFile(`${fileName}.json`, [JSON.stringify(LAYOUT.toJSON(), null, 2)])}
+                doneRename="Download"
+            >
+                <TextField
+                    label="Multicall title"
+                    defaultValue="my-multicall"
+                    variant="filled"
+                    className="light-textfield"
+                    helperText="Please give a name to your multicall"
+                    onChange={(e) => fileName = e.target.value}
+                />
+            </Dialog>,
+            <Dialog
+                key="Load from JSON"
+                title="Load from JSON"
+                open={dialogs.loadFromJSON}
+                onClose={() => {
+                    dialogs.loadFromJSON = false;
+                    this.forceUpdate();
+                }}
+                onCancel={() => {}}
+                onDone={() => readFile(uploadedFile, json => LAYOUT.fromJSON(json))}
+                doneRename="Load"
+            >
+                <input 
+                    accept=".json,application/JSON"
+                    type="file"
+                    onChange={(e) => uploadedFile = e.target.files[0]}
+                />
+                <br/>
+                <b className="warn">Your current multicall will be replaced!</b>
+            </Dialog>
+        ]
     }
 
 }

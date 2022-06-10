@@ -4,13 +4,14 @@ import React, { Component } from 'react';
 import { TextInput, TextInputWithUnits } from '../components/editor/elements';
 import { ArgsAccount, ArgsBig, ArgsError, ArgsJSON, ArgsString } from '../utils/args';
 import Call from '../utils/call';
-import { toGas, toYocto, formatTokenAmount } from '../utils/converter';
+import { toGas, toYocto, formatTokenAmount, unitToDecimals } from '../utils/converter';
 import './base.scss';
 
 export default class BaseTask extends Component {
 
     uniqueClassName = "base-task";
     call;
+    loadErrors;
     baseErrors = {
         addr: new ArgsError("Invalid address", value => ArgsAccount.isValid(value), true),
         func: new ArgsError("Cannot be empty", value => value.value != "", true),
@@ -39,22 +40,13 @@ export default class BaseTask extends Component {
 
         } else if (window.COPY?.payload) {
 
-            const errorsDeepCopy = {};
-            Object.keys(COPY.payload.errors).map(key => {
-                errorsDeepCopy[key] = Object.assign(
-                    Object.create(Object.getPrototypeOf(COPY.payload.errors[key])),
-                    COPY.payload.errors[key]
-                )
-            })
-
             const optionsDeepCopy = JSON.parse(JSON.stringify(COPY.payload.options))
 
             this.init({
                 name: COPY.payload.call?.name?.toString(),
                 ...COPY.payload.call.toJSON(),
                 units: COPY.payload.call.toUnits(),
-                options: optionsDeepCopy,
-                errors: errorsDeepCopy
+                options: optionsDeepCopy
             });
             this.state.showArgs = COPY.payload.showArgs;
             COPY = null;
@@ -78,14 +70,14 @@ export default class BaseTask extends Component {
             func: new ArgsString(actions?.func ?? ""),
             args: new ArgsJSON(actions?.args ? JSON.stringify(actions?.args, null, "  ") : '{}'),
             gas: new ArgsBig(
-                formatTokenAmount(actions?.gas ?? "0", units?.gas.decimals),
+                formatTokenAmount(actions?.gas ?? toGas("0"), units?.gas.decimals ?? unitToDecimals["Tgas"]),
                 "1",
                 toGas("300"),
                 units?.gas?.unit ?? "Tgas",
                 units?.gas?.decimals
             ),
             depo: new ArgsBig(
-                formatTokenAmount(actions?.depo ?? "0", units?.depo.decimals),
+                formatTokenAmount(actions?.depo ?? toYocto("0"), units?.depo.decimals ?? unitToDecimals["NEAR"]),
                 toYocto("0"),
                 null,
                 units?.depo?.unit ?? "NEAR",
@@ -93,9 +85,15 @@ export default class BaseTask extends Component {
             )
         });
 
-        if (json?.errors)
-            this.errors = json.errors
+        this.loadErrors = (() => {
+            for (let e in this.errors)
+                this.errors[e].validOrNull(this.call[e])
+        }).bind(this);
 
+    }
+
+    componentDidMount() {
+        this.loadErrors?.();
     }
 
     onAddressesUpdated() { }

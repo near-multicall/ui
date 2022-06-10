@@ -1,6 +1,8 @@
 @use 'sass/mixin';
+@use 'sass/base';
 @use 'sass/color';
 @use 'sass/size';
+@use 'sass/font';
 @use 'sass/animation';
 
 .sidebar-wrapper {
@@ -76,4 +78,60 @@
             opacity: 1;
         }
     }
+    .save, .load {
+        position: relative;
+        .MuiSvgIcon-root {
+            color: color.$light;
+            padding: 0.25 * size.$sidebar-width;
+            font-size: 1.5 * size.$large-text;
+            cursor: pointer;
+            &:hover {
+                background-color: rgba(color.$light, 0.1);
+            }
+        }
+        &:hover div {
+            visibility: visible !important;
+        }
+        div.save-menu, div.load-menu {
+            visibility: hidden;
+            position: absolute;
+            left: size.$sidebar-width;
+            top: 0;
+            padding-left: 0.5 * size.$gap;
+            width: max-content;   
+            ul {
+                padding: 0;
+                margin-left: 0;
+                background-color: color.$black;
+                color: color.$light-text;
+                font-size: size.$text;
+                border-radius: size.$task-radius;
+                list-style: none;
+                overflow: hidden;
+                li {
+                    padding: 0.25 * size.$gap 0.5 * size.$gap;
+                    cursor: pointer;
+                    &:last-of-type {
+                        padding-bottom: 0.5 * size.$gap;
+                    }
+                    &:first-of-type {
+                        padding-top:  0.5 * size.$gap;
+                    }
+                    &:hover {
+                        background-color: rgba(color.$light, 0.1);
+                    }
+                    .MuiChip-root {
+                        background-color: color.$purple;
+                        font-size: 0.8 * size.$smaller-text;
+                        height: auto;
+                        margin-left: 1ch;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.warn {
+    color: color.$yellow;
 }

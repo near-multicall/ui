@@ -1,0 +1,27 @@
+@use 'sass/size';
+@use 'sass/color';
+
+.dialog {
+    .title {
+        font-size: size.$large-text;
+    }
+    .MuiPaper-root {
+        background-color: color.$black;
+        color: color.$light-text;
+        border-radius: size.$task-radius;
+        font-size: size.$text;
+    }
+    .action {
+        button {
+            font-size: size.$text;
+            border-radius: size.$task-radius;
+            padding: 0.25 * size.$gap size.$gap;
+            &.cancel {
+                background-color: color.$red;
+            }
+            &.done {
+                background-color: color.$green;
+            }
+        }
+    }
+}
