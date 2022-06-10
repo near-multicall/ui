@@ -61,7 +61,7 @@ export default class Transfer extends BaseTask {
                 }    
             ),
             gas: new ArgsBig(
-                formatTokenAmount(actions?.gas ?? "7", units?.gas.decimals ?? unitToDecimals["Tgas"]),
+                formatTokenAmount(actions?.gas ?? toGas("7"), units?.gas.decimals ?? unitToDecimals["Tgas"]),
                 toGas("1"), 
                 toGas("300"), 
                 units?.gas?.unit ?? "Tgas",

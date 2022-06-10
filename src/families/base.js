@@ -70,14 +70,14 @@ export default class BaseTask extends Component {
             func: new ArgsString(actions?.func ?? ""),
             args: new ArgsJSON(actions?.args ? JSON.stringify(actions?.args, null, "  ") : '{}'),
             gas: new ArgsBig(
-                formatTokenAmount(actions?.gas ?? "0", units?.gas.decimals ?? unitToDecimals["Tgas"]),
+                formatTokenAmount(actions?.gas ?? toGas("0"), units?.gas.decimals ?? unitToDecimals["Tgas"]),
                 "1",
                 toGas("300"),
                 units?.gas?.unit ?? "Tgas",
                 units?.gas?.decimals
             ),
             depo: new ArgsBig(
-                formatTokenAmount(actions?.depo ?? "0", units?.depo.decimals ?? unitToDecimals["NEAR"]),
+                formatTokenAmount(actions?.depo ?? toYocto("0"), units?.depo.decimals ?? unitToDecimals["NEAR"]),
                 toYocto("0"),
                 null,
                 units?.depo?.unit ?? "NEAR",
