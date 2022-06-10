@@ -2,7 +2,6 @@ import { DeleteOutline, EditOutlined, AddOutlined, PauseOutlined, PlayArrowOutli
 import { Base64 } from 'js-base64';
 import React, { Component } from 'react';
 import { ArgsAccount, ArgsError } from '../../utils/args';
-import { SputnikDAO } from '../../utils/contracts/sputnik-dao';
 import { toNEAR, toYocto, Big } from '../../utils/converter';
 import { view } from '../../utils/wallet';
 import { SputnikDAO, SputnikUI } from '../../utils/contracts/sputnik-dao';
