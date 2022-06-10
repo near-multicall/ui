@@ -82,8 +82,6 @@ export default class Transfer extends BaseTask {
 
         }).bind(this)
 
-        if (json?.errors)
-            this.errors = json.errors
 
     }
 

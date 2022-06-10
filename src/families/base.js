@@ -40,22 +40,13 @@ export default class BaseTask extends Component {
 
         } else if (window.COPY?.payload) {
 
-            const errorsDeepCopy = {};
-            Object.keys(COPY.payload.errors).map(key => {
-                errorsDeepCopy[key] = Object.assign(
-                    Object.create(Object.getPrototypeOf(COPY.payload.errors[key])),
-                    COPY.payload.errors[key]
-                )
-            })
-
             const optionsDeepCopy = JSON.parse(JSON.stringify(COPY.payload.options))
 
             this.init({
                 name: COPY.payload.call?.name?.toString(),
                 ...COPY.payload.call.toJSON(),
                 units: COPY.payload.call.toUnits(),
-                options: optionsDeepCopy,
-                errors: errorsDeepCopy
+                options: optionsDeepCopy
             });
             this.state.showArgs = COPY.payload.showArgs;
             COPY = null;
@@ -94,9 +85,15 @@ export default class BaseTask extends Component {
             )
         });
 
-        if (json?.errors)
-            this.errors = json.errors
+        this.loadErrors = (() => {
+            for (let e in this.errors)
+                this.errors[e].validOrNull(this.call[e])
+        }).bind(this);
 
+    }
+
+    componentDidMount() {
+        this.loadErrors?.();
     }
 
     onAddressesUpdated() { }
