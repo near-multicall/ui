@@ -2,8 +2,9 @@ import { DeleteOutline, EditOutlined, AddOutlined, PauseOutlined, PlayArrowOutli
 import { Base64 } from 'js-base64';
 import React, { Component } from 'react';
 import { ArgsAccount, ArgsError } from '../../utils/args';
+import { SputnikDAO } from '../../utils/contracts/sputnik-dao';
 import { toNEAR, toYocto, Big } from '../../utils/converter';
-import { view, tx } from '../../utils/wallet';
+import { view } from '../../utils/wallet';
 import { SputnikDAO, SputnikUI } from '../../utils/contracts/sputnik-dao';
 import { TextInput } from '../editor/elements';
 import { InputAdornment } from '@mui/material'
@@ -129,8 +130,8 @@ export default class Dao extends Component {
     getBaseAddress(address) {
 
         let base;
-        if (address.endsWith("." + window.nearConfig.SPUTNIK_V2_FACTORY_ADDRESS))
-            base = address.split("." + window.nearConfig.SPUTNIK_V2_FACTORY_ADDRESS)[0];
+        if (address.endsWith("." + SputnikDAO.FACTORY_ADDRESS))
+            base = address.split("." + SputnikDAO.FACTORY_ADDRESS)[0];
         else if (address.endsWith("." + window.nearConfig.MULTICALL_FACTORY_ADDRESS))
             base = address.split("." + window.nearConfig.MULTICALL_FACTORY_ADDRESS)[0];
         else
@@ -531,7 +532,7 @@ export default class Dao extends Component {
                             this.lastInput = new Date()
                         } }
                         InputProps={{
-                            endAdornment: <InputAdornment position="end">{`.${window.nearConfig.SPUTNIK_V2_FACTORY_ADDRESS}`}</InputAdornment>,
+                            endAdornment: <InputAdornment position="end">{`.${SputnikDAO.FACTORY_ADDRESS}`}</InputAdornment>,
                         }}
                     />
                 </div>
