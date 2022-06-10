@@ -28,8 +28,8 @@ export default class Wallet extends Component {
             wallet: null,
             bond: "0",
             expanded: {
-                user: true,
-                dao: true
+                user: false,
+                dao: false || (STORAGE.addresses.dao === "")
             }
         }
 
@@ -212,6 +212,19 @@ export default class Wallet extends Component {
                 MENU.forceUpdate()
 
             })
+            .finally(() => {
+
+                let color = "red";
+
+                if (ArgsAccount.isValid(dao) && !noDao.isBad)
+                    color = "yellow";
+
+                if (!noContract.isBad)
+                    color = "";
+
+                this.setState({color: color});
+
+            })
 
     }
 
@@ -243,7 +256,7 @@ export default class Wallet extends Component {
 
     render() {
 
-        const { wallet, expanded } = this.state;
+        const { wallet, expanded, color } = this.state;
 
         if (!wallet)
             return null;
@@ -278,7 +291,10 @@ export default class Wallet extends Component {
                     </div>
                 </div>
                 <span>for</span>
-                <div className="dao" expand={ expanded.dao || STORAGE.addresses.dao === "" ? "yes" : "no" }>
+                <div 
+                    className={`dao ${color}`} 
+                    expand={ expanded.dao ? "yes" : "no" }
+                >
                     <Icon 
                         className="icon" 
                         onClick={() => this.toggleExpandedDao() }
@@ -303,8 +319,11 @@ export default class Wallet extends Component {
                                     multicall: newValue.replace(window.nearConfig.SPUTNIK_V2_FACTORY_ADDRESS, window.nearConfig.MULTICALL_FACTORY_ADDRESS)
                                 })
                                 setTimeout(() => {
-                                    if (new Date() - this.lastInput > 400 && ArgsAccount.isValid(newValue))
-                                        this.connectDao(newValue)
+                                    if (new Date() - this.lastInput > 400)
+                                        if (ArgsAccount.isValid(newValue))
+                                            this.connectDao(newValue);
+                                        else
+                                            this.setState({color: newValue === "" ? "" : "red"})
                                 }, 500)
                                 this.lastInput = new Date()
                             }}

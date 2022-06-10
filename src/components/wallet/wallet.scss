@@ -95,7 +95,7 @@
                         padding: 0;
                         input, textarea {
                             height: 100%;
-                            width: 200px;
+                            width: 25rem;
                             padding: 0;
                             padding-right: 17.5px;
                             color: color.$light-text;
@@ -123,6 +123,14 @@
             .peek {
                 display: none;
             }
+        }
+        &.red > .icon {
+            border-color: color.$red;
+            color: color.$red;
+        }
+        &.yellow > .icon {
+            border-color: color.$yellow;
+            color: color.$yellow;
         }
     }
 }

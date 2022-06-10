@@ -1,6 +1,8 @@
 import { unitToDecimals, SIMPLE_NUM_REGEX, convert, Big } from "./converter";
 import { BigSource } from "big.js";
 
+
+
 export default abstract class Args {
 
     private types = {
@@ -49,7 +51,7 @@ export default abstract class Args {
 
     getUnit = (): {} => ({
         unit: this.unit,
-        decimals: this.decimals ?? unitToDecimals(this.unit) ?? 0
+        decimals: this.decimals ??  unitToDecimals[this.unit!]
     });
 
 }
@@ -111,9 +113,9 @@ class ArgsNumber extends Args {
         }
 
         // Try to initialize, otherwise assign undefined
-        let decimals: number | undefined = value.decimals ?? (value.unit ? unitToDecimals(value.unit) : undefined);
+        let decimals: number | undefined = value.decimals ?? (value.unit ? unitToDecimals[value.unit] : undefined);
 
-        if (decimals !== undefined && value.value.toString().split(".")[1]?.length > decimals) {
+        if ((decimals !== undefined) && (value.value.toString().split(".")[1]?.length > decimals)) {
             return false;
         }
 
@@ -152,7 +154,8 @@ class ArgsBig extends Args {
             return false;
         }
 
-        const decimals = value.decimals ?? unitToDecimals(value.unit)
+        // Try to initialize, otherwise assign undefined
+        let decimals: number | undefined = value.decimals ?? (value.unit ? unitToDecimals[value.unit] : undefined);
 
         if ((decimals !== undefined) && (value.value.split(".")[1]?.length > decimals)) {
             return false;

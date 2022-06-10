@@ -2,7 +2,7 @@ import Checkbox from '@mui/material/Checkbox';
 import React from 'react';
 import { ArgsAccount, ArgsBig, ArgsString, ArgsObject, ArgsError } from "../../utils/args";
 import Call from "../../utils/call";
-import { toGas, formatTokenAmount, toYocto } from "../../utils/converter";
+import { toGas, toYocto, formatTokenAmount } from "../../utils/converter";
 import BaseTask from "../base";
 import "./multicall.scss";
 import { TextInput, TextInputWithUnits } from '../../components/editor/elements';
@@ -38,10 +38,10 @@ export default class Transfer extends BaseTask {
                     account_id: new ArgsAccount(actions.args.account_id),
                     amount: actions.args.amount 
                         ? new ArgsBig(
-                            formatTokenAmount(actions.args.amount, units.args.amount.decimals), 
-                            "0", 
+                            formatTokenAmount(actions.args.amount, units.args.amount.decimals),
+                            toYocto("0"), 
                             null, 
-                            units.args.amount.unit, 
+                            units.args.amount.unit,
                             units.args.amount.decimals
                         )
                         : new ArgsBig("0", "0", "0")
@@ -52,10 +52,10 @@ export default class Transfer extends BaseTask {
                 }    
             ),
             gas: new ArgsBig(
-                formatTokenAmount(actions?.gas ?? toGas(3), units?.gas.decimals), 
-                "1", 
+                formatTokenAmount(actions?.gas ?? "3", units?.gas.decimals),
+                toGas("1"), 
                 toGas("300"), 
-                units?.gas?.unit ?? "gas", 
+                units?.gas?.unit ?? "Tgas",
                 units?.gas?.decimals
             ),
             depo: new ArgsBig("1", "1", "1", "yocto")
@@ -66,15 +66,8 @@ export default class Transfer extends BaseTask {
             this.options.all = true;
         }
 
-        this.loadErrors = (() => {
-
-            for (let e in this.baseErrors)
-                this.errors[e].validOrNull(this.call[e])
-
-            this.errors.receiver.validOrNull(this.call.args.value.account_id);
-            this.errors.amount.validOrNull(this.call.args.value.amount);
-
-        }).bind(this)
+        if (json?.errors)
+            this.errors = json.errors
     
     }
 
@@ -107,6 +100,7 @@ export default class Transfer extends BaseTask {
                     value={ name }
                     variant="standard"
                     margin="normal"
+                    autoFocus
                     update={ this.updateCard }
                 />
                 <TextInput 

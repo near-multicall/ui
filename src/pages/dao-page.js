@@ -5,6 +5,7 @@ export default function DaoPage() {
 
     window.PAGE = "dao";
 
+    // TODO: remove "full" prop
     return(
         <>
             <Sidebar full={true} />

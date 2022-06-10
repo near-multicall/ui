@@ -61,10 +61,10 @@ export default class Transfer extends BaseTask {
                 }    
             ),
             gas: new ArgsBig(
-                formatTokenAmount(actions?.gas ?? toGas(7), units?.gas.decimals), 
-                "1", 
+                formatTokenAmount(actions?.gas ?? "7", units?.gas.decimals),
+                toGas("1"), 
                 toGas("300"), 
-                units?.gas?.unit ?? "gas",
+                units?.gas?.unit ?? "Tgas",
                 units?.gas?.decimals
             ),
             depo: new ArgsBig("1", "1", "1", "yocto")
@@ -81,6 +81,9 @@ export default class Transfer extends BaseTask {
             WALLET.then(() => this.updateFT());
 
         }).bind(this)
+
+        if (json?.errors)
+            this.errors = json.errors
 
     }
 
@@ -135,6 +138,7 @@ export default class Transfer extends BaseTask {
                     value={ name }
                     variant="standard"
                     margin="normal"
+                    autoFocus
                     update={ this.updateCard }
                 />
                 <TextInput 

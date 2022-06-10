@@ -191,7 +191,7 @@ export default class Dao extends Component {
                 <button 
                     className="create-multicall proposal-exists"
                     onClick={() => {
-                        const sub = window.ENVIRONMENT === "testnet" 
+                        const sub = window.NEAR_ENV === "testnet" 
                             ? "testnet-v2"
                             : "v2"
                         window.open(`https://${sub}.sputnik.fund/#/${sputnik}/${proposed}`)}
@@ -333,7 +333,7 @@ export default class Dao extends Component {
 
         // error
         const errors = Object.keys(this.errors)
-            .map(e => <p key={`p-${e}`}>
+            .map(e => <p key={`p-${e}`} className={this.errors[e].isBad ? "red" : "green"}>
                     <span>{ this.errors[e].isBad ? '\u2717' : '\u2714' }  </span>
                     { this.errors[e].message }
                 </p>);

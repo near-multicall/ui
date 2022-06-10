@@ -10,7 +10,7 @@
     width: size.$menu-width;
     height: calc(100% - 2 * size.$gap);
     min-width: calc(size.$task-width + 2 * size.$gap);
-    background-color: color.$dark;
+    background-color: color.$black;
     box-shadow: 1px 10px 20px 0 rgba(0,0,0,0.2);
     border-radius: size.$task-radius;
     z-index: 2;
@@ -19,7 +19,7 @@
         height: 100%;
         .tab-list {
             @include mixin.center-items;
-            background-color: rgba(color.$darkest, 0.25);
+            box-shadow: inset 0px 0px 30px 0px rgba(color.$white, 0.1);
             border-radius: size.$task-radius;
             margin: size.$gap;
             padding: 0;
@@ -36,11 +36,11 @@
                 background-color: transparent;
                 &:focus,
                 &:hover {
-                    background-color: rgba(color.$darkest, 0.25);
+                    background-color: rgba(color.$white, 0.1);
                 }
                 &.active-tab {
                     color: color.$text;
-                    background-color: color.$light;
+                    background-color: color.$white;
                 }
             }
         }
