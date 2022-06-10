@@ -3,7 +3,7 @@ import React from 'react';
 import { TextInput, TextInputWithUnits } from '../../components/editor/elements';
 import { ArgsAccount, ArgsBig, ArgsError, ArgsObject, ArgsString } from "../../utils/args";
 import Call from "../../utils/call";
-import { toGas, formatTokenAmount } from "../../utils/converter";
+import { toGas, formatTokenAmount, unitToDecimals } from "../../utils/converter";
 import { view } from "../../utils/wallet";
 import BaseTask from "../base";
 import "./near.scss";
@@ -61,7 +61,7 @@ export default class Transfer extends BaseTask {
                 }    
             ),
             gas: new ArgsBig(
-                formatTokenAmount(actions?.gas ?? "7", units?.gas.decimals),
+                formatTokenAmount(actions?.gas ?? toGas("7"), units?.gas.decimals ?? unitToDecimals["Tgas"]),
                 toGas("1"), 
                 toGas("300"), 
                 units?.gas?.unit ?? "Tgas",
@@ -69,9 +69,19 @@ export default class Transfer extends BaseTask {
             ),
             depo: new ArgsBig("1", "1", "1", "yocto")
         });
+        
+        this.loadErrors = (() => {
 
-        if (json?.errors)
-            this.errors = json.errors
+            for (let e in this.baseErrors)
+                this.errors[e].validOrNull(this.call[e])
+
+            this.errors.receiver.validOrNull(this.call.args.value.receiver_id);
+            this.errors.amount.validOrNull(this.call.args.value.amount);
+
+            WALLET.then(() => this.updateFT());
+
+        }).bind(this)
+
 
     }
 

@@ -55,7 +55,7 @@ export default class Column extends Component {
                                     ref={provided.innerRef}
                                     {...provided.droppableProps}
                                 >
-                                    { this.props.tasks.map((task, index) => <Task key={task.id} task={task} index={index} />) }
+                                    { this.props.tasks.map((task, index) => <Task key={task.id} task={task} index={index} json={task.json}/>) }
                                     { provided.placeholder }
                                 </div>
                             ) }
