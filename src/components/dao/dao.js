@@ -363,7 +363,7 @@ export default class Dao extends Component {
             ),
             view(multicall, "get_tokens", {}).catch(e => {}),
             view(multicall, "get_jobs", {}).catch(e => {}),
-            view(multicall, "job_get_bond", {}).catch(e => {}),
+            view(multicall, "get_job_bond", {}).catch(e => {}),
             dao.get_last_proposal_id().catch(e => {}),
             dao.get_policy().catch(e => {
                     if (e.type === "AccountDoesNotExist" && e.toString().includes(` ${dao_address} `)) {
