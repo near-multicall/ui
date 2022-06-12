@@ -5,9 +5,8 @@ function getConfig(env) {
   case 'mainnet':
     return {
       networkId: 'mainnet',
-      MULTICALL_FACTORY_ADDRESS: "multicall.near",
+      MULTICALL_FACTORY_ADDRESS: "v1_03.multicall.near",
       WNEAR_ADDRESS: "wrap.near",
-      SPUTNIK_V2_FACTORY_ADDRESS: "sputnik-dao.near",
       EXAMPLE_ADDRESS: "example.near",
       REF_EXCHANGE_ADDRESS: "v2.ref-finance.near",
       CRONCAT_MANAGER_ADDRESS: "manager_v1.croncat.near",
@@ -20,9 +19,8 @@ function getConfig(env) {
   case 'testnet':
     return {
       networkId: 'testnet',
-      MULTICALL_FACTORY_ADDRESS: "v1_02.multicall.testnet",
+      MULTICALL_FACTORY_ADDRESS: "v1_03.multicall.testnet",
       WNEAR_ADDRESS: "wrap.testnet",
-      SPUTNIK_V2_FACTORY_ADDRESS: "sputnikv2.testnet",
       EXAMPLE_ADDRESS: "example.testnet",
       REF_EXCHANGE_ADDRESS: "ref-finance-101.testnet",
       CRONCAT_MANAGER_ADDRESS: "manager_v1.croncat.testnet",

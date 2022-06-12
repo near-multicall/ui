@@ -78,6 +78,14 @@
                 color: color.$green;
             }
         }
+        .info-text {
+            font-size: size.$text;
+            color: color.$dark;
+            max-width: 40em;
+            a {
+                color: darken(color.$blue, 20%) !important;
+            }
+        }
         .info-card {
             display: flex;
             position: relative;
@@ -174,7 +182,7 @@
         .create-multicall {
             width: fit-content;
             align-self: center;
-            font-size: size.$small-text;
+            font-size: size.$text;
             padding: 0.25em 0.75em;
             border-radius: 0.5em;
             background-color: color.$green;
