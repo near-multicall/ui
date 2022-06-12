@@ -79,7 +79,7 @@ export default class Dao extends Component {
         // Date.now() returns timestamp in milliseconds, SputnikDAO uses nanoseconds
         const currentTime = Big( Date.now() ).times("1000000");
 
-        return dao.get_proposals(
+        return dao.getProposals(
             {
                 from_index: lastProposalID < 100 ? 0 : lastProposalID - 100,
                 limit: 100
@@ -209,17 +209,16 @@ export default class Dao extends Component {
                     return (
                         <>
                             <div className="info-text">
-                                {/* // TODO more percise and short text */}
                                 {/* hint: you can use "genesis" or "test" as DAO to get to this message */}
                                 {`A multicall instance can only be created for `} 
-                                <a href={ dao.get_dao_url(SputnikUI.ASTRO_UI) } target="_blank" rel="noopener noreferrer">
+                                <a href={ dao.getDaoUrl(SputnikUI.ASTRO_UI) } target="_blank" rel="noopener noreferrer">
                                     { dao_address }
                                 </a>
                                 {` by making a proposal.`}
                             </div>
                             <button 
                                 className="create-multicall"
-                                onClick={() => { dao.add_proposal(args, infos.policy.proposal_bond); }}
+                                onClick={() => { dao.addProposal(args, infos.policy.proposal_bond); }}
                             >
                                 Propose
                             </button>
@@ -230,7 +229,6 @@ export default class Dao extends Component {
                 else if (noAddProposalRights.isBad) {
                     return (
                         <div className="info-text">
-                            {/* // TODO more percise and short text */}
                             {/* hint: you can use "ref-community-board-testnet" as DAO to get to this message */}
                             {`This DAO has no multicall instance. A DAO member with proposing permissions should make a proposal.`}
                         </div>
@@ -241,16 +239,11 @@ export default class Dao extends Component {
             else if (proposed !== -1) {
                 // user does not have rights to VoteApprove
                 if ( noApproveProposalRights.isBad ) {
-                    // TODO: return proposal number along with some text
-                    // explain that user can't do anything about it, but the DAO
-                    // will get a multicall instance as soon as proposal with ID passes.
-                    // Show link to proposal with: dao.get_proposal_url()
                     return (
                         <div className="info-text">
-                            {/* // TODO more percise and short text */}
                             {`Proposal to create a multicall exists (#${proposed}), but you have no voting permissions on this DAO.`}
                             <br/>
-                            <a target="_blank" href={dao.get_proposal_url(SputnikUI.ASTRO_UI, proposed)} rel="noopener noreferrer">
+                            <a target="_blank" href={dao.getProposalUrl(SputnikUI.ASTRO_UI, proposed)} rel="noopener noreferrer">
                                 Proposal on Astro
                             </a>
                         </div>
@@ -258,15 +251,11 @@ export default class Dao extends Component {
                 }
                 // user can VoteApprove and already voted
                 else if ( proposedInfo.votes[window.account.accountId] ) {
-                    // TODO: explain to user that he did everything he should.
-                    // DAO will get multicall instance as soon as other DAO members
-                    // also approve the proposal. Also link to the proposal in question.
                     return (
                         <div className="info-text">
-                            {/* // TODO more percise and short text */}
                             {`You have voted on creating a multicall instance for this DAO. It will be created as soon as the proposal passes voting.`}
                             <br/>
-                            <a target="_blank" href={dao.get_proposal_url(SputnikUI.ASTRO_UI, proposed)} rel="noopener noreferrer">
+                            <a target="_blank" href={dao.getProposalUrl(SputnikUI.ASTRO_UI, proposed)} rel="noopener noreferrer">
                                 Proposal on Astro
                             </a>
                         </div>
@@ -277,17 +266,16 @@ export default class Dao extends Component {
                     return (
                         <>
                             <div className="info-text">
-                                {/* // TODO more percise and short text */}
                                 {/* hint: you can use "genesis" or "test" as DAO to get to this message */}
                                 {`There exists a proposal (#${proposed}) to create a multicall instance for this DAO. `} 
-                                <a href={ dao.get_proposal_url(SputnikUI.ASTRO_UI, proposed) } target="_blank" rel="noopener noreferrer">
+                                <a href={ dao.getProposalUrl(SputnikUI.ASTRO_UI, proposed) } target="_blank" rel="noopener noreferrer">
                                     Open on AstroDAO
                                 </a>
                             </div>
                             <button 
                                 className="create-multicall proposal-exists"
                                 onClick={() => {
-                                    dao.act_proposal(proposed, "VoteApprove");
+                                    dao.actProposal(proposed, "VoteApprove");
                                 }}
                             >
                                 {`vote YES`}
@@ -372,8 +360,8 @@ export default class Dao extends Component {
             view(multicall, "get_tokens", {}).catch(e => {}),
             view(multicall, "get_jobs", {}).catch(e => {}),
             view(multicall, "get_job_bond", {}).catch(e => {}),
-            dao.get_last_proposal_id().catch(e => {}),
-            dao.get_policy().catch(e => {
+            dao.getLastProposalId().catch(e => {}),
+            dao.getPolicy().catch(e => {
                     if (e.type === "AccountDoesNotExist" && e.toString().includes(` ${dao_address} `)) {
                         noDao.isBad = true;
                     }

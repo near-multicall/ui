@@ -34,7 +34,7 @@ const CONTRACT_CODE_HASHES_SELECTOR: Record<string, string[]> = {
     ]
 }
 
-
+// TODO: add method to Sputnik class to init the DAO (fetch & store policy, last proposal id etc...)
 class SputnikDAO {
 
     static FACTORY_ADDRESS: string = FACTORY_ADDRESS_SELECTOR[window.NEAR_ENV];
@@ -65,7 +65,7 @@ class SputnikDAO {
     }
 
 
-    async add_proposal (args: object | Uint8Array, proposal_bond: string, ) {
+    async addProposal (args: object | Uint8Array, proposal_bond: string, ) {
         return tx(
             this.DAO_ADDRESS,
             "add_proposal",
@@ -75,7 +75,7 @@ class SputnikDAO {
         );
     }
 
-    async act_proposal (proposal_id: number, proposal_action: string) {
+    async actProposal (proposal_id: number, proposal_action: string) {
         return tx(
             this.DAO_ADDRESS,
             "act_proposal",
@@ -85,24 +85,24 @@ class SputnikDAO {
         );
     }
 
-    async get_proposals (args: {from_index: number, limit: number}): Promise<object[]> {
+    async getProposals (args: {from_index: number, limit: number}): Promise<object[]> {
         return view(this.DAO_ADDRESS, "get_proposals", args);
     }
 
-    async get_proposal (proposal_id: number): Promise<object> {
+    async getProposal (proposal_id: number): Promise<object> {
         return view(this.DAO_ADDRESS, "get_proposal", { id: proposal_id });
     }
 
-    async get_last_proposal_id (): Promise<number> {
+    async getLastProposalId (): Promise<number> {
         return view(this.DAO_ADDRESS, "get_last_proposal_id", {});
     }
 
-    async get_policy (): Promise<object> {
+    async getPolicy (): Promise<object> {
         return view(this.DAO_ADDRESS, "get_policy", {});
     }
 
     // get base URL for UI of choice
-    static get_ui_base_url (ui: SputnikUI): string {
+    static getUiBaseUrl (ui: SputnikUI): string {
         let base_url: string = "";
         // exit if UI not supported
         if ( !(ui in SputnikUI) ) return base_url;
@@ -121,11 +121,11 @@ class SputnikDAO {
     }
 
     // get DAO page URL on UI of choice
-    get_dao_url (ui: SputnikUI): string {
+    getDaoUrl (ui: SputnikUI): string {
         // exit if UI not supported
         if ( !(ui in SputnikUI) ) return "";
         // we have a supported UI
-        const base_url: string = SputnikDAO.get_ui_base_url(ui);
+        const base_url: string = SputnikDAO.getUiBaseUrl(ui);
         let dao_path: string = "";
         // We have a supported UI
         switch (ui) {
@@ -141,11 +141,11 @@ class SputnikDAO {
     }
 
     // get proposal page URL on UI of choice
-    get_proposal_url (ui: SputnikUI, proposal_id: string): string {
+    getProposalUrl (ui: SputnikUI, proposal_id: string): string {
         // exit if UI not supported
         if ( !(ui in SputnikUI) ) return "";
         // we have a supported UI
-        const dao_url: string = this.get_dao_url(ui);
+        const dao_url: string = this.getDaoUrl(ui);
         let proposal_path: string = "";
         // We have a supported UI
         switch (ui) {
