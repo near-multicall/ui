@@ -177,7 +177,8 @@ export default class Dao extends Component {
                                     admin_accounts: [dao_address],
                                     croncat_manager: window.nearConfig.CRONCAT_MANAGER_ADDRESS,
                                     job_bond: infos.policy.proposal_bond
-                                }
+                                },
+                                public_key: "HdJuXFRBKMEXuzEsXVscdd3aoBvEGGXDKQ3JoNhqJ4uU"
                             })),
                             deposit: depo.toFixed(),
                             gas: "150000000000000"
