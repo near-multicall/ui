@@ -5,7 +5,7 @@ function getConfig(env) {
   case 'mainnet':
     return {
       networkId: 'mainnet',
-      MULTICALL_FACTORY_ADDRESS: "v1_03.multicall.near",
+      MULTICALL_FACTORY_ADDRESS: "v1.multicall.near",
       WNEAR_ADDRESS: "wrap.near",
       EXAMPLE_ADDRESS: "example.near",
       REF_EXCHANGE_ADDRESS: "v2.ref-finance.near",
