@@ -6,20 +6,27 @@ class Persistent {
         dao: ""
     }
 
-    setAddresses(newAddresses) {
+    setAddresses(newAddresses: {
+        user?: string,
+        multicall?: string,
+        dao?: string
+    }) {
 
         this.addresses = {
             ...this.addresses,
             ...newAddresses
         }
         
-        window["TASKS"]?.map(t => t.instance.current.onAddressesUpdated());
-        window["MENU"]?.forceUpdate();
-        window["DAO"]?.onAddressesUpdated();
-        window["EXPORT"]?.onAddressesUpdated();
-
+        document.dispatchEvent(new CustomEvent('onaddressesupdated', {
+            detail: {
+                ...this.addresses
+            }
+        }))
+        
     }
 
 }
 
 window["STORAGE"] = new Persistent();
+
+export {}

@@ -57,6 +57,8 @@ export default class BaseTask extends Component {
 
         this.updateCard = this.updateCard.bind(this);
 
+        document.addEventListener('onaddressesupdated', (e) => this.onAddressesUpdated(e))
+
     }
 
     init(json = null) {

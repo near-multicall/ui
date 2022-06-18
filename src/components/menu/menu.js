@@ -14,6 +14,8 @@ export default class Menu extends Component {
             tab: 0
         }
 
+        document.addEventListener('onaddressesupdated', () => this.forceUpdate())
+
     }
 
     componentDidMount() {
