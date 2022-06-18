@@ -1,9 +1,15 @@
+import { initialData } from '../initial-data.js'
+
 export class Persistent {
 
     addresses = {
         user: "",
         multicall: "",
         dao: ""
+    }
+
+    layout = {
+        ...initialData
     }
 
     setAddresses(newAddresses: {
@@ -25,12 +31,30 @@ export class Persistent {
         
     }
 
+    // TODO type layout
+    setLayout(newLayout: any) {
+
+        this.layout = {
+            ...this.layout,
+            ...newLayout
+        }
+
+        document.dispatchEvent(new CustomEvent('onlayoutupdated', {
+            detail: {
+                ...this.layout
+            }
+        }))
+
+    }
+
     save() {
-        localStorage.setItem("multicall_addresses", JSON.stringify(this.addresses))
+        localStorage.setItem("multicall_addresses", JSON.stringify(this.addresses));
+        localStorage.setItem("multicall_layout", JSON.stringify(this.layout));
     }
 
     load() {
         this.setAddresses(JSON.parse(localStorage.getItem("multicall_addresses") ?? "{}"))
+        this.setLayout(JSON.parse(localStorage.getItem("multicall_layout") ?? "{}"))
     }
 
 }
