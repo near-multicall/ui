@@ -173,7 +173,7 @@ export default class Wallet extends Component {
                         console.error(e, {...e})
 
                     this.setState({ bond: "0" })
-                    MENU.forceUpdate()
+                    window.MENU?.forceUpdate()
                     
                 }),
             view(multicall, "get_admins", {})
@@ -186,7 +186,7 @@ export default class Wallet extends Component {
                     else
                         console.error(e, {...e})
 
-                    MENU.forceUpdate()
+                    window.MENU?.forceUpdate()
 
                 })
         ])

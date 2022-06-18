@@ -25,6 +25,14 @@ export class Persistent {
         
     }
 
+    save() {
+        localStorage.setItem("multicall_addresses", JSON.stringify(this.addresses))
+    }
+
+    load() {
+        this.setAddresses(JSON.parse(localStorage.getItem("multicall_addresses") ?? "{}"))
+    }
+
 }
 
 window.STORAGE = new Persistent();

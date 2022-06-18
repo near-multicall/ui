@@ -1,4 +1,10 @@
-window.onbeforeunload = function (e) {
+window.onload = function(e) {
+    window.STORAGE.load();
+}
+
+window.onbeforeunload = function(e) {
+    window.STORAGE.save();
+
     e = e || window.event;
 
     // For IE and Firefox prior to version 4
@@ -26,4 +32,4 @@ export function readFile(file: File, callback: (json: object) => any) {
     reader.readAsText(file,'UTF-8');
   
     reader.onload = e_reader => callback(JSON.parse(e_reader?.target?.result as string));
-  }
+}
