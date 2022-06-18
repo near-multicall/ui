@@ -1,4 +1,4 @@
-class Persistent {
+export class Persistent {
 
     addresses = {
         user: "",
@@ -27,6 +27,4 @@ class Persistent {
 
 }
 
-window["STORAGE"] = new Persistent();
-
-export {}
+window.STORAGE = new Persistent();

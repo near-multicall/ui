@@ -513,8 +513,6 @@ export default class Dao extends Component {
 
         const { addr } = this.state;
 
-        window.STATE = this.state;
-
         return (
             <div className="dao-container">
                 <div className="address-container">

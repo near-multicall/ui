@@ -1,4 +1,3 @@
-import { WindPower } from '@mui/icons-material';
 import React, { Component } from 'react'
 import { Draggable } from 'react-beautiful-dnd';
 import { Family } from '../../components';
@@ -27,7 +26,7 @@ export default class Task extends Component {
 
             if (from) {
 
-                COPY["payload"] = {
+                COPY.payload = {
                     call: from.call,
                     showArgs: from.state.showArgs,
                     options: from.options,

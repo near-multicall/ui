@@ -3,18 +3,6 @@ import { getConfig } from '../near-config';
 import { baseDecode } from "borsh";
 import { Base64 } from 'js-base64';
 
-
-
-declare global {
-    interface Window {
-        NEAR_ENV: string
-        nearConfig: any
-        near: nearAPI.Near
-        walletAccount: nearAPI.WalletConnection
-        account: nearAPI.ConnectedWalletAccount
-    }
-}
-
 window.NEAR_ENV = process.env.NEAR_ENV ?? "testnet";
 window.nearConfig = getConfig(window.NEAR_ENV);
 
