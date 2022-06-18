@@ -1,3 +1,8 @@
+# Deploy Preview context: All Deploy Previews
+# will inherit these settings.
+[context.deploy-preview]
+  command = "yarn build:testnet"
+
 [[plugins]]
   package = "@netlify/plugin-lighthouse"
 

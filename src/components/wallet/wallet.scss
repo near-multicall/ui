@@ -41,6 +41,7 @@
         padding: 0.25 * size.$gap size.$gap;
         color: rgba(color.$text, 0.25);
         font-size: size.$text;
+        white-space: nowrap;
     }
     .user {
         @include avatar;
