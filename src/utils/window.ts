@@ -9,7 +9,7 @@ type CardInfo = {
     options: Object;
     errors: Object;
 }
-WebAssembly
+
 type CardCopy = {
     from: String;
     to: String;
@@ -51,6 +51,6 @@ declare global {
         account: nearAPI.ConnectedWalletAccount
         accountId: string
         contract: nearAPI.Contract
-        
+
     }
 }
