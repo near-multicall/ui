@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import { Column, Menu } from '../../components.js'
+import { initialData } from '../../initial-data.js'
 import './layout.scss'
 
 export default class Layout extends Component {
@@ -331,6 +332,8 @@ export default class Layout extends Component {
     }
 
     fromJSON(json) {
+
+        console.log(json);
 
         const layout = window.STORAGE.layout;
 

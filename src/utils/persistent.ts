@@ -49,12 +49,15 @@ export class Persistent {
 
     save() {
         localStorage.setItem("multicall_addresses", JSON.stringify(this.addresses));
-        localStorage.setItem("multicall_layout", JSON.stringify(this.layout));
+        console.log(window.LAYOUT.toJSON());
+        localStorage.setItem("multicall_json", JSON.stringify(window.LAYOUT.toJSON()));
+        // localStorage.setItem("multicall_layout", JSON.stringify(this.layout));
     }
 
     load() {
-        this.setAddresses(JSON.parse(localStorage.getItem("multicall_addresses") ?? "{}"))
-        this.setLayout(JSON.parse(localStorage.getItem("multicall_layout") ?? "{}"))
+        this.setAddresses(JSON.parse(localStorage.getItem("multicall_addresses") ?? "{}"));
+        window.LAYOUT.fromJSON(JSON.parse(localStorage.getItem("multicall_json") ?? "[]"));
+        // this.setLayout(JSON.parse(localStorage.getItem("multicall_layout") ?? "{}"));
     }
 
 }

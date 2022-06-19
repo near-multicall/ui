@@ -2,6 +2,7 @@ import * as nearAPI from "near-api-js";
 import { Component } from "react";
 import { Persistent } from "./persistent";
 import Task from "./../components/task/task";
+import Layout from "./../components/layout/layout";
 
 type CardInfo = {
     call: Object;
@@ -26,7 +27,7 @@ declare global {
         EDITOR: Component
         EXPORT: Component
 
-        LAYOUT: Component
+        LAYOUT: Layout
         SIDEBAR: Component
 
         // List of all mounted tasks
