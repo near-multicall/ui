@@ -89,7 +89,7 @@ enum ProposalAction {
 }
 
 
-// TODO: add method to Sputnik class to init the DAO (fetch & store policy, last proposal id etc...)
+
 class SputnikDAO {
 
     static FACTORY_ADDRESS: string = FACTORY_ADDRESS_SELECTOR[window.NEAR_ENV];
@@ -254,7 +254,7 @@ class SputnikDAO {
         
         // get all the user's permissions on the chosen proposal kind
         const proposalKindPermissions: string[] = this.policy.roles
-                .filter(r => r.kind === "Everyone" || r.kind.Group.includes(userAddr))
+                .filter(r => r.kind === "Everyone" || r.kind.Group?.includes(userAddr))
                 .map(r => r.permissions)
                 .flat()
                 .filter(permission => {

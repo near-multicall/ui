@@ -1,4 +1,4 @@
-import { DeleteOutline, EditOutlined, AddOutlined, PauseOutlined, PlayArrowOutlined, TrendingUpOutlined } from '@mui/icons-material';
+import { DeleteOutline, EditOutlined, AddOutlined, PauseOutlined, PlayArrowOutlined } from '@mui/icons-material';
 import { Base64 } from 'js-base64';
 import React, { Component } from 'react';
 import { ArgsAccount, ArgsError } from '../../utils/args';
@@ -18,10 +18,6 @@ export default class DaoComponent extends Component {
         addrError: new ArgsError("Invalid NEAR address", value => ArgsAccount.isValid(value), !ArgsAccount.isValid(STORAGE.addresses?.dao ?? "")),
         noDao: new ArgsError("Sputnik DAO not found on given address", value => this.errors.noDao.isBad),
         noContract: new ArgsError("DAO has no multicall instance", value => this.errors.noContract.isBad),
-        // TODO: remove, use SputnikDAO function instead
-        noAddProposalRights: new ArgsError("Permission to create a proposal on this dao", value => this.errors.noAddProposalRights),
-        // TODO: remove, use SputnikDAO function instead
-        noApproveProposalRights: new ArgsError("Permission to approve a proposal on this dao", value => this.errors.noApproveProposalRights) 
     }
 
     lastInput;
@@ -146,12 +142,7 @@ export default class DaoComponent extends Component {
             return;
 
         const { loading, addr, dao, infos, proposed, proposedInfo } = this.state;
-        const {
-            noContract,
-            noDao,
-            noAddProposalRights,
-            noApproveProposalRights
-        } = this.errors;
+        const { noContract, noDao } = this.errors;
 
         // happens if wallet not logged in or DAO object not initialized yet
         if (dao?.ready === false)
@@ -159,6 +150,10 @@ export default class DaoComponent extends Component {
 
         const multicall = `${addr.value}.${window.nearConfig.MULTICALL_FACTORY_ADDRESS}`;
         const depo = Big(this.fee).plus(MIN_INSTANCE_BALANCE);
+        // can user propose a FunctionCall to DAO?
+        const canPropose = dao.checkUserPermission(window.account.accountId, ProposalAction.AddProposal, ProposalKind.FunctionCall);
+        // can user vote approve a FunctionCall on the DAO?
+        const canApprove = dao.checkUserPermission(window.account.accountId, ProposalAction.VoteApprove, ProposalKind.FunctionCall);
 
         const args = {
             proposal: {
@@ -184,15 +179,6 @@ export default class DaoComponent extends Component {
             }
         };
 
-        // console.log(
-        //     "noContract", noContract.isBad, "\n",
-        //     "noDao", noDao.isBad, "\n",
-        //     "proposed", proposed !== -1, "\n",
-        //     "noAddProposalRights", noAddProposalRights.isBad, "\n",
-        //     "noApproveProposalRights", noApproveProposalRights.isBad, "\n",
-        //     "user has voted", proposedInfo?.votes?.[window.account.accountId]
-        // )
-
         if (
             noContract.isBad 
             && !noDao.isBad // base.sputnik-dao.near does not exist
@@ -202,7 +188,7 @@ export default class DaoComponent extends Component {
             // no create multicall proposal exists
             if (proposed === -1) {
                 // ... and user can propose FunctionCall
-                if (!noAddProposalRights.isBad) {
+                if ( canPropose ) {
                     return (
                         <>
                             <div className="info-text">
@@ -223,7 +209,7 @@ export default class DaoComponent extends Component {
                     )
                 } 
                 // ... and user cannot propose FunctionCall
-                else if (noAddProposalRights.isBad) {
+                else {
                     return (
                         <div className="info-text">
                             {/* hint: you can use "ref-community-board-testnet" as DAO to get to this message */}
@@ -235,7 +221,7 @@ export default class DaoComponent extends Component {
             // create multicall proposal exists
             else if (proposed !== -1) {
                 // user does not have rights to VoteApprove
-                if ( noApproveProposalRights.isBad ) {
+                if ( !canApprove ) {
                     return (
                         <div className="info-text">
                             {`Proposal to create a multicall exists (#${proposed}), but you have no voting permissions on this DAO.`}
@@ -316,31 +302,20 @@ export default class DaoComponent extends Component {
 
     loadInfos() {
 
-        const {
-            addrError,
-            noContract,
-            noDao,
-            noAddProposalRights,
-            noApproveProposalRights
-        } = this.errors;
+        const { addrError, noContract, noDao } = this.errors;
         const { addr, dao } = this.state;
 
         const multicall = `${addr.value}.${window.nearConfig.MULTICALL_FACTORY_ADDRESS}`;
-        const dao_address = `${addr.value}.${SputnikDAO.FACTORY_ADDRESS}`;
 
         this.lastAddr = addr.value;
 
         noContract.isBad = false;
         noDao.isBad = false;
-        noAddProposalRights.isBad = false;
-        noApproveProposalRights.isBad = false;
 
         // chosen address violates NEAR AccountId rules.
         if (addrError.isBad) {
             noContract.isBad = true;
             noDao.isBad = true;
-            noAddProposalRights.isBad = true;
-            noApproveProposalRights.isBad = true;
             this.setState({ proposed: -1, proposedInfo: {} });
             return;
         }
@@ -350,7 +325,7 @@ export default class DaoComponent extends Component {
         let newState = {};
 
         // initialize DAO object
-        SputnikDAO.init(dao_address).catch(e => {})
+        SputnikDAO.init(dao.address).catch(e => {})
         .then((newDAO) => {
             // DAO not ready => either no SputnikDAO contract on the chosen address
             // or some error happened during DAO object init.
@@ -385,23 +360,6 @@ export default class DaoComponent extends Component {
                 proposedInfo: proposal_info
             }
 
-            // can user propose a FunctionCall to DAO?
-            const { dao } = this.state;
-            const canPropose = dao.checkUserPermission(
-                window.account.accountId,
-                ProposalAction.AddProposal,
-                ProposalKind.FunctionCall
-            );
-            // can user vote approve a FunctionCall on the DAO?
-            const canApprove = dao.checkUserPermission(
-                window.account.accountId,
-                ProposalAction.VoteApprove,
-                ProposalKind.FunctionCall
-            );
-
-            if ( ! canPropose ) noAddProposalRights.isBad = true; // no add proposal rights
-            if ( ! canApprove ) noApproveProposalRights.isBad = true; // no vote approve proposal rights
-
             // update visuals
             this.setState(newState);
         })
@@ -431,9 +389,9 @@ export default class DaoComponent extends Component {
             </div>
 
         // errors to display
-        const noDisplayErrors = ["noAddProposalRights", "noApproveProposalRights"]
+        const displayErrorsList = ["addrError", "noDao", "noContract"];
         const displayErrors = Object.keys(this.errors)
-            .filter(e => this.errors[e].isBad && !noDisplayErrors.includes(e))
+            .filter(e => this.errors[e].isBad && displayErrorsList.includes(e))
             .map(e => <p key={`p-${e}`} className={"red"}>
                     <span>{ this.errors[e].isBad ? '\u2717' : '\u2714' }  </span>
                     { this.errors[e].message }
