@@ -104,7 +104,7 @@ export default class Wallet extends Component {
 
     }
 
-    proposeFT(desc, depo, gas, token, amount) {
+    proposeFT(desc, gas, token, amount) {
 
         const {
             multicall,
@@ -128,7 +128,7 @@ export default class Wallet extends Component {
                                         args: Base64.encode(JSON.stringify({"calls":LAYOUT.toBase64()}).toString())
                                     }).toString()
                                 })),
-                                deposit: `${depo}`,
+                                deposit: "1", // nep-141 ft_transfer_call gets EXACTLY 1 yocto
                                 gas: `${gas}`
                             }
                         ]

@@ -1,6 +1,11 @@
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import { InputAdornment } from '@mui/material';
 import Checkbox from '@mui/material/Checkbox';
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import FormControl from '@mui/material/FormControl';
+import FormLabel from '@mui/material/FormLabel';
 import Icon from '@mui/material/Icon';
 import TextField from '@mui/material/TextField';
 import { Base64 } from 'js-base64';
@@ -38,7 +43,9 @@ export default class Export extends Component {
         token: new ArgsAccount(window.nearConfig.WNEAR_ADDRESS)
     }
 
-    attachFTs = false;
+    attachTokens = false;
+    attachNEAR = false;
+    attachFT = false;
     showArgs = false;
 
     lastInput;
@@ -178,55 +185,91 @@ export default class Export extends Component {
                             options={[ "Tgas", "gas" ]}
                             update={ this.update }
                         />
-                        <TextInputWithUnits 
-                            label="Total attached deposit"
-                            value={ depo }
-                            error={ errors.depo }
-                            options={[ "NEAR", "yocto" ]}
-                            update={ this.update }
-                        />
                         <div className="checkbox">
                             <Checkbox
-                                checked={ this.attachFTs }
+                                checked={ this.attachTokens }
                                 onChange={e => {
-                                    this.attachFTs = e.target.checked;
+                                    this.attachTokens = e.target.checked;
                                     this.update();
                                 }}
                             />
-                            <p>Attach FTs to multicall</p>
+                            <p>Attach a token to multicall</p>
                         </div>
-                        { this.attachFTs
+                        { this.attachTokens
                             ? <>
-                                <TextInput
-                                    label="Token contract"
-                                    value={ token }
-                                    error={[ errors.token, errors.noToken, errors.notWhitelisted ]}
-                                    update={ () => {
-                                        this.update();
-                                        setTimeout(() => {
-                                            if (new Date() - this.lastInput > 400)
-                                                this.updateFT()
-                                        }, 500)
-                                        this.lastInput = new Date()
-                                    } }
-                                />
-                                <TextField
-                                    label="Amount"
-                                    value={ errors.amount.validOrNull(amount) || errors.amount.intermediate }
-                                    margin="dense"
-                                    size="small"
-                                    onChange={(e) => {
-                                        amount.value = e.target.value;
-                                        errors.amount.validOrNull(amount);
-                                        this.update();
-                                    }}
-                                    error={errors.amount.isBad}
-                                    helperText={errors.amount.isBad && errors.amount.message}
-                                    InputLabelProps={{ shrink: true }}
-                                    InputProps={{
-                                        endAdornment: <InputAdornment position="end">{amount.unit}</InputAdornment>,
-                                    }}
-                                />
+                                <FormControl>
+                                    <RadioGroup
+                                        row
+                                        aria-labelledby="demo-row-radio-buttons-group-label"
+                                        name="row-radio-buttons-group"
+                                    >
+                                        <FormControlLabel
+                                            checked={this.attachNEAR}
+                                            onChange={() => {
+                                                this.attachNEAR = true;
+                                                this.attachFT = false;
+                                                this.update();
+                                            }}
+                                            control={<Radio />}
+                                            label="NEAR"
+                                        />
+                                        <FormControlLabel
+                                            checked={this.attachFT}
+                                            onChange={() => {
+                                                this.attachFT = true;
+                                                this.attachNEAR = false;
+                                                this.update();
+                                            }}
+                                            control={<Radio />}
+                                            label="Fungible token"
+                                        />
+                                    </RadioGroup>
+                                </FormControl>
+                                { this.attachNEAR ?
+                                    <TextInputWithUnits 
+                                        label="Total attached deposit"
+                                        value={ depo }
+                                        error={ errors.depo }
+                                        options={[ "NEAR", "yocto" ]}
+                                        update={ this.update }
+                                    />
+                                    : <></>
+                                }
+                                { this.attachFT ?
+                                    <>
+                                        <TextInput
+                                            label="Token contract"
+                                            value={ token }
+                                            error={[ errors.token, errors.noToken, errors.notWhitelisted ]}
+                                            update={ () => {
+                                                this.update();
+                                                setTimeout(() => {
+                                                    if (new Date() - this.lastInput > 400)
+                                                        this.updateFT()
+                                                }, 500)
+                                                this.lastInput = new Date()
+                                            } }
+                                        />
+                                        <TextField
+                                            label="Amount"
+                                            value={ errors.amount.validOrNull(amount) || errors.amount.intermediate }
+                                            margin="dense"
+                                            size="small"
+                                            onChange={(e) => {
+                                                amount.value = e.target.value;
+                                                errors.amount.validOrNull(amount);
+                                                this.update();
+                                            }}
+                                            error={errors.amount.isBad}
+                                            helperText={errors.amount.isBad && errors.amount.message}
+                                            InputLabelProps={{ shrink: true }}
+                                            InputProps={{
+                                                endAdornment: <InputAdornment position="end">{amount.unit}</InputAdornment>,
+                                            }}
+                                        />
+                                    </>
+                                    : <></>
+                                }
                             </>
                             : <></>
                         }
@@ -276,7 +319,7 @@ export default class Export extends Component {
                         { this.showArgs 
                             ? <div className="value">
                                 <pre className="code">
-                                    { !this.attachFTs
+                                    { !this.attachTokens
                                         ? JSON.stringify({calls: LAYOUT.toBase64()}) 
                                         : JSON.stringify({
                                             receiver_id: STORAGE.addresses.multicall, 
@@ -302,12 +345,12 @@ export default class Export extends Component {
                                 || errors.depo.isBad
                                 || errors.desc.isBad
                                 || errors.hasErrors.isBad
-                                || (this.attachFTs && (errors.amount.isBad || errors.token.isBad))
+                                || (this.attachTokens && (errors.amount.isBad || errors.token.isBad))
                                 || walletError
                             }
                             onClick={() => {
-                                if (this.attachFTs)
-                                    WALLET.proposeFT(desc.value, convert(depo.value, depo.unit), convert(gas.value, gas.unit), token.value, convert(amount.value, amount.unit, amount.decimals))
+                                if (this.attachTokens)
+                                    WALLET.proposeFT(desc.value, convert(gas.value, gas.unit), token.value, convert(amount.value, amount.unit, amount.decimals))
                                 else
                                     WALLET.propose(desc.value, convert(depo.value, depo.unit), convert(gas.value, gas.unit))
                             }}
