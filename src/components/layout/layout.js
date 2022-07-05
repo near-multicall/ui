@@ -338,6 +338,9 @@ export default class Layout extends Component {
 
         this.clear();
 
+        if (!Array.isArray(json) || !json.length)
+            return;
+
         this.columnID = 0;
 
         let newLayout = {
