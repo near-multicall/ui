@@ -110,6 +110,16 @@ export default class Task extends Component {
                 }
 
             default:
+                for (let family in Family) {
+                    if (family === "BaseTask")
+                        continue;
+                    for (let task in Family[family])
+                        if (Family[family][task].inferOwnType(json)) {
+                            const TaskComponent = Family[family][task];
+                            return <TaskComponent ref={this.instance} id={this.id} json={json}/>
+                        }
+                }
+
                 return <Family.BaseTask ref={this.instance} id={this.id} json={json}/>
 
         }
@@ -136,7 +146,7 @@ export default class Task extends Component {
                                 : 1
                         }}
                     >
-                        <h1 style={{paddingLeft: "20px"}}>{this.id}</h1>
+                        {/* <h1 style={{paddingLeft: "20px"}}>{this.id}</h1> */}
                         { this.child }
                     </div>
                 )}

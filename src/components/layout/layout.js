@@ -22,6 +22,7 @@ export default class Layout extends Component {
     componentDidMount() {
 
         window.LAYOUT = this;
+        window.STORAGE.load();
 
     }
 
@@ -332,8 +333,6 @@ export default class Layout extends Component {
     }
 
     fromJSON(json) {
-
-        console.log(json);
 
         const layout = window.STORAGE.layout;
 

@@ -94,6 +94,10 @@ export default class BaseTask extends Component {
 
     }
 
+    static inferOwnType(json) {
+        return false;
+    }
+
     componentDidMount() {
         this.loadErrors?.();
     }

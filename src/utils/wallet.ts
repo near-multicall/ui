@@ -14,7 +14,7 @@ window.nearConfig = getConfig(window.NEAR_ENV);
  */
 async function initNear (): Promise<nearAPI.WalletConnection> {
     // Initializing connection to the NEAR node.
-    window.near = await nearAPI.connect(
+    window.near = window.near ?? await nearAPI.connect(
         Object.assign(
             {
                 deps: {
@@ -26,8 +26,8 @@ async function initNear (): Promise<nearAPI.WalletConnection> {
     )
 
     // Initializing Wallet based Account.
-    window.walletAccount = new nearAPI.WalletAccount(window.near, null)
-    window.account = window.walletAccount.account()
+    window.walletAccount =  window.walletAccount ?? new nearAPI.WalletAccount(window.near, null)
+    window.account = window.account ?? window.walletAccount.account()
 
     return window.walletAccount;
 }
