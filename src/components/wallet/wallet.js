@@ -210,7 +210,8 @@ export default class Wallet extends Component {
 
                 if ( ! canPropose ) noRights.isBad = true; // no add proposal rights
 
-                MENU.forceUpdate()
+                if (window.MENU !== undefined)
+                    window.MENU.forceUpdate()
 
             })
             .finally(() => {

@@ -48,8 +48,10 @@ export class Persistent {
     }
 
     save() {
+        if (window.PAGE !== "app") return;
+
         localStorage.setItem("multicall_addresses", JSON.stringify(this.addresses));
-        localStorage.setItem("multicall_json", JSON.stringify(window.LAYOUT?.toJSON()));
+        localStorage.setItem("multicall_json", JSON.stringify(window.LAYOUT.toJSON()));
         // localStorage.setItem("multicall_layout", JSON.stringify(this.layout));
     }
 
