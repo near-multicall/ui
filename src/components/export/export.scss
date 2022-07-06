@@ -114,12 +114,14 @@
             margin: 0 0.5ch;
             padding: 0 1em;
             border-radius: size.$task-radius;
+            border: 1px solid color.$light;
             font-size: size.$small-text;
             font-weight: 800;
             color: color.$light;
             background-color: rgba(color.$white, 0.1);
             &.selected {
                 color: color.$green;
+                border: 1px solid color.$green;
             }
             &:hover {
                 background-color: rgba(color.$white, 0.2);
