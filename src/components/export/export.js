@@ -185,93 +185,74 @@ export default class Export extends Component {
                             options={[ "Tgas", "gas" ]}
                             update={ this.update }
                         />
-                        <div className="checkbox">
-                            <Checkbox
-                                checked={ this.attachTokens }
-                                onChange={e => {
-                                    this.attachTokens = e.target.checked;
+                        <div className="attachment">
+                            <p>Attach</p>
+                            <button 
+                                className={this.attachNEAR ? "selected" : ""} 
+                                onClick={() => {
+                                    this.attachNEAR = !this.attachNEAR;
+                                    this.attachFT = false;
                                     this.update();
                                 }}
-                            />
-                            <p>Attach a token to multicall</p>
+                            >
+                                NEAR
+                            </button>
+                            <p>or</p>
+                            <button 
+                                className={this.attachFT ? "selected" : ""}
+                                onClick={() => {
+                                    this.attachNEAR = false;
+                                    this.attachFT = !this.attachFT;
+                                    this.update();
+                                }}
+                            >
+                                fungible token
+                            </button>
                         </div>
-                        { this.attachTokens
-                            ? <>
-                                <FormControl>
-                                    <RadioGroup
-                                        row
-                                        aria-labelledby="demo-row-radio-buttons-group-label"
-                                        name="row-radio-buttons-group"
-                                    >
-                                        <FormControlLabel
-                                            checked={this.attachNEAR}
-                                            onChange={() => {
-                                                this.attachNEAR = true;
-                                                this.attachFT = false;
-                                                this.update();
-                                            }}
-                                            control={<Radio />}
-                                            label="NEAR"
-                                        />
-                                        <FormControlLabel
-                                            checked={this.attachFT}
-                                            onChange={() => {
-                                                this.attachFT = true;
-                                                this.attachNEAR = false;
-                                                this.update();
-                                            }}
-                                            control={<Radio />}
-                                            label="Fungible token"
-                                        />
-                                    </RadioGroup>
-                                </FormControl>
-                                { this.attachNEAR ?
-                                    <TextInputWithUnits 
-                                        label="Total attached deposit"
-                                        value={ depo }
-                                        error={ errors.depo }
-                                        options={[ "NEAR", "yocto" ]}
-                                        update={ this.update }
-                                    />
-                                    : <></>
-                                }
-                                { this.attachFT ?
-                                    <>
-                                        <TextInput
-                                            label="Token contract"
-                                            value={ token }
-                                            error={[ errors.token, errors.noToken, errors.notWhitelisted ]}
-                                            update={ () => {
-                                                this.update();
-                                                setTimeout(() => {
-                                                    if (new Date() - this.lastInput > 400)
-                                                        this.updateFT()
-                                                }, 500)
-                                                this.lastInput = new Date()
-                                            } }
-                                        />
-                                        <TextField
-                                            label="Amount"
-                                            value={ errors.amount.validOrNull(amount) || errors.amount.intermediate }
-                                            margin="dense"
-                                            size="small"
-                                            onChange={(e) => {
-                                                amount.value = e.target.value;
-                                                errors.amount.validOrNull(amount);
-                                                this.update();
-                                            }}
-                                            error={errors.amount.isBad}
-                                            helperText={errors.amount.isBad && errors.amount.message}
-                                            InputLabelProps={{ shrink: true }}
-                                            InputProps={{
-                                                endAdornment: <InputAdornment position="end">{amount.unit}</InputAdornment>,
-                                            }}
-                                        />
-                                    </>
-                                    : <></>
-                                }
+                        { this.attachNEAR ?
+                            <TextInputWithUnits 
+                                label="Total attached deposit"
+                                value={ depo }
+                                error={ errors.depo }
+                                options={[ "NEAR", "yocto" ]}
+                                update={ this.update }
+                            />
+                            : null
+                        }
+                        { this.attachFT ?
+                            <>
+                                <TextInput
+                                    label="Token contract"
+                                    value={ token }
+                                    error={[ errors.token, errors.noToken, errors.notWhitelisted ]}
+                                    update={ () => {
+                                        this.update();
+                                        setTimeout(() => {
+                                            if (new Date() - this.lastInput > 400)
+                                                this.updateFT()
+                                        }, 500)
+                                        this.lastInput = new Date()
+                                    } }
+                                />
+                                <TextField
+                                    label="Amount"
+                                    value={ errors.amount.validOrNull(amount) || errors.amount.intermediate }
+                                    margin="dense"
+                                    size="small"
+                                    onChange={(e) => {
+                                        amount.value = e.target.value;
+                                        errors.amount.validOrNull(amount);
+                                        this.update();
+                                    }}
+                                    error={errors.amount.isBad}
+                                    helperText={errors.amount.isBad && errors.amount.message}
+                                    InputLabelProps={{ shrink: true }}
+                                    InputProps={{
+                                        endAdornment: <InputAdornment position="end">{amount.unit}</InputAdornment>,
+                                    }}
+                                />
                             </>
-                            : <></>
+                            : null
                         }
                     </div>
                     { allErrors.length > 0 && <div className="error-container">
