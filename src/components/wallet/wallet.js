@@ -332,8 +332,8 @@ export default class Wallet extends Component {
                             }
                             onInputChange={(e) => {
                                 if (e !== null) {
-                                    console.log(e);
-                                    this.daoSearch(e.target.value);
+                                    searchDelayed.cancel();
+                                    searchDelayed(e.target.value);
                                 }
                             }}
                         />
