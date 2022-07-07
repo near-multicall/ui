@@ -7,6 +7,7 @@ import { view, tx } from '../../utils/wallet';
 import { TextInput } from '../editor/elements';
 import { InputAdornment } from '@mui/material'
 import './dao.scss';
+import debounce from 'lodash.debounce';
 
 // minimum balance a multicall instance needs for storage + state.
 const MIN_INSTANCE_BALANCE = toYocto(1); // 1 NEAR
@@ -17,7 +18,7 @@ export default class Dao extends Component {
         addr: new ArgsError("Address valid", value => ArgsAccount.isValid(value), !ArgsAccount.isValid(STORAGE.addresses?.dao ?? "")),
         noContract: new ArgsError("Multicall found", value => this.errors.noContract.isBad),
         noDao: new ArgsError("Sputnik dao found", value => this.errors.noDao.isBad),
-        noRights: new ArgsError("Permission to create a proposal on this dao", value => this.errors.noRights), 
+        noRights: new ArgsError("Permission to create a proposal on this dao", value => this.errors.noRights),
     }
 
     lastInput;
@@ -46,7 +47,7 @@ export default class Dao extends Component {
                 "get_fee",
                 {}
             ))
-            .then(res => { 
+            .then(res => {
                 this.fee = res;
                 this.loadInfos()
             })
@@ -80,7 +81,7 @@ export default class Dao extends Component {
             ))
             .then(res => {
 
-                const proposals = res.filter(p => 
+                const proposals = res.filter(p =>
                     p.kind?.FunctionCall?.receiver_id === window.nearConfig.MULTICALL_FACTORY_ADDRESS &&
                     p.kind?.FunctionCall?.actions?.[0]?.method_name === "create" &&
                     p.status === 'InProgress'
@@ -89,12 +90,12 @@ export default class Dao extends Component {
                 return proposals.length > 0
                     ? proposals.pop().id
                     : -1
-                    
-            }).catch(e => {})
+
+            }).catch(e => { })
 
     }
 
-    onAddressesUpdated() {  
+    onAddressesUpdated() {
 
         if (this.getBaseAddress(STORAGE.addresses.dao) !== this.state.addr.value)
             this.setState({
@@ -166,40 +167,41 @@ export default class Dao extends Component {
             }
         };
 
-        if (noContract.isBad 
+        if (noContract.isBad
             && !noDao.isBad // base.sputnik.near does not exist
             && !noRights.isBad // user is not permissioned
             && !loading
             && this.lastAddr === document.querySelector(".address-container input")._valueTracker.getValue()) // disappear while debouncing
-            return proposed === -1 
-            ? (
-                <button 
-                    className="create-multicall"
-                    onClick={() => {
-                        tx(
-                            sputnik,
-                            "add_proposal",
-                            args,
-                            10_000_000_000_000,
-                            infos.policy.proposal_bond
-                        )
-                    }}
-                >
-                    {`create a multicall for ${sputnik}`}
-                </button>
-            ) : (
-                <button 
-                    className="create-multicall proposal-exists"
-                    onClick={() => {
-                        const sub = window.NEAR_ENV === "testnet" 
-                            ? "testnet-v2"
-                            : "v2"
-                        window.open(`https://${sub}.sputnik.fund/#/${sputnik}/${proposed}`)}
-                    }
-                >
-                    {`vote on creating a multicall instance`}
-                </button>
-            )
+            return proposed === -1
+                ? (
+                    <button
+                        className="create-multicall"
+                        onClick={() => {
+                            tx(
+                                sputnik,
+                                "add_proposal",
+                                args,
+                                10_000_000_000_000,
+                                infos.policy.proposal_bond
+                            )
+                        }}
+                    >
+                        {`create a multicall for ${sputnik}`}
+                    </button>
+                ) : (
+                    <button
+                        className="create-multicall proposal-exists"
+                        onClick={() => {
+                            const sub = window.NEAR_ENV === "testnet"
+                                ? "testnet-v2"
+                                : "v2"
+                            window.open(`https://${sub}.sputnik.fund/#/${sputnik}/${proposed}`)
+                        }
+                        }
+                    >
+                        {`vote on creating a multicall instance`}
+                    </button>
+                )
 
     }
 
@@ -209,10 +211,10 @@ export default class Dao extends Component {
 
         return (
             <span>
-                <a href={ addr.toUrl(window.nearConfig.networkId) } target="_blank" rel="noopener noreferrer">
-                    { addr.value }
+                <a href={addr.toUrl(window.nearConfig.networkId)} target="_blank" rel="noopener noreferrer">
+                    {addr.value}
                 </a>
-                <DeleteOutline/>
+                <DeleteOutline />
             </span>
         )
     }
@@ -221,13 +223,13 @@ export default class Dao extends Component {
 
         return (
             <div class="job">
-                <EditOutlined/>
-                <DeleteOutline/>
-                { job.is_active
-                    ? <PauseOutlined/>
-                    : <PlayArrowOutlined/>
+                <EditOutlined />
+                <DeleteOutline />
+                {job.is_active
+                    ? <PauseOutlined />
+                    : <PlayArrowOutlined />
                 }
-                <pre>{ JSON.stringify(job, null, "  ") }</pre>
+                <pre>{JSON.stringify(job, null, "  ")}</pre>
             </div>
         );
 
@@ -246,6 +248,8 @@ export default class Dao extends Component {
         const sputnik = `${this.state.addr.value}.${window.nearConfig.SPUTNIK_V2_FACTORY_ADDRESS}`;
 
         this.lastAddr = this.state.addr.value;
+
+
 
         noContract.isBad = false;
         noDao.isBad = false;
@@ -268,9 +272,9 @@ export default class Dao extends Component {
                     if (e.type === "AccountDoesNotExist" && e.toString().includes(` ${multicall} `))
                         noContract.isBad = true;
                 }),
-            view(multicall, "get_tokens", {}).catch(e => {}),
-            view(multicall, "get_jobs", {}).catch(e => {}),
-            view(multicall, "job_get_bond", {}).catch(e => {}),
+            view(multicall, "get_tokens", {}).catch(e => { }),
+            view(multicall, "get_jobs", {}).catch(e => { }),
+            view(multicall, "job_get_bond", {}).catch(e => { }),
             view(sputnik, "get_policy", {})
                 .catch(e => {
                     if (e.type === "AccountDoesNotExist" && e.toString().includes(` ${sputnik} `))
@@ -278,35 +282,35 @@ export default class Dao extends Component {
                 }),
             this.proposalAlreadyExists()
         ])
-        .then(([admins, tokens, jobs, bond, policy, proposed]) =>
-            newState = { 
-                infos: {
-                    admins: admins,
-                    tokens: tokens,
-                    jobs: jobs,
-                    bond: bond,
-                    policy: policy
-                },
-                loading: false,
-                proposed: proposed
-            }
-        )
-        .then(() => {
-            // can user propose FunctionCall to DAO?
-            const canPropose = newState.infos.policy?.roles
-                .filter(r => r.kind === "Everyone" || r.kind.Group.includes(window.WALLET.state.wallet.getAccountId()))
-                .map(r => r.permissions)
-                .flat()
-                .some(permission => {
-                    const [proposalKind, action] = permission.split(":")
-                    return (proposalKind === "*" || proposalKind === "call") && (action === "*" || action === "AddProposal")
-                })
+            .then(([admins, tokens, jobs, bond, policy, proposed]) =>
+                newState = {
+                    infos: {
+                        admins: admins,
+                        tokens: tokens,
+                        jobs: jobs,
+                        bond: bond,
+                        policy: policy
+                    },
+                    loading: false,
+                    proposed: proposed
+                }
+            )
+            .then(() => {
+                // can user propose FunctionCall to DAO?
+                const canPropose = newState.infos.policy?.roles
+                    .filter(r => r.kind === "Everyone" || r.kind.Group.includes(window.WALLET.state.wallet.getAccountId()))
+                    .map(r => r.permissions)
+                    .flat()
+                    .some(permission => {
+                        const [proposalKind, action] = permission.split(":")
+                        return (proposalKind === "*" || proposalKind === "call") && (action === "*" || action === "AddProposal")
+                    })
 
-            if ( ! canPropose ) noRights.isBad = true; // no add proposal rights
+                if (!canPropose) noRights.isBad = true; // no add proposal rights
 
-            // update visuals
-            this.setState(newState);
-        })
+                // update visuals
+                this.setState(newState);
+            })
 
     }
 
@@ -326,7 +330,7 @@ export default class Dao extends Component {
         const { wallet } = window.WALLET.state;
 
         // connect wallet
-        if (!wallet.isSignedIn()) 
+        if (!wallet.isSignedIn())
             return <div className="info-container error">
                 Please sign in to continue
             </div>
@@ -334,20 +338,20 @@ export default class Dao extends Component {
         // error
         const errors = Object.keys(this.errors)
             .map(e => <p key={`p-${e}`} className={this.errors[e].isBad ? "red" : "green"}>
-                    <span>{ this.errors[e].isBad ? '\u2717' : '\u2714' }  </span>
-                    { this.errors[e].message }
-                </p>);
+                <span>{this.errors[e].isBad ? '\u2717' : '\u2714'}  </span>
+                {this.errors[e].message}
+            </p>);
 
         if (Object.keys(this.errors).filter(e => this.errors[e].isBad && e !== "noRights").length > 0)
             return (<>
                 <div className="info-container error">
-                    <div>{ errors }</div>
-                    { this.createMulticall() }
+                    <div>{errors}</div>
+                    {this.createMulticall()}
                 </div>
             </>);
 
         // loading ...
-        if (loading) 
+        if (loading)
             return <div className="info-container loader"></div>
 
         // everything should be loaded
@@ -361,24 +365,24 @@ export default class Dao extends Component {
         // infos found
         return <div className="info-container">
             <div className="info-card admins">
-                <AddOutlined/>
+                <AddOutlined />
                 <h1 className="title">Admins</h1>
                 <ul className="list">
-                    { infos.admins.map(a => <li>{ this.toLink(a) }</li>) }
+                    {infos.admins.map(a => <li>{this.toLink(a)}</li>)}
                 </ul>
             </div>
             <div className="info-card tokens">
-                <AddOutlined/>
+                <AddOutlined />
                 <h1 className="title">Tokens</h1>
                 <ul className="list">
-                    { infos.tokens.map(t => <li>{ this.toLink(t) }</li>) }
+                    {infos.tokens.map(t => <li>{this.toLink(t)}</li>)}
                 </ul>
             </div>
             <div className="info-card jobs">
-                <AddOutlined/>
+                <AddOutlined />
                 <h1 className="title">Jobs</h1>
                 <div className="scroll-wrapper">
-                    { infos.jobs.map(j => this.job(j)) }
+                    {infos.jobs.map(j => this.job(j))}
                 </div>
             </div>
             <div className="info-card bond">
@@ -394,6 +398,8 @@ export default class Dao extends Component {
 
         const { addr } = this.state;
 
+        const loadInfoDelayed = debounce(this.loadInfos, 500);
+
         window.STATE = this.state;
 
         return (
@@ -401,22 +407,20 @@ export default class Dao extends Component {
                 <div className="address-container">
                     <TextInput
                         placeholder="Insert DAO name here"
-                        value={ addr }
-                        error={ this.errors.addr }
-                        update={ () => {
+                        value={addr}
+                        error={this.errors.addr}
+                        update={() => {
                             this.forceUpdate();
-                            setTimeout(() => {
-                                if (new Date() - this.lastInput > 400)
-                                    this.loadInfos()
-                            }, 500)
-                            this.lastInput = new Date()
-                        } }
+                            if (this.state.addr !== undefined) {
+                                loadInfoDelayed();
+                            }
+                        }}
                         InputProps={{
                             endAdornment: <InputAdornment position="end">{`.${window.nearConfig.SPUTNIK_V2_FACTORY_ADDRESS}`}</InputAdornment>,
                         }}
                     />
                 </div>
-                { this.getContent() }
+                {this.getContent()}
             </div>
         );
 
