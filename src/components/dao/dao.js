@@ -15,7 +15,7 @@ const MIN_INSTANCE_BALANCE = toYocto(1); // 1 NEAR
 export default class DaoComponent extends Component {
 
     errors = {
-        addrError: new ArgsError("Invalid NEAR address", value => ArgsAccount.isValid(value), !ArgsAccount.isValid(STORAGE.addresses?.dao ?? "")),
+        addr: new ArgsError("Invalid NEAR address", value => ArgsAccount.isValid(value), !ArgsAccount.isValid(STORAGE.addresses?.dao ?? "")),
         noDao: new ArgsError("Sputnik DAO not found on given address", value => this.errors.noDao.isBad),
         noContract: new ArgsError("DAO has no multicall instance", value => this.errors.noContract.isBad),
     }
@@ -113,7 +113,7 @@ export default class DaoComponent extends Component {
             this.setState({
                 addr: this.getBaseAddress(STORAGE.addresses.dao)
             }, () => {
-                this.errors.addrError.validOrNull(this.state.addr);
+                this.errors.addr.validOrNull(this.state.addr);
                 this.loadInfos();
                 this.forceUpdate();
             })
@@ -145,7 +145,7 @@ export default class DaoComponent extends Component {
         const { noContract, noDao } = this.errors;
 
         // happens if wallet not logged in or DAO object not initialized yet
-        if (dao?.ready === false)
+        if (dao?.ready !== true)
             return <></>;
 
         const multicall = `${addr.value}.${window.nearConfig.MULTICALL_FACTORY_ADDRESS}`;
@@ -302,10 +302,11 @@ export default class DaoComponent extends Component {
 
     loadInfos() {
 
-        const { addrError, noContract, noDao } = this.errors;
-        const { addr, dao } = this.state;
+        const { addr: addrError, noContract, noDao } = this.errors;
+        const { addr } = this.state;
 
         const multicall = `${addr.value}.${window.nearConfig.MULTICALL_FACTORY_ADDRESS}`;
+        const daoAddress = `${addr.value}.${SputnikDAO.FACTORY_ADDRESS}`;
 
         this.lastAddr = addr.value;
 
@@ -316,7 +317,6 @@ export default class DaoComponent extends Component {
         if (addrError.isBad) {
             noContract.isBad = true;
             noDao.isBad = true;
-            this.setState({ proposed: -1, proposedInfo: {} });
             return;
         }
 
@@ -325,44 +325,52 @@ export default class DaoComponent extends Component {
         let newState = {};
 
         // initialize DAO object
-        SputnikDAO.init(dao.address).catch(e => {})
+        SputnikDAO.init(daoAddress).catch(e => {})
         .then((newDAO) => {
+            this.setState({ dao: newDAO });
             // DAO not ready => either no SputnikDAO contract on the chosen address
             // or some error happened during DAO object init.
-            this.setState({ dao: newDAO });
-            if (!newDAO.ready) { return; }
-        }).then(() => {
-            return Promise.all([
-                view(multicall, "get_admins", {}).catch(e => {
-                        if (e.type === "AccountDoesNotExist" && e.toString().includes(` ${multicall} `)) {
-                            noContract.isBad = true;
+            if (!newDAO.ready) {
+                noContract.isBad = true;
+                noDao.isBad = true;
+                this.setState({ loading: false });
+                return;
+            }
+            // DAO correctly initialized, try to fetch multicall info
+            else {
+                Promise.all([
+                    view(multicall, "get_admins", {}).catch(e => {
+                            if (e.type === "AccountDoesNotExist" && e.toString().includes(` ${multicall} `)) {
+                                noContract.isBad = true;
+                            }
                         }
+                    ),
+                    view(multicall, "get_tokens", {}).catch(e => {}),
+                    view(multicall, "get_jobs", {}).catch(e => {}),
+                    view(multicall, "get_job_bond", {}).catch(e => {}),
+                    this.proposalAlreadyExists().catch(e => {})
+                ])
+                .then(([admins, tokens, jobs, bond, createMulticallProposalInfo]) => {
+                    const { proposal_id, proposal_info } = createMulticallProposalInfo;
+        
+                    newState = { 
+                        infos: {
+                            admins: admins,
+                            tokens: tokens,
+                            jobs: jobs,
+                            bond: bond
+                        },
+                        loading: false,
+                        proposed: proposal_id,
+                        proposedInfo: proposal_info
                     }
-                ),
-                view(multicall, "get_tokens", {}).catch(e => {}),
-                view(multicall, "get_jobs", {}).catch(e => {}),
-                view(multicall, "get_job_bond", {}).catch(e => {}),
-                this.proposalAlreadyExists().catch(e => {})
-            ])
-        })
-        .then(([admins, tokens, jobs, bond, createMulticallProposalInfo]) => {
-            const { proposal_id, proposal_info } = createMulticallProposalInfo;
-
-            newState = { 
-                infos: {
-                    admins: admins,
-                    tokens: tokens,
-                    jobs: jobs,
-                    bond: bond
-                },
-                loading: false,
-                proposed: proposal_id,
-                proposedInfo: proposal_info
+        
+                    // update visuals
+                    this.setState(newState);
+                })     
             }
 
-            // update visuals
-            this.setState(newState);
-        })
+        });
 
     }
 
@@ -389,7 +397,7 @@ export default class DaoComponent extends Component {
             </div>
 
         // errors to display
-        const displayErrorsList = ["addrError", "noDao", "noContract"];
+        const displayErrorsList = ["addr", "noDao", "noContract"];
         const displayErrors = Object.keys(this.errors)
             .filter(e => this.errors[e].isBad && displayErrorsList.includes(e))
             .map(e => <p key={`p-${e}`} className={"red"}>
@@ -459,7 +467,7 @@ export default class DaoComponent extends Component {
                     <TextInput
                         placeholder="Insert DAO name here"
                         value={ addr }
-                        error={ this.errors.addrError }
+                        error={ this.errors.addr }
                         update={ () => {
                             this.forceUpdate();
                             setTimeout(() => {
