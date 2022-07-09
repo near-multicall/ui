@@ -5700,10 +5700,10 @@ near-api-js@^0.44.2:
     text-encoding-utf-8 "^1.0.2"
     tweetnacl "^1.0.1"
 
-near-cli@^3.0.0:
-  version "3.3.1"
-  resolved "https://registry.yarnpkg.com/near-cli/-/near-cli-3.3.1.tgz#56a674f562d3a62e66b71186e098561861c986f4"
-  integrity sha512-wqZ9dDnKddIACj01+Oh3Obr1YF39olF/izj8aJGG+TikVTchnmhq21HPvkLphax+mJ2b/UVHKwa60UcAkg6OdA==
+near-cli@^3.4.0:
+  version "3.4.0"
+  resolved "https://registry.yarnpkg.com/near-cli/-/near-cli-3.4.0.tgz#576420f7447f25668e9de89f17e8aaa70930a5d8"
+  integrity sha512-twuq8IO4Ok68542ZlctQy/RRHYY/q6I1Dmub3tuVNUWkOmiViDDEmd1g5X3Lt/tuOkSQl/831o/k03p3MWkaXw==
   dependencies:
     ascii-table "0.0.9"
     bn.js "^5.1.1"
