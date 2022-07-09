@@ -48,7 +48,7 @@ function tx (
     addr: string,
     func: string,
     args: object | Uint8Array,
-    gas: number,
+    gas: string,
     depo: string = "0"
 ): Promise<void> {
     // is user logged in?
