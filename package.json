@@ -26,7 +26,7 @@
     "gh-pages": "^4.0.0",
     "jest": "^28.1.2",
     "jest-environment-node": "^28.0.2",
-    "near-cli": "^3.0.0",
+    "near-cli": "^3.4.0",
     "nodemon": "~2.0.3",
     "process": "^0.11.10",
     "react-test-renderer": "^18.0.0",
