@@ -2,6 +2,7 @@ import { Base64 } from 'js-base64';
 import React, { Component } from 'react';
 import { toGas } from '../../utils/converter';
 import { initNear, tx, view } from '../../utils/wallet';
+import { SputnikDAO } from '../../utils/contracts/sputnik-dao';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import { Icon } from '@mui/material';
@@ -159,7 +160,7 @@ export default class Wallet extends Component {
         noDao.isBad = false;
         noContract.isBad = false;
 
-        const multicall = dao.replace(window.nearConfig.SPUTNIK_V2_FACTORY_ADDRESS, window.nearConfig.MULTICALL_FACTORY_ADDRESS);
+        const multicall = dao.replace(SputnikDAO.FACTORY_ADDRESS, window.nearConfig.MULTICALL_FACTORY_ADDRESS);
 
         Promise.all([
             view(dao, "get_policy", {})
@@ -258,7 +259,7 @@ export default class Wallet extends Component {
     daoSearch(newValue) {
         STORAGE.setAddresses({
             dao: newValue ?? "",
-            multicall: newValue?.replace(window.nearConfig.SPUTNIK_V2_FACTORY_ADDRESS, window.nearConfig.MULTICALL_FACTORY_ADDRESS)
+            multicall: newValue?.replace(SputnikDAO.FACTORY_ADDRESS, window.nearConfig.MULTICALL_FACTORY_ADDRESS)
         });
         if (newValue !== undefined && ArgsAccount.isValid(newValue)) {
             this.connectDao(newValue);

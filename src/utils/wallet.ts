@@ -1,6 +1,7 @@
-import * as nearAPI from "near-api-js"
+import * as nearAPI from "near-api-js";
 import { getConfig } from '../near-config';
-import { baseDecode } from "borsh"
+import { baseDecode } from "borsh";
+import { Base64 } from 'js-base64';
 
 
 
@@ -67,24 +68,23 @@ function tx (
     return passToWallet([ TXs ]);
 }
 
-function view (
+async function view (
     addr: string,
     func: string,
-    args: any
+    args: object
 ): Promise<any> {
-    // is user logged in?
-    if ( !window.walletAccount.isSignedIn() ) {
-        console.error("Wallet not connected");
-        // create & return empty promise
-        return Promise.resolve();
-    }
-
-    return window.account.viewFunction(
-        addr, 
-        func, 
-        args
-    )
-
+    // query the RPC for view methods
+    const encodedArgs: string = Base64.encode( JSON.stringify(args) );
+    // returns response object
+    const response: any = await window.near.connection.provider.query({
+        request_type: "call_function",
+        finality: "final",
+        account_id: addr,
+        method_name: func,
+        args_base64: encodedArgs,
+    });
+    // RPC returns JSON-serialized returns, needs parsing.
+    return JSON.parse( String.fromCharCode(... response.result) );
 }
 
 async function makeTransaction (
