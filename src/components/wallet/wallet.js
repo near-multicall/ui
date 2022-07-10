@@ -256,7 +256,6 @@ export default class Wallet extends Component {
     }
 
     daoSearch(newValue) {
-        console.log(newValue);
         STORAGE.setAddresses({
             dao: newValue ?? "",
             multicall: newValue?.replace(window.nearConfig.SPUTNIK_V2_FACTORY_ADDRESS, window.nearConfig.MULTICALL_FACTORY_ADDRESS)

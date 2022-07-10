@@ -97,12 +97,16 @@ export default class Dao extends Component {
 
     onAddressesUpdated() {
 
+        const loadInfoDelayed = debounce(() => this.loadInfos(), 500)
+
+
         if (this.getBaseAddress(STORAGE.addresses.dao) !== this.state.addr.value)
             this.setState({
                 addr: this.getBaseAddress(STORAGE.addresses.dao)
             }, () => {
                 this.errors.addr.validOrNull(this.state.addr);
-                this.loadInfos();
+                loadInfoDelayed.cancel();
+                loadInfoDelayed();
                 this.forceUpdate();
             })
 
@@ -368,14 +372,14 @@ export default class Dao extends Component {
                 <AddOutlined />
                 <h1 className="title">Admins</h1>
                 <ul className="list">
-                    {infos.admins.map(a => <li>{this.toLink(a)}</li>)}
+                    {infos.admins.map(a => <li key={infos.admins.id}>{this.toLink(a)}</li>)}
                 </ul>
             </div>
             <div className="info-card tokens">
                 <AddOutlined />
                 <h1 className="title">Tokens</h1>
                 <ul className="list">
-                    {infos.tokens.map(t => <li>{this.toLink(t)}</li>)}
+                    {infos.tokens.map(t => <li key={infos.tokens.id}>{this.toLink(t)}</li>)}
                 </ul>
             </div>
             <div className="info-card jobs">
@@ -398,7 +402,7 @@ export default class Dao extends Component {
 
         const { addr } = this.state;
 
-        const loadInfoDelayed = debounce(this.loadInfos, 500);
+        const loadInfoDelayed = debounce(() => this.loadInfos(), 500);
 
         window.STATE = this.state;
 
@@ -411,7 +415,9 @@ export default class Dao extends Component {
                         error={this.errors.addr}
                         update={() => {
                             this.forceUpdate();
-                            if (this.state.addr !== undefined) {
+                            if (this.state.addr.isValid) {
+                                loadInfoDelayed.cancel();
+                                console.log("hi")
                                 loadInfoDelayed();
                             }
                         }}
