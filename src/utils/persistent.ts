@@ -1,3 +1,5 @@
+import debounce from 'lodash.debounce';
+
 class Persistent {
 
     addresses = {
@@ -6,7 +8,7 @@ class Persistent {
         dao: ""
     }
 
-    setAddresses(newAddresses) {
+    setAddresses = debounce((newAddresses: object) => {
 
         this.addresses = {
             ...this.addresses,
@@ -18,7 +20,7 @@ class Persistent {
         window["DAO"]?.onAddressesUpdated();
         window["EXPORT"]?.onAddressesUpdated();
 
-    }
+    }, 100);
 
 }
 
