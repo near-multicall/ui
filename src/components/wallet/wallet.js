@@ -25,7 +25,7 @@ export default class Wallet extends Component {
             this.daoSearch(newValue);
         },
         // debounce time
-        500
+        400
     );
 
     constructor(props) {
@@ -262,7 +262,7 @@ export default class Wallet extends Component {
     }
 
     daoSearch(newValue) {
-        STORAGE.setAddresses({});
+        STORAGE.setAddresses({}); // hack: empty setAddresses call to invoke callbacks
         if (newValue !== undefined && ArgsAccount.isValid(newValue)) {
             this.connectDao(newValue);
         }
@@ -277,6 +277,7 @@ export default class Wallet extends Component {
 
         if (!wallet)
             return null;
+
 
         return (
             <div
@@ -332,6 +333,7 @@ export default class Wallet extends Component {
                             }
                             onInputChange={(e) => {
                                 if (e === null) return;
+                                // set STORAGE.addresses to have no delay, thus no rubber banding
                                 STORAGE.addresses.dao = e.target.value ?? "";
                                 STORAGE.addresses.multicall = e.target.value?.replace(SputnikDAO.FACTORY_ADDRESS, window.nearConfig.MULTICALL_FACTORY_ADDRESS)
                                 this.searchDelayed.cancel();
