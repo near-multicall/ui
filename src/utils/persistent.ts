@@ -8,7 +8,7 @@ class Persistent {
         dao: ""
     }
 
-    setAddresses = debounce((newAddresses) => {
+    setAddresses = debounce((newAddresses: object) => {
 
         this.addresses = {
             ...this.addresses,

@@ -23,7 +23,8 @@ export default class Dao extends Component {
         noApproveProposalRights: new ArgsError("Permission to approve a proposal on this dao", value => this.errors.noApproveProposalRights) 
     }
 
-    lastInput;
+    loadInfoDebounced = debounce(() => this.loadInfos(), 500);
+
     lastAddr;
 
     constructor(props) {
@@ -514,8 +515,6 @@ export default class Dao extends Component {
 
         const { addr } = this.state;
 
-        const loadInfoDelayed = debounce(() => this.loadInfos(), 500);
-
         return (
             <div className="dao-container">
                 <div className="address-container">
@@ -525,8 +524,7 @@ export default class Dao extends Component {
                         error={this.errors.addr}
                         update={() => {
                             if (this.state.addr.isValid) {
-                                loadInfoDelayed.cancel();
-                                loadInfoDelayed();
+                                this.loadInfoDebounced();
                             }
                             this.forceUpdate();
                         }}

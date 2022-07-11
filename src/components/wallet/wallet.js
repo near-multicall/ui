@@ -19,7 +19,7 @@ export default class Wallet extends Component {
 
     daoList = [];
 
-    searchDelayed = debounce(
+    daoSearchDebounced = debounce(
         // debounced function
         (newValue) => {
             this.daoSearch(newValue);
@@ -331,13 +331,11 @@ export default class Wallet extends Component {
                                     placeholder="Select DAO"
                                 />
                             }
-                            onInputChange={(e) => {
-                                if (e === null) return;
+                            onInputChange={(e, newValue) => {
                                 // set STORAGE.addresses to have no delay, thus no rubber banding
-                                STORAGE.addresses.dao = e.target.value ?? "";
-                                STORAGE.addresses.multicall = e.target.value?.replace(SputnikDAO.FACTORY_ADDRESS, window.nearConfig.MULTICALL_FACTORY_ADDRESS)
-                                this.searchDelayed.cancel();
-                                this.searchDelayed(e.target.value)
+                                STORAGE.addresses.dao = newValue ?? "";
+                                STORAGE.addresses.multicall = newValue?.replace(SputnikDAO.FACTORY_ADDRESS, window.nearConfig.MULTICALL_FACTORY_ADDRESS);
+                                this.daoSearchDebounced(newValue)
                             }}
                         />
                     </div>
