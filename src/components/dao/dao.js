@@ -116,16 +116,12 @@ export default class Dao extends Component {
 
     onAddressesUpdated() {
 
-        const loadInfoDelayed = debounce(() => this.loadInfos(), 500)
-
-
         if (this.getBaseAddress(STORAGE.addresses.dao) !== this.state.addr.value)
             this.setState({
                 addr: this.getBaseAddress(STORAGE.addresses.dao)
             }, () => {
                 this.errors.addr.validOrNull(this.state.addr);
-                loadInfoDelayed.cancel();
-                loadInfoDelayed();
+                this.loadInfos();
                 this.forceUpdate();
             })
 
@@ -520,8 +516,6 @@ export default class Dao extends Component {
 
         const loadInfoDelayed = debounce(() => this.loadInfos(), 500);
 
-        window.STATE = this.state;
-
         return (
             <div className="dao-container">
                 <div className="address-container">
@@ -530,12 +524,11 @@ export default class Dao extends Component {
                         value={addr}
                         error={this.errors.addr}
                         update={() => {
-                            this.forceUpdate();
                             if (this.state.addr.isValid) {
                                 loadInfoDelayed.cancel();
-                                console.log("hi")
                                 loadInfoDelayed();
                             }
+                            this.forceUpdate();
                         }}
                         InputProps={{
                             endAdornment: <InputAdornment position="end">{`.${SputnikDAO.FACTORY_ADDRESS}`}</InputAdornment>,

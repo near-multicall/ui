@@ -19,7 +19,14 @@ export default class Wallet extends Component {
 
     daoList = [];
 
-    lastInput;
+    searchDelayed = debounce(
+        // debounced function
+        (newValue) => {
+            this.daoSearch(newValue);
+        },
+        // debounce time
+        500
+    );
 
     constructor(props) {
 
@@ -49,8 +56,6 @@ export default class Wallet extends Component {
                 }
             }
             ));
-        this.connectDao.bind(this);
-        this.daoSearch.bind(this);
     }
 
     then(func) { return new Promise(resolve => resolve(func())) } // mock promise
@@ -257,10 +262,7 @@ export default class Wallet extends Component {
     }
 
     daoSearch(newValue) {
-        STORAGE.setAddresses({
-            dao: newValue ?? "",
-            multicall: newValue?.replace(SputnikDAO.FACTORY_ADDRESS, window.nearConfig.MULTICALL_FACTORY_ADDRESS)
-        });
+        STORAGE.setAddresses({});
         if (newValue !== undefined && ArgsAccount.isValid(newValue)) {
             this.connectDao(newValue);
         }
@@ -272,16 +274,6 @@ export default class Wallet extends Component {
     render() {
 
         const { wallet, expanded, color } = this.state;
-
-        const searchDelayed = debounce(
-            // debounced function
-            (e, newValue) => {
-                if (e === null) return;
-                this.daoSearch(newValue);
-            },
-            // debounce time
-            500
-        );
 
         if (!wallet)
             return null;
@@ -338,7 +330,13 @@ export default class Wallet extends Component {
                                     placeholder="Select DAO"
                                 />
                             }
-                            onInputChange={searchDelayed}
+                            onInputChange={(e) => {
+                                if (e === null) return;
+                                STORAGE.addresses.dao = e.target.value ?? "";
+                                STORAGE.addresses.multicall = e.target.value?.replace(SputnikDAO.FACTORY_ADDRESS, window.nearConfig.MULTICALL_FACTORY_ADDRESS)
+                                this.searchDelayed.cancel();
+                                this.searchDelayed(e.target.value)
+                            }}
                         />
                     </div>
                     <div className="peek">
