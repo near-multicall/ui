@@ -321,6 +321,7 @@ export default class DaoComponent extends Component {
         if (addrError.isBad) {
             noContract.isBad = true;
             noDao.isBad = true;
+            this.setState({ proposed: -1, proposedInfo: {} });
             return;
         }
 
