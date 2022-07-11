@@ -273,7 +273,15 @@ export default class Wallet extends Component {
 
         const { wallet, expanded, color } = this.state;
 
-        const searchDelayed = debounce((newValue) => this.daoSearch(newValue), 500);
+        const searchDelayed = debounce(
+            // debounced function
+            (e, newValue) => {
+                if (e === null) return;
+                this.daoSearch(newValue);
+            },
+            // debounce time
+            500
+        );
 
         if (!wallet)
             return null;
@@ -330,12 +338,7 @@ export default class Wallet extends Component {
                                     placeholder="Select DAO"
                                 />
                             }
-                            onInputChange={(e) => {
-                                if (e !== null) {
-                                    searchDelayed.cancel();
-                                    searchDelayed(e.target.value);
-                                }
-                            }}
+                            onInputChange={searchDelayed}
                         />
                     </div>
                     <div className="peek">
