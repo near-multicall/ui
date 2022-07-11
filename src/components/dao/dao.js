@@ -344,11 +344,10 @@ export default class DaoComponent extends Component {
             else {
                 Promise.all([
                     view(multicall, "get_admins", {}).catch(e => {
-                            if (e.type === "AccountDoesNotExist" && e.toString().includes(` ${multicall} `)) {
-                                noContract.isBad = true;
-                            }
+                        if (e.type === "AccountDoesNotExist" && e.toString().includes(` ${multicall} `)) {
+                            noContract.isBad = true;
                         }
-                    ),
+                    }),
                     view(multicall, "get_tokens", {}).catch(e => {}),
                     view(multicall, "get_jobs", {}).catch(e => {}),
                     view(multicall, "get_job_bond", {}).catch(e => {}),
