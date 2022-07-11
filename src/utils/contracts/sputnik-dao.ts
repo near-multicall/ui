@@ -1,4 +1,5 @@
 import { tx, view } from "../wallet";
+import { toGas } from "../converter";
 
 
 const FACTORY_ADDRESS_SELECTOR: Record<string, string> = {
@@ -70,7 +71,7 @@ class SputnikDAO {
             this.DAO_ADDRESS,
             "add_proposal",
             args,
-            10_000_000_000_000,
+            toGas("10"),  // 10 Tgas
             proposal_bond
         );
     }
@@ -80,7 +81,7 @@ class SputnikDAO {
             this.DAO_ADDRESS,
             "act_proposal",
             { id: proposal_id, action: proposal_action },
-            200_000_000_000_000,
+            toGas("200"),  // 200 Tgas
             "0"
         );
     }

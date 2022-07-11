@@ -100,21 +100,31 @@
             }
         }
     }
-    .checkbox {
+    .attachment {
         @include mixin.center-items(flex-start, center);
         flex-flow: row nowrap;
         width: 100%;
+        margin: 0.25 * size.$gap 0;
         p {
             color: color.$light-text;
             font-size: size.$small-text;
         }
-        .MuiCheckbox-root {
+        button {
+            height: 2em;
+            margin: 0 0.5ch;
+            padding: 0 1em;
+            border-radius: size.$task-radius;
+            border: 1px solid color.$light;
+            font-size: size.$small-text;
+            font-weight: 800;
             color: color.$light;
-            &.Mui-checked {
+            background-color: rgba(color.$white, 0.1);
+            &.selected {
                 color: color.$green;
+                border: 1px solid color.$green;
             }
-            .MuiSvgIcon-root {
-                font-size: size.$text;
+            &:hover {
+                background-color: rgba(color.$white, 0.2);
             }
         }
     }

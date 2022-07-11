@@ -1,12 +1,11 @@
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import { InputAdornment } from '@mui/material';
-import Checkbox from '@mui/material/Checkbox';
 import Icon from '@mui/material/Icon';
 import TextField from '@mui/material/TextField';
 import { Base64 } from 'js-base64';
 import React, { Component } from 'react';
 import { ArgsAccount, ArgsBig, ArgsError, ArgsString } from '../../utils/args';
-import { convert, toGas, toNEAR } from '../../utils/converter';
+import { Big, convert, toGas, toNEAR } from '../../utils/converter';
 import { view } from "../../utils/wallet";
 import { TextInput, TextInputWithUnits } from '../editor/elements';
 import debounce from "lodash.debounce";
@@ -39,7 +38,8 @@ export default class Export extends Component {
         token: new ArgsAccount(window.nearConfig.WNEAR_ADDRESS)
     }
 
-    attachFTs = false;
+    attachNEAR = false;
+    attachFT = false;
     showArgs = false;
 
     updateFTDebounced = debounce(() => this.updateFT(), 500);
@@ -99,8 +99,7 @@ export default class Export extends Component {
         this.errors.noToken.isBad = false;
         this.errors.notWhitelisted.isBad = false;
 
-        if (this.errors.token.isBad)
-            return;
+        if (this.errors.token.isBad) return;
 
         Promise.all([
             view(
@@ -127,8 +126,10 @@ export default class Export extends Component {
                 amount.unit = metadata.symbol;
                 amount.decimals = metadata.decimals;
             }
-            if (whitelist)
+            // check if token is whitelisted on multicall
+            if (whitelist) {
                 this.errors.notWhitelisted.isBad = !this.errors.noToken.isBad && !whitelist.includes(token.value);
+            }
 
             this.update()
         })
@@ -180,27 +181,44 @@ export default class Export extends Component {
                             options={[ "Tgas", "gas" ]}
                             update={ this.update }
                         />
-                        <TextInputWithUnits 
-                            label="Total attached deposit"
-                            value={ depo }
-                            error={ errors.depo }
-                            options={[ "NEAR", "yocto" ]}
-                            update={ this.update }
-                        />
-                        <div className="checkbox">
-                            <Checkbox
-                                checked={ this.attachFTs }
-                                onChange={e => {
-                                    this.attachFTs = e.target.checked;
+                        <div className="attachment">
+                            <p>Attach</p>
+                            <button 
+                                className={this.attachNEAR ? "selected" : ""} 
+                                onClick={() => {
+                                    this.attachNEAR = !this.attachNEAR;
+                                    this.attachFT = false;
                                     this.update();
                                 }}
-                            />
-                            <p>Attach FTs to multicall</p>
+                            >
+                                NEAR
+                            </button>
+                            <p>or</p>
+                            <button 
+                                className={this.attachFT ? "selected" : ""}
+                                onClick={() => {
+                                    this.attachNEAR = false;
+                                    this.attachFT = !this.attachFT;
+                                    this.update();
+                                }}
+                            >
+                                fungible token
+                            </button>
                         </div>
-                        { this.attachFTs
-                            ? <>
+                        { this.attachNEAR ?
+                            <TextInputWithUnits 
+                                label="Total attached deposit"
+                                value={ depo }
+                                error={ errors.depo }
+                                options={[ "NEAR", "yocto" ]}
+                                update={ this.update }
+                            />
+                            : null
+                        }
+                        { this.attachFT ?
+                            <>
                                 <TextInput
-                                    label="Token contract"
+                                    label="Token address"
                                     value={ token }
                                     error={[ errors.token, errors.noToken, errors.notWhitelisted ]}
                                     update={ () => {
@@ -226,7 +244,7 @@ export default class Export extends Component {
                                     }}
                                 />
                             </>
-                            : <></>
+                            : null
                         }
                     </div>
                     { allErrors.length > 0 && <div className="error-container">
@@ -274,11 +292,11 @@ export default class Export extends Component {
                         { this.showArgs 
                             ? <div className="value">
                                 <pre className="code">
-                                    { !this.attachFTs
+                                    { !this.attachFT
                                         ? JSON.stringify({calls: LAYOUT.toBase64()}) 
                                         : JSON.stringify({
                                             receiver_id: STORAGE.addresses.multicall, 
-                                            amount: amount.value,
+                                            amount: convert(amount.value, amount.unit, amount.decimals),
                                             msg: JSON.stringify({
                                                 function_id: "multicall",
                                                 args: Base64.encode(JSON.stringify({"calls":LAYOUT.toBase64()}).toString())
@@ -300,14 +318,19 @@ export default class Export extends Component {
                                 || errors.depo.isBad
                                 || errors.desc.isBad
                                 || errors.hasErrors.isBad
-                                || (this.attachFTs && (errors.amount.isBad || errors.token.isBad))
+                                || (this.attachFT && (errors.amount.isBad || errors.token.isBad || errors.noToken.isBad || errors.notWhitelisted.isBad))
                                 || walletError
                             }
                             onClick={() => {
-                                if (this.attachFTs)
-                                    WALLET.proposeFT(desc.value, convert(depo.value, depo.unit), convert(gas.value, gas.unit), token.value, convert(amount.value, amount.unit, amount.decimals))
-                                else
+                                // multicall with attached FT
+                                if (this.attachFT)
+                                    WALLET.proposeFT(desc.value, convert(gas.value, gas.unit), token.value, convert(amount.value, amount.unit, amount.decimals))
+                                // multicall with attached NEAR
+                                else if (this.attachNEAR)
                                     WALLET.propose(desc.value, convert(depo.value, depo.unit), convert(gas.value, gas.unit))
+                                // attach NEAR disabled, ignore depo amount and attach 1 yocto.
+                                else
+                                    WALLET.propose(desc.value, "1", convert(gas.value, gas.unit))
                             }}
                         >
                             {`Propose on ${STORAGE.addresses.dao}`}
