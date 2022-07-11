@@ -8,6 +8,7 @@ import { SputnikDAO, SputnikUI, ProposalKind, ProposalAction } from '../../utils
 import { TextInput } from '../editor/elements';
 import { InputAdornment } from '@mui/material'
 import './dao.scss';
+import debounce from 'lodash.debounce';
 
 // minimum balance a multicall instance needs for storage + state.
 const MIN_INSTANCE_BALANCE = toYocto(1); // 1 NEAR
@@ -20,7 +21,8 @@ export default class DaoComponent extends Component {
         noContract: new ArgsError("DAO has no multicall instance", value => this.errors.noContract.isBad),
     }
 
-    lastInput;
+    loadInfoDebounced = debounce(() => this.loadInfos(), 500);
+
     lastAddr;
 
     constructor(props) {
@@ -107,7 +109,7 @@ export default class DaoComponent extends Component {
 
     }
 
-    onAddressesUpdated() {  
+    onAddressesUpdated() {
 
         if (this.getBaseAddress(STORAGE.addresses.dao) !== this.state.addr.value) {
             this.setState({
@@ -276,8 +278,8 @@ export default class DaoComponent extends Component {
 
         return (
             <span>
-                <a href={ addr.toUrl(window.nearConfig.networkId) } target="_blank" rel="noopener noreferrer">
-                    { addr.value }
+                <a href={addr.toUrl()} target="_blank" rel="noopener noreferrer">
+                    {addr.value}
                 </a>
                 { deleteIcon ? <DeleteOutline/> : null }
             </span>
@@ -288,13 +290,13 @@ export default class DaoComponent extends Component {
 
         return (
             <div class="job">
-                <EditOutlined/>
-                <DeleteOutline/>
-                { job.is_active
-                    ? <PauseOutlined/>
-                    : <PlayArrowOutlined/>
+                <EditOutlined />
+                <DeleteOutline />
+                {job.is_active
+                    ? <PauseOutlined />
+                    : <PlayArrowOutlined />
                 }
-                <pre>{ JSON.stringify(job, null, "  ") }</pre>
+                <pre>{JSON.stringify(job, null, "  ")}</pre>
             </div>
         );
 
@@ -309,6 +311,8 @@ export default class DaoComponent extends Component {
         const daoAddress = `${addr.value}.${SputnikDAO.FACTORY_ADDRESS}`;
 
         this.lastAddr = addr.value;
+
+
 
         noContract.isBad = false;
         noDao.isBad = false;
@@ -414,7 +418,7 @@ export default class DaoComponent extends Component {
             </>);
 
         // loading ...
-        if (loading) 
+        if (loading)
             return <div className="info-container loader"></div>
 
         // everything should be loaded
@@ -428,24 +432,24 @@ export default class DaoComponent extends Component {
         // infos found
         return <div className="info-container">
             <div className="info-card admins">
-                <AddOutlined/>
+                <AddOutlined />
                 <h1 className="title">Admins</h1>
                 <ul className="list">
-                    { infos.admins.map(a => <li>{ this.toLink(a) }</li>) }
+                    {infos.admins.map(a => <li key={infos.admins.id}>{this.toLink(a)}</li>)}
                 </ul>
             </div>
             <div className="info-card tokens">
-                <AddOutlined/>
+                <AddOutlined />
                 <h1 className="title">Tokens</h1>
                 <ul className="list">
-                    { infos.tokens.map(t => <li>{ this.toLink(t) }</li>) }
+                    {infos.tokens.map(t => <li key={infos.tokens.id}>{this.toLink(t)}</li>)}
                 </ul>
             </div>
             <div className="info-card jobs">
-                <AddOutlined/>
+                <AddOutlined />
                 <h1 className="title">Jobs</h1>
                 <div className="scroll-wrapper">
-                    { infos.jobs.map(j => this.job(j)) }
+                    {infos.jobs.map(j => this.job(j))}
                 </div>
             </div>
             <div className="info-card bond">
@@ -466,22 +470,20 @@ export default class DaoComponent extends Component {
                 <div className="address-container">
                     <TextInput
                         placeholder="Insert DAO name here"
-                        value={ addr }
-                        error={ this.errors.addr }
-                        update={ () => {
+                        value={addr}
+                        error={this.errors.addr}
+                        update={() => {
+                            if (this.state.addr.isValid) {
+                                this.loadInfoDebounced();
+                            }
                             this.forceUpdate();
-                            setTimeout(() => {
-                                if (new Date() - this.lastInput > 400)
-                                    this.loadInfos()
-                            }, 500)
-                            this.lastInput = new Date()
-                        } }
+                        }}
                         InputProps={{
                             endAdornment: <InputAdornment position="end">{`.${SputnikDAO.FACTORY_ADDRESS}`}</InputAdornment>,
                         }}
                     />
                 </div>
-                { this.getContent() }
+                {this.getContent()}
             </div>
         );
 
