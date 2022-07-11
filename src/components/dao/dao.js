@@ -296,7 +296,7 @@ export default class Dao extends Component {
 
         return (
             <span>
-                <a href={addr.toUrl(window.nearConfig.networkId)} target="_blank" rel="noopener noreferrer">
+                <a href={addr.toUrl()} target="_blank" rel="noopener noreferrer">
                     {addr.value}
                 </a>
                 { deleteIcon ? <DeleteOutline/> : null }
