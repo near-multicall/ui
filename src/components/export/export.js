@@ -92,12 +92,12 @@ export default class Export extends Component {
 
     updateFT() {
 
-        if (this.errors.token.isBad) return;
-
         const { token, amount } = this.ft;
 
         this.errors.noToken.isBad = false;
         this.errors.notWhitelisted.isBad = false;
+
+        if (this.errors.token.isBad) return;
 
         Promise.all([
             view(
