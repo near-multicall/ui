@@ -228,7 +228,7 @@ export default class BaseTask extends Component {
                     <div className="delete-pseudo"></div>
                 </div>
                 <div className="data-container">
-                    <p><span>Contract address</span><a className="code" href={addr.toUrl(window.nearConfig.networkId)} target="_blank" rel="noopener noreferrer">{addr.toString()}</a></p>
+                    <p><span>Contract address</span><a className="code" href={addr.toUrl()} target="_blank" rel="noopener noreferrer">{addr.toString()}</a></p>
                     <p><span>Function name</span><span className="code">{func.toString()}</span></p>
                     <p className="expandable"><span>Function arguments</span>{
                         showArgs

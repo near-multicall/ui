@@ -8,6 +8,7 @@ import { ArgsAccount, ArgsBig, ArgsError, ArgsString } from '../../utils/args';
 import { Big, convert, toGas, toNEAR } from '../../utils/converter';
 import { view } from "../../utils/wallet";
 import { TextInput, TextInputWithUnits } from '../editor/elements';
+import debounce from "lodash.debounce";
 import './export.scss';
 
 export default class Export extends Component {
@@ -41,7 +42,7 @@ export default class Export extends Component {
     attachFT = false;
     showArgs = false;
 
-    lastInput;
+    updateFTDebounced = debounce(() => this.updateFT(), 500);
 
     constructor(props) {
 
@@ -86,6 +87,7 @@ export default class Export extends Component {
 
     update() {
 
+        // Hack to bind function to this
         this.forceUpdate();
 
     }
@@ -221,11 +223,7 @@ export default class Export extends Component {
                                     error={[ errors.token, errors.noToken, errors.notWhitelisted ]}
                                     update={ () => {
                                         this.update();
-                                        setTimeout(() => {
-                                            if (new Date() - this.lastInput > 400)
-                                                this.updateFT()
-                                        }, 500)
-                                        this.lastInput = new Date()
+                                        this.updateFTDebounced();
                                     } }
                                 />
                                 <TextField
