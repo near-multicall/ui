@@ -20,15 +20,28 @@ export default class BatchTask extends Component {
             showArgs: false
         }
 
+        props.json.actions.map(a => ({
+            address: props.json.address,
+            actions: [a]            
+        }))
+            .forEach((j, i) => {
+                if (TASKS.find(task => task.id === `${props.id}-${i}`)) return;
+                STORAGE.layout.columns[this.props.id].taskIds.push(`${props.id}-${i}`);
+                STORAGE.layout.tasks[`${props.id}-${i}`] = { id: `${props.id}-${i}`, addr: "", func: "", json: j }
+            })
+        STORAGE.setLayout({}); // trigger callbacks
+
+        document.addEventListener('onlayoutupdated', () => this.forceUpdate())
+
     }
 
     onAddressesUpdated() {}
 
     render() {
 
-        console.log(this.props.id);
+        this.tasks = STORAGE.layout.columns[this.props.id].taskIds.map(taskId => STORAGE.layout.tasks[taskId]);
 
-        this.tasks = LAYOUT.state.columns[this.props.id].taskIds.map(taskId => LAYOUT.state.tasks[taskId]);
+        console.log(this.tasks);
 
         return (
             <fieldset className="task-container batch-container">

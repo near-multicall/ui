@@ -10,20 +10,26 @@
     width: calc(100% - 0.5 * size.$gap);
     padding: 0;
     min-height: size.$task-height;
-    border: 0.25 * size.$gap solid color.$black;
-    border-radius: size.$task-radius;
+    border: 0.25 * size.$gap dotted color.$dark;
+    border-radius: 2 * size.$task-radius;
     background-color: transparent;
     .tasks-wrapper {
-        border-radius: size.$task-radius;
         width: 100%;
         background-color: transparent;
         box-shadow: none !important;
+        .task-wrapper {
+            width: calc(size.$task-width - size.$gap) !important;
+            &:first-of-type {
+                margin-top: 0.5 * size.$gap;
+            }
+        }
     }
-    .name {
+    & > .name {
         margin: 0 auto;
-        padding: 0 size.$gap;
+        padding: 0 0.5 * size.$gap;
         font-size: size.$large-text;
-        color: color.$black;
+        font-weight: 800;
+        color: color.$dark;
         background-color: transparent;
     }
 }

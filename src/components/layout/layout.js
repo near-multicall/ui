@@ -375,8 +375,11 @@ export default class Layout extends Component {
             this.columnID++;
             
             for (let t in json[c]) {
+
+                console.log(json[c][t]);
+
                 let task;
-                if (json[c][t].action.length > 1) { 
+                if (json[c][t].actions.length > 1) { 
 
                     const newBatch = {
                         id: `task-${this.taskID}`,
@@ -391,6 +394,8 @@ export default class Layout extends Component {
                             [`task-${this.taskID}`]: newBatch
                         },
                     }
+
+                    console.log("created new column", `task-${this.taskID}`);
 
                     task = {id: `task-${this.taskID++}`, addr: "", func: "batch", json: json[c][t]}
                     
