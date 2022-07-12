@@ -1,0 +1,29 @@
+@use 'sass/color';
+@use 'sass/size';
+@use 'sass/font';
+@use 'sass/mixin';
+
+.batch-container {
+    position: relative;
+    display: flex;
+    flex-flow: column nowrap;
+    width: calc(100% - 0.5 * size.$gap);
+    padding: 0;
+    min-height: size.$task-height;
+    border: 0.25 * size.$gap solid color.$black;
+    border-radius: size.$task-radius;
+    background-color: transparent;
+    .tasks-wrapper {
+        border-radius: size.$task-radius;
+        width: 100%;
+        background-color: transparent;
+        box-shadow: none !important;
+    }
+    .name {
+        margin: 0 auto;
+        padding: 0 size.$gap;
+        font-size: size.$large-text;
+        color: color.$black;
+        background-color: transparent;
+    }
+}

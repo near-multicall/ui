@@ -1,4 +1,3 @@
-import { WindPower } from '@mui/icons-material';
 import React, { Component } from 'react'
 import { Draggable } from 'react-beautiful-dnd';
 import { Family } from '../../components';
@@ -113,7 +112,12 @@ export default class Task extends Component {
                 }
 
             default:
-                return <Family.BaseTask ref={this.instance} id={this.id} json={json}/>
+                switch (func) {
+                    case "batch":
+                        return <Family.BatchTask ref={this.instance} id={this.id} json={json}/>
+                    default:
+                        return <Family.BaseTask ref={this.instance} id={this.id} json={json}/>
+                }
 
         }
 

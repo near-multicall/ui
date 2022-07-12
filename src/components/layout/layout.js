@@ -363,7 +363,27 @@ export default class Layout extends Component {
             this.columnID++;
             
             for (let t in json[c]) {
-                let task = {id: `task-${this.taskID++}`, addr: "", func: "", json: json[c][t]};
+                let task;
+                if (json[c][t].action.length > 1) { 
+
+                    const newBatch = {
+                        id: `task-${this.taskID}`,
+                        title: 'Drag here',
+                        taskIds: []
+                    };
+
+                    newState = {
+                        ...newState,
+                        columns: {
+                            ...newState.columns,
+                            [`task-${this.taskID}`]: newBatch
+                        },
+                    }
+
+                    task = {id: `task-${this.taskID++}`, addr: "", func: "batch", json: json[c][t]}
+                    
+                } else
+                    task = {id: `task-${this.taskID++}`, addr: "", func: "", json: json[c][t]};
                 newState.columns[newColumn.id].taskIds.push(task.id);
                 newState.tasks[task.id] = task;
             }
