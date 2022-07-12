@@ -28,7 +28,7 @@ export default class Task extends Component {
             if (from) {
 
                 COPY["payload"] = {
-                    call: from.call,
+                    calls: from.calls,
                     showArgs: from.state.showArgs,
                     options: from.options,
                     errors: from.errors
@@ -50,7 +50,7 @@ export default class Task extends Component {
             this.child = existent.child;
 
             window.TEMP = {
-                call: this.instance.current.call,
+                calls: this.instance.current.calls,
                 showArgs: this.instance.current.state.showArgs,
                 options: this.instance.current.options,
                 errors: this.instance.current.errors

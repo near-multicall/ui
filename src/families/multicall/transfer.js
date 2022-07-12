@@ -15,7 +15,7 @@ export default class Transfer extends BaseTask {
         addr: new ArgsError("Invalid address", value => true),
         func: new ArgsError("Cannot be empty", value => value != ""),
         args: new ArgsError("Invalid JSON", value => true),
-        receiver: new ArgsError("Invalid address", value => ArgsAccount.isValid(value), !ArgsAccount.isValid(this.call.args.value.account_id)),
+        receiver: new ArgsError("Invalid address", value => ArgsAccount.isValid(value), !ArgsAccount.isValid(this.calls[0].args.value.account_id)),
         amount: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value)),
         gas: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value)),
     };
@@ -29,7 +29,7 @@ export default class Transfer extends BaseTask {
         const actions = json?.actions?.[0];
         const units = json?.units?.actions?.[0];
 
-        this.call = new Call({
+        this.calls = [new Call({
             name: new ArgsString(json?.name ?? "Transfer Near"),
             addr: new ArgsAccount(STORAGE.addresses.multicall ?? ""),
             func: new ArgsString(actions?.func ?? "near_transfer"),
@@ -59,19 +59,19 @@ export default class Transfer extends BaseTask {
                 units?.gas?.decimals
             ),
             depo: new ArgsBig("1", "1", "1", "yocto")
-        });
+        })];
 
         if ((actions?.args?.account_id !== undefined && actions.args.amount === undefined) || json?.options?.all) {
-            this.call.args.value.amount.omit = true;
+            this.calls[0].args.value.amount.omit = true;
             this.options.all = true;
         }
 
         this.loadErrors = (() => {
             for (let e in this.baseErrors)
-                this.errors[e].validOrNull(this.call[e])
+                this.errors[e].validOrNull(this.calls[0][e])
 
-            this.errors.receiver.validOrNull(this.call.args.value.account_id);
-            this.errors.amount.validOrNull(this.call.args.value.amount);
+            this.errors.receiver.validOrNull(this.calls[0].args.value.account_id);
+            this.errors.amount.validOrNull(this.calls[0].args.value.amount);
         }).bind(this)
     
     }
@@ -79,8 +79,8 @@ export default class Transfer extends BaseTask {
 
     onAddressesUpdated() {
 
-        this.call.addr.value = STORAGE.addresses.multicall;
-        this.errors.addr.validOrNull(this.call.addr.value);
+        this.calls[0].addr.value = STORAGE.addresses.multicall;
+        this.errors.addr.validOrNull(this.calls[0].addr.value);
         this.forceUpdate();
         
     }
@@ -90,12 +90,12 @@ export default class Transfer extends BaseTask {
         const {
             name,
             gas
-        } = this.call;
+        } = this.calls[0];
 
         const {
             account_id,
             amount
-        } = this.call.args.value;
+        } = this.calls[0].args.value;
 
         const errors = this.errors;
 
@@ -119,7 +119,7 @@ export default class Transfer extends BaseTask {
                         checked={this.transferAll}
                         onChange={e => {
                             this.options.all = e.target.checked;
-                            this.call.args.value.amount.omit = e.target.checked;
+                            this.calls[0].args.value.amount.omit = e.target.checked;
                             this.updateCard();
                         }}
                     />

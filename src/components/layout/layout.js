@@ -385,7 +385,7 @@ export default class Layout extends Component {
             for (let t of this.state.columns[c].taskIds) {
                 const task = TASKS.find(task => task.id === t);
                 if (task)
-                    output[output.length -1].push(task.instance.current.call.toJSON());
+                    output[output.length -1].push(...task.instance.current.calls.filter(c => !c.omit).map(c => c.toJSON()));
                 else
                     console.warn(`no task with id ${t}`);
             }

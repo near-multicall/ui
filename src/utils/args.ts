@@ -6,6 +6,7 @@ import { BigSource } from "big.js";
 export default abstract class Args {
 
     private types = {
+        "boolean":  ArgsBool,
         "string":   ArgsString, 
         "account":  ArgsAccount,
         "number":   ArgsNumber,
@@ -53,6 +54,16 @@ export default abstract class Args {
         unit: this.unit,
         decimals: this.decimals ??  unitToDecimals[this.unit!]
     });
+
+}
+
+class ArgsBool extends Args {
+
+    constructor(value: boolean) {
+
+        super("boolean", value);
+
+    }
 
 }
 
@@ -293,6 +304,7 @@ class ArgsError {
 
 export {
     Args,
+    ArgsBool,
     ArgsString, 
     ArgsAccount,
     ArgsNumber,

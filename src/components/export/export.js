@@ -255,7 +255,7 @@ export default class Export extends Component {
                             { allErrors.map((e, i) => 
                                 <div className="error" key={`error-${i}`}>
                                     <p className="msg">
-                                        {`[${e.task.call.name}] Error: ${e.message}`}
+                                        {`[${e.task.calls[0].name}] Error: ${e.message}`}
                                     </p>
                                     <EditOutlinedIcon 
                                         className="icon" 

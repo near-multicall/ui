@@ -17,6 +17,7 @@ export default class Call {
     args: ArgsObject | ArgsJSON;
     gas: ArgsBig;
     depo: ArgsBig;
+    omit: boolean;
 
     constructor({
         name,
@@ -40,6 +41,7 @@ export default class Call {
         this.args = args;
         this.gas = gas;
         this.depo = depo;
+        this.omit = false;
 
     }
 

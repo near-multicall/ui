@@ -10,7 +10,7 @@ import './base.scss';
 export default class BaseTask extends Component {
 
     uniqueClassName = "base-task";
-    call;
+    calls;
     loadErrors;
     baseErrors = {
         addr: new ArgsError("Invalid address", value => ArgsAccount.isValid(value), true),
@@ -33,7 +33,7 @@ export default class BaseTask extends Component {
 
         if (window.TEMP) {
 
-            this.call = TEMP.call;
+            this.calls = TEMP.calls;
             this.state.showArgs = TEMP.showArgs;
             this.options = TEMP.options;
             this.errors = TEMP.errors;
@@ -64,7 +64,7 @@ export default class BaseTask extends Component {
         const actions = json?.actions?.[0];
         const units = json?.units?.actions?.[0];
 
-        this.call = new Call({
+        this.calls = [new Call({
             name: new ArgsString(json?.name ?? "Custom"),
             addr: new ArgsAccount(json?.address ?? ""),
             func: new ArgsString(actions?.func ?? ""),
@@ -83,11 +83,11 @@ export default class BaseTask extends Component {
                 units?.depo?.unit ?? "NEAR",
                 units?.depo?.decimals
             )
-        });
+        })];
 
         this.loadErrors = (() => {
             for (let e in this.errors)
-                this.errors[e].validOrNull(this.call[e])
+                this.errors[e].validOrNull(this.calls[0][e])
         }).bind(this);
 
     }
@@ -120,7 +120,7 @@ export default class BaseTask extends Component {
             args,
             gas,
             depo
-        } = this.call;
+        } = this.calls[0];
 
         const errors = this.errors;
 
@@ -171,16 +171,45 @@ export default class BaseTask extends Component {
 
     }
 
-    render() {
+    renderCall(call) {
 
         const {
-            name,
             addr,
             func,
             args,
             gas,
             depo
-        } = this.call;
+        } = call;
+
+        const errors = this.errors;
+
+        const { showArgs } = this.state;
+
+        return (
+            <div className="data-container">
+                <p><span>Contract address</span><a className="code" href={addr.toUrl()} target="_blank" rel="noopener noreferrer">{addr.toString()}</a></p>
+                <p><span>Function name</span><span className="code">{func.toString()}</span></p>
+                <p className="expandable"><span>Function arguments</span>{
+                    showArgs
+                        ? <a onClick={() => this.setState({ showArgs: false })} >hide</a>
+                        : <a onClick={() => this.setState({ showArgs: true })} >show</a>
+                }</p>
+                {showArgs && (errors.args.validOrNull(args) // TODO: rethink args intermediate and to checks for seperate args (this code will break eventually)
+                    ? <pre className="code">{JSON.stringify(args.toString(), null, "  ")}</pre>
+                    : <pre className="code">{errors.args.intermediate}</pre>)
+                }
+                <p><span>Allocated gas</span><span className="code">{gas.toString()} <span>{gas.unit}</span></span></p>
+                <p><span>Attached deposit</span><span className="code">{depo.toString()}  <span>{depo.unit}</span></span></p>
+            </div>
+        )
+
+    }
+
+    render() {
+
+        const {
+            name
+        } = this.calls[0];
 
         const errors = this.errors;
         
@@ -188,7 +217,7 @@ export default class BaseTask extends Component {
             .filter(([k, v]) => v.isBad)
             .length > 0
 
-        const { showArgs, isEdited } = this.state;
+        const { isEdited } = this.state;
 
         const { id } = this.props;
 
@@ -227,21 +256,7 @@ export default class BaseTask extends Component {
                     </Tooltip>
                     <div className="delete-pseudo"></div>
                 </div>
-                <div className="data-container">
-                    <p><span>Contract address</span><a className="code" href={addr.toUrl()} target="_blank" rel="noopener noreferrer">{addr.toString()}</a></p>
-                    <p><span>Function name</span><span className="code">{func.toString()}</span></p>
-                    <p className="expandable"><span>Function arguments</span>{
-                        showArgs
-                            ? <a onClick={() => this.setState({ showArgs: false })} >hide</a>
-                            : <a onClick={() => this.setState({ showArgs: true })} >show</a>
-                    }</p>
-                    {showArgs && (errors.args.validOrNull(args)
-                        ? <pre className="code">{JSON.stringify(args.toString(), null, "  ")}</pre>
-                        : <pre className="code">{errors.args.intermediate}</pre>)
-                    }
-                    <p><span>Allocated gas</span><span className="code">{gas.toString()} <span>{gas.unit}</span></span></p>
-                    <p><span>Attached deposit</span><span className="code">{depo.toString()}  <span>{depo.unit}</span></span></p>
-                </div>
+                { this.calls.filter(c => !c.omit).map(c => this.renderCall(c)) }
             </div>
         );
 
