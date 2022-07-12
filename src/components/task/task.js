@@ -102,6 +102,8 @@ export default class Task extends Component {
                 switch (func) {
                     case "ft_transfer":
                         return <Family.Near.Transfer ref={this.instance} id={this.id} json={json}/>        
+                    case "storage_deposit":
+                        return <Family.Near.StorageDeposit ref={this.instance} id={this.id} json={json}/>        
                 }
 
             case "ref-finance":

@@ -2,7 +2,8 @@
 @use 'sass/mixin';
 @use 'sass/size';
 
-.near-transfer-task {
+.near-transfer-task, 
+.near-storage-deposit-task {
     background: color.$lightest;
     .name {
         color: color.$text !important;
