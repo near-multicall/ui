@@ -57,6 +57,8 @@ export default class BaseTask extends Component {
 
         this.updateCard = this.updateCard.bind(this);
 
+        document.addEventListener('onaddressesupdated', (e) => this.onAddressesUpdated(e))
+
     }
 
     init(json = null) {
@@ -90,6 +92,10 @@ export default class BaseTask extends Component {
                 this.errors[e].validOrNull(this.call[e])
         }).bind(this);
 
+    }
+
+    static inferOwnType(json) {
+        return false;
     }
 
     componentDidMount() {

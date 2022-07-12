@@ -56,6 +56,8 @@ export default class Dao extends Component {
                 this.loadInfos()
             })
 
+        document.addEventListener('onaddressesupdated', (e) => this.onAddressesUpdated(e))
+
     }
 
     componentDidMount() {

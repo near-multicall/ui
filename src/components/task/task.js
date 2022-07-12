@@ -26,7 +26,7 @@ export default class Task extends Component {
 
             if (from) {
 
-                COPY["payload"] = {
+                COPY.payload = {
                     call: from.call,
                     showArgs: from.state.showArgs,
                     options: from.options,
@@ -116,6 +116,16 @@ export default class Task extends Component {
                     case "batch":
                         return <Family.BatchTask ref={this.instance} id={this.id} json={json}/>
                     default:
+                        for (let family in Family) {
+                            if (family === "BaseTask")
+                                continue;
+                            for (let task in Family[family])
+                                if (Family[family][task].inferOwnType(json)) {
+                                    const TaskComponent = Family[family][task];
+                                    return <TaskComponent ref={this.instance} id={this.id} json={json}/>
+                                }
+                        }
+
                         return <Family.BaseTask ref={this.instance} id={this.id} json={json}/>
                 }
 
