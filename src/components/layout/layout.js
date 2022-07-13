@@ -334,9 +334,9 @@ export default class Layout extends Component {
 
     fromJSON(json) {
 
-        const layout = window.STORAGE.layout;
-
         this.clear();
+
+        const layout = window.STORAGE.layout;
 
         if (!Array.isArray(json) || !json.length)
             return;
