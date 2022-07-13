@@ -9,7 +9,7 @@ import {
     ArgsJSON
 } from './args';
 
-export default class Call {
+export class Call {
     
     name: ArgsString;
     addr: ArgsAccount;
@@ -95,6 +95,88 @@ export default class Call {
                 "gas": this.gas.getUnit(),
                 "depo": this.depo.getUnit()
             }]
+        }
+
+    }
+
+}
+
+export class BatchCall extends Call {
+
+    calls: Call[] = [];
+
+    constructor() {
+
+        super({
+            name: new ArgsString("Batch"),
+            addr: new ArgsAccount(""),
+            func: new ArgsString(""),
+            args: new ArgsObject({}),
+            gas: new ArgsBig(0),
+            depo: new ArgsBig(0)
+        });
+
+    }
+
+    setCalls(calls: Call[]) {
+
+        this.addr = calls[0].addr;
+        this.calls = calls;
+
+    }
+
+    toString() {
+
+        return JSON.stringify({
+            "address": this.addr.toString(),
+            "actions": this.calls.map(c => ({
+                "func": c.func.toString(),
+                "args": JSON.stringify(c.args.toString(), null, "  "),
+                "gas": convert(c.gas.value, c.gas.unit).toString(),
+                "depo": convert(c.depo.value, c.depo.unit).toString()
+            }))
+        });
+
+    }
+
+    toJSON() {
+
+        return {
+            "address": this.addr.toString(),
+            "actions": this.calls.map(c => ({
+                "func": c.func.toString(),
+                "args": c.args.toString(),
+                "gas": convert(c.gas.value, c.gas.unit).toString(),
+                "depo": convert(c.depo.value, c.depo.unit).toString()
+            }))
+        }
+
+    }
+
+    toBase64() {
+
+        return {
+            "address": this.addr.toString(),
+            "actions": this.calls.map(c => ({
+                "func": c.func.toString(),
+                "args": Base64.encode(JSON.stringify(c.args.toString())),
+                "gas": convert(c.gas.value, c.gas.unit).toString(),
+                "depo": convert(c.depo.value, c.depo.unit).toString()
+            }))
+        }
+
+    }
+
+    toUnits() {
+
+        return {
+            "address": this.addr.getUnit(),
+            "actions": this.calls.map(c => ({
+                "func": c.func.getUnit(),
+                "args": c.args.getUnit(),
+                "gas": c.gas.getUnit(),
+                "depo": c.depo.getUnit()
+            }))
         }
 
     }

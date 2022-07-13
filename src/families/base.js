@@ -3,7 +3,7 @@ import { Tooltip } from '@mui/material';
 import React, { Component } from 'react';
 import { TextInput, TextInputWithUnits } from '../components/editor/elements';
 import { ArgsAccount, ArgsBig, ArgsError, ArgsJSON, ArgsString } from '../utils/args';
-import Call from '../utils/call';
+import { Call } from '../utils/call';
 import { toGas, toYocto, formatTokenAmount, unitToDecimals } from '../utils/converter';
 import './base.scss';
 

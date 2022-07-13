@@ -1,7 +1,7 @@
 import Checkbox from '@mui/material/Checkbox';
 import React from 'react';
 import { ArgsAccount, ArgsBig, ArgsString, ArgsObject, ArgsError } from "../../utils/args";
-import Call from "../../utils/call";
+import { Call } from "../../utils/call";
 import { toGas, toYocto, formatTokenAmount, unitToDecimals } from "../../utils/converter";
 import BaseTask from "../base";
 import Multicall from '../../utils/contracts/multicall';

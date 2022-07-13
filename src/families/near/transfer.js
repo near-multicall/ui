@@ -2,7 +2,7 @@ import { InputAdornment } from '@mui/material';
 import React from 'react';
 import { TextInput, TextInputWithUnits } from '../../components/editor/elements';
 import { ArgsAccount, ArgsBig, ArgsError, ArgsObject, ArgsString } from "../../utils/args";
-import Call from "../../utils/call";
+import { Call } from "../../utils/call";
 import { toGas, formatTokenAmount, unitToDecimals } from "../../utils/converter";
 import { view } from "../../utils/wallet";
 import BaseTask from "../base";

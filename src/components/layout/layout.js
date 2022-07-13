@@ -126,6 +126,9 @@ export default class Layout extends Component {
 
     clear = () => {
 
+        console.warn("layout cleared");
+        console.trace();
+
         let newLayout = {
             ...initialData
         }
@@ -204,6 +207,10 @@ export default class Layout extends Component {
 
         if (destination.droppableId === source.droppableId &&
             destination.index === source.index)
+            return;
+
+        // batch attempts to hold itself
+        if (destination.droppableId === draggableId)
             return;
 
         if (type === 'column') {

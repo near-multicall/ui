@@ -7,29 +7,34 @@
     position: relative;
     display: flex;
     flex-flow: column nowrap;
-    width: calc(100% - 0.5 * size.$gap);
+    width: 100%;
     padding: 0;
     min-height: size.$task-height;
-    border: 0.25 * size.$gap dotted color.$dark;
-    border-radius: 2 * size.$task-radius;
+    border-radius: 1.25 * size.$task-radius;
     background-color: transparent;
+    overflow: hidden;
     .tasks-wrapper {
-        width: 100%;
+        width: calc(100% - 0.5 * size.$gap);
+        margin: 0.25 * size.$gap;
+        margin-top: 0;
         background-color: transparent;
-        box-shadow: none !important;
+        box-shadow: 0 0 0 9999px color.$black !important;
+        border-radius: size.$task-radius;
         .task-wrapper {
             width: calc(size.$task-width - size.$gap) !important;
             &:first-of-type {
                 margin-top: 0.5 * size.$gap;
             }
+            &:last-of-type {
+                margin-bottom: 0.5 * size.$gap;
+            }
         }
     }
     & > .name {
-        margin: 0 auto;
-        padding: 0 0.5 * size.$gap;
-        font-size: size.$large-text;
+        padding: 0.25 * size.$gap 0.5 * size.$gap;
+        font-size: size.$text;
         font-weight: 800;
-        color: color.$dark;
-        background-color: transparent;
+        color: color.$light-text;
+        z-index: 1;
     }
 }
