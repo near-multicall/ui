@@ -1,7 +1,3 @@
-window.onload = function(e) {
-    window.STORAGE.load();
-}
-
 window.onbeforeunload = function(e) {
     window.STORAGE.save();
 
