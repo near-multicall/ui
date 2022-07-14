@@ -217,7 +217,6 @@ export default class Wallet extends Component {
 
                     this.setState({ bond: "0" })
                     window.MENU?.forceUpdate()
-
                 }),
             view(multicall, "get_admins", {})
                 .catch(e => {
@@ -253,7 +252,8 @@ export default class Wallet extends Component {
 
                 if (!canPropose) noRights.isBad = true; // no add proposal rights
 
-                window.MENU?.forceUpdate()
+                if (window.MENU !== undefined)
+                    window.MENU.forceUpdate()
 
             })
             .finally(() => {

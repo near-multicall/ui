@@ -1,0 +1,40 @@
+@use 'sass/color';
+@use 'sass/size';
+@use 'sass/font';
+@use 'sass/mixin';
+
+.batch-container {
+    position: relative;
+    display: flex;
+    flex-flow: column nowrap;
+    width: 100%;
+    padding: 0;
+    min-height: size.$task-height;
+    border-radius: 1.25 * size.$task-radius;
+    background-color: transparent;
+    overflow: hidden;
+    .tasks-wrapper {
+        width: calc(100% - 0.5 * size.$gap);
+        margin: 0.25 * size.$gap;
+        margin-top: 0;
+        background-color: transparent;
+        box-shadow: 0 0 0 9999px color.$black !important;
+        border-radius: size.$task-radius;
+        .task-wrapper {
+            width: calc(size.$task-width - size.$gap) !important;
+            &:first-of-type {
+                margin-top: 0.5 * size.$gap;
+            }
+            &:last-of-type {
+                margin-bottom: 0.5 * size.$gap;
+            }
+        }
+    }
+    & > .name {
+        padding: 0.25 * size.$gap 0.5 * size.$gap;
+        font-size: size.$text;
+        font-weight: 800;
+        color: color.$light-text;
+        z-index: 1;
+    }
+}

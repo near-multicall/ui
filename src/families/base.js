@@ -3,7 +3,7 @@ import { Tooltip } from '@mui/material';
 import React, { Component } from 'react';
 import { TextInput, TextInputWithUnits } from '../components/editor/elements';
 import { ArgsAccount, ArgsBig, ArgsError, ArgsJSON, ArgsString } from '../utils/args';
-import Call from '../utils/call';
+import { Call } from '../utils/call';
 import { toGas, toYocto, formatTokenAmount, unitToDecimals } from '../utils/converter';
 import './base.scss';
 
@@ -57,6 +57,8 @@ export default class BaseTask extends Component {
 
         this.updateCard = this.updateCard.bind(this);
 
+        document.addEventListener('onaddressesupdated', (e) => this.onAddressesUpdated(e))
+
     }
 
     init(json = null) {
@@ -90,6 +92,10 @@ export default class BaseTask extends Component {
                 this.errors[e].validOrNull(this.call[e])
         }).bind(this);
 
+    }
+
+    static inferOwnType(json) {
+        return false;
     }
 
     componentDidMount() {

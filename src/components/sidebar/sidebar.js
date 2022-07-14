@@ -76,8 +76,19 @@ export default class Sidebar extends Component {
                         </span>
                     </div>
                     <nav>
-                        <NavLink className={({ isActive }) => isActive ? "active" : ""} to="/app">App</NavLink>
-                        <NavLink className={({ isActive }) => isActive ? "active" : ""} to="/dao">Dao</NavLink>
+                        <NavLink 
+                            className={({ isActive }) => isActive ? "active" : ""} 
+                            to="/app"
+                        >
+                            App
+                        </NavLink>
+                        <NavLink 
+                            className={({ isActive }) => isActive ? "active" : ""} 
+                            to="/dao"
+                            onClick={() => window.STORAGE.save()}
+                        >
+                            Dao
+                        </NavLink>
                     </nav>
                     <hr/>
                     { window.PAGE === "app"

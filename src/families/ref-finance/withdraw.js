@@ -1,6 +1,6 @@
 import React from 'react';
 import { ArgsAccount, ArgsBig, ArgsJSON, ArgsString, ArgsError } from "../../utils/args";
-import Call from "../../utils/call";
+import { Call } from "../../utils/call";
 import { toGas } from "../../utils/converter";
 import BaseTask from "../base";
 import "./ref-finance.scss";

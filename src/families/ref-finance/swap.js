@@ -2,7 +2,7 @@ import { TextField } from '@mui/material';
 import React from 'react';
 import { TextInput, TextInputWithUnits } from '../../components/editor/elements';
 import { ArgsAccount, ArgsBig, ArgsError, ArgsNumber, ArgsString, ArgsObject, ArgsArray } from "../../utils/args";
-import Call from "../../utils/call";
+import { Call } from "../../utils/call";
 import { toGas } from "../../utils/converter";
 import BaseTask from "../base";
 import "./ref-finance.scss";

@@ -1,13 +1,15 @@
-window.onbeforeunload = function (e) {
-    e = e || window.event;
+window.onbeforeunload = function(e) {
+    window.STORAGE.save();
 
-    // For IE and Firefox prior to version 4
-    if (e) {
-        e.returnValue = 'Sure?';
-    }
+    // e = e || window.event;
 
-    // For Safari
-    return 'Sure?';
+    // // For IE and Firefox prior to version 4
+    // if (e) {
+    //     e.returnValue = 'Sure?';
+    // }
+
+    // // For Safari
+    // return 'Sure?';
 };
 
 export function saveFile(name: string, data: any) {
@@ -26,4 +28,4 @@ export function readFile(file: File, callback: (json: object) => any) {
     reader.readAsText(file,'UTF-8');
   
     reader.onload = e_reader => callback(JSON.parse(e_reader?.target?.result as string));
-  }
+}

@@ -1,4 +1,3 @@
-import { WindPower } from '@mui/icons-material';
 import React, { Component } from 'react'
 import { Draggable } from 'react-beautiful-dnd';
 import { Family } from '../../components';
@@ -27,7 +26,7 @@ export default class Task extends Component {
 
             if (from) {
 
-                COPY["payload"] = {
+                COPY.payload = {
                     call: from.call,
                     showArgs: from.state.showArgs,
                     options: from.options,
@@ -74,6 +73,8 @@ export default class Task extends Component {
         else 
             window.TASKS = [this];
 
+        this.instance.current.onListed?.();
+
     }
 
     componentWillUnmount() {
@@ -102,6 +103,8 @@ export default class Task extends Component {
                 switch (func) {
                     case "ft_transfer":
                         return <Family.Near.Transfer ref={this.instance} id={this.id} json={json}/>        
+                    case "storage_deposit":
+                        return <Family.Near.StorageDeposit ref={this.instance} id={this.id} json={json}/>        
                 }
 
             case "ref-finance":
@@ -111,7 +114,22 @@ export default class Task extends Component {
                 }
 
             default:
-                return <Family.BaseTask ref={this.instance} id={this.id} json={json}/>
+                switch (func) {
+                    case "batch":
+                        return <Family.BatchTask ref={this.instance} id={this.id} json={json}/>
+                    default:
+                        for (let family in Family) {
+                            if (family === "BaseTask")
+                                continue;
+                            for (let task in Family[family])
+                                if (Family[family][task].inferOwnType(json)) {
+                                    const TaskComponent = Family[family][task];
+                                    return <TaskComponent ref={this.instance} id={this.id} json={json}/>
+                                }
+                        }
+
+                        return <Family.BaseTask ref={this.instance} id={this.id} json={json}/>
+                }
 
         }
 
@@ -137,7 +155,7 @@ export default class Task extends Component {
                                 : 1
                         }}
                     >
-                        {/* <h1 style={{paddingLeft: "20px"}}>{this.id}</h1> */}
+                        <h1 style={{paddingLeft: "20px"}}>{this.id}</h1>
                         { this.child }
                     </div>
                 )}
