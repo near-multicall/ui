@@ -129,6 +129,8 @@ export default class Layout extends Component {
         console.warn("layout cleared");
         console.trace();
 
+        TASKS = [];
+
         let newLayout = {
             ...initialData
         }
@@ -383,8 +385,6 @@ export default class Layout extends Component {
             
             for (let t in json[c]) {
 
-                console.log(json[c][t]);
-
                 let task;
                 if (json[c][t].actions.length > 1) { 
 
@@ -413,8 +413,16 @@ export default class Layout extends Component {
             }
         }
 
+        // why is TASKS [] when returning from DAO page?
+        // BATCH MOUNTED, ... fires too early (before clear())
+        console.log("LAYOUT fromJSON, TASKS:", ...TASKS.map(t => t.id));
+        console.log("LAYOUT fromJSON, newLayout:", newLayout);
+
         window.STORAGE.setLayout(newLayout);
-        window.TASKS.forEach(t => t.instance.current.forceUpdate());
+        window.TASKS.forEach(t => {
+            t.instance.current.forceUpdate();
+            t.instance.current.componentDidMount();
+        });
 
     }
 

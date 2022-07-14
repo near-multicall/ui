@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
 import { Droppable } from 'react-beautiful-dnd';
 import { DeleteOutline, MoveDown, EditOutlined } from '@mui/icons-material';
 import { Tooltip } from '@mui/material';
@@ -30,34 +31,40 @@ export default class BatchTask extends Component {
             showArgs: false
         }
 
-        document.addEventListener('onlayoutupdated', () => this.forceUpdate())
+        window.STATE = this;
 
     }
 
     componentDidMount() {
 
-        console.log("IAM FUCKING MOUNTING");
-        this.loadTasks();
+        console.log("BATCH MOUNTED")
+        // this.loadTasks();
 
     }
 
     loadTasks() {
+
+        console.log("BATCH loadTasks, TASKS:", ...TASKS.map(t => t.id));
 
         this.props.json.actions.map(a => ({
             address: this.props.json.address,
             actions: [a]            
         }))
             .forEach((j, i) => {
-                if (TASKS.find(task => task.id === `${this.props.id}-${i}`)) {
-                    console.log(`${this.props.id}-${i}`, "already exists!!!", TASKS.find(task => task.id === `${this.props.id}-${i}`));
-                }
-                console.log("I am now spawning new task", `${this.props.id}-${i}`, "eventhough this exists:", TASKS.find(task => task.id === `${this.props.id}-${i}`))
+                const existent = TASKS.find(task => task.id === `${this.props.id}-${i}`);
+                if (existent !== undefined && existent.instance.current !== null )
+                    return;
                 STORAGE.layout.columns[this.props.id].taskIds.push(`${this.props.id}-${i}`);
                 STORAGE.layout.tasks[`${this.props.id}-${i}`] = { id: `${this.props.id}-${i}`, addr: "", func: "", json: j }
             })
         STORAGE.setLayout({}); // trigger callbacks
 
-        console.log("loaded");
+    }
+
+    onListed() {
+
+        console.log("BATCH onListed, TASKS:", ...TASKS.map(t => t.id));
+        this.loadTasks();
 
     }
 
@@ -66,8 +73,6 @@ export default class BatchTask extends Component {
     render() {
 
         this.tasks = STORAGE.layout.columns[this.props.id].taskIds.map(taskId => STORAGE.layout.tasks[taskId]);
-
-        console.log(this.tasks);
 
         return (
             <div className="task-container batch-container">
