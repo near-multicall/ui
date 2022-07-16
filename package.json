@@ -55,7 +55,7 @@
     "lodash.debounce": "^4.0.8",
     "luxon": "^1.28.0 || ^2.0.0",
     "moment": "^2.29.4",
-    "near-api-js": "^0.44.2",
+    "near-api-js": "^0.45.1",
     "parcel": "^2.4.0",
     "react": "^18.0.0",
     "react-beautiful-dnd": "^13.1.0",

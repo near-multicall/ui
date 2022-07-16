@@ -2,7 +2,7 @@ import { Base64 } from 'js-base64';
 import React, { Component } from 'react';
 import { toGas, Big } from '../../utils/converter';
 import { initNear, tx, view } from '../../utils/wallet';
-import { SputnikDAO } from '../../utils/contracts/sputnik-dao';
+import { SputnikDAO, ProposalKind, ProposalAction } from '../../utils/contracts/sputnik-dao';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import { Icon } from '@mui/material';
@@ -34,7 +34,7 @@ export default class Wallet extends Component {
 
         this.state = {
             wallet: null,
-            bond: "0",
+            currentDAO: new SputnikDAO(STORAGE.addresses?.dao ?? ""),
             expanded: {
                 user: false,
                 dao: false || (STORAGE.addresses.dao === "")
@@ -100,12 +100,14 @@ export default class Wallet extends Component {
             }
         }
 
+        const { proposal_bond } = this.state.currentDAO.policy;
+
         tx(
             dao,
             "add_proposal",
             args,
             toGas("15"),
-            this.state.bond
+            proposal_bond
         )
 
     }
@@ -180,12 +182,14 @@ export default class Wallet extends Component {
             );
         }
 
+        const { proposal_bond } = this.state.currentDAO.policy;
+
         tx(
             dao,
             "add_proposal",
             args,
             toGas("15"),
-            this.state.bond
+            proposal_bond
         )
 
     }
@@ -205,20 +209,7 @@ export default class Wallet extends Component {
         const multicall = dao.replace(SputnikDAO.FACTORY_ADDRESS, window.nearConfig.MULTICALL_FACTORY_ADDRESS);
 
         Promise.all([
-            view(dao, "get_policy", {})
-                .catch(e => {
-
-                    if (e.type === "AccountDoesNotExist" && e.toString().includes(` ${dao} `) ||
-                        e.type === "CodeDoesNotExist" && e.toString().includes(`${dao}`) ||
-                        e.toString().includes("MethodNotFound"))
-                        noDao.isBad = true;
-                    else
-                        console.error(e, { ...e })
-
-                    this.setState({ bond: "0" })
-                    window.MENU?.forceUpdate()
-
-                }),
+            SputnikDAO.init(dao).catch(e => {}),
             view(multicall, "get_admins", {})
                 .catch(e => {
 
@@ -233,23 +224,24 @@ export default class Wallet extends Component {
 
                 })
         ])
-            .then(([policy, admins]) => {
+            .then(([initializedDAO, admins]) => {
 
-                if (!policy) return;
+                if (!initializedDAO.ready) {
+                    noDao.isBad = true;
+                    MENU.forceUpdate()
+                    return;
+                }
 
                 this.setState({
-                    bond: policy.proposal_bond
+                    currentDAO: initializedDAO
                 });
 
                 // can user propose FunctionCall to DAO?
-                const canPropose = policy.roles
-                    .filter(r => r.kind === "Everyone" || r.kind.Group.includes(this.state.wallet.getAccountId()))
-                    .map(r => r.permissions)
-                    .flat()
-                    .some(permission => {
-                        const [proposalKind, action] = permission.split(":")
-                        return (proposalKind === "*" || proposalKind === "call") && (action === "*" || action === "AddProposal")
-                    })
+                const canPropose = initializedDAO.checkUserPermission(
+                    window.account.accountId,
+                    ProposalAction.AddProposal,
+                    ProposalKind.FunctionCall
+                );
 
                 if (!canPropose) noRights.isBad = true; // no add proposal rights
 
