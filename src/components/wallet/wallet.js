@@ -2,6 +2,7 @@ import { Base64 } from 'js-base64';
 import React, { Component } from 'react';
 import { toGas, Big } from '../../utils/converter';
 import { initNear, tx, view } from '../../utils/wallet';
+import { useWalletSelector } from '../../contexts/walletSelectorContext';
 import { SputnikDAO } from '../../utils/contracts/sputnik-dao';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
@@ -11,7 +12,10 @@ import { ArgsAccount, ArgsError } from '../../utils/args';
 import debounce from 'lodash.debounce';
 
 
+
+
 export default class Wallet extends Component {
+    static contextType = useWalletSelector();
 
     errors = {
         noDao: new ArgsError(`No sputnik dao found at address`, value => this.errors.noDao.isBad),
@@ -63,11 +67,13 @@ export default class Wallet extends Component {
     then(func) { return new Promise(resolve => resolve(func())) } // mock promise
 
     signIn() {
-        window.modal.show();
+        const { modal } = this.context;
+        modal.show();
     }
 
     async signOut() {
-        const wallet = await window.selector.wallet();
+        const { selector } = this.context;
+        const wallet = await selector.wallet();
 
         wallet.signOut().catch((err) => {
         console.log("Failed to sign out");

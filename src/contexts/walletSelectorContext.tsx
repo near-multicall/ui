@@ -98,13 +98,11 @@ export const WalletSelectorContextProvider: React.FC <any> = ({ children }) => {
 };
 
 export function useWalletSelector() {
-  const context = useContext(WalletSelectorContext);
-
-  if (!context) {
+  if (!WalletSelectorContext) {
     throw new Error(
       "useWalletSelector must be used within a WalletSelectorContextProvider"
     );
   }
 
-  return context;
+  return WalletSelectorContext;
 }
