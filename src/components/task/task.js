@@ -146,7 +146,7 @@ export default class Task extends Component {
                                 : 1
                         }}
                     >
-                        <h1 style={{paddingLeft: "20px"}}>{this.id}</h1>
+                        {/* <h1 style={{paddingLeft: "20px"}}>{this.id}</h1> */}
                         { this.child }
                     </div>
                 )}
