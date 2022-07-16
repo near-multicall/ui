@@ -8,7 +8,9 @@ import TextField from '@mui/material/TextField';
 import { Icon } from '@mui/material';
 import './wallet.scss';
 import { ArgsAccount, ArgsError } from '../../utils/args';
-import debounce from 'lodash.debounce'
+import debounce from 'lodash.debounce';
+
+
 export default class Wallet extends Component {
 
     errors = {
@@ -61,17 +63,16 @@ export default class Wallet extends Component {
     then(func) { return new Promise(resolve => resolve(func())) } // mock promise
 
     signIn() {
-
-        this.state.wallet.requestSignIn()
-
+        window.modal.show();
     }
 
-    signOut() {
+    async signOut() {
+        const wallet = await window.selector.wallet();
 
-        this.state.wallet.signOut();
-        LAYOUT.forceUpdate();
-        this.forceUpdate();
-
+        wallet.signOut().catch((err) => {
+        console.log("Failed to sign out");
+        console.error(err);
+        });
     }
 
     propose(desc, depo, gas) {

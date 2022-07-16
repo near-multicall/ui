@@ -1,4 +1,5 @@
 import * as nearAPI from "near-api-js";
+import type { NetworkId } from "@near-wallet-selector/core";
 import { getConfig } from '../near-config';
 import { baseDecode } from "borsh";
 import { Base64 } from 'js-base64';
@@ -7,7 +8,7 @@ import { Base64 } from 'js-base64';
 
 declare global {
     interface Window {
-        NEAR_ENV: string
+        NEAR_ENV: NetworkId
         nearConfig: any
         near: nearAPI.Near
         walletAccount: nearAPI.WalletConnection
@@ -15,7 +16,7 @@ declare global {
     }
 }
 
-window.NEAR_ENV = process.env.NEAR_ENV ?? "testnet";
+window.NEAR_ENV = <NetworkId> process.env.NEAR_ENV ?? "testnet";
 window.nearConfig = getConfig(window.NEAR_ENV);
 
 /**
