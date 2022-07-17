@@ -7,12 +7,14 @@ import type { WalletSelectorModal } from "@near-wallet-selector/modal-ui";
 import { setupNearWallet } from "@near-wallet-selector/near-wallet";
 import { setupMyNearWallet } from "@near-wallet-selector/my-near-wallet";
 import { setupSender } from "@near-wallet-selector/sender";
+import { setupMathWallet } from "@near-wallet-selector/math-wallet";
 
 
 // import wallet icons
 const nearWalletIconUrl = new URL("../../node_modules/@near-wallet-selector/near-wallet/assets/near-wallet-icon.png", import.meta.url);
 const senderIconUrl = new URL("../../node_modules/@near-wallet-selector/sender/assets/sender-icon.png", import.meta.url);
 const myNearWalletIconUrl = new URL("../../node_modules/@near-wallet-selector/my-near-wallet/assets/my-near-wallet-icon.png", import.meta.url);
+const mathWalletIconUrl = new URL("../../node_modules/@near-wallet-selector/math-wallet/assets/math-wallet-icon.png", import.meta.url);
 
 declare global {
   interface Window {
@@ -41,7 +43,8 @@ export const WalletSelectorContextProvider: React.FC <any> = ({ children }) => {
       modules: [
         setupNearWallet({ iconUrl: nearWalletIconUrl.href }),
         setupSender({ iconUrl: senderIconUrl.href }),
-        setupMyNearWallet({ iconUrl: myNearWalletIconUrl.href })
+        setupMyNearWallet({ iconUrl: myNearWalletIconUrl.href }),
+        setupMathWallet({ iconUrl: mathWalletIconUrl.href })
       ],
     });
     const _modal = setupModal(_selector, { contractId: window.nearConfig.MULTICALL_FACTORY_ADDRESS });

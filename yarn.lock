@@ -1699,6 +1699,18 @@
     near-api-js "0.44.2"
     rxjs "~7.4.0"
 
+"@near-wallet-selector/math-wallet@^5.0.0":
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/@near-wallet-selector/math-wallet/-/math-wallet-5.0.0.tgz#b4fc77bbc1a0ef4376f0e94cbd184473345b8165"
+  integrity sha512-PIslBc3gHRXv+C15KXPOeNHPF2/0pT9E/CpKSA0e7E6HEWCsFb36IxVB5PcpZZ7pVR955cR2uZBhSFhOLJTGuw==
+  dependencies:
+    "@near-wallet-selector/core" "5.0.0"
+    "@near-wallet-selector/wallet-utils" "5.0.0"
+    bn.js "^5.2.0"
+    is-mobile "^3.0.0"
+    near-api-js "0.44.2"
+    rxjs "~7.4.0"
+
 "@near-wallet-selector/modal-ui@^5.0.0":
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/@near-wallet-selector/modal-ui/-/modal-ui-5.0.0.tgz#9cda18f0d45bac4b393392a8426572ba4d06b570"
