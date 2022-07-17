@@ -5,6 +5,7 @@ import AppPage from './pages/app-page';
 import DaoPage from './pages/dao-page';
 import { WalletSelectorContextProvider } from "./contexts/walletSelectorContext"
 import './utils/persistent';
+import "@near-wallet-selector/modal-ui/styles.css";
 
 window.PAGE = "app";
 

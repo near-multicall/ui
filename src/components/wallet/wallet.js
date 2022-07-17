@@ -35,7 +35,6 @@ export default class Wallet extends Component {
     );
 
     constructor(props) {
-
         super(props);
 
         this.state = {
@@ -51,10 +50,11 @@ export default class Wallet extends Component {
             .then(wallet => this.setState({
                 wallet: wallet,
             }, () => {
-                STORAGE.setAddresses({ user: wallet.getAccountId() })
+                const { accountId } = this.context;
+                STORAGE.setAddresses({ user: accountId })
                 window.WALLET = this;
-                if (wallet.getAccountId() !== "") {
-                    const URL = `https://api.${window.NEAR_ENV === "mainnet" ? "" : "testnet."}app.astrodao.com/api/v1/daos/account-daos/${this.state.wallet.getAccountId()}`;
+                if (accountId !== "") {
+                    const URL = `https://api.${window.NEAR_ENV === "mainnet" ? "" : "testnet."}app.astrodao.com/api/v1/daos/account-daos/${accountId}`;
                     fetch(URL)
                         .then(response => response.json())
                         .then(data => this.daoList = data.map(dao => dao.id))
@@ -198,6 +198,7 @@ export default class Wallet extends Component {
     }
 
     connectDao(dao) {
+        const { accountId } = this.context;
 
         const {
             noDao,
@@ -250,7 +251,7 @@ export default class Wallet extends Component {
 
                 // can user propose FunctionCall to DAO?
                 const canPropose = policy.roles
-                    .filter(r => r.kind === "Everyone" || r.kind.Group.includes(this.state.wallet.getAccountId()))
+                    .filter(r => r.kind === "Everyone" || r.kind.Group.includes(accountId))
                     .map(r => r.permissions)
                     .flat()
                     .some(permission => {
@@ -316,10 +317,11 @@ export default class Wallet extends Component {
     }
 
     render() {
+        const { selector: walletSelector, accountId } = this.context;
+        const { expanded, color } = this.state;
 
-        const { wallet, expanded, color } = this.state;
 
-        if (!wallet)
+        if (!walletSelector)
             return null;
 
 
@@ -327,20 +329,20 @@ export default class Wallet extends Component {
             <div
                 className="wallet"
             >
-                <div className="user" expand={expanded.user || !wallet.isSignedIn() ? "yes" : "no"}>
+                <div className="user" expand={expanded.user || !walletSelector.isSignedIn() ? "yes" : "no"}>
                     <Icon
                         className="icon"
                         onClick={() => this.toggleExpandedUser()}
                     >
-                        {expanded.user && wallet.isSignedIn() ? "chevron_left" : "person"}
+                        {expanded.user && walletSelector.isSignedIn() ? "chevron_left" : "person"}
                     </Icon>
                     <div className="peek">
-                        {wallet.getAccountId()}
+                        {accountId}
                     </div>
                     <div className="expand">
-                        {wallet.isSignedIn()
+                        {walletSelector.isSignedIn()
                             ? <>
-                                {wallet.getAccountId()}
+                                {accountId}
                                 <button
                                     className="logout"
                                     onClick={() => this.signOut()}

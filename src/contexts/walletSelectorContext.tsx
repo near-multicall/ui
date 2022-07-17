@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { map, distinctUntilChanged } from "rxjs";
 import { setupWalletSelector } from "@near-wallet-selector/core";
 import type { WalletSelector, AccountState } from "@near-wallet-selector/core";
@@ -8,6 +8,11 @@ import { setupNearWallet } from "@near-wallet-selector/near-wallet";
 import { setupMyNearWallet } from "@near-wallet-selector/my-near-wallet";
 import { setupSender } from "@near-wallet-selector/sender";
 
+
+// import wallet icons
+const nearWalletIconUrl = new URL("../../node_modules/@near-wallet-selector/near-wallet/assets/near-wallet-icon.png", import.meta.url);
+const senderIconUrl = new URL("../../node_modules/@near-wallet-selector/sender/assets/sender-icon.png", import.meta.url);
+const myNearWalletIconUrl = new URL("../../node_modules/@near-wallet-selector/my-near-wallet/assets/my-near-wallet-icon.png", import.meta.url);
 
 declare global {
   interface Window {
@@ -34,9 +39,9 @@ export const WalletSelectorContextProvider: React.FC <any> = ({ children }) => {
     const _selector = await setupWalletSelector({
       network: window.NEAR_ENV,
       modules: [
-        setupNearWallet(),
-        setupMyNearWallet(),
-        setupSender()
+        setupNearWallet({ iconUrl: nearWalletIconUrl.href }),
+        setupSender({ iconUrl: senderIconUrl.href }),
+        setupMyNearWallet({ iconUrl: myNearWalletIconUrl.href })
       ],
     });
     const _modal = setupModal(_selector, { contractId: window.nearConfig.MULTICALL_FACTORY_ADDRESS });

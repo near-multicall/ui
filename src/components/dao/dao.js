@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 import { ArgsAccount, ArgsError } from '../../utils/args';
 import { toNEAR, toYocto, Big } from '../../utils/converter';
 import { view } from '../../utils/wallet';
+import { useWalletSelector } from '../../contexts/walletSelectorContext';
 import { SputnikDAO, SputnikUI } from '../../utils/contracts/sputnik-dao';
 import { TextInput } from '../editor/elements';
 import { InputAdornment } from '@mui/material'
@@ -14,6 +15,7 @@ import debounce from 'lodash.debounce';
 const MIN_INSTANCE_BALANCE = toYocto(1); // 1 NEAR
 
 export default class Dao extends Component {
+    static contextType = useWalletSelector();
 
     errors = {
         addr: new ArgsError("Invalid NEAR address", value => ArgsAccount.isValid(value), !ArgsAccount.isValid(STORAGE.addresses?.dao ?? "")),
@@ -45,16 +47,15 @@ export default class Dao extends Component {
             }
         }
 
-        window.WALLET
-            .then(() => view(
-                window.nearConfig.MULTICALL_FACTORY_ADDRESS,
-                "get_fee",
-                {}
-            ))
-            .then(res => {
-                this.fee = res;
-                this.loadInfos()
-            })
+        view(
+            window.nearConfig.MULTICALL_FACTORY_ADDRESS,
+            "get_fee",
+            {}
+        )
+        .then(res => {
+            this.fee = res;
+            this.loadInfos()
+        })
 
     }
 
@@ -144,6 +145,7 @@ export default class Dao extends Component {
 
 
     createMulticall() {
+        const { accountId } = this.contextType;
 
         if (this.fee === undefined)
             return;
@@ -189,15 +191,6 @@ export default class Dao extends Component {
                 }
             }
         };
-
-        // console.log(
-        //     "noContract", noContract.isBad, "\n",
-        //     "noDao", noDao.isBad, "\n",
-        //     "proposed", proposed !== -1, "\n",
-        //     "noAddProposalRights", noAddProposalRights.isBad, "\n",
-        //     "noApproveProposalRights", noApproveProposalRights.isBad, "\n",
-        //     "user has voted", proposedInfo?.votes?.[window.account.accountId]
-        // )
 
         if (
             noContract.isBad 
@@ -253,7 +246,7 @@ export default class Dao extends Component {
                     )
                 }
                 // user can VoteApprove and already voted
-                else if ( proposedInfo.votes[window.account.accountId] ) {
+                else if ( proposedInfo.votes[accountId] ) {
                     return (
                         <div className="info-text">
                             {`You have voted on creating a multicall instance for this DAO. It will be created as soon as the proposal passes voting.`}
@@ -321,7 +314,7 @@ export default class Dao extends Component {
     }
 
     loadInfos() {
-
+        const { accountId } = this.contextType;
         const {
             addr,
             noContract,
@@ -430,22 +423,11 @@ export default class Dao extends Component {
     }
 
     getContent() {
+        const { selector: walletSelector } = this.contextType;
+        const { infos, loading } = this.state;
 
-        const {
-            infos,
-            loading,
-        } = this.state;
-
-        // wait for wallet to initialize
-        if (!window.WALLET?.state?.wallet) {
-            window.WALLET.then(() => this.forceUpdate());
-            return;
-        }
-
-        const { wallet } = window.WALLET.state;
-
-        // connect wallet
-        if (!wallet.isSignedIn())
+        // if user not logged in, remind him to sign in.
+        if (!walletSelector.isSignedIn())
             return <div className="info-container error">
                 Please sign in to continue
             </div>

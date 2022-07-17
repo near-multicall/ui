@@ -5,7 +5,7 @@ import TextField from '@mui/material/TextField';
 import { Base64 } from 'js-base64';
 import React, { Component } from 'react';
 import { ArgsAccount, ArgsBig, ArgsError, ArgsString } from '../../utils/args';
-import { Big, convert, toGas, toNEAR } from '../../utils/converter';
+import { convert, toGas, toNEAR } from '../../utils/converter';
 import { view } from "../../utils/wallet";
 import { TextInput, TextInputWithUnits } from '../editor/elements';
 import debounce from "lodash.debounce";
@@ -60,7 +60,7 @@ export default class Export extends Component {
 
     onAddressesUpdated() {
 
-        window.WALLET.then(() => this.updateFT());
+        this.updateFT();
         
     }
 
