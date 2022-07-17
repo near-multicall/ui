@@ -150,8 +150,8 @@ export default class Export extends Component {
 
         errors.hasErrors.isBad = allErrors.length > 0;
 
-        const walletError = window?.WALLET?.errors 
-            ? Object.entries(WALLET.errors).filter(([k, v]) => v.isBad)[0]?.[1].message
+        const walletError = window?.WALLET_COMPONENT?.errors 
+            ? Object.entries(WALLET_COMPONENT.errors).filter(([k, v]) => v.isBad)[0]?.[1].message
             : null
 
         const addresses = Object.fromEntries(Object.entries(STORAGE.addresses)
@@ -326,13 +326,13 @@ export default class Export extends Component {
                             onClick={() => {
                                 // multicall with attached FT
                                 if (this.attachFT)
-                                    WALLET.proposeFT(desc.value, convert(gas.value, gas.unit), token.value, convert(amount.value, amount.unit, amount.decimals))
+                                    WALLET_COMPONENT.proposeFT(desc.value, convert(gas.value, gas.unit), token.value, convert(amount.value, amount.unit, amount.decimals))
                                 // multicall with attached NEAR
                                 else if (this.attachNEAR)
-                                    WALLET.propose(desc.value, convert(depo.value, depo.unit), convert(gas.value, gas.unit))
+                                    WALLET_COMPONENT.propose(desc.value, convert(depo.value, depo.unit), convert(gas.value, gas.unit))
                                 // attach NEAR disabled, ignore depo amount and attach 1 yocto.
                                 else
-                                    WALLET.propose(desc.value, "1", convert(gas.value, gas.unit))
+                                    WALLET_COMPONENT.propose(desc.value, "1", convert(gas.value, gas.unit))
                             }}
                         >
                             {`Propose on ${STORAGE.addresses.dao}`}
@@ -340,7 +340,7 @@ export default class Export extends Component {
                         </button>
                     : <button 
                         className="login button"
-                        onClick={() => WALLET.signIn()}
+                        onClick={() => WALLET_COMPONENT.signIn()}
                     >
                         Connect to Wallet
                     </button>

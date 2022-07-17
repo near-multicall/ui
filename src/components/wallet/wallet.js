@@ -47,8 +47,8 @@ export default class Wallet extends Component {
 
         const { accountId } = context;
         STORAGE.setAddresses({ user: accountId })
-        window.WALLET = this;
-        if (accountId !== "") {
+        window.WALLET_COMPONENT = this;
+        if (accountId) {
             const URL = `https://api.${window.NEAR_ENV === "mainnet" ? "" : "testnet."}app.astrodao.com/api/v1/daos/account-daos/${accountId}`;
             fetch(URL)
                 .then(response => response.json())

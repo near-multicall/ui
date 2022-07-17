@@ -13,7 +13,8 @@
     "start:testnet": "NEAR_ENV=testnet yarn start",
     "start:mainnet": "NEAR_ENV=mainnet yarn start",
     "dev": "nodemon --watch contract -e ts --exec \"yarn start\"",
-    "test": "jest test --runInBand"
+    "test": "jest test --runInBand",
+    "postinstall": "patch-package"
   },
   "devDependencies": {
     "@babel/core": "^7.17.7",
@@ -57,6 +58,8 @@
     "lodash.debounce": "^4.0.8",
     "near-api-js": "^0.45.1",
     "parcel": "^2.4.0",
+    "patch-package": "^6.4.7",
+    "postinstall-postinstall": "^2.1.0",
     "react": "^18.0.0",
     "react-beautiful-dnd": "^13.1.0",
     "react-dom": "^18.0.0",
