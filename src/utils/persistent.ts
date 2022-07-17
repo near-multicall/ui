@@ -17,7 +17,7 @@ class Persistent {
         
         window["TASKS"]?.map(t => t.instance.current.onAddressesUpdated());
         window["MENU"]?.forceUpdate();
-        window["DAO"]?.onAddressesUpdated();
+        window["DAO_COMPONENT"]?.onAddressesUpdated();
         window["EXPORT"]?.onAddressesUpdated();
 
     }, 100);

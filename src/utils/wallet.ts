@@ -15,6 +15,10 @@ declare global {
 
 window.NEAR_ENV = <NetworkId> process.env.NEAR_ENV ?? "testnet";
 window.nearConfig = getConfig(window.NEAR_ENV);
+// create RPC Provider object.
+const rpcProvider = new providers.JsonRpcProvider({
+    url: window.nearConfig.nodeUrl
+});
 
 
 async function tx (
@@ -60,13 +64,9 @@ async function view (
     func: string,
     args: object
 ): Promise<any> {
-    // create JSON RPC provider object
-    const provider = new providers.JsonRpcProvider({
-        url: window.nearConfig.nodeUrl
-    });
     const encodedArgs: string = Base64.encode( JSON.stringify(args) );
     // returns response object
-    const response: any = await provider.query({
+    const response: any = await rpcProvider.query({
         request_type: "call_function",
         finality: "final",
         account_id: addr,
@@ -78,4 +78,4 @@ async function view (
 }
 
 
-export { tx, view };
+export { tx, view, rpcProvider };
