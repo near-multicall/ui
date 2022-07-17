@@ -7,11 +7,13 @@ import React, { Component } from 'react';
 import { ArgsAccount, ArgsBig, ArgsError, ArgsString } from '../../utils/args';
 import { convert, toGas, toNEAR } from '../../utils/converter';
 import { view } from "../../utils/wallet";
+import { useWalletSelector } from '../../contexts/walletSelectorContext';
 import { TextInput, TextInputWithUnits } from '../editor/elements';
 import debounce from "lodash.debounce";
 import './export.scss';
 
 export default class Export extends Component {
+    static contextType = useWalletSelector();
 
     errors = {
         user: new ArgsError("Invalid address", value => ArgsAccount.isValid(value), true),
@@ -137,7 +139,7 @@ export default class Export extends Component {
     }
 
     render() {
-
+        const { selector: walletSelector } = this.context;
         const LAYOUT = this.props.layout; // ususally global parameter
 
         const { gas, depo, desc } = this.total;
@@ -309,7 +311,7 @@ export default class Export extends Component {
                         }
                     </div>
                     <div className="spacer"></div>
-                    { WALLET?.state?.wallet.isSignedIn() 
+                    { walletSelector.isSignedIn() 
                         ? <button 
                             className="propose button"
                             disabled={

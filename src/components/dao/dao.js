@@ -140,7 +140,7 @@ export default class DaoComponent extends Component {
 
 
     createMulticall() {
-        const { accountId } = this.contextType;
+        const { accountId } = this.context;
 
         if (this.fee === undefined)
             return;
@@ -380,7 +380,7 @@ export default class DaoComponent extends Component {
     }
 
     getContent() {
-        const { selector: walletSelector } = this.contextType;
+        const { selector: walletSelector } = this.context;
         const { infos, loading } = this.state;
 
         // if user not logged in, remind him to sign in.

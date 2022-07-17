@@ -56,7 +56,7 @@ export default class BaseTask extends Component {
         }
 
         this.updateCard = this.updateCard.bind(this);
-        window.WALLET.then(() => this.updateContract());
+        this.updateContract();
     }
 
     init(json = null) {
@@ -89,7 +89,7 @@ export default class BaseTask extends Component {
             for (let e in this.errors) {
                 this.errors[e].validOrNull(this.call[e])
             }
-            WALLET.then(() => this.updateContract());
+            this.updateContract();
         }).bind(this);
 
     }

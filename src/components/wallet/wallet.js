@@ -1,7 +1,7 @@
 import { Base64 } from 'js-base64';
 import React, { Component } from 'react';
 import { toGas, Big } from '../../utils/converter';
-import { initNear, tx, view } from '../../utils/wallet';
+import { tx, view } from '../../utils/wallet';
 import { useWalletSelector } from '../../contexts/walletSelectorContext';
 import { SputnikDAO, ProposalKind, ProposalAction } from '../../utils/contracts/sputnik-dao';
 import Autocomplete from '@mui/material/Autocomplete';
@@ -34,11 +34,10 @@ export default class Wallet extends Component {
         400
     );
 
-    constructor(props) {
-        super(props);
+    constructor(props, context) {
+        super(props, context);
 
         this.state = {
-            wallet: null,
             currentDAO: new SputnikDAO(STORAGE.addresses?.dao ?? ""),
             expanded: {
                 user: false,
@@ -46,25 +45,17 @@ export default class Wallet extends Component {
             }
         }
 
-        window.WALLET = initNear()
-            .then(wallet => this.setState({
-                wallet: wallet,
-            }, () => {
-                const { accountId } = this.context;
-                STORAGE.setAddresses({ user: accountId })
-                window.WALLET = this;
-                if (accountId !== "") {
-                    const URL = `https://api.${window.NEAR_ENV === "mainnet" ? "" : "testnet."}app.astrodao.com/api/v1/daos/account-daos/${accountId}`;
-                    fetch(URL)
-                        .then(response => response.json())
-                        .then(data => this.daoList = data.map(dao => dao.id))
-                        .then(() => this.forceUpdate())
-                }
-            }
-            ));
+        const { accountId } = context;
+        STORAGE.setAddresses({ user: accountId })
+        window.WALLET = this;
+        if (accountId !== "") {
+            const URL = `https://api.${window.NEAR_ENV === "mainnet" ? "" : "testnet."}app.astrodao.com/api/v1/daos/account-daos/${accountId}`;
+            fetch(URL)
+                .then(response => response.json())
+                .then(data => this.daoList = data.map(dao => dao.id))
+                .then(() => this.forceUpdate())
+        }
     }
-
-    then(func) { return new Promise(resolve => resolve(func())) } // mock promise
 
     signIn() {
         const { modal } = this.context;
