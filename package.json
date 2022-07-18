@@ -45,7 +45,7 @@
     "@emotion/styled": "^11.9.3",
     "@mui/icons-material": "^5.2.0",
     "@mui/lab": "^5.0.0-alpha.58",
-    "@mui/material": "^5.0.0",
+    "@mui/material": "^5.9.1",
     "@types/react": "^18.0.0",
     "big.js": "^6.2.1",
     "borsh": "^0.7.0",
