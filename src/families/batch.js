@@ -14,11 +14,12 @@ export default class BatchTask extends Component {
     options = {};
     errors;
 
-    tasks;
+    tasks = [];
+    loaded = false;
 
     get call() {
 
-        this.calls.setCalls(this.tasks.map(t => TASKS.find(task => task.id === t.id).instance.current.call));
+        this.calls.setCalls(this.tasks.map(t => TASKS.find(task => task.id === t.key).instance.current.call));
         return this.calls;
 
     }
@@ -31,16 +32,11 @@ export default class BatchTask extends Component {
             showArgs: false
         }
 
-        window.STATE = this;
+        document.addEventListener('onlayoutupdated', () => this.forceUpdate());
 
     }
 
-    componentDidMount() {
-
-        console.log("BATCH MOUNTED")
-        // this.loadTasks();
-
-    }
+    componentDidMount() {}
 
     loadTasks() {
 
@@ -51,11 +47,12 @@ export default class BatchTask extends Component {
             actions: [a]            
         }))
             .forEach((j, i) => {
-                const existent = TASKS.find(task => task.id === `${this.props.id}-${i}`);
-                if (existent !== undefined && existent.instance.current !== null )
+                const id = `task-${LAYOUT.taskID++}`;
+                const existent = TASKS.find(task => task.id === id);
+                if (existent !== undefined && existent.instance.current !== null)
                     return;
-                STORAGE.layout.columns[this.props.id].taskIds.push(`${this.props.id}-${i}`);
-                STORAGE.layout.tasks[`${this.props.id}-${i}`] = { id: `${this.props.id}-${i}`, addr: "", func: "", json: j }
+                STORAGE.layout.columns[this.props.id].taskIds.push(id);
+                STORAGE.layout.tasks[id] = { id: id, addr: "", func: "", json: j }
             })
         STORAGE.setLayout({}); // trigger callbacks
 
@@ -63,8 +60,18 @@ export default class BatchTask extends Component {
 
     onListed() {
 
+        if (window.TEMP !== null) // Batch is moved
+            return;  
+
         console.log("BATCH onListed, TASKS:", ...TASKS.map(t => t.id));
         this.loadTasks();
+
+        this.tasks = STORAGE.layout.columns[this.props.id].taskIds
+            .map(taskId => STORAGE.layout.tasks[taskId])
+            .map((task, index) => <Task key={task.id} task={task} index={index} json={task.json}/>)
+
+        this.loaded = true;
+        this.forceUpdate();
 
     }
 
@@ -72,7 +79,12 @@ export default class BatchTask extends Component {
 
     render() {
 
-        this.tasks = STORAGE.layout.columns[this.props.id].taskIds.map(taskId => STORAGE.layout.tasks[taskId]);
+        this.tasks = STORAGE.layout.columns[this.props.id].taskIds
+            .map(taskId => STORAGE.layout.tasks[taskId])
+            .map((task, index) => <Task key={task.id} task={task} index={index} json={task.json}/>);
+
+        if (STORAGE.layout.columns[this.props.id].taskIds.length === 0 && this.loaded)
+            LAYOUT.deleteTask(this.props.id);
 
         return (
             <div className="task-container batch-container">
@@ -117,7 +129,8 @@ export default class BatchTask extends Component {
                             ref={provided.innerRef}
                             {...provided.droppableProps}
                         >
-                            { this.tasks.map((task, index) => <Task key={task.id} task={task} index={index} json={task.json}/>) }
+                            { console.log("BATCH render, tasks", this.tasks) }
+                            { this.tasks }
                             { provided.placeholder }
                         </div>
                     ) }

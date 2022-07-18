@@ -15,6 +15,8 @@ export default class Layout extends Component {
 
         super(props);
 
+        this.clear();
+
         document.addEventListener('onlayoutupdated', () => this.forceUpdate())
 
     }
@@ -127,9 +129,6 @@ export default class Layout extends Component {
     clear = () => {
 
         console.warn("layout cleared");
-        console.trace();
-
-        TASKS = [];
 
         let newLayout = {
             ...initialData
