@@ -23,6 +23,11 @@ body, html, #root {
     font-size: clamp(1.8mm, 0.6vw, 2.5mm);
 }
 
+body {
+    // wallet selector style override
+    --wallet-selector-content-bg: #{color.$black};
+}
+
 a {
     color: color.$blue !important;
     text-decoration: none;
