@@ -467,8 +467,6 @@ export default class Layout extends Component {
             }
         }
 
-        // why is TASKS [] when returning from DAO page?
-        // BATCH MOUNTED, ... fires too early (before clear())
         console.log("LAYOUT fromJSON, TASKS:", ...TASKS.map(t => t.id));
         console.log("LAYOUT fromJSON, newLayout:", newLayout);
 
