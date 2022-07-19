@@ -5,15 +5,15 @@ import Task from "./../components/task/task";
 import Layout from "./../components/layout/layout";
 
 type CardInfo = {
-    call: Object;
-    showArgs: Boolean;
-    options: Object;
-    errors: Object;
+    call: object;
+    showArgs: boolean;
+    options: object;
+    errors: object;
 }
 
 type CardCopy = {
-    from: String;
-    to: String;
+    from: string;
+    to: string;
     payload?: CardInfo;
 }
 
