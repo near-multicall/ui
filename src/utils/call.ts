@@ -120,7 +120,6 @@ export class BatchCall extends Call {
 
     setCalls(calls: Call[]) {
 
-        this.addr = calls[0].addr;
         this.calls = calls;
 
     }

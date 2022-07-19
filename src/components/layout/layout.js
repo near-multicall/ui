@@ -336,6 +336,43 @@ export default class Layout extends Component {
 
             }
 
+            // dropping in batch
+            if (layout.tasks[destination.droppableId] !== undefined) {
+
+                const draggableAddr = TASKS.find(t => t.id === draggableId).instance.current.call.addr.value;
+                const droppableAddr = TASKS.find(t => t.id === destination.droppableId).instance.current.call.addr.value;
+
+                // user attempted to add card with alien address to batch
+                if (draggableAddr !== droppableAddr)
+                    return;
+
+                // user is merging two batches with same address
+                if (layout.tasks[draggableId] !== undefined && layout.columns[draggableId] !== undefined) {
+                   
+                    const finishTaskIds = Array.from(finish.taskIds);
+                    finishTaskIds.splice(destination.index, 0, ...layout.columns[draggableId].taskIds);
+                    const newFinish = {
+                        ...finish,
+                        taskIds: finishTaskIds
+                    };
+
+                    const newLayout = {
+                        ...layout,
+                        columns: {
+                            ...layout.columns,
+                            [newStart.id]: newStart,
+                            [newFinish.id]: newFinish
+                        }
+                    }
+
+                    window.STORAGE.setLayout(newLayout);
+
+                    return;
+
+                }
+            
+            }
+
             const finishTaskIds = Array.from(finish.taskIds);
             finishTaskIds.splice(destination.index, 0, draggableId);
             const newFinish = {
