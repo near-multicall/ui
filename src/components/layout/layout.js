@@ -37,26 +37,37 @@ export default class Layout extends Component {
     getColumns = () => window.STORAGE.layout.columns;
 
     // TODO delete elements after exjecting from tasklist / columnlist
+    
+    /**
+     * returns column ID and index inside column's taskIds for a given taskId
+     * 
+     * @param {string} taskId
+     * @returns {object} 
+     */
+    static findTaskCoordinates = (taskId) => {
+        let index;
+        const layout = window.STORAGE.layout;
+        const colId = layout.columnOrder.find((colId) => {
+            index = layout.columns[colId].taskIds.indexOf(taskId);
+            return index >= 0;
+        });
+
+        return { columnId: colId, taskIndex: index }
+    }
 
     deleteTask = (taskId) => {
 
         const layout = window.STORAGE.layout;
-        let column, index;
+        const { columnId, taskIndex } = Layout.findTaskCoordinates(taskId);
 
-        for (let c of layout.columnOrder)
-            for (let i in layout.columns[c].taskIds)
-                if (layout.columns[c].taskIds[i] === taskId) {
-                    column = layout.columns[c];
-                    index = i
-                }
-
-        if (column == undefined || index == undefined) {
+        if (columnId == undefined || taskIndex == undefined) {
             console.error("Task not found");
             return;
         }
 
+        const column = layout.columns[columnId];
         const taskIds = Array.from(column.taskIds);
-        taskIds.splice(index, 1);
+        taskIds.splice(taskIndex, 1);
         const newColumn = {
             ...column,
             taskIds: taskIds
@@ -66,7 +77,7 @@ export default class Layout extends Component {
             ...layout,
             columns: {
                 ...layout.columns,
-                [newColumn.id]: newColumn,
+                [columnId]: newColumn,
             }
         }
 
@@ -77,16 +88,9 @@ export default class Layout extends Component {
     duplicateTask = (taskId) => {
 
         const layout = window.STORAGE.layout;
-        let column, index;
+        const { columnId, taskIndex } = Layout.findTaskCoordinates(taskId);
 
-        for (let c of layout.columnOrder)
-            for (let i in layout.columns[c].taskIds)
-                if (layout.columns[c].taskIds[i] === taskId) {
-                    column = layout.columns[c];
-                    index = i
-                }
-
-        if (column == undefined || index == undefined) {
+        if (columnId == undefined || taskIndex == undefined) {
             console.error("Task not found");
             return;
         }
@@ -95,8 +99,9 @@ export default class Layout extends Component {
         const taskClone = JSON.parse(JSON.stringify(layout.tasks[taskId.toString()]));
         taskClone.id = `task-${this.taskID}`;
 
+        const column = layout.columns[columnId];
         const taskIds = Array.from(column.taskIds);
-        taskIds.splice(index, 0, taskClone.id);
+        taskIds.splice(taskIndex, 0, taskClone.id);
 
         this.taskID++;
 
@@ -109,7 +114,7 @@ export default class Layout extends Component {
             ...layout,
             columns: {
                 ...layout.columns,
-                [newColumn.id]: newColumn,
+                [columnId]: newColumn,
             },
             tasks: {
                 ...layout.tasks,
