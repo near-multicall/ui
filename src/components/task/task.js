@@ -32,6 +32,8 @@ export default class Task extends Component {
                     options: from.options,
                     errors: from.errors
                 }
+
+                console.log(window.COPY);
             
             }
 
@@ -116,7 +118,10 @@ export default class Task extends Component {
             default:
                 switch (func) {
                     case "batch":
-                        return <Family.BatchTask ref={this.instance} id={this.id} json={json}/>
+                        const newJson = window.COPY !== null
+                            ? TASKS.find(t => t.id === window.COPY.from).instance.current.call.toJSON()
+                            : json
+                        return <Family.BatchTask ref={this.instance} id={this.id} json={newJson}/>
                     default:
                         for (let family in Family) {
                             if (family === "BaseTask")
@@ -155,7 +160,7 @@ export default class Task extends Component {
                                 : 1
                         }}
                     >
-                        <h1 style={{paddingLeft: "20px"}}>{this.id}</h1>
+                        {/* <h1 style={{paddingLeft: "20px"}}>{this.id}</h1> */}
                         { this.child }
                     </div>
                 )}

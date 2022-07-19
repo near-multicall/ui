@@ -12,7 +12,7 @@
     min-height: size.$task-height;
     border-radius: 1.25 * size.$task-radius;
     background-color: transparent;
-    overflow: hidden;
+    overflow: shown;
     .tasks-wrapper {
         width: calc(100% - 0.5 * size.$gap);
         margin: 0.25 * size.$gap;
@@ -36,5 +36,15 @@
         font-weight: 800;
         color: color.$light-text;
         z-index: 1;
+    }
+    &.has-errors:not(.is-edited) {
+        outline: 4px solid color.$red;
+        outline-offset: -2px;
+        border-radius: 1.25 * size.$task-radius;
+    }
+    &.is-edited {
+        outline: 4px solid color.$blue;
+        outline-offset: -2px;
+        border-radius: 1.25 * size.$task-radius;
     }
 }

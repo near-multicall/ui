@@ -43,7 +43,7 @@ export default class Layout extends Component {
         const layout = window.STORAGE.layout;
         let column, index;
 
-        for (let c of layout.columnOrder)
+        for (let c in layout.columns)
             for (let i in layout.columns[c].taskIds)
                 if (layout.columns[c].taskIds[i] === taskId) {
                     column = layout.columns[c];
@@ -79,7 +79,7 @@ export default class Layout extends Component {
         const layout = window.STORAGE.layout;
         let column, index;
 
-        for (let c of layout.columnOrder)
+        for (let c in layout.columns)
             for (let i in layout.columns[c].taskIds)
                 if (layout.columns[c].taskIds[i] === taskId) {
                     column = layout.columns[c];
@@ -91,8 +91,10 @@ export default class Layout extends Component {
             return;
         }
 
+        const task = layout.tasks[taskId.toString()];
+
         // create new task
-        const taskClone = JSON.parse(JSON.stringify(layout.tasks[taskId.toString()]));
+        const taskClone = JSON.parse(JSON.stringify(task));
         taskClone.id = `task-${this.taskID}`;
 
         const taskIds = Array.from(column.taskIds);
@@ -113,9 +115,21 @@ export default class Layout extends Component {
             },
             tasks: {
                 ...layout.tasks,
-                [taskClone.id]: taskClone
+                [taskClone.id]: {
+                    id: taskClone.id,
+                    addr: taskClone.addr,
+                    func: taskClone.func,
+                }
             }
         }
+
+        if (task.addr === "" && task.func === "batch")
+            // TODO add json
+            newLayout.columns[taskClone.id] = {
+                id: taskClone.id,
+                title: 'Drag here',
+                taskIds: []
+            }    
 
         window.COPY = {
             from: taskId,
@@ -123,6 +137,10 @@ export default class Layout extends Component {
         }
 
         window.STORAGE.setLayout(newLayout);
+
+        const batchTask = TASKS.find(t => t.id === newColumn.id);
+        if (!!batchTask) // update batch if necessary
+            batchTask.instance.current.forceUpdate();
 
     }
 

@@ -155,13 +155,13 @@
         }
     }
     &.has-errors:not(.is-edited) {
-        outline: 8px solid color.$red;
-        outline-offset: -4px;
+        outline: 4px solid color.$red;
+        outline-offset: -2px;
         border-radius: size.$task-radius;
     }
     &.is-edited {
-        outline: 8px solid color.$blue;
-        outline-offset: -4px;
+        outline: 4px solid color.$blue;
+        outline-offset: -2px;
         border-radius: size.$task-radius;
     }
 }
