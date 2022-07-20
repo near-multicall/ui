@@ -202,7 +202,7 @@ export default class Sidebar extends Component {
                     className="light-textfield"
                 />
                 <br/>
-                <p>Enter a SputnikDAO or AstroDAO proposal link</p>
+                <p>Enter proposal link from AstroDAO or base UI</p>
             </Dialog>
         ]
     }
