@@ -87,7 +87,7 @@ class ArgsAccount extends Args {
 
     isValid = (): boolean => ArgsAccount.isValid(this);
 
-    toUrl = (network: string) => `https://explorer.${network}.near.org/accounts/${this.value}`;
+    toUrl = () => `https://explorer.${window.NEAR_ENV}.near.org/accounts/${this.value}`;
 
 }
 

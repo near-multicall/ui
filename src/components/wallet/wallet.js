@@ -1,14 +1,14 @@
 import { Base64 } from 'js-base64';
 import React, { Component } from 'react';
-import { toGas } from '../../utils/converter';
+import { toGas, Big } from '../../utils/converter';
 import { initNear, tx, view } from '../../utils/wallet';
-import { SputnikDAO } from '../../utils/contracts/sputnik-dao';
+import { SputnikDAO, ProposalKind, ProposalAction } from '../../utils/contracts/sputnik-dao';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import { Icon } from '@mui/material';
 import './wallet.scss';
 import { ArgsAccount, ArgsError } from '../../utils/args';
-
+import debounce from 'lodash.debounce'
 export default class Wallet extends Component {
 
     errors = {
@@ -19,7 +19,14 @@ export default class Wallet extends Component {
 
     daoList = [];
 
-    lastInput;
+    daoSearchDebounced = debounce(
+        // debounced function
+        (newValue) => {
+            this.daoSearch(newValue);
+        },
+        // debounce time
+        400
+    );
 
     constructor(props) {
 
@@ -27,7 +34,7 @@ export default class Wallet extends Component {
 
         this.state = {
             wallet: null,
-            bond: "0",
+            currentDAO: new SputnikDAO(STORAGE.addresses?.dao ?? ""),
             expanded: {
                 user: false,
                 dao: false || (STORAGE.addresses.dao === "")
@@ -35,21 +42,20 @@ export default class Wallet extends Component {
         }
 
         window.WALLET = initNear()
-            .then( wallet => this.setState({
-                    wallet: wallet,
-                }, () => {
-                    STORAGE.setAddresses({ user: wallet.getAccountId() })
-                    window.WALLET = this;
-                    if (wallet.getAccountId() !== "") {
-                        const URL = `https://api.${window.NEAR_ENV === "mainnet" ? "" : "testnet."}app.astrodao.com/api/v1/daos/account-daos/${this.state.wallet.getAccountId()}`;
-                        fetch(URL)
-                            .then(response => response.json())
-                            .then(data => this.daoList = data.map(dao => dao.id))
-                            .then(() => this.forceUpdate())
-                    }
+            .then(wallet => this.setState({
+                wallet: wallet,
+            }, () => {
+                STORAGE.setAddresses({ user: wallet.getAccountId() })
+                window.WALLET = this;
+                if (wallet.getAccountId() !== "") {
+                    const URL = `https://api.${window.NEAR_ENV === "mainnet" ? "" : "testnet."}app.astrodao.com/api/v1/daos/account-daos/${this.state.wallet.getAccountId()}`;
+                    fetch(URL)
+                        .then(response => response.json())
+                        .then(data => this.daoList = data.map(dao => dao.id))
+                        .then(() => this.forceUpdate())
                 }
+            }
             ));
-
     }
 
     then(func) { return new Promise(resolve => resolve(func())) } // mock promise
@@ -59,7 +65,7 @@ export default class Wallet extends Component {
         this.state.wallet.requestSignIn()
 
     }
-    
+
     signOut() {
 
         this.state.wallet.signOut();
@@ -94,22 +100,28 @@ export default class Wallet extends Component {
             }
         }
 
+        const { proposal_bond } = this.state.currentDAO.policy;
+
         tx(
             dao,
             "add_proposal",
             args,
             toGas("15"),
-            this.state.bond
+            proposal_bond
         )
 
     }
 
-    proposeFT(desc, depo, gas, token, amount) {
-
-        const {
-            multicall,
-            dao
-        } = STORAGE.addresses
+    /**
+     * propose multicall with attached FT
+     * 
+     * @param {string} desc DAO proposal description
+     * @param {string} gas gas for the multicall action
+     * @param {string} token attached FT address
+     * @param {string} amount attached FT amount
+     */
+    async proposeFT(desc, gas, token, amount) {
+        const { multicall, dao } = STORAGE.addresses;
 
         const args = {
             proposal: {
@@ -121,15 +133,15 @@ export default class Wallet extends Component {
                             {
                                 method_name: "ft_transfer_call",
                                 args: Base64.encode(JSON.stringify({
-                                    receiver_id: STORAGE.addresses.multicall, 
+                                    receiver_id: multicall, 
                                     amount: amount,
                                     msg: JSON.stringify({
                                         function_id: "multicall",
-                                        args: Base64.encode(JSON.stringify({"calls":LAYOUT.toBase64()}).toString())
+                                        args: Base64.encode(JSON.stringify({ "calls": LAYOUT.toBase64() }).toString())
                                     }).toString()
                                 })),
-                                deposit: `${depo}`,
-                                gas: `${gas}`
+                                deposit: "1", // nep-141 specifies EXACTLY 1 yocto
+                                gas: gas
                             }
                         ]
                     }
@@ -137,12 +149,47 @@ export default class Wallet extends Component {
             }
         }
 
+        // check if multicall has enough storage on Token
+        const [storageBalance, storageBounds] = await Promise.all([
+            // get storage balance of multicall on the token
+            view(
+                token,
+                "storage_balance_of",
+                { account_id: multicall }
+            ).catch(e => "0"), // return 0 if failed
+            // get storage balance bounds in case multicall has no storage on the token and it needs to be paid
+            view(
+                token,
+                "storage_balance_bounds",
+                {}
+            ).catch(e => {})
+        ]);
+        const totalStorageBalance = Big(storageBalance?.total ?? "0");
+        const storageMinBound = Big(storageBounds.min);
+
+        // if storage balance is less than minimum bound, add proposal action to pay for storage
+        if (totalStorageBalance.lt(storageMinBound)) {
+            // push to beginning of actions array. Has to execute before ft_transfer_call
+            args.proposal.kind.FunctionCall.actions.unshift(
+                {
+                    method_name: "storage_deposit",
+                    args: Base64.encode( JSON.stringify(
+                        { account_id: multicall }
+                    )),
+                    deposit: storageMinBound.sub(totalStorageBalance).toFixed(), // difference between current storage total and required minimum
+                    gas: toGas("5") // 5 Tgas
+                }
+            );
+        }
+
+        const { proposal_bond } = this.state.currentDAO.policy;
+
         tx(
             dao,
             "add_proposal",
             args,
             toGas("15"),
-            this.state.bond
+            proposal_bond
         )
 
     }
@@ -162,20 +209,7 @@ export default class Wallet extends Component {
         const multicall = dao.replace(SputnikDAO.FACTORY_ADDRESS, window.nearConfig.MULTICALL_FACTORY_ADDRESS);
 
         Promise.all([
-            view(dao, "get_policy", {})
-                .catch(e => {
-
-                    if (e.type === "AccountDoesNotExist" && e.toString().includes(` ${dao} `) ||
-                        e.type === "CodeDoesNotExist" && e.toString().includes(`${dao}`) ||
-                        e.toString().includes("MethodNotFound"))
-                        noDao.isBad = true;
-                    else
-                        console.error(e, {...e})
-
-                    this.setState({ bond: "0" })
-                    window.MENU?.forceUpdate()
-                    
-                }),
+            SputnikDAO.init(dao).catch(e => {}),
             view(multicall, "get_admins", {})
                 .catch(e => {
 
@@ -184,34 +218,34 @@ export default class Wallet extends Component {
                         e.toString().includes("MethodNotFound"))
                         noContract.isBad = true;
                     else
-                        console.error(e, {...e})
+                        console.error(e, { ...e })
 
                     window.MENU?.forceUpdate()
 
                 })
         ])
-            .then(([policy, admins]) => {
+            .then(([initializedDAO, admins]) => {
 
-                if (!policy) return;
+                if (!initializedDAO.ready) {
+                    noDao.isBad = true;
+                    MENU.forceUpdate()
+                    return;
+                }
 
                 this.setState({
-                    bond: policy.proposal_bond
+                    currentDAO: initializedDAO
                 });
 
                 // can user propose FunctionCall to DAO?
-                const canPropose = policy.roles
-                    .filter(r => r.kind === "Everyone" || r.kind.Group.includes(this.state.wallet.getAccountId()))
-                    .map(r => r.permissions)
-                    .flat()
-                    .some(permission => {
-                        const [proposalKind, action] = permission.split(":")
-                        return (proposalKind === "*" || proposalKind === "call") && (action === "*" || action === "AddProposal")
-                    })
+                const canPropose = initializedDAO.checkUserPermission(
+                    window.account.accountId,
+                    ProposalAction.AddProposal,
+                    ProposalKind.FunctionCall
+                );
 
-                if ( ! canPropose ) noRights.isBad = true; // no add proposal rights
+                if (!canPropose) noRights.isBad = true; // no add proposal rights
 
-                if (window.MENU !== undefined)
-                    window.MENU.forceUpdate()
+                window.MENU?.forceUpdate()
 
             })
             .finally(() => {
@@ -224,7 +258,7 @@ export default class Wallet extends Component {
                 if (!noContract.isBad)
                     color = "";
 
-                this.setState({color: color});
+                this.setState({ color: color });
 
             })
 
@@ -256,6 +290,16 @@ export default class Wallet extends Component {
 
     }
 
+    daoSearch(newValue) {
+        STORAGE.setAddresses({}); // hack: empty setAddresses call to invoke callbacks
+        if (newValue !== undefined && ArgsAccount.isValid(newValue)) {
+            this.connectDao(newValue);
+        }
+        else {
+            this.setState({ color: newValue === "" ? "" : "red" });
+        }
+    }
+
     render() {
 
         const { wallet, expanded, color } = this.state;
@@ -263,45 +307,46 @@ export default class Wallet extends Component {
         if (!wallet)
             return null;
 
+
         return (
             <div
                 className="wallet"
             >
-                <div className="user" expand={ expanded.user || !wallet.isSignedIn() ? "yes" : "no" }>
-                    <Icon 
-                        className="icon" 
-                        onClick={() => this.toggleExpandedUser() }
+                <div className="user" expand={expanded.user || !wallet.isSignedIn() ? "yes" : "no"}>
+                    <Icon
+                        className="icon"
+                        onClick={() => this.toggleExpandedUser()}
                     >
-                        { expanded.user && wallet.isSignedIn()  ? "chevron_left" : "person" }
+                        {expanded.user && wallet.isSignedIn() ? "chevron_left" : "person"}
                     </Icon>
                     <div className="peek">
-                        { wallet.getAccountId() }
+                        {wallet.getAccountId()}
                     </div>
                     <div className="expand">
-                        { wallet.isSignedIn()
+                        {wallet.isSignedIn()
                             ? <>
-                                { wallet.getAccountId() } 
-                                <button 
-                                    className="logout" 
-                                    onClick={ () => this.signOut() }
+                                {wallet.getAccountId()}
+                                <button
+                                    className="logout"
+                                    onClick={() => this.signOut()}
                                 >
                                     sign out
                                 </button>
-                              </>
-                            : <button onClick={ () => this.signIn() }>sign in</button>
+                            </>
+                            : <button onClick={() => this.signIn()}>sign in</button>
                         }
                     </div>
                 </div>
                 <span>for</span>
-                <div 
-                    className={`dao ${color}`} 
-                    expand={ expanded.dao ? "yes" : "no" }
+                <div
+                    className={`dao ${color}`}
+                    expand={expanded.dao ? "yes" : "no"}
                 >
-                    <Icon 
-                        className="icon" 
-                        onClick={() => this.toggleExpandedDao() }
+                    <Icon
+                        className="icon"
+                        onClick={() => this.toggleExpandedDao()}
                     >
-                        { expanded.dao && STORAGE.addresses.dao !== "" ? "chevron_left" : "groups" }
+                        {expanded.dao && STORAGE.addresses.dao !== "" ? "chevron_left" : "groups"}
                     </Icon>
                     <div className="expand">
                         <Autocomplete
@@ -309,30 +354,22 @@ export default class Wallet extends Component {
                             freeSolo
                             value={STORAGE.addresses.dao}
                             options={this.daoList}
-                            renderInput={(params) => 
-                                <TextField 
-                                    {...params} 
+                            renderInput={(params) =>
+                                <TextField
+                                    {...params}
                                     placeholder="Select DAO"
                                 />
                             }
-                            onInputChange={(event, newValue) => {
-                                STORAGE.setAddresses({
-                                    dao: newValue ?? "",
-                                    multicall: newValue.replace(SputnikDAO.FACTORY_ADDRESS, window.nearConfig.MULTICALL_FACTORY_ADDRESS)
-                                })
-                                setTimeout(() => {
-                                    if (new Date() - this.lastInput > 400)
-                                        if (ArgsAccount.isValid(newValue))
-                                            this.connectDao(newValue);
-                                        else
-                                            this.setState({color: newValue === "" ? "" : "red"})
-                                }, 500)
-                                this.lastInput = new Date()
+                            onInputChange={(e, newValue) => {
+                                // set STORAGE.addresses to have no delay, thus no rubber banding
+                                STORAGE.addresses.dao = newValue ?? "";
+                                STORAGE.addresses.multicall = newValue?.replace(SputnikDAO.FACTORY_ADDRESS, window.nearConfig.MULTICALL_FACTORY_ADDRESS);
+                                this.daoSearchDebounced(newValue)
                             }}
                         />
                     </div>
                     <div className="peek">
-                        { STORAGE?.addresses?.dao ?? "" }
+                        {STORAGE?.addresses?.dao ?? ""}
                     </div>
                 </div>
             </div>

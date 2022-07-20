@@ -1,4 +1,6 @@
 import { initialData } from '../initial-data.js'
+import debounce from 'lodash.debounce';
+
 
 export class Persistent {
     static STORAGE_KEY_ADDRESSES = "multicall_addresses";
@@ -14,24 +16,28 @@ export class Persistent {
         ...initialData
     }
 
-    setAddresses(newAddresses: {
+    setAddresses = debounce(
+        // debounced function
+        (newAddresses: {
         user?: string,
         multicall?: string,
         dao?: string
-    }) {
+        }) => {
 
-        this.addresses = {
-            ...this.addresses,
-            ...newAddresses
-        }
-        
-        document.dispatchEvent(new CustomEvent('onaddressesupdated', {
-            detail: {
-                ...this.addresses
+            this.addresses = {
+                ...this.addresses,
+                ...newAddresses
             }
-        }))
-        
-    }
+            
+            document.dispatchEvent(new CustomEvent('onaddressesupdated', {
+                detail: {
+                    ...this.addresses
+                }
+            }));
+        },
+        // delay in ms
+        100
+    );
 
     // TODO type layout
     setLayout(newLayout: any) {

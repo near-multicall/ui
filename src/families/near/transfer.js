@@ -6,6 +6,7 @@ import Call from "../../utils/call";
 import { toGas, formatTokenAmount, unitToDecimals } from "../../utils/converter";
 import { view } from "../../utils/wallet";
 import BaseTask from "../base";
+import debounce from "lodash.debounce";
 import "./near.scss";
 
 
@@ -23,7 +24,7 @@ export default class Transfer extends BaseTask {
         noToken: new ArgsError("Address does not belong to token contract", value => this.errors.noToken)
     };
 
-    lastInput;
+    updateFTDebounced = debounce(() => this.updateFT(), 500);
 
     constructor(props) {
 
@@ -150,11 +151,7 @@ export default class Transfer extends BaseTask {
                     error={[ errors.addr, errors.noToken ]}
                     update={ () => {
                         this.updateCard();
-                        setTimeout(() => {
-                            if (new Date() - this.lastInput > 400)
-                                this.updateFT()
-                        }, 500)
-                        this.lastInput = new Date()
+                        this.updateFTDebounced();
                     } }
                 />
                 <TextInput 

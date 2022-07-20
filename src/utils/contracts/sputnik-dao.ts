@@ -1,4 +1,5 @@
 import { tx, view } from "../wallet";
+import { toGas } from "../converter";
 
 
 const FACTORY_ADDRESS_SELECTOR: Record<string, string> = {
@@ -28,13 +29,68 @@ const CONTRACT_CODE_HASHES_SELECTOR: Record<string, string[]> = {
         "2Zof1Tyy4pMeJM48mDSi5ww2QQhTz97b9S8h6W6r4HnK" // v3.0
     ],
     "testnet": [
-        "8RMeZ5cXDap6TENxaJKtigRYf3n139iHmTRe8ZUNey6N", // 2.0
+        "ZGdM2TFdQpcXrxPxvq25514EViyi9xBSboetDiB3Uiq", // 2.0
         "8LN56HLNjvwtiNb6pRVNSTMtPgJYqGjAgkVSHRiK5Wfv", // v2.1 (with gas fix)
         "783vth3Fg8MBBGGFmRqrytQCWBpYzUcmHoCq4Mo8QqF5" // v3.0
     ]
 }
 
-// TODO: add method to Sputnik class to init the DAO (fetch & store policy, last proposal id etc...)
+// Define structure of a SputnikDAO policy
+type Policy = {
+    // List of roles and permissions for them in the current policy.
+    roles: any[],
+    // Default vote policy. Used when given proposal kind doesn't have special policy.
+    default_vote_policy: object,
+    // Proposal bond. (u128 as a string)
+    proposal_bond: string,
+    // Expiration period for proposals in nanoseconds. (u64 as a string)
+    proposal_period: string,
+    // Bond for claiming a bounty. (u128 as a string)
+    bounty_bond: string,
+    // Period in which giving up on bounty is not punished. (u64 as a string)
+    bounty_forgiveness_period: string
+}
+
+enum ProposalKind {
+    ChangeConfig = "config",
+    ChangePolicy = "policy",
+    AddMemberToRole = "add_member_to_role",
+    RemoveMemberFromRole = "remove_member_from_role",
+    FunctionCall = "call",
+    UpgradeSelf = "upgrade_self",
+    UpgradeRemote = "upgrade_remote",
+    Transfer = "transfer",
+    SetStakingContract = "set_vote_token",
+    AddBounty = "add_bounty",
+    BountyDone = "bounty_done",
+    Vote = "vote",
+    FactoryInfoUpdate = "factory_info_update",
+    ChangePolicyAddOrUpdateRole = "policy_add_or_update_role",
+    ChangePolicyRemoveRole = "policy_remove_role",
+    ChangePolicyUpdateDefaultVotePolicy = "policy_update_default_vote_policy",
+    ChangePolicyUpdateParameters = "policy_update_parameters"
+}
+
+enum ProposalAction {
+    /// Action to add proposal. Used internally.
+    AddProposal = "AddProposal",
+    /// Action to remove given proposal. Used for immediate deletion in special cases.
+    RemoveProposal = "RemoveProposal",
+    /// Vote to approve given proposal or bounty.
+    VoteApprove = "VoteApprove",
+    /// Vote to reject given proposal or bounty.
+    VoteReject = "VoteReject",
+    /// Vote to remove given proposal or bounty (because it's spam).
+    VoteRemove = "VoteRemove",
+    /// Finalize proposal, called when it's expired to return the funds
+    /// (or in the future can be used for early proposal closure).
+    Finalize = "Finalize",
+    /// Move a proposal to the hub to shift into another DAO.
+    MoveToHub = "MoveToHub"
+}
+
+
+
 class SputnikDAO {
 
     static FACTORY_ADDRESS: string = FACTORY_ADDRESS_SELECTOR[window.NEAR_ENV];
@@ -42,10 +98,43 @@ class SputnikDAO {
     static ASTRO_UI_BASE_URL: string = ASTRO_UI_URL_SELECTOR[window.NEAR_ENV];
     static CONTRACT_CODE_HASHES: string[] = CONTRACT_CODE_HASHES_SELECTOR[window.NEAR_ENV];
     
-    DAO_ADDRESS: string;
+    address: string;
+    // needs initialization, but start with an empty policy
+    policy: Policy = { roles: [], default_vote_policy: {}, proposal_bond: "", proposal_period: "", bounty_bond: "", bounty_forgiveness_period: "" };
+    // needs initialization, but start with -1 because it's distinguishable from a real ID ( >= 0 )
+    lastProposalId: number = -1;
+    // DAO instance is ready when info (policy...) are fetched & assigned correctly
+    ready: boolean = false;
 
+
+    // shouldn't be used directly, use init() instead
     constructor(dao_address: string) {
-        this.DAO_ADDRESS = dao_address;
+        this.address = dao_address;
+    }
+
+    // used to create and initialize a DAO instance
+    static async init (dao_address: string): Promise<SputnikDAO> {
+        // verify address is a SputnikDAO, fetch DAO info and mark it ready
+        const newDAO = new SputnikDAO(dao_address);
+        const [ isDAO, daoPolicy, daoLastProposalId ] = await Promise.all([
+            // on failure set isDAO to false
+            SputnikDAO.isSputnikDAO(dao_address).catch(err => { return false }),
+            // on failure set policy to default policy (empty)
+            newDAO.getPolicy().catch(err => { return newDAO.policy }),
+            // on failure ste last proposal ID to default (-1)
+            newDAO.getLastProposalId().catch(err => { return newDAO.lastProposalId })
+        ]);
+        newDAO.policy = daoPolicy;
+        newDAO.lastProposalId = daoLastProposalId;
+        // set DAO to ready if address is a DAO and lastProposalID + policy got updated. 
+        if (
+            isDAO === true
+            && newDAO.lastProposalId >= 0
+            && newDAO.policy.roles.length >= 1
+        ) {
+            newDAO.ready = true;
+        }
+        return newDAO;
     }
 
     /**
@@ -67,38 +156,38 @@ class SputnikDAO {
 
     async addProposal (args: object | Uint8Array, proposal_bond: string, ) {
         return tx(
-            this.DAO_ADDRESS,
+            this.address,
             "add_proposal",
             args,
-            10_000_000_000_000,
+            toGas("10"),  // 10 Tgas
             proposal_bond
         );
     }
 
     async actProposal (proposal_id: number, proposal_action: string) {
         return tx(
-            this.DAO_ADDRESS,
+            this.address,
             "act_proposal",
             { id: proposal_id, action: proposal_action },
-            200_000_000_000_000,
+            toGas("200"),  // 200 Tgas
             "0"
         );
     }
 
     async getProposals (args: {from_index: number, limit: number}): Promise<object[]> {
-        return view(this.DAO_ADDRESS, "get_proposals", args);
+        return view(this.address, "get_proposals", args);
     }
 
     async getProposal (proposal_id: number): Promise<object> {
-        return view(this.DAO_ADDRESS, "get_proposal", { id: proposal_id });
+        return view(this.address, "get_proposal", { id: proposal_id });
     }
 
     async getLastProposalId (): Promise<number> {
-        return view(this.DAO_ADDRESS, "get_last_proposal_id", {});
+        return view(this.address, "get_last_proposal_id", {});
     }
 
-    async getPolicy (): Promise<object> {
-        return view(this.DAO_ADDRESS, "get_policy", {});
+    async getPolicy (): Promise<Policy> {
+        return view(this.address, "get_policy", {});
     }
 
     // get base URL for UI of choice
@@ -130,10 +219,10 @@ class SputnikDAO {
         // We have a supported UI
         switch (ui) {
             case SputnikUI.REFERENCE_UI:
-                dao_path = `${this.DAO_ADDRESS}`;
+                dao_path = `${this.address}`;
                 break;
             case SputnikUI.ASTRO_UI:
-                dao_path = `dao/${this.DAO_ADDRESS}`;
+                dao_path = `dao/${this.address}`;
                 break;
             default: break;
         }
@@ -153,15 +242,38 @@ class SputnikDAO {
                 proposal_path = `${proposal_id}`;
                 break;
             case SputnikUI.ASTRO_UI:
-                proposal_path = `proposals/${this.DAO_ADDRESS}-${proposal_id}`;
+                proposal_path = `proposals/${this.address}-${proposal_id}`;
                 break;
             default: break;
         }
         return `${dao_url}/${proposal_path}`;
     }
+
+    // check if user can perform some action on some proposal kind
+    checkUserPermission (userAddr: string, givenAction: ProposalAction, givenProposalKind: ProposalKind): boolean {
+        if (this.ready === false) return false;
+        
+        // get all the user's permissions on the chosen proposal kind
+        const proposalKindPermissions: string[] = this.policy.roles
+                .filter(r => r.kind === "Everyone" || r.kind.Group?.includes(userAddr))
+                .map(r => r.permissions)
+                .flat()
+                .filter(permission => {
+                    const [proposalKind, action] = permission.split(":");
+                    return (proposalKind === "*" || proposalKind === givenProposalKind);
+                });
+        const canDoAction: boolean = proposalKindPermissions?.some(permission => {
+            const [proposalKind, action] = permission.split(":");
+            return (action === "*" || action === givenAction);
+        });
+
+        return canDoAction;
+    }
 }
 
 export{
     SputnikDAO,
-    SputnikUI
+    SputnikUI,
+    ProposalKind,
+    ProposalAction
 }
