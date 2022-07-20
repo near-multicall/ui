@@ -8,8 +8,10 @@ import Discord from '../../assets/discord.svg';
 import Github from '../../assets/github.svg';
 import Twitter from '../../assets/twitter.svg';
 import { Wallet } from '../../components';
+import { ArgsError, ArgsString } from '../../utils/args';
 import { readFile, saveFile } from '../../utils/loader';
 import Dialog from '../dialog/dialog';
+import { TextInput } from '../editor/elements';
 import './sidebar.scss';
 export default class Sidebar extends Component {
 
@@ -20,10 +22,10 @@ export default class Sidebar extends Component {
         this.state = {
             dialogs: {
                 saveAsJSON: false,
-                loadFromJSON: false
+                loadFromJSON: false,
+                loadFromProposal: false,
             }
         }
-
     }
 
     componentDidMount() {
@@ -57,7 +59,7 @@ export default class Sidebar extends Component {
         return <div className="load-menu">
             <ul>
                 <li onClick={ () => this.openDialog("loadFromJSON") }>Load from JSON</li>
-                <li>Load from Proposal <Chip label="coming soon!"/></li>
+                <li onClick={ () => this.openDialog("loadFromProposal") }>Load from Proposal</li>
                 {/* <li>Load from Link <Chip label="coming soon!"/></li> */}
             </ul>
         </div>
@@ -127,8 +129,15 @@ export default class Sidebar extends Component {
 
         const { dialogs } = this.state;
 
+        // Load from JSON
         let fileName = "my-multicall";
         let uploadedFile;
+
+        // Load from Proposal
+        const validProposalURLRegex = /^(https:\/\/)?((testnet\.)?app\.astrodao\.com\/dao\/((?=[^\/]{2,64}\/)(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_])*[a-z\d]+)\/proposals\/\4\-\d+)|((testnet\-)?v2\.sputnik\.fund\/#\/((?=[^\/]{2,64}\/)(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_])*[a-z\d]+)\/\d+)$/;
+        const proposalURL = new ArgsString("");
+        const proposalURLInvalid = new ArgsError("Invalid URL", value => validProposalURLRegex.test(value));
+        const proposalNonExistent = new ArgsError("The specified URL does not link to a proposal", value => proposalNonExistent);
 
         return [
             <Dialog 
@@ -171,6 +180,29 @@ export default class Sidebar extends Component {
                 />
                 <br/>
                 <b className="warn">Your current multicall will be replaced!</b>
+            </Dialog>,
+            <Dialog
+                key="Load from Proposal"
+                title="Load from Proposal"
+                open={dialogs.loadFromProposal}
+                onClose={() => {
+                    dialogs.loadFromProposal = false;
+                    this.forceUpdate();
+                }}
+                onCancel={() => {}}
+                onDone={() => {/* TODO fetch and load proposal json, during load and on fail set proposalNonExistent to bad */}}
+                doneRename="Load"
+                disable={proposalURLInvalid.isBad || proposalNonExistent.isBad}
+            >
+                <TextInput
+                    label="Proposal URL"
+                    value={ proposalURL }
+                    error={[ proposalURLInvalid, proposalNonExistent ]}
+                    variant="filled"
+                    className="light-textfield"
+                />
+                <br/>
+                <p>Enter a SputnikDAO or AstroDAO proposal link</p>
             </Dialog>
         ]
     }

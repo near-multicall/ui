@@ -38,6 +38,7 @@ export default class Dialog extends Component {
             doneRename,
             onCancel, 
             cancelRename,
+            disable,
             children 
         } = this.props;
 
@@ -66,8 +67,9 @@ export default class Dialog extends Component {
                     }
                     { onDone !== undefined 
                       ? <button 
-                            className="done" 
+                            className={`done ${disable ? "disabled" : ""}`} 
                             onClick={() => {
+                                if (disable) return;
                                 onDone();
                                 onClose();
                             }}

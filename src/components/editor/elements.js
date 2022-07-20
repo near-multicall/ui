@@ -28,6 +28,7 @@ class TextInput extends Component {
                 value.value = e.target.value;
                 errors.forEach(e => e?.validOrNull(value));
                 update?.(e);
+                this.forceUpdate();
             }}
             error={errors.some(e => e?.isBad)}
             helperText={errors.map(e => {
@@ -98,6 +99,7 @@ class TextInputWithUnits extends Component {
                         value.unit = e.target.value;
                         errors.forEach(e => e?.validOrNull(value));
                         update?.(e);
+                        this.forceUpdate();
                     }}
                     InputLabelProps={{ shrink: true }}
                     {...unitProps}

@@ -1,5 +1,6 @@
 @use 'sass/size';
 @use 'sass/color';
+@use 'sass/font';
 
 .dialog {
     .title {
@@ -11,6 +12,20 @@
         border-radius: size.$task-radius;
         font-size: size.$text;
     }
+    .content {
+        .MuiTextField-root {
+            width: 100%;
+        }
+        p.Mui-error {
+            color: color.$red;
+            font-weight: 800;
+            font-family: font.$text;
+            font-size: size.$small-text;
+            &::before {
+                content: 'Error: '
+            }
+        }
+    }
     .action {
         button {
             font-size: size.$text;
@@ -21,6 +36,10 @@
             }
             &.done {
                 background-color: color.$green;
+            }
+            &.disabled {
+                background-color: color.$darkish;
+                cursor: not-allowed;
             }
         }
     }
