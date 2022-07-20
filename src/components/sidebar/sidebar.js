@@ -140,7 +140,7 @@ export default class Sidebar extends Component {
                     this.forceUpdate();
                 }}
                 onCancel={() => {}}
-                onDone={() => saveFile(`${fileName}.json`, [JSON.stringify(LAYOUT.toJSON(), null, 2)])}
+                onDone={() => saveFile(`${fileName}.json`, [JSON.stringify(LAYOUT.toBase64(), null, 2)])}
                 doneRename="Download"
             >
                 <TextField
@@ -161,7 +161,7 @@ export default class Sidebar extends Component {
                     this.forceUpdate();
                 }}
                 onCancel={() => {}}
-                onDone={() => readFile(uploadedFile, json => LAYOUT.fromJSON(json))}
+                onDone={() => readFile(uploadedFile, json => LAYOUT.fromBase64(json))}
                 doneRename="Load"
             >
                 <input 

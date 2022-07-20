@@ -8,7 +8,7 @@ export default class Column extends Component {
 
     render() {
 
-        const menuColumn = this.props.column.id === 'menu' || this.props.column.id === 'trash';
+        const menuColumn = this.props.column.id === 'menu';
 
         return (
             <Draggable
@@ -60,9 +60,6 @@ export default class Column extends Component {
                                 </div>
                             ) }
                         </Droppable>
-                        { this.props.column.id === 'trash' &&
-                            <Icon className="icon">delete_outline</Icon>
-                        }
                         { !menuColumn && 
                             <Icon 
                                 className="add-column"

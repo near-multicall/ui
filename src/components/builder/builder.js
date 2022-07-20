@@ -9,8 +9,7 @@ export default class Builder extends Component {
 
         const LAYOUT = this.props.layout; // ususally global parameter
 
-        const menuColumn = LAYOUT.getColumns()['menu'],
-            trashColumn = LAYOUT.getColumns()['trash'];
+        const menuColumn = LAYOUT.getColumns()['menu'];
 
         return (
             <div 
@@ -37,17 +36,6 @@ export default class Builder extends Component {
                                     index={LAYOUT.getColumnID()}
                                 />
                             </div>
-                            {/* TODO: delete trash
-                            <div 
-                                className="trash"
-                            >
-                                <Column 
-                                    key={'trash'} 
-                                    column={trashColumn} 
-                                    tasks={trashColumn.taskIds.map(taskId => LAYOUT.getTasks()[taskId])} 
-                                    index={LAYOUT.getColumnID() + 1}
-                                />
-                            </div> */}
                         </div>
                     ) }
                 </Droppable>

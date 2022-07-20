@@ -53,13 +53,13 @@ export class Persistent {
         if (window.PAGE !== "app") return;
 
         localStorage.setItem(Persistent.STORAGE_KEY_ADDRESSES, JSON.stringify(this.addresses));
-        localStorage.setItem(Persistent.STORAGE_KEY_JSON, JSON.stringify(window.LAYOUT.toJSON()));
+        localStorage.setItem(Persistent.STORAGE_KEY_JSON, JSON.stringify(window.LAYOUT.toBase64()));
         // localStorage.setItem("multicall_layout", JSON.stringify(this.layout));
     }
 
     load() {
         this.setAddresses(JSON.parse(localStorage.getItem(Persistent.STORAGE_KEY_ADDRESSES) ?? "{}"));
-        window.LAYOUT?.fromJSON(JSON.parse(localStorage.getItem(Persistent.STORAGE_KEY_JSON) ?? "[]"));
+        window.LAYOUT?.fromBase64(JSON.parse(localStorage.getItem(Persistent.STORAGE_KEY_JSON) ?? "[]"));
         // this.setLayout(JSON.parse(localStorage.getItem("multicall_layout") ?? "{}"));
     }
 

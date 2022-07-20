@@ -1,7 +1,8 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
-import { Column, Menu } from '../../components.js'
-import { initialData } from '../../initial-data.js'
+import { Column, Menu } from '../../components.js';
+import { initialData } from '../../initial-data.js';
+import { Base64 } from 'js-base64';
 import './layout.scss'
 
 export default class Layout extends Component {
@@ -303,22 +304,6 @@ export default class Layout extends Component {
 
             }
 
-            if (finish.id === 'trash') {
-
-                const newLayout = {
-                    ...layout,
-                    columns: {
-                        ...layout.columns,
-                        [newStart.id]: newStart,
-                    }
-                }
-    
-                window.STORAGE.setLayout(newLayout);
-
-                return;
-
-            }
-
             const finishTaskIds = Array.from(finish.taskIds);
             finishTaskIds.splice(destination.index, 0, draggableId);
             const newFinish = {
@@ -356,7 +341,6 @@ export default class Layout extends Component {
             ...layout,
             columnOrder: [],
             columns: {
-                "trash": layout.columns.trash,
                 "menu": layout.columns.menu,
             }
         }
@@ -393,6 +377,73 @@ export default class Layout extends Component {
         window.STORAGE.setLayout(newLayout);
         window.TASKS.forEach(t => t.instance.current.forceUpdate());
 
+    }
+
+    fromBase64(json) {
+        this.clear();
+
+        const layout = window.STORAGE.layout;
+
+        if (!Array.isArray(json) || !json.length)
+            return;
+
+        this.columnID = 0;
+
+        let newLayout = {
+            ...layout,
+            columnOrder: [],
+            columns: {
+                "menu": layout.columns.menu
+            }
+        }
+
+        for (let c in json) {
+
+            const newColumn = {
+                id: `column-${this.columnID}`,
+                title: 'Drag here',
+                taskIds: []
+            };
+    
+            const newColumnOrder = Array.from(newLayout.columnOrder);
+            newColumnOrder.push(`column-${this.columnID}`);
+    
+            newLayout = {
+                ...newLayout,
+                columns: {
+                    ...newLayout.columns,
+                    [`column-${this.columnID}`]: newColumn
+                },
+                columnOrder: newColumnOrder
+            }
+    
+            this.columnID++;
+            
+            for (let t in json[c]) {
+                const { address: jsonAddress, actions: jsonActions } = json[c][t];
+                let task = {
+                    id: `task-${this.taskID++}`,
+                    addr: "",
+                    func: "",
+                    json: {
+                        address: jsonAddress,
+                        actions: jsonActions.map((action) => (
+                            {
+                                func: action.func,
+                                args: JSON.parse( Base64.decode(action.args) ),
+                                gas: action.gas,
+                                depo: action.depo
+                            }
+                        ))
+                    }
+                };
+                newLayout.columns[newColumn.id].taskIds.push(task.id);
+                newLayout.tasks[task.id] = task;
+            }
+        }
+
+        window.STORAGE.setLayout(newLayout);
+        window.TASKS.forEach(t => t.instance.current.forceUpdate());
     }
 
     toJSON() {

@@ -100,6 +100,7 @@ export default class BaseTask extends Component {
 
     componentDidMount() {
         this.loadErrors?.();
+        this.forceUpdate();
     }
 
     onAddressesUpdated() { }
