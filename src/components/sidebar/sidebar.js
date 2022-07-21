@@ -1,6 +1,7 @@
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import FileUploadOutlinedIcon from '@mui/icons-material/FileUploadOutlined';
 import ScienceOutlinedIcon from '@mui/icons-material/ScienceOutlined';
+import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined';
 import { Chip, Icon, TextField } from '@mui/material';
 import React, { Component } from 'react';
 import { NavLink } from "react-router-dom";
@@ -26,6 +27,7 @@ export default class Sidebar extends Component {
                 saveAsJSON: false,
                 loadFromJSON: false,
                 loadFromProposal: false,
+                clearAll: false
             }
         }
     }
@@ -104,6 +106,11 @@ export default class Sidebar extends Component {
                             <div className="load">
                                 <FileUploadOutlinedIcon/>
                                 { this.loadMenu() }
+                            </div>
+                            <div className="clear">
+                                <DeleteForeverOutlinedIcon 
+                                    onClick={ () => this.openDialog("clearAll") }
+                                />
                             </div>
                         </>
                       : null
@@ -255,7 +262,21 @@ export default class Sidebar extends Component {
                 />
                 <br/>
                 <p>Enter proposal link from AstroDAO or base UI</p>
-            </Dialog>
+            </Dialog>,
+            <Dialog
+                key="Clear All"
+                title="Clear All"
+                open={dialogs.clearAll}
+                onClose={() => {
+                    dialogs.clearAll = false;
+                    this.forceUpdate();
+                }}
+                onCancel={() => {}}
+                onDone={() => LAYOUT.clear()}
+                doneRename="Yes, clear all"
+            >
+                <b className="warn">Are you sure you want to clear your multicall?<br/>You cannot undo this action!</b>
+            </Dialog>,
         ]
     }
 
