@@ -8,7 +8,9 @@ import Discord from '../../assets/discord.svg';
 import Github from '../../assets/github.svg';
 import Twitter from '../../assets/twitter.svg';
 import { Wallet } from '../../components';
+import { SputnikDAO } from '../../utils/contracts/sputnik-dao';
 import { ArgsError, ArgsString } from '../../utils/args';
+import { Base64 } from 'js-base64';
 import { readFile, saveFile } from '../../utils/loader';
 import Dialog from '../dialog/dialog';
 import { TextInput } from '../editor/elements';
@@ -128,16 +130,17 @@ export default class Sidebar extends Component {
     dialogs() {
 
         const { dialogs } = this.state;
+        const dialogComponent = React.createRef();
 
         // Load from JSON
         let fileName = "my-multicall";
         let uploadedFile;
 
         // Load from Proposal
-        const validProposalURLRegex = /^(https:\/\/)?((testnet\.)?app\.astrodao\.com\/dao\/((?=[^\/]{2,64}\/)(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_])*[a-z\d]+)\/proposals\/\4\-\d+)|((testnet\-)?v2\.sputnik\.fund\/#\/((?=[^\/]{2,64}\/)(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_])*[a-z\d]+)\/\d+)$/;
         const proposalURL = new ArgsString("");
-        const proposalURLInvalid = new ArgsError("Invalid URL", value => validProposalURLRegex.test(value));
-        const proposalNonExistent = new ArgsError("The specified URL does not link to a proposal", value => proposalNonExistent);
+        const proposalURLInvalid = new ArgsError("Invalid URL", urlInput => !! SputnikDAO.getInfoFromProposalUrl(urlInput.value), true);
+        const proposalNonExistent = new ArgsError("The specified URL does not link to a proposal", urlInput => proposalNonExistent.isBad);
+        let argsFromProposal;
 
         return [
             <Dialog 
@@ -190,14 +193,63 @@ export default class Sidebar extends Component {
                     this.forceUpdate();
                 }}
                 onCancel={() => {}}
-                onDone={() => {/* TODO fetch and load proposal json, during load and on fail set proposalNonExistent to bad */}}
+                onDone={() => { window.LAYOUT.fromBase64(argsFromProposal); }}
                 doneRename="Load"
-                disable={proposalURLInvalid.isBad || proposalNonExistent.isBad}
+                disable={() => proposalURLInvalid.isBad || proposalNonExistent.isBad}
+                ref={dialogComponent}
             >
                 <TextInput
                     label="Proposal URL"
                     value={ proposalURL }
                     error={[ proposalURLInvalid, proposalNonExistent ]}
+                    update={(e, textInputComponent) => {
+                        // don't fetch proposal info from bad URL.
+                        if (proposalURLInvalid.isBad) {
+                            proposalNonExistent.isBad = false;
+                            return;
+                        }
+                        const { dao, proposalId } = SputnikDAO.getInfoFromProposalUrl(proposalURL.value);
+                        // !!! creating SputnikDAO instance must be done using init() to make sure DAO exists
+                        // on that address. We use constructor here because of previous logic checks.
+                        const daoObj = new SputnikDAO(dao);
+                        // TODO: why is first time trying a valid proposal URL return false;
+                        daoObj.getProposal(proposalId)
+                            .catch((e) => {
+                                proposalNonExistent.isBad = true;
+                                return;
+                            })
+                            .then((propOrUndefined) => {
+                                if (!!propOrUndefined) {
+                                    let isMulticallWithAttachedFT = false;
+                                    let multicallArgs;
+                                    const currProposal = propOrUndefined.kind.FunctionCall;
+                                    const multicallAction = currProposal.actions.find(action => {
+                                        // is it normal multicall?
+                                        if (action.method_name === "multicall") {
+                                            multicallArgs = JSON.parse( Base64.decode(action.args) );
+                                            return true;
+                                        }
+                                        // is it multicall with attached FT?
+                                        else if (action.method_name === "ft_transfer_call") {
+                                            const ftTransferArgs = JSON.parse( Base64.decode(action.args) );
+                                            const ftTransferMsg = JSON.parse( ftTransferArgs.msg );
+                                            if (ftTransferMsg.function_id && ftTransferMsg.function_id === "multicall") {
+                                                multicallArgs = JSON.parse( Base64.decode(ftTransferMsg.args) );
+                                                return true;
+                                            }
+                                        }
+                                    });
+                                    if (multicallAction) {
+                                        proposalNonExistent.isBad = false;
+                                        argsFromProposal = multicallArgs.calls;
+                                        console.log(argsFromProposal);
+                                    }
+                                }
+                                textInputComponent.forceUpdate();
+                                dialogComponent.current.forceUpdate();
+                            });
+                        dialogComponent.current.forceUpdate();
+                    }}
                     variant="filled"
                     className="light-textfield"
                 />

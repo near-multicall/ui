@@ -27,7 +27,7 @@ class TextInput extends Component {
             onChange={(e) => {
                 value.value = e.target.value;
                 errors.forEach(e => e?.validOrNull(value));
-                update?.(e);
+                update?.(e, this);
                 this.forceUpdate();
             }}
             error={errors.some(e => e?.isBad)}
@@ -78,7 +78,7 @@ class TextInputWithUnits extends Component {
                     onChange={(e) => {
                         value.value = e.target.value;
                         errors.forEach(e => e?.validOrNull(value));
-                        update?.(e);
+                        update?.(e, this);
                     }}
                     error={errors.some(e => e?.isBad)}
                     helperText={errors.map(e => {
@@ -98,7 +98,7 @@ class TextInputWithUnits extends Component {
                     onChange={e => {
                         value.unit = e.target.value;
                         errors.forEach(e => e?.validOrNull(value));
-                        update?.(e);
+                        update?.(e, this);
                         this.forceUpdate();
                     }}
                     InputLabelProps={{ shrink: true }}

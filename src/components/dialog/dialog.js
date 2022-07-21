@@ -67,9 +67,9 @@ export default class Dialog extends Component {
                     }
                     { onDone !== undefined 
                       ? <button 
-                            className={`done ${disable ? "disabled" : ""}`} 
+                            className={`done ${disable?.() ? "disabled" : ""}`} 
                             onClick={() => {
-                                if (disable) return;
+                                if (disable?.()) return;
                                 onDone();
                                 onClose();
                             }}
