@@ -124,7 +124,6 @@ export default class Layout extends Component {
         }
 
         if (task.addr === "" && task.func === "batch")
-            // TODO add json
             newLayout.columns[taskClone.id] = {
                 id: taskClone.id,
                 title: 'Drag here',
@@ -147,6 +146,9 @@ export default class Layout extends Component {
     clear = () => {
 
         console.warn("layout cleared");
+
+        if (window.TASKS)
+            window.TASKS = [];
 
         let newLayout = {
             ...initialData
