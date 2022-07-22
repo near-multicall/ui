@@ -136,6 +136,10 @@ export default class Layout extends Component {
 
         console.warn("layout cleared");
 
+        // clear card content
+        if (window.TASKS)
+            window.TASKS = [];
+
         let newLayout = {
             ...initialData
         }
