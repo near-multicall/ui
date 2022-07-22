@@ -219,7 +219,7 @@ export default class Sidebar extends Component {
                         // !!! creating SputnikDAO instance must be done using init() to make sure DAO exists
                         // on that address. We use constructor here because of previous logic checks.
                         const daoObj = new SputnikDAO(dao);
-                        // TODO: why is first time trying a valid proposal URL return false;
+                        // fetch proposal info from DAO contract
                         daoObj.getProposal(proposalId)
                             .catch((e) => {
                                 proposalNonExistent.isBad = true;
@@ -227,10 +227,9 @@ export default class Sidebar extends Component {
                             })
                             .then((propOrUndefined) => {
                                 if (!!propOrUndefined) {
-                                    let isMulticallWithAttachedFT = false;
                                     let multicallArgs;
-                                    const currProposal = propOrUndefined.kind.FunctionCall;
-                                    const multicallAction = currProposal.actions.find(action => {
+                                    const currProposal = propOrUndefined.kind?.FunctionCall;
+                                    const multicallAction = currProposal?.actions.find(action => {
                                         // is it normal multicall?
                                         if (action.method_name === "multicall") {
                                             multicallArgs = JSON.parse( Base64.decode(action.args) );
