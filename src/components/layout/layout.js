@@ -140,14 +140,10 @@ export default class Layout extends Component {
         if (window.TASKS)
             window.TASKS = [];
 
-        let newLayout = {
-            ...initialData
-        }
-
         this.taskID = 0;
         this.columnID = 1;
 
-        window.STORAGE.setLayout(newLayout);
+        window.STORAGE.setLayout(initialData);
 
     }
 
@@ -384,6 +380,7 @@ export default class Layout extends Component {
     }
 
     fromBase64(json) {
+
         this.clear();
 
         const layout = window.STORAGE.layout;

@@ -200,7 +200,9 @@ export default class Sidebar extends Component {
                     this.forceUpdate();
                 }}
                 onCancel={() => {}}
-                onDone={() => { window.LAYOUT.fromBase64(argsFromProposal); }}
+                onDone={() => {
+                    window.LAYOUT.fromBase64(argsFromProposal);
+                }}
                 doneRename="Load"
                 disable={() => proposalURLInvalid.isBad || proposalNonExistent.isBad}
                 ref={dialogComponent}
