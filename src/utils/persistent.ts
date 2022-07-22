@@ -12,9 +12,7 @@ export class Persistent {
         dao: ""
     }
 
-    layout = {
-        ...initialData
-    }
+    layout = JSON.parse(JSON.stringify(initialData));
 
     setAddresses = debounce(
         // debounced function
@@ -44,7 +42,7 @@ export class Persistent {
 
         this.layout = {
             ...this.layout,
-            ...newLayout
+            ...JSON.parse(JSON.stringify(newLayout))
         }
 
         document.dispatchEvent(new CustomEvent('onlayoutupdated', {

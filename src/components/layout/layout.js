@@ -136,14 +136,14 @@ export default class Layout extends Component {
 
         console.warn("layout cleared");
 
-        let newLayout = {
-            ...initialData
-        }
+        // clear card content
+        if (window.TASKS)
+            window.TASKS = [];
 
         this.taskID = 0;
         this.columnID = 1;
 
-        window.STORAGE.setLayout(newLayout);
+        window.STORAGE.setLayout(initialData);
 
     }
 
@@ -380,6 +380,7 @@ export default class Layout extends Component {
     }
 
     fromBase64(json) {
+
         this.clear();
 
         const layout = window.STORAGE.layout;
