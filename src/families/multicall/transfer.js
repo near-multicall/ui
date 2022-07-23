@@ -39,11 +39,11 @@ export default class Transfer extends BaseTask {
                     account_id: new ArgsAccount(actions.args.account_id),
                     amount: actions.args.amount 
                         ? new ArgsBig(
-                            formatTokenAmount(actions.args.amount, units?.args.amount.decimals),
+                            formatTokenAmount(actions.args.amount, units?.args.amount.decimals ?? unitToDecimals["NEAR"]),
                             toYocto("0"), 
                             null, 
-                            units?.args.amount.unit ?? "yocto",
-                            units?.args.amount.decimals ?? unitToDecimals["yocto"]
+                            units?.args.amount.unit ?? "NEAR",
+                            units?.args.amount.decimals ?? unitToDecimals["NEAR"]
                         )
                         : new ArgsBig("0", "0", "0")
                 }

@@ -112,6 +112,9 @@ export default class Transfer extends BaseTask {
         })
         .then(res => {
             if (res) {
+                if (amount.decimals === null) {
+                    amount.value = formatTokenAmount(amount.value, res.decimals);
+                }
                 amount.unit = res.symbol;
                 amount.decimals = res.decimals;
             }
