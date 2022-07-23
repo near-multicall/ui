@@ -23,7 +23,7 @@ export default class DaoComponent extends Component {
         noContract: new ArgsError("DAO has no multicall instance", value => this.errors.noContract.isBad),
     }
 
-    loadInfoDebounced = debounce(() => this.loadInfos(), 500);
+    loadInfoDebounced = debounce(() => this.loadInfos(), 400);
 
     lastAddr;
 
@@ -71,19 +71,16 @@ export default class DaoComponent extends Component {
      * 
      * @returns {object} ID and info of proposal to create multicall instance,
      */
-    proposalAlreadyExists () {
-        const { dao } = this.state;
+    proposalAlreadyExists (dao) {
         // Date.now() returns timestamp in milliseconds, SputnikDAO uses nanoseconds
         const currentTime = Big( Date.now() ).times("1000000");
         const lastProposalId = dao.lastProposalId;
         const proposalPeriod = dao.policy.proposal_period;
 
-        return dao.getProposals(
-            {
-                from_index: lastProposalId < 100 ? 0 : lastProposalId - 100,
-                limit: 100
-            }
-        ).then(res => {
+        return dao.getProposals({
+            from_index: lastProposalId < 100 ? 0 : lastProposalId - 100,
+            limit: 100
+        }).then(res => {
 
             const proposals = res.filter(p => {
                 // discard if not active proposal to create multicall instance
@@ -358,7 +355,7 @@ export default class DaoComponent extends Component {
                     view(multicall, "get_tokens", {}).catch(e => {}),
                     view(multicall, "get_jobs", {}).catch(e => {}),
                     view(multicall, "get_job_bond", {}).catch(e => {}),
-                    this.proposalAlreadyExists().catch(e => {})
+                    this.proposalAlreadyExists(newDAO).catch(e => {})
                 ])
                 .then(([admins, tokens, jobs, bond, createMulticallProposalInfo]) => {
                     const { proposal_id, proposal_info } = createMulticallProposalInfo;
