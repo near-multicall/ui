@@ -58,7 +58,7 @@ export default class Column extends Component {
                                 >
                                     { this.props.tasks.map((task, index) => 
                                         <Task 
-                                            key={hash(task, { algorithm: 'sha1', encoding: 'base64' })} 
+                                            key={hash(task, { algorithm: 'md5', encoding: 'base64' })} 
                                             task={task} 
                                             index={index} 
                                             json={task.json}
