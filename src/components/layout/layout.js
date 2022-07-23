@@ -136,9 +136,15 @@ export default class Layout extends Component {
 
         console.warn("layout cleared");
 
+<<<<<<< Updated upstream
         // clear card content
         if (window.TASKS)
             window.TASKS = [];
+=======
+        let newLayout = {
+            ...initialData
+        }
+>>>>>>> Stashed changes
 
         this.taskID = 0;
         this.columnID = 1;
