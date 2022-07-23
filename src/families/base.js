@@ -39,6 +39,7 @@ export default class BaseTask extends Component {
         if (window.TEMP) {
             this.call = TEMP.call;
             this.state.showArgs = TEMP.showArgs;
+            this.state.isEdited = TEMP.isEdited;
             this.options = TEMP.options;
             this.errors = TEMP.errors;
         }

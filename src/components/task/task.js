@@ -47,6 +47,7 @@ export default class Task extends Component {
             window.TEMP = {
                 call: this.instance.current.call,
                 showArgs: this.instance.current.state.showArgs,
+                isEdited: this.instance.current.state.isEdited,
                 options: this.instance.current.options,
                 errors: this.instance.current.errors
             };
