@@ -16,11 +16,6 @@ export const initialData = {
             id: 'menu',
             title: 'Infinite Column',
             taskIds: ['task-i4', 'task-i3', 'task-i2']
-        },
-        'trash': {
-            id: 'trash',
-            title: 'Delete',
-            taskIds: []
         }
     },
     columnOrder: ['column-0']

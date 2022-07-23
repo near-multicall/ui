@@ -1,4 +1,3 @@
-import { WindPower } from '@mui/icons-material';
 import React, { Component } from 'react'
 import { Draggable } from 'react-beautiful-dnd';
 import { Family } from '../../components';
@@ -27,7 +26,7 @@ export default class Task extends Component {
 
             if (from) {
 
-                COPY["payload"] = {
+                COPY.payload = {
                     call: from.call,
                     showArgs: from.state.showArgs,
                     options: from.options,
@@ -35,10 +34,6 @@ export default class Task extends Component {
                 }
             
             }
-
-        } else { 
-
-            window.COPY = null;
 
         }
 
@@ -52,6 +47,7 @@ export default class Task extends Component {
             window.TEMP = {
                 call: this.instance.current.call,
                 showArgs: this.instance.current.state.showArgs,
+                isEdited: this.instance.current.state.isEdited,
                 options: this.instance.current.options,
                 errors: this.instance.current.errors
             };
@@ -111,6 +107,16 @@ export default class Task extends Component {
                 }
 
             default:
+                for (let family in Family) {
+                    if (family === "BaseTask")
+                        continue;
+                    for (let task in Family[family])
+                        if (Family[family][task].inferOwnType(json)) {
+                            const TaskComponent = Family[family][task];
+                            return <TaskComponent ref={this.instance} id={this.id} json={json}/>
+                        }
+                }
+
                 return <Family.BaseTask ref={this.instance} id={this.id} json={json}/>
 
         }

@@ -52,6 +52,8 @@ export default class Export extends Component {
 
         this.update = this.update.bind(this);
 
+        document.addEventListener('onaddressesupdated', (e) => this.onAddressesUpdated(e))
+
     }
 
     componentDidMount() {

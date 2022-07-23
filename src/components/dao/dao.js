@@ -55,6 +55,8 @@ export default class DaoComponent extends Component {
             this.loadInfos()
         });
 
+        document.addEventListener('onaddressesupdated', (e) => this.onAddressesUpdated(e))
+
     }
 
     componentDidMount() {
@@ -310,6 +312,7 @@ export default class DaoComponent extends Component {
 
         const multicall = `${addr.value}.${window.nearConfig.MULTICALL_FACTORY_ADDRESS}`;
         const daoAddress = `${addr.value}.${SputnikDAO.FACTORY_ADDRESS}`;
+        if (this.lastAddr === addr.value) return;
 
         this.lastAddr = addr.value;
 
@@ -333,13 +336,15 @@ export default class DaoComponent extends Component {
         // initialize DAO object
         SputnikDAO.init(daoAddress).catch(e => {})
         .then((newDAO) => {
-            this.setState({ dao: newDAO });
             // DAO not ready => either no SputnikDAO contract on the chosen address
             // or some error happened during DAO object init.
             if (!newDAO.ready) {
                 noContract.isBad = true;
                 noDao.isBad = true;
-                this.setState({ loading: false });
+                this.setState({
+                    dao: newDAO, 
+                    loading: false 
+                });
                 return;
             }
             // DAO correctly initialized, try to fetch multicall info
@@ -358,7 +363,8 @@ export default class DaoComponent extends Component {
                 .then(([admins, tokens, jobs, bond, createMulticallProposalInfo]) => {
                     const { proposal_id, proposal_info } = createMulticallProposalInfo;
         
-                    newState = { 
+                    newState = {
+                        dao: newDAO,
                         infos: {
                             admins: admins,
                             tokens: tokens,

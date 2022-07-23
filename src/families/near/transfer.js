@@ -45,11 +45,11 @@ export default class Transfer extends BaseTask {
                 ? {
                     receiver_id: new ArgsAccount(actions.args.receiver_id),
                     amount: new ArgsBig(
-                        formatTokenAmount(actions.args.amount, units.args.amount.decimals),
+                        formatTokenAmount(actions.args.amount, units?.args.amount.decimals),
                         "0",
                         null,
-                        units.args.amount.unit,
-                        units.args.amount.decimals
+                        units?.args.amount.unit ?? "unknown",
+                        units?.args.amount.decimals
                     ),
                     memo: new ArgsString(actions.args.memo)
                 }
@@ -84,6 +84,11 @@ export default class Transfer extends BaseTask {
 
     }
 
+    static inferOwnType(json) {
+        // TODO check if address is token address, note requires promise.all in tasks
+        return !!json && json.actions[0].func === "ft_transfer"
+    }
+
     updateFT() {
 
         const { addr, args } = this.call;
@@ -105,6 +110,9 @@ export default class Transfer extends BaseTask {
         })
         .then(res => {
             if (res) {
+                if (amount.decimals === null) {
+                    amount.value = formatTokenAmount(amount.value, res.decimals);
+                }
                 amount.unit = res.symbol;
                 amount.decimals = res.decimals;
             }
