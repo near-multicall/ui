@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { Droppable, Draggable } from 'react-beautiful-dnd';
 import Icon from '@mui/material/Icon';
 import { Task } from '../../components.js'
-import { nanoid } from 'nanoid';
+import hash from 'object-hash';
 import './column.scss';
 
 export default class Column extends Component {
@@ -56,10 +56,14 @@ export default class Column extends Component {
                                     ref={provided.innerRef}
                                     {...provided.droppableProps}
                                 >
-                                    { this.props.tasks.map((task, index) => {
-                                        let t = <Task key={nanoid()} task={task} index={index} json={task.json}/>
-                                        return t;
-                                    }) }
+                                    { this.props.tasks.map((task, index) => 
+                                        <Task 
+                                            key={hash(task, { algorithm: 'sha1', encoding: 'base64' })} 
+                                            task={task} 
+                                            index={index} 
+                                            json={task.json}
+                                        />
+                                    ) }
                                     { provided.placeholder }
                                 </div>
                             ) }
