@@ -250,7 +250,6 @@ export default class Sidebar extends Component {
                                     if (multicallAction) {
                                         proposalNonExistent.isBad = false;
                                         argsFromProposal = multicallArgs.calls;
-                                        console.log(argsFromProposal);
                                     }
                                 }
                                 textInputComponent.forceUpdate();
