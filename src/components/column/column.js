@@ -2,11 +2,14 @@ import React, { Component } from 'react'
 import { Droppable, Draggable } from 'react-beautiful-dnd';
 import Icon from '@mui/material/Icon';
 import { Task } from '../../components.js'
+import { nanoid } from 'nanoid';
 import './column.scss';
 
 export default class Column extends Component {
 
     render() {
+
+        console.log(this.props.column.id);
 
         const menuColumn = this.props.column.id === 'menu';
 
@@ -55,7 +58,11 @@ export default class Column extends Component {
                                     ref={provided.innerRef}
                                     {...provided.droppableProps}
                                 >
-                                    { this.props.tasks.map((task, index) => <Task key={task.id} task={task} index={index} json={task.json}/>) }
+                                    { this.props.tasks.map((task, index) => {
+                                        let t = <Task key={nanoid()} task={task} index={index} json={task.json}/>
+                                        console.log(t);
+                                        return t;
+                                    }) }
                                     { provided.placeholder }
                                 </div>
                             ) }

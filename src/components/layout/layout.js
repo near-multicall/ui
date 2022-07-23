@@ -328,6 +328,8 @@ export default class Layout extends Component {
 
     fromJSON(json) {
 
+        console.log(json);
+
         this.clear();
 
         const layout = window.STORAGE.layout;
@@ -380,6 +382,8 @@ export default class Layout extends Component {
     }
 
     fromBase64(json) {
+
+        console.log(json);
 
         this.clear();
 

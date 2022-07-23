@@ -64,6 +64,8 @@ export default class Task extends Component {
 
         }
 
+        console.log(props.task.id, this.instance);
+
     }
 
     componentDidMount() {
