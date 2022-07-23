@@ -9,8 +9,6 @@ export default class Column extends Component {
 
     render() {
 
-        console.log(this.props.column.id);
-
         const menuColumn = this.props.column.id === 'menu';
 
         return (
