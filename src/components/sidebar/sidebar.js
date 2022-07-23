@@ -262,6 +262,7 @@ export default class Sidebar extends Component {
                 />
                 <br/>
                 <p>Enter proposal link from AstroDAO or base UI</p>
+                <b className="warn">Your current multicall will be replaced!</b>
             </Dialog>,
             <Dialog
                 key="Clear All"
