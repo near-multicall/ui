@@ -47,7 +47,7 @@ export const WalletSelectorContextProvider: React.FC <any> = ({ children }) => {
         setupMathWallet({ iconUrl: mathWalletIconUrl.href })
       ],
     });
-    const _modal = setupModal(_selector, { contractId: window.nearConfig.MULTICALL_FACTORY_ADDRESS });
+    const _modal = setupModal(_selector, { contractId: window.nearConfig.MULTICALL_FACTORY_ADDRESS, theme: "dark" });
     const state = _selector.store.getState();
 
     setAccounts(state.accounts);
