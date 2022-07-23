@@ -1,9 +1,9 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
-import { initialData } from '../../initial-data.js'
-import { Column, Menu } from '../../components.js'
+import { Column, Menu } from '../../components.js';
+import { initialData } from '../../initial-data.js';
+import { Base64 } from 'js-base64';
 import './layout.scss'
-import Task from '../task/task.js';
 
 export default class Layout extends Component {
 
@@ -15,16 +15,17 @@ export default class Layout extends Component {
     constructor(props) {
 
         super(props);
-        
-        this.state = {
-            ...initialData,
-        };
+
+        this.clear();
+
+        document.addEventListener('onlayoutupdated', () => this.forceUpdate())
 
     }
 
     componentDidMount() {
 
         window.LAYOUT = this;
+        window.STORAGE.load();
 
     }
 
@@ -32,70 +33,76 @@ export default class Layout extends Component {
 
     getColumnID = () => this.columnID;
 
-    getTasks = () => this.state.tasks;
+    getTasks = () => window.STORAGE.layout.tasks;
 
-    getColumns = () => this.state.columns;
+    getColumns = () => window.STORAGE.layout.columns;
 
     // TODO delete elements after exjecting from tasklist / columnlist
+    
+    /**
+     * returns column ID and index inside column's taskIds for a given taskId
+     * 
+     * @param {string} taskId
+     * @returns {object} 
+     */
+    static findTaskCoordinates = (taskId) => {
+        let index;
+        const layout = window.STORAGE.layout;
+        const colId = layout.columnOrder.find((colId) => {
+            index = layout.columns[colId].taskIds.indexOf(taskId);
+            return index >= 0;
+        });
+
+        return { columnId: colId, taskIndex: index }
+    }
 
     deleteTask = (taskId) => {
 
-        let column, index;
+        const layout = window.STORAGE.layout;
+        const { columnId, taskIndex } = Layout.findTaskCoordinates(taskId);
 
-        for (let c of this.state.columnOrder)
-            for (let i in this.state.columns[c].taskIds)
-                if (this.state.columns[c].taskIds[i] === taskId) {
-                    column = this.state.columns[c];
-                    index = i
-                }
-
-        if (column == undefined || index == undefined) {
+        if (columnId == undefined || taskIndex == undefined) {
             console.error("Task not found");
             return;
         }
 
+        const column = layout.columns[columnId];
         const taskIds = Array.from(column.taskIds);
-        taskIds.splice(index, 1);
+        taskIds.splice(taskIndex, 1);
         const newColumn = {
             ...column,
             taskIds: taskIds
         };
 
-        const newState = {
-            ...this.state,
+        const newLayout = {
+            ...layout,
             columns: {
-                ...this.state.columns,
-                [newColumn.id]: newColumn,
+                ...layout.columns,
+                [columnId]: newColumn,
             }
         }
 
-        this.setState(newState);
+        window.STORAGE.setLayout(newLayout);
 
     }
 
     duplicateTask = (taskId) => {
 
-        let column, index;
+        const layout = window.STORAGE.layout;
+        const { columnId, taskIndex } = Layout.findTaskCoordinates(taskId);
 
-        for (let c of this.state.columnOrder)
-            for (let i in this.state.columns[c].taskIds)
-                if (this.state.columns[c].taskIds[i] === taskId) {
-                    column = this.state.columns[c];
-                    index = i
-                }
-
-        if (column == undefined || index == undefined) {
+        if (columnId == undefined || taskIndex == undefined) {
             console.error("Task not found");
             return;
         }
 
         // create new task
-        const taskClone = JSON.parse(JSON.stringify(this.state.tasks[taskId.toString()]));
+        const taskClone = JSON.parse(JSON.stringify(layout.tasks[taskId.toString()]));
         taskClone.id = `task-${this.taskID}`;
-        this.state.tasks[taskClone.id] = taskClone;
 
+        const column = layout.columns[columnId];
         const taskIds = Array.from(column.taskIds);
-        taskIds.splice(index, 0, `task-${this.taskID}`);
+        taskIds.splice(taskIndex, 0, taskClone.id);
 
         this.taskID++;
 
@@ -104,11 +111,15 @@ export default class Layout extends Component {
             taskIds: taskIds
         };
 
-        const newState = {
-            ...this.state,
+        const newLayout = {
+            ...layout,
             columns: {
-                ...this.state.columns,
-                [newColumn.id]: newColumn,
+                ...layout.columns,
+                [columnId]: newColumn,
+            },
+            tasks: {
+                ...layout.tasks,
+                [taskClone.id]: taskClone
             }
         }
 
@@ -116,39 +127,43 @@ export default class Layout extends Component {
             from: taskId,
             to: taskClone.id
         }
-        this.setState(newState);
+
+        window.STORAGE.setLayout(newLayout);
 
     }
 
     clear = () => {
 
-        let newState = {
-            ...initialData
-        }
+        console.warn("layout cleared");
+
+        // clear card content
+        if (window.TASKS)
+            window.TASKS = [];
 
         this.taskID = 0;
         this.columnID = 1;
 
-        this.setState(newState);
+        window.STORAGE.setLayout(initialData);
 
     }
 
     deleteColumn = index => {
 
-        const newColumnOrder = Array.from(this.state.columnOrder);
+        const layout = window.STORAGE.layout;
+        const newColumnOrder = Array.from(layout.columnOrder);
         newColumnOrder.splice(index, 1);
 
-        let newState = {
-            ...this.state,
+        let newLayout = {
+            ...layout,
             columnOrder: newColumnOrder
         }
 
         // list should never be empty
         if (newColumnOrder.length === 0)
-            newState = {
-                ...this.state,
+            newLayout = {
+                ...layout,
                 columns: {
-                    ...this.state.columns,
+                    ...layout.columns,
                     [`column-${this.columnID}`]: {
                         id: `column-${this.columnID}`,
                         title: 'Drag here',
@@ -158,7 +173,7 @@ export default class Layout extends Component {
                 columnOrder: [`column-${this.columnID++}`]
             }
 
-        this.setState(newState);
+        window.STORAGE.setLayout(newLayout);
 
     }
 
@@ -170,13 +185,14 @@ export default class Layout extends Component {
             taskIds: []
         };
 
-        const newColumnOrder = Array.from(this.state.columnOrder);
+        const layout = window.STORAGE.layout;
+        const newColumnOrder = Array.from(layout.columnOrder);
         newColumnOrder.push(`column-${this.columnID}`);
 
-        const newState = {
-            ...this.state,
+        const newLayout = {
+            ...layout,
             columns: {
-                ...this.state.columns,
+                ...layout.columns,
                 [`column-${this.columnID}`]: newColumn
             },
             columnOrder: newColumnOrder
@@ -184,12 +200,13 @@ export default class Layout extends Component {
 
         this.columnID++;
 
-        this.setState(newState);
+        window.STORAGE.setLayout(newLayout);
 
     }
 
     onDragEnd = result => {
 
+        const layout = window.STORAGE.layout;
         const { destination, source, draggableId, type } = result;
     
         if (!destination)
@@ -201,24 +218,24 @@ export default class Layout extends Component {
 
         if (type === 'column') {
             
-            const newColumnOrder = Array.from(this.state.columnOrder);
+            const newColumnOrder = Array.from(layout.columnOrder);
 
             newColumnOrder.splice(source.index, 1);
             newColumnOrder.splice(destination.index, 0, draggableId);
 
-            const newState = {
-                ...this.state,
+            const newLayout = {
+                ...layout,
                 columnOrder: newColumnOrder
             };
 
-            this.setState(newState);
+            window.STORAGE.setLayout(newLayout);
 
             return;
 
         }
 
-        const start = this.state.columns[source.droppableId];
-        const finish = this.state.columns[destination.droppableId];
+        const start = layout.columns[source.droppableId];
+        const finish = layout.columns[destination.droppableId];
 
         if (!start || !finish) {
 
@@ -239,15 +256,15 @@ export default class Layout extends Component {
                 taskIds: newTaskIds
             };
 
-            const newState = {
-                ...this.state,
+            const newLayout = {
+                ...layout,
                 columns: {
-                    ...this.state.columns,
+                    ...layout.columns,
                     [newColumn.id]: newColumn
                 }
             }
 
-            this.setState(newState);
+            window.STORAGE.setLayout(newLayout);
 
         } else {
 
@@ -265,9 +282,9 @@ export default class Layout extends Component {
                 startTaskIds[source.index] = `task-${this.taskID}`;
 
                 // create new task
-                const taskClone = JSON.parse(JSON.stringify(this.state.tasks[taskId.toString()]));
+                const taskClone = JSON.parse(JSON.stringify(layout.tasks[taskId.toString()]));
                 taskClone.id = `task-${this.taskID}`;
-                this.state.tasks[taskClone.id] = taskClone;
+                window.STORAGE.layout.tasks[taskClone.id] = taskClone;
 
                 this.taskID++;
 
@@ -287,22 +304,6 @@ export default class Layout extends Component {
 
             }
 
-            if (finish.id === 'trash') {
-
-                const newState = {
-                    ...this.state,
-                    columns: {
-                        ...this.state.columns,
-                        [newStart.id]: newStart,
-                    }
-                }
-    
-                this.setState(newState);
-
-                return;
-
-            }
-
             const finishTaskIds = Array.from(finish.taskIds);
             finishTaskIds.splice(destination.index, 0, draggableId);
             const newFinish = {
@@ -310,33 +311,36 @@ export default class Layout extends Component {
                 taskIds: finishTaskIds
             };
 
-            const newState = {
-                ...this.state,
+            const newLayout = {
+                ...layout,
                 columns: {
-                    ...this.state.columns,
+                    ...layout.columns,
                     [newStart.id]: newStart,
                     [newFinish.id]: newFinish
                 }
             }
 
-            this.setState(newState);
+            window.STORAGE.setLayout(newLayout);
 
         }
 
     }
 
     fromJSON(json) {
-
         this.clear();
+
+        const layout = window.STORAGE.layout;
+
+        if (!Array.isArray(json) || !json.length)
+            return;
 
         this.columnID = 0;
 
-        let newState = {
-            ...this.state,
+        let newLayout = {
+            ...layout,
             columnOrder: [],
             columns: {
-                "trash": this.state.columns.trash,
-                "menu": this.state.columns.menu,
+                "menu": layout.columns.menu,
             }
         }
 
@@ -348,13 +352,13 @@ export default class Layout extends Component {
                 taskIds: []
             };
     
-            const newColumnOrder = Array.from(newState.columnOrder);
+            const newColumnOrder = Array.from(newLayout.columnOrder);
             newColumnOrder.push(`column-${this.columnID}`);
     
-            newState = {
-                ...newState,
+            newLayout = {
+                ...newLayout,
                 columns: {
-                    ...newState.columns,
+                    ...newLayout.columns,
                     [`column-${this.columnID}`]: newColumn
                 },
                 columnOrder: newColumnOrder
@@ -364,25 +368,91 @@ export default class Layout extends Component {
             
             for (let t in json[c]) {
                 let task = {id: `task-${this.taskID++}`, addr: "", func: "", json: json[c][t]};
-                newState.columns[newColumn.id].taskIds.push(task.id);
-                newState.tasks[task.id] = task;
+                newLayout.columns[newColumn.id].taskIds.push(task.id);
+                newLayout.tasks[task.id] = task;
             }
         }
 
-        this.setState(newState, () => TASKS.forEach(t => t.instance.current.forceUpdate()));
+        window.STORAGE.setLayout(newLayout);
+    }
 
+    fromBase64(json) {
+        this.clear();
+
+        const layout = window.STORAGE.layout;
+
+        if (!Array.isArray(json) || !json.length)
+            return;
+
+        this.columnID = 0;
+
+        let newLayout = {
+            ...layout,
+            columnOrder: [],
+            columns: {
+                "menu": layout.columns.menu
+            }
+        }
+
+        for (let c in json) {
+
+            const newColumn = {
+                id: `column-${this.columnID}`,
+                title: 'Drag here',
+                taskIds: []
+            };
+    
+            const newColumnOrder = Array.from(newLayout.columnOrder);
+            newColumnOrder.push(`column-${this.columnID}`);
+    
+            newLayout = {
+                ...newLayout,
+                columns: {
+                    ...newLayout.columns,
+                    [`column-${this.columnID}`]: newColumn
+                },
+                columnOrder: newColumnOrder
+            }
+    
+            this.columnID++;
+            
+            for (let t in json[c]) {
+                const { address: jsonAddress, actions: jsonActions } = json[c][t];
+                let task = {
+                    id: `task-${this.taskID++}`,
+                    addr: "",
+                    func: "",
+                    json: {
+                        address: jsonAddress,
+                        actions: jsonActions.map((action) => (
+                            {
+                                func: action.func,
+                                args: JSON.parse( Base64.decode(action.args) ),
+                                gas: action.gas,
+                                depo: action.depo
+                            }
+                        ))
+                    }
+                };
+                newLayout.columns[newColumn.id].taskIds.push(task.id);
+                newLayout.tasks[task.id] = task;
+            }
+        }
+
+        window.STORAGE.setLayout(newLayout);
     }
 
     toJSON() {
 
+        const layout = window.STORAGE.layout;
         let output = [];
 
-        for (let c of this.state.columnOrder) {
+        for (let c of layout.columnOrder) {
         
-            if (this.state.columns[c].taskIds.length === 0)
+            if (layout.columns[c].taskIds.length === 0)
                 continue;
             output.push([]);
-            for (let t of this.state.columns[c].taskIds) {
+            for (let t of layout.columns[c].taskIds) {
                 const task = TASKS.find(task => task.id === t);
                 if (task)
                     output[output.length -1].push(task.instance.current.call.toJSON());
@@ -398,14 +468,15 @@ export default class Layout extends Component {
 
     toBase64() {
 
+        const layout = window.STORAGE.layout;
         let output = [];
 
-        for (let c of this.state.columnOrder) {
+        for (let c of layout.columnOrder) {
         
-            if (this.state.columns[c].taskIds.length === 0)
+            if (layout.columns[c].taskIds.length === 0)
                 continue;
             output.push([]);
-            for (let t of this.state.columns[c].taskIds) {
+            for (let t of layout.columns[c].taskIds) {
                 const task = TASKS.find(task => task.id === t);
                 if (task)
                     output[output.length -1].push(task.instance.current.call.toBase64());
@@ -420,14 +491,15 @@ export default class Layout extends Component {
     }
 
     toErrors() {
-
+        
+        const layout = window.STORAGE.layout;
         let output = [];
 
         if (!window?.TASKS)
             return output;
 
         const tasks = TASKS
-            .filter(t => !this.state.columns['menu'].taskIds.includes(t.id))
+            .filter(t => !layout.columns['menu'].taskIds.includes(t.id))
             .map(t => t.instance.current);
 
         for (let t of tasks)
@@ -452,7 +524,8 @@ export default class Layout extends Component {
 
     empty() {
 
-        return this.state.columnOrder.length === 1 && this.state.columns[this.state.columnOrder[0]].taskIds.length === 0
+        const layout = window.STORAGE.layout;
+        return layout.columnOrder.length === 1 && layout.columns[layout.columnOrder[0]].taskIds.length === 0
 
     }
 
@@ -465,6 +538,8 @@ export default class Layout extends Component {
     }
 
     render() {
+
+        const layout = window.STORAGE.layout;
 
         return (
             <DragDropContext
@@ -486,10 +561,10 @@ export default class Layout extends Component {
                                 {...provided.droppableProps}
                                 ref={provided.innerRef}
                             >
-                                { this.state.columnOrder.map((columnId, index) => {
+                                { layout.columnOrder.map((columnId, index) => {
                                 
-                                    const column = this.state.columns[columnId];
-                                    const tasks = column.taskIds.map(taskId => this.state.tasks[taskId]);
+                                    const column = layout.columns[columnId];
+                                    const tasks = column.taskIds.map(taskId => layout.tasks[taskId]);
 
                                     return (
                                         <Column 

@@ -6,6 +6,7 @@ import { ArgsAccount, ArgsBig, ArgsError, ArgsJSON, ArgsString } from '../utils/
 import Call from '../utils/call';
 import { toGas, toYocto, formatTokenAmount, unitToDecimals } from '../utils/converter';
 import { hasContract } from '../utils/contracts/generic';
+import debounce from "lodash.debounce";
 import './base.scss';
 
 export default class BaseTask extends Component {
@@ -24,6 +25,8 @@ export default class BaseTask extends Component {
     errors = this.baseErrors;
     options = {};
 
+    updateContractDebounced = debounce(() => this.updateContract(), 500);
+
     constructor(props) {
 
         super(props);
@@ -36,6 +39,7 @@ export default class BaseTask extends Component {
         if (window.TEMP) {
             this.call = TEMP.call;
             this.state.showArgs = TEMP.showArgs;
+            this.state.isEdited = TEMP.isEdited;
             this.options = TEMP.options;
             this.errors = TEMP.errors;
         }
@@ -56,6 +60,9 @@ export default class BaseTask extends Component {
         }
 
         this.updateCard = this.updateCard.bind(this);
+
+        document.addEventListener('onaddressesupdated', (e) => this.onAddressesUpdated(e));
+
         window.WALLET.then(() => this.updateContract());
     }
 
@@ -94,6 +101,10 @@ export default class BaseTask extends Component {
 
     }
 
+    static inferOwnType(json) {
+        return false;
+    }
+
     updateContract() {
 
         const { addr } = this.call;
@@ -111,11 +122,11 @@ export default class BaseTask extends Component {
         // TODO: add methods to extract contract functions.
         // TODO: add autocomplete for "func" input using fetched contract method names.
         // might need to move logic for custom card to seaparate class that inherits from this.
-
     }
 
     componentDidMount() {
         this.loadErrors?.();
+        this.forceUpdate();
     }
 
     onAddressesUpdated() { }
@@ -161,11 +172,7 @@ export default class BaseTask extends Component {
                     error={[errors.addr, errors.noContract]}
                     update={ () => {
                         this.updateCard();
-                        setTimeout(() => {
-                            if (new Date() - this.lastInput > 400)
-                                this.updateContract()
-                        }, 500)
-                        this.lastInput = new Date()
+                        this.updateContractDebounced()
                     } }
                 />
                 <TextInput

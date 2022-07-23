@@ -4,6 +4,7 @@ import { ArgsAccount, ArgsBig, ArgsString, ArgsObject, ArgsError } from "../../u
 import Call from "../../utils/call";
 import { toGas, toYocto, formatTokenAmount, unitToDecimals } from "../../utils/converter";
 import BaseTask from "../base";
+import Multicall from '../../utils/contracts/multicall';
 import "./multicall.scss";
 import { TextInput, TextInputWithUnits } from '../../components/editor/elements';
 
@@ -38,11 +39,11 @@ export default class Transfer extends BaseTask {
                     account_id: new ArgsAccount(actions.args.account_id),
                     amount: actions.args.amount 
                         ? new ArgsBig(
-                            formatTokenAmount(actions.args.amount, units.args.amount.decimals),
+                            formatTokenAmount(actions.args.amount, units?.args.amount.decimals ?? unitToDecimals["NEAR"]),
                             toYocto("0"), 
                             null, 
-                            units.args.amount.unit,
-                            units.args.amount.decimals
+                            units?.args.amount.unit ?? "NEAR",
+                            units?.args.amount.decimals ?? unitToDecimals["NEAR"]
                         )
                         : new ArgsBig("0", "0", "0")
                 }
@@ -76,6 +77,10 @@ export default class Transfer extends BaseTask {
     
     }
 
+    static inferOwnType(json) {
+        // TODO use Multicall.isMulticall(json.address)); note: will need promise.all in tasks
+        return !!json && json.address.endsWith(Multicall.FACTORY_ADDRESS) && json.actions[0].func === "near_transfer"
+    }
 
     onAddressesUpdated() {
 

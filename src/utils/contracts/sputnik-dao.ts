@@ -1,5 +1,6 @@
 import { tx, view } from "../wallet";
 import { toGas } from "../converter";
+import { ArgsAccount } from "../args";
 
 
 const FACTORY_ADDRESS_SELECTOR: Record<string, string> = {
@@ -248,6 +249,44 @@ class SputnikDAO {
         }
         return `${dao_url}/${proposal_path}`;
     }
+
+    // check if URL is for a proposal page on UI of choice
+    static getInfoFromProposalUrl (url: string): { dao: string, proposalId: number } | undefined {
+        // create URL object from url
+        let urlObj: URL; 
+        try { urlObj = new URL(url); }
+        // input string isn't a valid URL
+        catch (e) { return; }
+
+        // initialize with invalid values
+        let daoAddr: string = "",
+            propId: number = -1;
+        // dextract info depending to Frontend type
+        if ( SputnikDAO.getUiBaseUrl(SputnikUI.ASTRO_UI) === (urlObj.origin) ) {
+            const path: string[] = urlObj.pathname.split("/");
+            daoAddr = path[2];
+            const propIdStr: string = path[4].split("-").pop() ?? "";
+            propId = Number.isNaN( propIdStr ) ? -1 : parseInt(propIdStr);
+        }
+        else if ( SputnikDAO.getUiBaseUrl(SputnikUI.REFERENCE_UI) === (urlObj.origin + "/#") ) {
+            const path: string[] = urlObj.hash.split("/");
+            daoAddr = path[1];
+            const propIdStr: string = path[2];
+            propId = Number.isNaN( propIdStr ) ? -1 : parseInt(propIdStr);
+        }
+        // URL doesn't belong to a supported UI type
+        else { return; }
+
+        // check output validity: DAO address is valid NEAR address
+        // and proposal ID is a positive number
+        if ( ArgsAccount.isValid(daoAddr) && propId >= 0 ) {
+            return { dao: daoAddr, proposalId: propId };
+        }
+        // outputs invalid
+        else { return; }
+    }
+
+
 
     // check if user can perform some action on some proposal kind
     checkUserPermission (userAddr: string, givenAction: ProposalAction, givenProposalKind: ProposalKind): boolean {
