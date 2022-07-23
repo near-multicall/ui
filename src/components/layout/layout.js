@@ -136,9 +136,15 @@ export default class Layout extends Component {
 
         console.warn("layout cleared");
 
+<<<<<<< Updated upstream
         // clear card content
         if (window.TASKS)
             window.TASKS = [];
+=======
+        let newLayout = {
+            ...initialData
+        }
+>>>>>>> Stashed changes
 
         this.taskID = 0;
         this.columnID = 1;
@@ -328,6 +334,8 @@ export default class Layout extends Component {
 
     fromJSON(json) {
 
+        console.log(json);
+
         this.clear();
 
         const layout = window.STORAGE.layout;
@@ -378,6 +386,8 @@ export default class Layout extends Component {
     }
 
     fromBase64(json) {
+
+        console.log(json);
 
         this.clear();
 
