@@ -375,8 +375,6 @@ export default class Layout extends Component {
         }
 
         window.STORAGE.setLayout(newLayout);
-        window.TASKS.forEach(t => t.instance.current.forceUpdate());
-
     }
 
     fromBase64(json) {
@@ -444,7 +442,6 @@ export default class Layout extends Component {
         }
 
         window.STORAGE.setLayout(newLayout);
-        window.TASKS.forEach(t => t.instance.current.forceUpdate());
     }
 
     toJSON() {
