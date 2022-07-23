@@ -1,4 +1,4 @@
-import { tx, view } from "../wallet";
+import { tx, view, rpcProvider } from "../wallet";
 import { toGas } from "../converter";
 import { ArgsAccount } from "../args";
 
@@ -145,7 +145,7 @@ class SputnikDAO {
      * @param accountId 
      */
     static async isSputnikDAO (accountId: string): Promise<boolean> {
-        const accountInfo: any = await window.near.connection.provider.query({
+        const accountInfo: any = await rpcProvider.query({
             request_type: "view_account",
             finality: "final",
             account_id: accountId

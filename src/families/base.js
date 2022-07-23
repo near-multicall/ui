@@ -63,7 +63,7 @@ export default class BaseTask extends Component {
 
         document.addEventListener('onaddressesupdated', (e) => this.onAddressesUpdated(e));
 
-        window.WALLET.then(() => this.updateContract());
+        this.updateContract();
     }
 
     init(json = null) {
@@ -96,7 +96,7 @@ export default class BaseTask extends Component {
             for (let e in this.errors) {
                 this.errors[e].validOrNull(this.call[e])
             }
-            WALLET.then(() => this.updateContract());
+            this.updateContract();
         }).bind(this);
 
     }

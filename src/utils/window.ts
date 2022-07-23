@@ -1,4 +1,5 @@
 import * as nearAPI from "near-api-js";
+import type { NetworkId } from "@near-wallet-selector/core";
 import { Component } from "react";
 import { Persistent } from "./persistent";
 import Task from "./../components/task/task";
@@ -44,14 +45,8 @@ declare global {
         STORAGE: Persistent
 
         // Wallet definitions
-        WALLET: Promise<nearAPI.WalletConnection> | Component
-        NEAR_ENV: string
+        WALLET_COMPONENT: Promise<nearAPI.WalletConnection> | Component
+        NEAR_ENV: NetworkId
         nearConfig: any
-        near: nearAPI.Near
-        walletAccount: nearAPI.WalletConnection
-        account: nearAPI.ConnectedWalletAccount
-        accountId: string
-        contract: nearAPI.Contract
-
     }
 }

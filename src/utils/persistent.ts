@@ -17,9 +17,9 @@ export class Persistent {
     setAddresses = debounce(
         // debounced function
         (newAddresses: {
-        user?: string,
-        multicall?: string,
-        dao?: string
+            user?: string,
+            multicall?: string,
+            dao?: string
         }) => {
 
             this.addresses = {

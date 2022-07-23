@@ -1,4 +1,4 @@
-import { initNear, tx, view } from "../wallet";
+import { rpcProvider } from "../wallet";
 
 const FACTORY_ADDRESS_SELECTOR: Record<string, string> = {
     "mainnet": "v1.multicall.near",
@@ -33,8 +33,7 @@ export default class Multicall {
      * @param accountId 
      */
      static async isMulticall(accountId: string): Promise<boolean> {
-        await initNear();
-        const accountInfo: any = window.near.connection.provider.query({
+        const accountInfo: any = await rpcProvider.query({
             request_type: "view_account",
             finality: "final",
             account_id: accountId

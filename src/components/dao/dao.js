@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 import { ArgsAccount, ArgsError } from '../../utils/args';
 import { toNEAR, toYocto, Big } from '../../utils/converter';
 import { view } from '../../utils/wallet';
+import { useWalletSelector } from '../../contexts/walletSelectorContext';
 import { SputnikDAO, SputnikUI, ProposalKind, ProposalAction } from '../../utils/contracts/sputnik-dao';
 import { TextInput } from '../editor/elements';
 import { InputAdornment } from '@mui/material'
@@ -14,6 +15,7 @@ import debounce from 'lodash.debounce';
 const MIN_INSTANCE_BALANCE = toYocto(1); // 1 NEAR
 
 export default class DaoComponent extends Component {
+    static contextType = useWalletSelector();
 
     errors = {
         addr: new ArgsError("Invalid NEAR address", value => ArgsAccount.isValid(value), !ArgsAccount.isValid(STORAGE.addresses?.dao ?? "")),
@@ -21,7 +23,7 @@ export default class DaoComponent extends Component {
         noContract: new ArgsError("DAO has no multicall instance", value => this.errors.noContract.isBad),
     }
 
-    loadInfoDebounced = debounce(() => this.loadInfos(), 500);
+    loadInfoDebounced = debounce(() => this.loadInfos(), 400);
 
     lastAddr;
 
@@ -43,16 +45,15 @@ export default class DaoComponent extends Component {
             }
         }
 
-        window.WALLET
-            .then(() => view(
-                window.nearConfig.MULTICALL_FACTORY_ADDRESS,
-                "get_fee",
-                {}
-            ))
-            .then(createMulticallFee => { 
-                this.fee = createMulticallFee;
-                this.loadInfos()
-            })
+        view(
+            window.nearConfig.MULTICALL_FACTORY_ADDRESS,
+            "get_fee",
+            {}
+        )
+        .then(createMulticallFee => {
+            this.fee = createMulticallFee;
+            this.loadInfos()
+        });
 
         document.addEventListener('onaddressesupdated', (e) => this.onAddressesUpdated(e))
 
@@ -70,19 +71,16 @@ export default class DaoComponent extends Component {
      * 
      * @returns {object} ID and info of proposal to create multicall instance,
      */
-    proposalAlreadyExists () {
-        const { dao } = this.state;
+    proposalAlreadyExists (dao) {
         // Date.now() returns timestamp in milliseconds, SputnikDAO uses nanoseconds
         const currentTime = Big( Date.now() ).times("1000000");
         const lastProposalId = dao.lastProposalId;
         const proposalPeriod = dao.policy.proposal_period;
 
-        return dao.getProposals(
-            {
-                from_index: lastProposalId < 100 ? 0 : lastProposalId - 100,
-                limit: 100
-            }
-        ).then(res => {
+        return dao.getProposals({
+            from_index: lastProposalId < 100 ? 0 : lastProposalId - 100,
+            limit: 100
+        }).then(res => {
 
             const proposals = res.filter(p => {
                 // discard if not active proposal to create multicall instance
@@ -141,6 +139,7 @@ export default class DaoComponent extends Component {
 
 
     createMulticall() {
+        const { accountId } = this.context;
 
         if (this.fee === undefined)
             return;
@@ -155,9 +154,9 @@ export default class DaoComponent extends Component {
         const multicall = `${addr.value}.${window.nearConfig.MULTICALL_FACTORY_ADDRESS}`;
         const depo = Big(this.fee).plus(MIN_INSTANCE_BALANCE);
         // can user propose a FunctionCall to DAO?
-        const canPropose = dao.checkUserPermission(window.account.accountId, ProposalAction.AddProposal, ProposalKind.FunctionCall);
+        const canPropose = dao.checkUserPermission(accountId, ProposalAction.AddProposal, ProposalKind.FunctionCall);
         // can user vote approve a FunctionCall on the DAO?
-        const canApprove = dao.checkUserPermission(window.account.accountId, ProposalAction.VoteApprove, ProposalKind.FunctionCall);
+        const canApprove = dao.checkUserPermission(accountId, ProposalAction.VoteApprove, ProposalKind.FunctionCall);
 
         const args = {
             proposal: {
@@ -237,7 +236,7 @@ export default class DaoComponent extends Component {
                     )
                 }
                 // user can VoteApprove and already voted
-                else if ( proposedInfo.votes[window.account.accountId] ) {
+                else if ( proposedInfo.votes[accountId] ) {
                     return (
                         <div className="info-text">
                             {`You have voted on creating a multicall instance for this DAO. It will be created as soon as the proposal passes voting.`}
@@ -305,7 +304,6 @@ export default class DaoComponent extends Component {
     }
 
     loadInfos() {
-
         const { addr: addrError, noContract, noDao } = this.errors;
         const { addr } = this.state;
 
@@ -357,7 +355,7 @@ export default class DaoComponent extends Component {
                     view(multicall, "get_tokens", {}).catch(e => {}),
                     view(multicall, "get_jobs", {}).catch(e => {}),
                     view(multicall, "get_job_bond", {}).catch(e => {}),
-                    this.proposalAlreadyExists().catch(e => {})
+                    this.proposalAlreadyExists(newDAO).catch(e => {})
                 ])
                 .then(([admins, tokens, jobs, bond, createMulticallProposalInfo]) => {
                     const { proposal_id, proposal_info } = createMulticallProposalInfo;
@@ -385,23 +383,12 @@ export default class DaoComponent extends Component {
     }
 
     getContent() {
+        const { selector: walletSelector } = this.context;
+        const { infos, loading } = this.state;
 
-        const {
-            infos,
-            loading,
-        } = this.state;
-
-        // wait for wallet to initialize
-        if (!window.WALLET?.state?.wallet) {
-            window.WALLET.then(() => this.forceUpdate());
-            return;
-        }
-
-        const { wallet } = window.WALLET.state;
-
-        // connect wallet
+        // if user not logged in, remind him to sign in.
         // TODO: only require signIn when DAO has no multicall instance (to know if user can propose or vote on existing proposal to create multicall)
-        if (!wallet.isSignedIn()) 
+        if (!walletSelector.isSignedIn())
             return <div className="info-container error">
                 Please sign in to continue
             </div>
