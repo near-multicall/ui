@@ -60,7 +60,6 @@ export default class Column extends Component {
                                 >
                                     { this.props.tasks.map((task, index) => {
                                         let t = <Task key={nanoid()} task={task} index={index} json={task.json}/>
-                                        console.log(t);
                                         return t;
                                     }) }
                                     { provided.placeholder }
