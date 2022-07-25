@@ -1,5 +1,6 @@
 import { DeleteOutline, EditOutlined, MoveDown } from '@mui/icons-material';
 import { Tooltip } from '@mui/material';
+import hash from 'object-hash';
 import { Component } from 'react';
 import { Droppable } from 'react-beautiful-dnd';
 import { Task } from '../components.js';
@@ -103,7 +104,7 @@ export default class BatchTask extends Component {
     getTasks() {
 
         try {
-            return this.tasksDOM.map(t => TASKS.find(task => task.id === t.key).instance.current);
+            return this.tasksDOM.map(t => TASKS.find(task => task.id === t.props.task.id).instance.current);
         } catch(e) {
             throw new Error("Tasks not loaded");
         }
@@ -119,7 +120,14 @@ export default class BatchTask extends Component {
 
         this.tasksDOM = STORAGE.layout.columns[this.props.id].taskIds
             .map(taskId => STORAGE.layout.tasks[taskId])
-            .map((task, index) => <Task key={task.id} task={task} index={index} json={task.json}/>)
+            .map((task, index) => 
+                <Task 
+                    key={hash(task, { algorithm: 'md5', encoding: 'base64' })} 
+                    task={task} 
+                    index={index} 
+                    json={task.json}
+                />
+            )
 
         this.options.loaded = true;
         this.forceUpdate();
@@ -168,11 +176,38 @@ export default class BatchTask extends Component {
 
     }
 
+    onRender() {
+
+        const { addr } = this.state,
+              { id } = this.props;
+
+        // create tasks
+        this.tasksDOM = STORAGE.layout.columns[id].taskIds
+            .map(taskId => STORAGE.layout.tasks[taskId])
+            .map((task, index) => 
+                <Task 
+                    key={hash(task, { algorithm: 'md5', encoding: 'base64' })} 
+                    task={task} 
+                    index={index} 
+                    json={task.json}
+                />
+            );
+
+        // delete empty batches
+        if (STORAGE.layout.columns[id].taskIds.length === 0 && this.options.loaded)
+            LAYOUT.deleteTask(id);
+
+        // evaluate errors
+        const tasks = this.tasksDOM.map(t => TASKS.find(task => task.id === t.props.task.id)?.instance.current);
+        if (tasks?.length >= 2 && tasks.every(t => !!t) && this.options.loaded)
+            this.errors.noSingleAddress.isBad = !tasks.every(t => t.call.addr.value === addr.value);
+
+    }
+
     render() {
 
         const {
             name,
-            addr,
             isEdited
         } = this.state;
 
@@ -180,16 +215,7 @@ export default class BatchTask extends Component {
 
         const { id } = this.props;
 
-        this.tasksDOM = STORAGE.layout.columns[id].taskIds
-            .map(taskId => STORAGE.layout.tasks[taskId])
-            .map((task, index) => <Task key={task.id} task={task} index={index} json={task.json}/>);
-
-        if (STORAGE.layout.columns[id].taskIds.length === 0 && this.options.loaded)
-            LAYOUT.deleteTask(id);
-
-        const tasks = this.tasksDOM.map(t => TASKS.find(task => task.id === t.key)?.instance.current);
-        if (tasks?.length >= 2 && tasks.every(t => !!t) && this.options.loaded)
-            errors.noSingleAddress.isBad = !tasks.every(t => t.call.addr.value === addr.value);
+        this.onRender();
 
         const hasErrors = Object.entries(errors)
             .filter(([k, v]) => v.isBad)
