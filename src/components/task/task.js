@@ -72,8 +72,6 @@ export default class Task extends Component {
         else 
             window.TASKS = [this];
 
-        this.instance.current.onListed?.();
-
     }
 
     componentWillUnmount() {

@@ -40,8 +40,8 @@ export default class BatchTask extends Component {
         this.state = {
             showArgs: false,
             isEdited: false,
-            name: new ArgsString("Batch"),
-            addr: new ArgsAccount(this.props?.json.address)
+            name: new ArgsString(""),
+            addr: new ArgsAccount("")
         }
 
         if (window.TEMP) {
@@ -56,35 +56,23 @@ export default class BatchTask extends Component {
 
             const optionsDeepCopy = JSON.parse(JSON.stringify(COPY.payload.options))
 
-            this.state.name.value = COPY.payload.call?.name?.toString();
-            this.options = optionsDeepCopy;
+            this.init({
+                name: COPY.payload.call?.name?.toString(),
+                ...COPY.payload.call.toJSON(),
+                options: optionsDeepCopy
+            })
             this.state.showArgs = COPY.payload.showArgs;
-
             COPY = null;
 
             this.options.loaded = false;
 
+        } else {
+            this.init(this.props.json);
         }
 
-        this.updateCard = this.updateCard.bind(this);
-
-        this.loadErrors = (() => {
-            this.errors.addr.validOrNull(this.state.addr);
-        }).bind(this);
-
-        document.addEventListener('onlayoutupdated', () => this.forceUpdate());
-
-    }
-
-    componentDidMount() {
-        this.loadErrors?.();
-        this.forceUpdate();
-    }
-
-    loadTasks() {
-
-        console.log("BATCH loadTasks, TASKS:", ...TASKS.map(t => t.id));
-
+        if (window.TEMP !== null) // Batch is moved
+            return; 
+        
         this.props.json.actions.map(a => ({
             address: this.props.json.address,
             actions: [a]            
@@ -99,6 +87,61 @@ export default class BatchTask extends Component {
             })
         STORAGE.setLayout({}); // trigger callbacks
 
+        this.loadTasks();
+
+        this.options.loaded = true;
+
+        this.updateCard = this.updateCard.bind(this);
+
+        document.addEventListener('onlayoutupdated', () => this.forceUpdate());
+
+    }
+
+    init(json = null) {
+
+        this.state = {
+            ...this.state,
+            name: new ArgsString(json?.name ?? "Batch"),
+            addr: new ArgsAccount(json?.address ?? "")
+        };
+
+        this.loadErrors = (() => {
+            this.errors.addr.validOrNull(this.state.addr);
+        }).bind(this);
+
+    }
+
+    componentDidMount() {
+        this.loadErrors?.();
+        this.forceUpdate();
+    }
+
+    loadTasks() {
+
+        const { addr } = this.state,
+              { id } = this.props;
+
+        // create tasks
+        this.tasksDOM = STORAGE.layout.columns[id].taskIds
+            .map(taskId => STORAGE.layout.tasks[taskId])
+            .map((task, index) => 
+                <Task 
+                    key={hash(task, { algorithm: 'md5', encoding: 'base64' })} 
+                    task={task} 
+                    index={index} 
+                    json={task.json}
+                />
+            );
+
+        // delete empty batches
+        if (STORAGE.layout.columns[id].taskIds.length === 0 && this.options.loaded)
+            LAYOUT.deleteTask(id);
+
+        // evaluate errors
+        const tasks = this.tasksDOM.map(t => TASKS.find(task => task.id === t.props.task.id)?.instance.current);
+        if (tasks?.length >= 2 && tasks.every(t => !!t) && this.options.loaded)
+            this.errors.noSingleAddress.isBad = !tasks.every(t => t.call.addr.value === addr.value);
+
     }
 
     getTasks() {
@@ -108,29 +151,6 @@ export default class BatchTask extends Component {
         } catch(e) {
             throw new Error("Tasks not loaded");
         }
-    }
-
-    onListed() {
-
-        if (window.TEMP !== null) // Batch is moved
-            return;  
-
-        console.log("BATCH onListed, TASKS:", ...TASKS.map(t => t.id));
-        this.loadTasks();
-
-        this.tasksDOM = STORAGE.layout.columns[this.props.id].taskIds
-            .map(taskId => STORAGE.layout.tasks[taskId])
-            .map((task, index) => 
-                <Task 
-                    key={hash(task, { algorithm: 'md5', encoding: 'base64' })} 
-                    task={task} 
-                    index={index} 
-                    json={task.json}
-                />
-            )
-
-        this.options.loaded = true;
-        this.forceUpdate();
 
     }
 
@@ -176,34 +196,6 @@ export default class BatchTask extends Component {
 
     }
 
-    onRender() {
-
-        const { addr } = this.state,
-              { id } = this.props;
-
-        // create tasks
-        this.tasksDOM = STORAGE.layout.columns[id].taskIds
-            .map(taskId => STORAGE.layout.tasks[taskId])
-            .map((task, index) => 
-                <Task 
-                    key={hash(task, { algorithm: 'md5', encoding: 'base64' })} 
-                    task={task} 
-                    index={index} 
-                    json={task.json}
-                />
-            );
-
-        // delete empty batches
-        if (STORAGE.layout.columns[id].taskIds.length === 0 && this.options.loaded)
-            LAYOUT.deleteTask(id);
-
-        // evaluate errors
-        const tasks = this.tasksDOM.map(t => TASKS.find(task => task.id === t.props.task.id)?.instance.current);
-        if (tasks?.length >= 2 && tasks.every(t => !!t) && this.options.loaded)
-            this.errors.noSingleAddress.isBad = !tasks.every(t => t.call.addr.value === addr.value);
-
-    }
-
     render() {
 
         const {
@@ -215,7 +207,7 @@ export default class BatchTask extends Component {
 
         const { id } = this.props;
 
-        this.onRender();
+        this.loadTasks();
 
         const hasErrors = Object.entries(errors)
             .filter(([k, v]) => v.isBad)
