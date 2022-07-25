@@ -1,10 +1,11 @@
-import { DeleteOutline, EditOutlined, AddOutlined, PauseOutlined, PlayArrowOutlined, TrendingUpOutlined } from '@mui/icons-material';
+import { DeleteOutline, EditOutlined, AddOutlined, PauseOutlined, PlayArrowOutlined } from '@mui/icons-material';
 import { Base64 } from 'js-base64';
 import React, { Component } from 'react';
 import { ArgsAccount, ArgsError } from '../../utils/args';
 import { toNEAR, toYocto, Big } from '../../utils/converter';
 import { view } from '../../utils/wallet';
-import { SputnikDAO, SputnikUI } from '../../utils/contracts/sputnik-dao';
+import { useWalletSelector } from '../../contexts/walletSelectorContext';
+import { SputnikDAO, SputnikUI, ProposalKind, ProposalAction } from '../../utils/contracts/sputnik-dao';
 import { TextInput } from '../editor/elements';
 import { InputAdornment } from '@mui/material'
 import './dao.scss';
@@ -13,17 +14,16 @@ import debounce from 'lodash.debounce';
 // minimum balance a multicall instance needs for storage + state.
 const MIN_INSTANCE_BALANCE = toYocto(1); // 1 NEAR
 
-export default class Dao extends Component {
+export default class DaoComponent extends Component {
+    static contextType = useWalletSelector();
 
     errors = {
         addr: new ArgsError("Invalid NEAR address", value => ArgsAccount.isValid(value), !ArgsAccount.isValid(STORAGE.addresses?.dao ?? "")),
         noDao: new ArgsError("Sputnik DAO not found on given address", value => this.errors.noDao.isBad),
         noContract: new ArgsError("DAO has no multicall instance", value => this.errors.noContract.isBad),
-        noAddProposalRights: new ArgsError("Permission to create a proposal on this dao", value => this.errors.noAddProposalRights),
-        noApproveProposalRights: new ArgsError("Permission to approve a proposal on this dao", value => this.errors.noApproveProposalRights) 
     }
 
-    loadInfoDebounced = debounce(() => this.loadInfos(), 500);
+    loadInfoDebounced = debounce(() => this.loadInfos(), 400);
 
     lastAddr;
 
@@ -33,6 +33,7 @@ export default class Dao extends Component {
 
         this.state = {
             addr: this.getBaseAddress(STORAGE.addresses?.dao ?? ""),
+            dao: new SputnikDAO(STORAGE.addresses?.dao ?? ""),
             loading: false,
             proposed: -1,
             proposedInfo: {},
@@ -40,21 +41,21 @@ export default class Dao extends Component {
                 admins: [],
                 tokens: [],
                 jobs: [],
-                bond: "...",
-                policy: undefined
+                bond: "..."
             }
         }
 
-        window.WALLET
-            .then(() => view(
-                window.nearConfig.MULTICALL_FACTORY_ADDRESS,
-                "get_fee",
-                {}
-            ))
-            .then(res => {
-                this.fee = res;
-                this.loadInfos()
-            })
+        view(
+            window.nearConfig.MULTICALL_FACTORY_ADDRESS,
+            "get_fee",
+            {}
+        )
+        .then(createMulticallFee => {
+            this.fee = createMulticallFee;
+            this.loadInfos()
+        });
+
+        document.addEventListener('onaddressesupdated', (e) => this.onAddressesUpdated(e))
 
         document.addEventListener('onaddressesupdated', (e) => this.onAddressesUpdated(e))
 
@@ -62,7 +63,7 @@ export default class Dao extends Component {
 
     componentDidMount() {
 
-        window.DAO = this;
+        window.DAO_COMPONENT = this;
 
     }
 
@@ -70,56 +71,49 @@ export default class Dao extends Component {
      * check if DAO has a proposal to create multicall instance.
      * proposal must be in progress, and not expired.
      * 
-     * @param {number} lastProposalID
-     * @param {string} proposalPeriod After this duration (nanoseconds), a proposal expires.
      * @returns {object} ID and info of proposal to create multicall instance,
      */
-    proposalAlreadyExists (lastProposalID, proposalPeriod) {
-
-        const { addr } = this.state;
-        const multicall = `${this.state.addr.value}.${window.nearConfig.MULTICALL_FACTORY_ADDRESS}`;
-        const dao_address = `${addr.value}.${SputnikDAO.FACTORY_ADDRESS}`;
-        const dao = new SputnikDAO(dao_address);
+    proposalAlreadyExists (dao) {
         // Date.now() returns timestamp in milliseconds, SputnikDAO uses nanoseconds
         const currentTime = Big( Date.now() ).times("1000000");
+        const lastProposalId = dao.lastProposalId;
+        const proposalPeriod = dao.policy.proposal_period;
 
-        return dao.getProposals(
-            {
-                from_index: lastProposalID < 100 ? 0 : lastProposalID - 100,
-                limit: 100
-            }
-        ).then(res => {
+        return dao.getProposals({
+            from_index: lastProposalId < 100 ? 0 : lastProposalId - 100,
+            limit: 100
+        }).then(res => {
 
-                const proposals = res.filter(p => {
-                    // discard if not active proposal to create multicall instance
-                    if (
-                        ! (p.kind?.FunctionCall?.receiver_id === window.nearConfig.MULTICALL_FACTORY_ADDRESS)
-                        || ! (p.kind?.FunctionCall?.actions?.[0]?.method_name === "create")
-                        || ! (p.status === 'InProgress')
-                    ) {
-                        return false;
-                    }
-                    // calculate proposal expiration timestamp in nanoseconds
-                    const expirationTime = Big(p.submission_time).add(proposalPeriod);
-                    // check if proposal expired
-                    return (expirationTime.gt(currentTime)) ? true : false;
-                })
-
-                // If there many "Create multicall" proposals, return latest.
-                if (proposals.length > 0) {
-                    const lastProposal = proposals.pop();
-                    return { proposal_id: lastProposal.id, proposal_info: lastProposal };
+            const proposals = res.filter(p => {
+                // discard if not active proposal to create multicall instance
+                if (
+                    ! (p.kind?.FunctionCall?.receiver_id === window.nearConfig.MULTICALL_FACTORY_ADDRESS)
+                    || ! (p.kind?.FunctionCall?.actions?.[0]?.method_name === "create")
+                    || ! (p.status === 'InProgress')
+                ) {
+                    return false;
                 }
-                // No "Create multicall" proposals found.
-                else return { proposal_id: -1, proposal_info: {} };
-                    
-            }).catch(e => {})
+                // calculate proposal expiration timestamp in nanoseconds
+                const expirationTime = Big(p.submission_time).add(proposalPeriod);
+                // check if proposal expired
+                return (expirationTime.gt(currentTime)) ? true : false;
+            })
+
+            // If there many "Create multicall" proposals, return latest.
+            if (proposals.length > 0) {
+                const lastProposal = proposals.pop();
+                return { proposal_id: lastProposal.id, proposal_info: lastProposal };
+            }
+            // No "Create multicall" proposals found.
+            else return { proposal_id: -1, proposal_info: {} };
+                
+        }).catch(e => {})
 
     }
 
     onAddressesUpdated() {
 
-        if (this.getBaseAddress(STORAGE.addresses.dao) !== this.state.addr.value)
+        if (this.getBaseAddress(STORAGE.addresses.dao) !== this.state.addr.value) {
             this.setState({
                 addr: this.getBaseAddress(STORAGE.addresses.dao)
             }, () => {
@@ -127,6 +121,7 @@ export default class Dao extends Component {
                 this.loadInfos();
                 this.forceUpdate();
             })
+        }
 
     }
 
@@ -146,27 +141,24 @@ export default class Dao extends Component {
 
 
     createMulticall() {
+        const { accountId } = this.context;
 
         if (this.fee === undefined)
             return;
 
-        const { loading, addr, infos, proposed, proposedInfo } = this.state;
-        const {
-            noContract,
-            noDao,
-            noAddProposalRights,
-            noApproveProposalRights
-        } = this.errors;
+        const { loading, addr, dao, infos, proposed, proposedInfo } = this.state;
+        const { noContract, noDao } = this.errors;
 
-        // happens if wallet not logged in
-        if (infos.policy === undefined)
+        // happens if wallet not logged in or DAO object not initialized yet
+        if (dao?.ready !== true)
             return <></>;
 
-        const multicall = `${this.state.addr.value}.${window.nearConfig.MULTICALL_FACTORY_ADDRESS}`;
-        const dao_address = `${addr.value}.${SputnikDAO.FACTORY_ADDRESS}`;
-        const dao = new SputnikDAO(dao_address);
-
+        const multicall = `${addr.value}.${window.nearConfig.MULTICALL_FACTORY_ADDRESS}`;
         const depo = Big(this.fee).plus(MIN_INSTANCE_BALANCE);
+        // can user propose a FunctionCall to DAO?
+        const canPropose = dao.checkUserPermission(accountId, ProposalAction.AddProposal, ProposalKind.FunctionCall);
+        // can user vote approve a FunctionCall on the DAO?
+        const canApprove = dao.checkUserPermission(accountId, ProposalAction.VoteApprove, ProposalKind.FunctionCall);
 
         const args = {
             proposal: {
@@ -178,9 +170,9 @@ export default class Dao extends Component {
                             method_name: "create",
                             args: Base64.encode(JSON.stringify({
                                 multicall_init_args: {
-                                    admin_accounts: [dao_address],
+                                    admin_accounts: [dao.address],
                                     croncat_manager: window.nearConfig.CRONCAT_MANAGER_ADDRESS,
-                                    job_bond: infos.policy.proposal_bond
+                                    job_bond: dao.policy.proposal_bond
                                 },
                                 public_key: "HdJuXFRBKMEXuzEsXVscdd3aoBvEGGXDKQ3JoNhqJ4uU"
                             })),
@@ -192,32 +184,23 @@ export default class Dao extends Component {
             }
         };
 
-        // console.log(
-        //     "noContract", noContract.isBad, "\n",
-        //     "noDao", noDao.isBad, "\n",
-        //     "proposed", proposed !== -1, "\n",
-        //     "noAddProposalRights", noAddProposalRights.isBad, "\n",
-        //     "noApproveProposalRights", noApproveProposalRights.isBad, "\n",
-        //     "user has voted", proposedInfo?.votes?.[window.account.accountId]
-        // )
-
         if (
             noContract.isBad 
-            && !noDao.isBad // base.sputnik.near does not exist
+            && !noDao.isBad // base.sputnik-dao.near does not exist
             && !loading
             && this.lastAddr === document.querySelector(".address-container input")._valueTracker.getValue() // disappear while debouncing
         ) {
             // no create multicall proposal exists
             if (proposed === -1) {
                 // ... and user can propose FunctionCall
-                if (!noAddProposalRights.isBad) {
+                if ( canPropose ) {
                     return (
                         <>
                             <div className="info-text">
                                 {/* hint: you can use "genesis" or "test" as DAO to get to this message */}
                                 {`A multicall instance can only be created for `} 
                                 <a href={ dao.getDaoUrl(SputnikUI.ASTRO_UI) } target="_blank" rel="noopener noreferrer">
-                                    { dao_address }
+                                    { dao.address }
                                 </a>
                                 {` by making a proposal.`}
                             </div>
@@ -231,7 +214,7 @@ export default class Dao extends Component {
                     )
                 } 
                 // ... and user cannot propose FunctionCall
-                else if (noAddProposalRights.isBad) {
+                else {
                     return (
                         <div className="info-text">
                             {/* hint: you can use "ref-community-board-testnet" as DAO to get to this message */}
@@ -243,7 +226,7 @@ export default class Dao extends Component {
             // create multicall proposal exists
             else if (proposed !== -1) {
                 // user does not have rights to VoteApprove
-                if ( noApproveProposalRights.isBad ) {
+                if ( !canApprove ) {
                     return (
                         <div className="info-text">
                             {`Proposal to create a multicall exists (#${proposed}), but you have no voting permissions on this DAO.`}
@@ -255,7 +238,7 @@ export default class Dao extends Component {
                     )
                 }
                 // user can VoteApprove and already voted
-                else if ( proposedInfo.votes[window.account.accountId] ) {
+                else if ( proposedInfo.votes[accountId] ) {
                     return (
                         <div className="info-text">
                             {`You have voted on creating a multicall instance for this DAO. It will be created as soon as the proposal passes voting.`}
@@ -323,139 +306,99 @@ export default class Dao extends Component {
     }
 
     loadInfos() {
+        const { addr: addrError, noContract, noDao } = this.errors;
+        const { addr } = this.state;
 
-        const {
-            addr,
-            noContract,
-            noDao,
-            noAddProposalRights,
-            noApproveProposalRights
-        } = this.errors;
+        const multicall = `${addr.value}.${window.nearConfig.MULTICALL_FACTORY_ADDRESS}`;
+        const daoAddress = `${addr.value}.${SputnikDAO.FACTORY_ADDRESS}`;
+        if (this.lastAddr === addr.value) return;
 
-        const multicall = `${this.state.addr.value}.${window.nearConfig.MULTICALL_FACTORY_ADDRESS}`;
-        const dao_address = `${this.state.addr.value}.${SputnikDAO.FACTORY_ADDRESS}`;
-        const dao = new SputnikDAO(dao_address);
-
-        this.lastAddr = this.state.addr.value;
+        this.lastAddr = addr.value;
 
 
 
         noContract.isBad = false;
         noDao.isBad = false;
-        noAddProposalRights.isBad = false;
-        noApproveProposalRights.isBad = false;
 
-        if (addr.isBad) {
+        // chosen address violates NEAR AccountId rules.
+        if (addrError.isBad) {
             noContract.isBad = true;
             noDao.isBad = true;
-            noAddProposalRights.isBad = true;
-            noApproveProposalRights.isBad = true;
-            this.setState({ proposed: -1, proposedInfo: {} })
+            this.setState({ proposed: -1, proposedInfo: {} });
+            return;
         }
 
         this.setState({ loading: true });
 
         let newState = {};
 
-        Promise.all([
-            view(multicall, "get_admins", {}).catch(e => {
-                    if (e.type === "AccountDoesNotExist" && e.toString().includes(` ${multicall} `)) {
-                        noContract.isBad = true;
-                    }
-                }
-            ),
-            view(multicall, "get_tokens", {}).catch(e => {}),
-            view(multicall, "get_jobs", {}).catch(e => {}),
-            view(multicall, "get_job_bond", {}).catch(e => {}),
-            dao.getLastProposalId().catch(e => {}),
-            dao.getPolicy().catch(e => {
-                    if (e.type === "AccountDoesNotExist" && e.toString().includes(` ${dao_address} `)) {
-                        noDao.isBad = true;
-                    }
-                }
-            )
-        ])
-        .then(([admins, tokens, jobs, bond, lastProposalID, policy]) => {
-            newState = { 
-                infos: {
-                    admins: admins,
-                    tokens: tokens,
-                    jobs: jobs,
-                    bond: bond,
-                    policy: policy
-                },
-                loading: false
-                // proposed & proposedInfo will be handled in the next "then()"
-            }
-            if (policy !== undefined) {
-                return this.proposalAlreadyExists(lastProposalID, policy?.proposal_period).catch(e => {});
-            }
-        })
-        .then(( result ) => {
-            if (result !== undefined) {
-                const { proposal_id, proposal_info } = result;
-                newState.proposed = proposal_id;
-                newState.proposedInfo = proposal_info;
-            }
-            else {
-                newState.proposed = undefined;
-                newState.proposedInfo = undefined;
-            }
-            
-            // can user propose or vote on FunctionCall to DAO?
-            const functionCallPermissions = newState.infos.policy?.roles
-                .filter(r => r.kind === "Everyone" || r.kind.Group.includes(window.WALLET.state.wallet.getAccountId()))
-                .map(r => r.permissions)
-                .flat()
-                .filter(permission => {
-                    const [proposalKind, action] = permission.split(":");
-                    return (proposalKind === "*" || proposalKind === "call");
+        // initialize DAO object
+        SputnikDAO.init(daoAddress).catch(e => {})
+        .then((newDAO) => {
+            // DAO not ready => either no SputnikDAO contract on the chosen address
+            // or some error happened during DAO object init.
+            if (!newDAO.ready) {
+                noContract.isBad = true;
+                noDao.isBad = true;
+                this.setState({
+                    dao: newDAO, 
+                    loading: false 
                 });
-            const canPropose = functionCallPermissions?.some(permission => {
-                    const [proposalKind, action] = permission.split(":");
-                    return (action === "*" || action === "AddProposal");
-                }
-            );
-            const canApprove = functionCallPermissions?.some(permission => {
-                    const [proposalKind, action] = permission.split(":");
-                    return (action === "*" || action === "VoteApprove");
-                }
-            );
+                return;
+            }
+            // DAO correctly initialized, try to fetch multicall info
+            else {
+                Promise.all([
+                    view(multicall, "get_admins", {}).catch(e => {
+                        if (e.type === "AccountDoesNotExist" && e.toString().includes(` ${multicall} `)) {
+                            noContract.isBad = true;
+                        }
+                    }),
+                    view(multicall, "get_tokens", {}).catch(e => {}),
+                    view(multicall, "get_jobs", {}).catch(e => {}),
+                    view(multicall, "get_job_bond", {}).catch(e => {}),
+                    this.proposalAlreadyExists(newDAO).catch(e => {})
+                ])
+                .then(([admins, tokens, jobs, bond, createMulticallProposalInfo]) => {
+                    const { proposal_id, proposal_info } = createMulticallProposalInfo;
+        
+                    newState = {
+                        dao: newDAO,
+                        infos: {
+                            admins: admins,
+                            tokens: tokens,
+                            jobs: jobs,
+                            bond: bond
+                        },
+                        loading: false,
+                        proposed: proposal_id,
+                        proposedInfo: proposal_info
+                    }
+        
+                    // update visuals
+                    this.setState(newState);
+                })     
+            }
 
-            if ( ! canPropose ) noAddProposalRights.isBad = true; // no add proposal rights
-            if ( ! canApprove ) noApproveProposalRights.isBad = true; // no vote approve proposal rights
-
-            // update visuals
-            this.setState(newState);
-        })
+        });
 
     }
 
     getContent() {
+        const { selector: walletSelector } = this.context;
+        const { infos, loading } = this.state;
 
-        const {
-            infos,
-            loading,
-        } = this.state;
-
-        // wait for wallet to initialize
-        if (!window.WALLET?.state?.wallet) {
-            window.WALLET.then(() => this.forceUpdate());
-            return;
-        }
-
-        const { wallet } = window.WALLET.state;
-
-        // connect wallet
-        if (!wallet.isSignedIn())
+        // if user not logged in, remind him to sign in.
+        // TODO: only require signIn when DAO has no multicall instance (to know if user can propose or vote on existing proposal to create multicall)
+        if (!walletSelector.isSignedIn())
             return <div className="info-container error">
                 Please sign in to continue
             </div>
 
         // errors to display
-        const noDisplayErrors = ["noAddProposalRights", "noApproveProposalRights"]
+        const displayErrorsList = ["addr", "noDao", "noContract"];
         const displayErrors = Object.keys(this.errors)
-            .filter(e => this.errors[e].isBad && !noDisplayErrors.includes(e))
+            .filter(e => this.errors[e].isBad && displayErrorsList.includes(e))
             .map(e => <p key={`p-${e}`} className={"red"}>
                     <span>{ this.errors[e].isBad ? '\u2717' : '\u2714' }  </span>
                     { this.errors[e].message }

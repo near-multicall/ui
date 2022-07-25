@@ -27,11 +27,9 @@ export default class Transfer extends BaseTask {
     updateFTDebounced = debounce(() => this.updateFT(), 500);
 
     constructor(props) {
-
         super(props);
 
-        window.WALLET.then(() => this.updateFT());
-
+        this.updateFT();
     }
 
     init(json = null) {
@@ -79,7 +77,7 @@ export default class Transfer extends BaseTask {
             this.errors.receiver.validOrNull(this.call.args.value.receiver_id);
             this.errors.amount.validOrNull(this.call.args.value.amount);
 
-            WALLET.then(() => this.updateFT());
+            this.updateFT();
 
         }).bind(this)
 
@@ -112,6 +110,9 @@ export default class Transfer extends BaseTask {
         })
         .then(res => {
             if (res) {
+                if (amount.decimals === null) {
+                    amount.value = formatTokenAmount(amount.value, res.decimals);
+                }
                 amount.unit = res.symbol;
                 amount.decimals = res.decimals;
             }

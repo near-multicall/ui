@@ -30,7 +30,7 @@ export default class StorageDeposit extends BaseTask {
 
         super(props);
 
-        window.WALLET.then(() => this.updateFT());
+        this.updateFT();
 
     }
 
@@ -63,7 +63,7 @@ export default class StorageDeposit extends BaseTask {
 
             this.errors.account.validOrNull(this.call.args.value.account_id);
 
-            WALLET.then(() => this.updateFT());
+            this.updateFT();
 
         }).bind(this)
 

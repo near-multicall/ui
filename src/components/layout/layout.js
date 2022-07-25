@@ -1,7 +1,8 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
-import { Column, Menu } from '../../components.js'
-import { initialData } from '../../initial-data.js'
+import { Column, Menu } from '../../components.js';
+import { initialData } from '../../initial-data.js';
+import { Base64 } from 'js-base64';
 import './layout.scss'
 
 export default class Layout extends Component {
@@ -37,26 +38,42 @@ export default class Layout extends Component {
     getColumns = () => window.STORAGE.layout.columns;
 
     // TODO delete elements after exjecting from tasklist / columnlist
+    
+    /**
+     * returns column ID and index inside column's taskIds for a given taskId
+     * 
+     * @param {string} taskId
+     * @returns {object} 
+     */
+    findTaskCoordinates = (taskId) => {
+
+        const layout = window.STORAGE.layout;
+
+        for (let c in layout.columns)
+            for (let i in layout.columns[c].taskIds)
+                if (layout.columns[c].taskIds[i] === taskId)
+                    return {
+                        columnId: c,
+                        taskIndex: i
+                    }
+
+        return { columnId: undefined, taskIndex: undefined }
+
+    }
 
     deleteTask = (taskId) => {
 
         const layout = window.STORAGE.layout;
-        let column, index;
+        const { columnId, taskIndex } = this.findTaskCoordinates(taskId);
 
-        for (let c in layout.columns)
-            for (let i in layout.columns[c].taskIds)
-                if (layout.columns[c].taskIds[i] === taskId) {
-                    column = layout.columns[c];
-                    index = i
-                }
-
-        if (column == undefined || index == undefined) {
+        if (columnId == undefined || taskIndex == undefined) {
             console.error("Task not found");
             return;
         }
 
+        const column = layout.columns[columnId];
         const taskIds = Array.from(column.taskIds);
-        taskIds.splice(index, 1);
+        taskIds.splice(taskIndex, 1);
         const newColumn = {
             ...column,
             taskIds: taskIds
@@ -66,7 +83,7 @@ export default class Layout extends Component {
             ...layout,
             columns: {
                 ...layout.columns,
-                [newColumn.id]: newColumn,
+                [columnId]: newColumn,
             }
         }
 
@@ -77,16 +94,9 @@ export default class Layout extends Component {
     duplicateTask = (taskId) => {
 
         const layout = window.STORAGE.layout;
-        let column, index;
+        const { columnId, taskIndex } = this.findTaskCoordinates(taskId);
 
-        for (let c in layout.columns)
-            for (let i in layout.columns[c].taskIds)
-                if (layout.columns[c].taskIds[i] === taskId) {
-                    column = layout.columns[c];
-                    index = i
-                }
-
-        if (column == undefined || index == undefined) {
+        if (columnId == undefined || taskIndex == undefined) {
             console.error("Task not found");
             return;
         }
@@ -97,8 +107,9 @@ export default class Layout extends Component {
         const taskClone = JSON.parse(JSON.stringify(task));
         taskClone.id = `task-${this.taskID}`;
 
+        const column = layout.columns[columnId];
         const taskIds = Array.from(column.taskIds);
-        taskIds.splice(index, 0, taskClone.id);
+        taskIds.splice(taskIndex, 0, taskClone.id);
 
         this.taskID++;
 
@@ -111,7 +122,7 @@ export default class Layout extends Component {
             ...layout,
             columns: {
                 ...layout.columns,
-                [newColumn.id]: newColumn,
+                [columnId]: newColumn,
             },
             tasks: {
                 ...layout.tasks,
@@ -147,17 +158,14 @@ export default class Layout extends Component {
 
         console.warn("layout cleared");
 
+        // clear card content
         if (window.TASKS)
             window.TASKS = [];
-
-        let newLayout = {
-            ...initialData
-        }
 
         this.taskID = 0;
         this.columnID = 1;
 
-        window.STORAGE.setLayout(newLayout);
+        window.STORAGE.setLayout(initialData);
 
     }
 
@@ -322,22 +330,6 @@ export default class Layout extends Component {
 
             }
 
-            if (finish.id === 'trash') {
-
-                const newLayout = {
-                    ...layout,
-                    columns: {
-                        ...layout.columns,
-                        [newStart.id]: newStart,
-                    }
-                }
-    
-                window.STORAGE.setLayout(newLayout);
-
-                return;
-
-            }
-
             // dropping in batch
             if (layout.tasks[destination.droppableId] !== undefined) {
 
@@ -398,7 +390,6 @@ export default class Layout extends Component {
     }
 
     fromJSON(json) {
-
         this.clear();
 
         const layout = window.STORAGE.layout;
@@ -412,7 +403,6 @@ export default class Layout extends Component {
             ...layout,
             columnOrder: [],
             columns: {
-                "trash": layout.columns.trash,
                 "menu": layout.columns.menu,
             }
         }
@@ -473,11 +463,98 @@ export default class Layout extends Component {
         console.log("LAYOUT fromJSON, newLayout:", newLayout);
 
         window.STORAGE.setLayout(newLayout);
-        window.TASKS.forEach(t => {
-            t.instance.current.forceUpdate();
-            t.instance.current.componentDidMount();
-        });
 
+    }
+
+    fromBase64(json) {
+        this.clear();
+
+        const layout = window.STORAGE.layout;
+
+        if (!Array.isArray(json) || !json.length)
+            return;
+
+        this.columnID = 0;
+
+        let newLayout = {
+            ...layout,
+            columnOrder: [],
+            columns: {
+                "menu": layout.columns.menu
+            }
+        }
+
+        for (let c in json) {
+
+            const newColumn = {
+                id: `column-${this.columnID}`,
+                title: 'Drag here',
+                taskIds: []
+            };
+    
+            const newColumnOrder = Array.from(newLayout.columnOrder);
+            newColumnOrder.push(`column-${this.columnID}`);
+    
+            newLayout = {
+                ...newLayout,
+                columns: {
+                    ...newLayout.columns,
+                    [`column-${this.columnID}`]: newColumn
+                },
+                columnOrder: newColumnOrder
+            }
+    
+            this.columnID++;
+            
+            for (let t in json[c]) {
+
+                const { address: jsonAddress, actions: jsonActions } = json[c][t];
+                let task = {
+                    id: `task-${this.taskID}`,
+                    addr: "",
+                    func: "",
+                    json: {
+                        address: jsonAddress,
+                        actions: jsonActions.map((action) => (
+                            {
+                                func: action.func,
+                                args: JSON.parse( Base64.decode(action.args) ),
+                                gas: action.gas,
+                                depo: action.depo
+                            }
+                        ))
+                    }
+                };
+
+                if (json[c][t].actions.length > 1) { 
+
+                    const newBatch = {
+                        id: `task-${this.taskID}`,
+                        title: 'Drag here',
+                        taskIds: []
+                    };
+
+                    newLayout = {
+                        ...newLayout,
+                        columns: {
+                            ...newLayout.columns,
+                            [`task-${this.taskID}`]: newBatch
+                        },
+                    }
+
+                    console.log("created new column", `task-${this.taskID}`);
+
+                    task.func = "batch";
+                    
+                }
+
+                this.taskID++;
+                newLayout.columns[newColumn.id].taskIds.push(task.id);
+                newLayout.tasks[task.id] = task;
+            }
+        }
+
+        window.STORAGE.setLayout(newLayout);
     }
 
     toJSON() {

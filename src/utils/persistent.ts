@@ -1,7 +1,10 @@
-import debounce from 'lodash.debounce';
 import { initialData } from '../initial-data.js'
+import debounce from 'lodash.debounce';
 
-class Persistent {
+
+export class Persistent {
+    static STORAGE_KEY_ADDRESSES = "multicall_addresses";
+    static STORAGE_KEY_JSON = "multicall_json";
 
     addresses = {
         user: "",
@@ -9,35 +12,37 @@ class Persistent {
         dao: ""
     }
 
-    layout = {
-        ...initialData
-    }
+    layout = JSON.parse(JSON.stringify(initialData));
 
-    setAddresses = debounce((newAddresses: {
-        user?: string,
-        multicall?: string,
-        dao?: string
-    }) => {
+    setAddresses = debounce(
+        // debounced function
+        (newAddresses: {
+            user?: string,
+            multicall?: string,
+            dao?: string
+        }) => {
 
-        this.addresses = {
-            ...this.addresses,
-            ...newAddresses
-        }
-        
-        document.dispatchEvent(new CustomEvent('onaddressesupdated', {
-            detail: {
-                ...this.addresses
+            this.addresses = {
+                ...this.addresses,
+                ...newAddresses
             }
-        }))
-        
-    }, 100);
+            
+            document.dispatchEvent(new CustomEvent('onaddressesupdated', {
+                detail: {
+                    ...this.addresses
+                }
+            }));
+        },
+        // delay in ms
+        100
+    );
 
     // TODO type layout
     setLayout(newLayout: any) {
 
         this.layout = {
             ...this.layout,
-            ...newLayout
+            ...JSON.parse(JSON.stringify(newLayout))
         }
 
         document.dispatchEvent(new CustomEvent('onlayoutupdated', {
@@ -51,14 +56,14 @@ class Persistent {
     save() {
         if (window.PAGE !== "app") return;
 
-        localStorage.setItem("multicall_addresses", JSON.stringify(this.addresses));
-        localStorage.setItem("multicall_json", JSON.stringify(window.LAYOUT.toJSON()));
+        localStorage.setItem(Persistent.STORAGE_KEY_ADDRESSES, JSON.stringify(this.addresses));
+        localStorage.setItem(Persistent.STORAGE_KEY_JSON, JSON.stringify(window.LAYOUT.toBase64()));
         // localStorage.setItem("multicall_layout", JSON.stringify(this.layout));
     }
 
     load() {
-        this.setAddresses(JSON.parse(localStorage.getItem("multicall_addresses") ?? "{}"));
-        window.LAYOUT?.fromJSON(JSON.parse(localStorage.getItem("multicall_json") ?? "[]"));
+        this.setAddresses(JSON.parse(localStorage.getItem(Persistent.STORAGE_KEY_ADDRESSES) ?? "{}"));
+        window.LAYOUT?.fromBase64(JSON.parse(localStorage.getItem(Persistent.STORAGE_KEY_JSON) ?? "[]"));
         // this.setLayout(JSON.parse(localStorage.getItem("multicall_layout") ?? "{}"));
     }
 

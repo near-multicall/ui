@@ -2,13 +2,14 @@ import React, { Component } from 'react'
 import { Droppable, Draggable } from 'react-beautiful-dnd';
 import Icon from '@mui/material/Icon';
 import { Task } from '../../components.js'
+import hash from 'object-hash';
 import './column.scss';
 
 export default class Column extends Component {
 
     render() {
 
-        const menuColumn = this.props.column.id === 'menu' || this.props.column.id === 'trash';
+        const menuColumn = this.props.column.id === 'menu';
 
         return (
             <Draggable
@@ -55,14 +56,18 @@ export default class Column extends Component {
                                     ref={provided.innerRef}
                                     {...provided.droppableProps}
                                 >
-                                    { this.props.tasks.map((task, index) => <Task key={task.id} task={task} index={index} json={task.json}/>) }
+                                    { this.props.tasks.map((task, index) => 
+                                        <Task 
+                                            key={hash(task, { algorithm: 'md5', encoding: 'base64' })} 
+                                            task={task} 
+                                            index={index} 
+                                            json={task.json}
+                                        />
+                                    ) }
                                     { provided.placeholder }
                                 </div>
                             ) }
                         </Droppable>
-                        { this.props.column.id === 'trash' &&
-                            <Icon className="icon">delete_outline</Icon>
-                        }
                         { !menuColumn && 
                             <Icon 
                                 className="add-column"

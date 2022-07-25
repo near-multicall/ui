@@ -1,6 +1,7 @@
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import FileUploadOutlinedIcon from '@mui/icons-material/FileUploadOutlined';
 import ScienceOutlinedIcon from '@mui/icons-material/ScienceOutlined';
+import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined';
 import { Chip, Icon, TextField } from '@mui/material';
 import React, { Component } from 'react';
 import { NavLink } from "react-router-dom";
@@ -8,8 +9,12 @@ import Discord from '../../assets/discord.svg';
 import Github from '../../assets/github.svg';
 import Twitter from '../../assets/twitter.svg';
 import { Wallet } from '../../components';
+import { SputnikDAO } from '../../utils/contracts/sputnik-dao';
+import { ArgsError, ArgsString } from '../../utils/args';
+import { Base64 } from 'js-base64';
 import { readFile, saveFile } from '../../utils/loader';
 import Dialog from '../dialog/dialog';
+import { TextInput } from '../editor/elements';
 import './sidebar.scss';
 export default class Sidebar extends Component {
 
@@ -20,10 +25,11 @@ export default class Sidebar extends Component {
         this.state = {
             dialogs: {
                 saveAsJSON: false,
-                loadFromJSON: false
+                loadFromJSON: false,
+                loadFromProposal: false,
+                clearAll: false
             }
         }
-
     }
 
     componentDidMount() {
@@ -57,7 +63,7 @@ export default class Sidebar extends Component {
         return <div className="load-menu">
             <ul>
                 <li onClick={ () => this.openDialog("loadFromJSON") }>Load from JSON</li>
-                <li>Load from Proposal <Chip label="coming soon!"/></li>
+                <li onClick={ () => this.openDialog("loadFromProposal") }>Load from Proposal</li>
                 {/* <li>Load from Link <Chip label="coming soon!"/></li> */}
             </ul>
         </div>
@@ -101,6 +107,11 @@ export default class Sidebar extends Component {
                                 <FileUploadOutlinedIcon/>
                                 { this.loadMenu() }
                             </div>
+                            <div className="clear">
+                                <DeleteForeverOutlinedIcon 
+                                    onClick={ () => this.openDialog("clearAll") }
+                                />
+                            </div>
                         </>
                       : null
                     }
@@ -126,9 +137,17 @@ export default class Sidebar extends Component {
     dialogs() {
 
         const { dialogs } = this.state;
+        const dialogComponent = React.createRef();
 
+        // Load from JSON
         let fileName = "my-multicall";
         let uploadedFile;
+
+        // Load from Proposal
+        const proposalURL = new ArgsString("");
+        const proposalURLInvalid = new ArgsError("Invalid URL", urlInput => !! SputnikDAO.getInfoFromProposalUrl(urlInput.value), true);
+        const proposalNonExistent = new ArgsError("The specified URL does not link to a proposal", urlInput => proposalNonExistent.isBad);
+        let argsFromProposal;
 
         return [
             <Dialog 
@@ -140,7 +159,7 @@ export default class Sidebar extends Component {
                     this.forceUpdate();
                 }}
                 onCancel={() => {}}
-                onDone={() => saveFile(`${fileName}.json`, [JSON.stringify(LAYOUT.toJSON(), null, 2)])}
+                onDone={() => saveFile(`${fileName}.json`, [JSON.stringify(LAYOUT.toBase64(), null, 2)])}
                 doneRename="Download"
             >
                 <TextField
@@ -161,7 +180,7 @@ export default class Sidebar extends Component {
                     this.forceUpdate();
                 }}
                 onCancel={() => {}}
-                onDone={() => readFile(uploadedFile, json => LAYOUT.fromJSON(json))}
+                onDone={() => readFile(uploadedFile, json => LAYOUT.fromBase64(json))}
                 doneRename="Load"
             >
                 <input 
@@ -171,7 +190,94 @@ export default class Sidebar extends Component {
                 />
                 <br/>
                 <b className="warn">Your current multicall will be replaced!</b>
-            </Dialog>
+            </Dialog>,
+            <Dialog
+                key="Load from Proposal"
+                title="Load from Proposal"
+                open={dialogs.loadFromProposal}
+                onClose={() => {
+                    dialogs.loadFromProposal = false;
+                    this.forceUpdate();
+                }}
+                onCancel={() => {}}
+                onDone={() => {
+                    window.LAYOUT.fromBase64(argsFromProposal);
+                }}
+                doneRename="Load"
+                disable={() => proposalURLInvalid.isBad || proposalNonExistent.isBad}
+                ref={dialogComponent}
+            >
+                <TextInput
+                    label="Proposal URL"
+                    value={ proposalURL }
+                    error={[ proposalURLInvalid, proposalNonExistent ]}
+                    update={(e, textInputComponent) => {
+                        // don't fetch proposal info from bad URL.
+                        if (proposalURLInvalid.isBad) {
+                            proposalNonExistent.isBad = false;
+                            return;
+                        }
+                        const { dao, proposalId } = SputnikDAO.getInfoFromProposalUrl(proposalURL.value);
+                        // !!! creating SputnikDAO instance must be done using init() to make sure DAO exists
+                        // on that address. We use constructor here because of previous logic checks.
+                        const daoObj = new SputnikDAO(dao);
+                        // fetch proposal info from DAO contract
+                        daoObj.getProposal(proposalId)
+                            .catch((e) => {
+                                proposalNonExistent.isBad = true;
+                                return;
+                            })
+                            .then((propOrUndefined) => {
+                                if (!!propOrUndefined) {
+                                    let multicallArgs;
+                                    const currProposal = propOrUndefined.kind?.FunctionCall;
+                                    const multicallAction = currProposal?.actions.find(action => {
+                                        // is it normal multicall?
+                                        if (action.method_name === "multicall") {
+                                            multicallArgs = JSON.parse( Base64.decode(action.args) );
+                                            return true;
+                                        }
+                                        // is it multicall with attached FT?
+                                        else if (action.method_name === "ft_transfer_call") {
+                                            const ftTransferArgs = JSON.parse( Base64.decode(action.args) );
+                                            const ftTransferMsg = JSON.parse( ftTransferArgs.msg );
+                                            if (ftTransferMsg.function_id && ftTransferMsg.function_id === "multicall") {
+                                                multicallArgs = JSON.parse( Base64.decode(ftTransferMsg.args) );
+                                                return true;
+                                            }
+                                        }
+                                    });
+                                    if (multicallAction) {
+                                        proposalNonExistent.isBad = false;
+                                        argsFromProposal = multicallArgs.calls;
+                                    }
+                                }
+                                textInputComponent.forceUpdate();
+                                dialogComponent.current.forceUpdate();
+                            });
+                        dialogComponent.current.forceUpdate();
+                    }}
+                    variant="filled"
+                    className="light-textfield"
+                />
+                <br/>
+                <p>Enter proposal link from AstroDAO or base UI</p>
+                <b className="warn">Your current multicall will be replaced!</b>
+            </Dialog>,
+            <Dialog
+                key="Clear All"
+                title="Clear All"
+                open={dialogs.clearAll}
+                onClose={() => {
+                    dialogs.clearAll = false;
+                    this.forceUpdate();
+                }}
+                onCancel={() => {}}
+                onDone={() => LAYOUT.clear()}
+                doneRename="Yes, clear all"
+            >
+                <b className="warn">Are you sure you want to clear your multicall?<br/>You cannot undo this action!</b>
+            </Dialog>,
         ]
     }
 

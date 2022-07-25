@@ -5,6 +5,8 @@ import { TextInput, TextInputWithUnits } from '../components/editor/elements';
 import { ArgsAccount, ArgsBig, ArgsError, ArgsJSON, ArgsString } from '../utils/args';
 import { Call } from '../utils/call';
 import { toGas, toYocto, formatTokenAmount, unitToDecimals } from '../utils/converter';
+import { hasContract } from '../utils/contracts/generic';
+import debounce from "lodash.debounce";
 import './base.scss';
 
 export default class BaseTask extends Component {
@@ -17,10 +19,13 @@ export default class BaseTask extends Component {
         func: new ArgsError("Cannot be empty", value => value.value != "", true),
         args: new ArgsError("Invalid JSON", value => JSON.parse(value.value)),
         gas: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value), true),
-        depo: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value) && value.value !== "")
+        depo: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value) && value.value !== ""),
+        noContract: new ArgsError("Address is not a smart contract", value => this.errors.noContract)
     };
     errors = this.baseErrors;
     options = {};
+
+    updateContractDebounced = debounce(() => this.updateContract(), 500);
 
     constructor(props) {
 
@@ -32,14 +37,13 @@ export default class BaseTask extends Component {
         };
 
         if (window.TEMP) {
-
             this.call = TEMP.call;
             this.state.showArgs = TEMP.showArgs;
+            this.state.isEdited = TEMP.isEdited;
             this.options = TEMP.options;
             this.errors = TEMP.errors;
-
-        } else if (window.COPY?.payload) {
-
+        }
+        else if (window.COPY?.payload) {
             const optionsDeepCopy = JSON.parse(JSON.stringify(COPY.payload.options))
 
             this.init({
@@ -50,15 +54,16 @@ export default class BaseTask extends Component {
             });
             this.state.showArgs = COPY.payload.showArgs;
             COPY = null;
-
-        } else
-
+        }
+        else {
             this.init(this.props.json);
+        }
 
         this.updateCard = this.updateCard.bind(this);
 
-        document.addEventListener('onaddressesupdated', (e) => this.onAddressesUpdated(e))
+        document.addEventListener('onaddressesupdated', (e) => this.onAddressesUpdated(e));
 
+        this.updateContract();
     }
 
     init(json = null) {
@@ -88,14 +93,35 @@ export default class BaseTask extends Component {
         });
 
         this.loadErrors = (() => {
-            for (let e in this.errors)
+            for (let e in this.errors) {
                 this.errors[e].validOrNull(this.call[e])
+            }
+            this.updateContract();
         }).bind(this);
 
     }
 
     static inferOwnType(json) {
         return false;
+    }
+
+    updateContract() {
+
+        const { addr } = this.call;
+        this.errors.noContract.isBad = false;
+
+        if (this.errors.addr.isBad) return;
+
+        // on failure set result to false
+        hasContract( addr.value ).catch(e => { return false })
+        .then(res => {
+            this.errors.noContract.isBad = !res;
+            this.updateCard()
+        })
+
+        // TODO: add methods to extract contract functions.
+        // TODO: add autocomplete for "func" input using fetched contract method names.
+        // might need to move logic for custom card to seaparate class that inherits from this.
     }
 
     componentDidMount() {
@@ -143,8 +169,11 @@ export default class BaseTask extends Component {
                 <TextInput
                     label="Contract address"
                     value={addr}
-                    error={errors.addr}
-                    update={this.updateCard}
+                    error={[errors.addr, errors.noContract]}
+                    update={ () => {
+                        this.updateCard();
+                        this.updateContractDebounced()
+                    } }
                 />
                 <TextInput
                     label="Function name"

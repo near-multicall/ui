@@ -37,10 +37,6 @@ export default class Task extends Component {
             
             }
 
-        } else { 
-
-            window.COPY = null;
-
         }
 
         const existent = window?.TASKS?.find(t => t.id === props.task.id);
@@ -53,6 +49,7 @@ export default class Task extends Component {
             window.TEMP = {
                 call: this.instance.current.call,
                 showArgs: this.instance.current.state.showArgs,
+                isEdited: this.instance.current.state.isEdited,
                 options: this.instance.current.options,
                 errors: this.instance.current.errors
             };
@@ -118,7 +115,7 @@ export default class Task extends Component {
             default:
                 switch (func) {
                     case "batch":
-                        const newJson = window.COPY !== null
+                        const newJson = !!window.COPY
                             ? TASKS.find(t => t.id === window.COPY.from).instance.current.call.toJSON()
                             : json
                         return <Family.BatchTask ref={this.instance} id={this.id} json={newJson}/>
