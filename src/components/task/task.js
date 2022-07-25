@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Draggable } from 'react-beautiful-dnd';
 import { Family } from '../../components';
+import hash from 'object-hash';
 import './task.scss'
 
 export default class Task extends Component {
@@ -76,7 +77,11 @@ export default class Task extends Component {
 
     componentWillUnmount() {
 
-        TASKS.splice(TASKS.indexOf(this), 1);
+        const index = TASKS.indexOf(this);
+
+        if (index === -1) return;
+
+        TASKS.splice(index, 1);
         EDITOR.forceUpdate();
 
     }
@@ -138,7 +143,8 @@ export default class Task extends Component {
     render() {
 
         return (
-            <Draggable 
+            <Draggable
+                key={this.id}
                 draggableId={this.props.task.id} 
                 index={this.props.index}
             >

@@ -48,3 +48,24 @@
         border-radius: 1.25 * size.$task-radius;
     }
 }
+
+.disguised-batch {
+    .data-container {
+        hr {
+            margin: 0.25 * size.$gap;
+            border-color: rgba(color.$black, 0.05);
+        }
+        .details {
+            @include mixin.no-scrollbar;
+            padding: 1rem;
+            margin: 0.5rem;
+            background-color: rgba(color.$lightest, 1);
+            border-radius: 0.5 * size.$task-radius;
+            font-size: size.$smaller-text;
+            overflow-x: scroll;
+        }
+    }
+    .hidden {
+        display: none;
+    }
+}

@@ -1,4 +1,4 @@
-import { DeleteOutline, EditOutlined, MoveDown } from '@mui/icons-material';
+import { DeleteOutline, EditOutlined, MoveDown, VisibilityOutlined, VisibilityOffOutlined } from '@mui/icons-material';
 import { Tooltip } from '@mui/material';
 import hash from 'object-hash';
 import { Component } from 'react';
@@ -12,13 +12,17 @@ import './batch.scss';
 
 export default class BatchTask extends Component {
 
+    uniqueClassName="base-task";
+
     calls = new BatchCall();
-    errors = {
+    baseErrors = {
         addr: new ArgsError("Invalid address", value => ArgsAccount.isValid(value)),
         noSingleAddress: new ArgsError("Batches may only have one target address", value => this.errors.noSingleAddress)
     };
+    errors = { ...this.baseErrors };
     options = {
-        loaded: false
+        loaded: false,
+        disguised: true
     };
 
     tasks = [];
@@ -85,6 +89,7 @@ export default class BatchTask extends Component {
                 STORAGE.layout.columns[this.props.id].taskIds.push(id);
                 STORAGE.layout.tasks[id] = { id: id, addr: "", func: "", json: j }
             })
+
         STORAGE.setLayout({}); // trigger callbacks
 
         this.loadTasks();
@@ -138,16 +143,17 @@ export default class BatchTask extends Component {
             LAYOUT.deleteTask(id);
 
         // evaluate errors
-        const tasks = this.tasksDOM.map(t => TASKS.find(task => task.id === t.props.task.id)?.instance.current);
-        if (tasks?.length >= 2 && tasks.every(t => !!t) && this.options.loaded)
-            this.errors.noSingleAddress.isBad = !tasks.every(t => t.call.addr.value === addr.value);
+        this.tasks = this.tasksDOM.map(t => TASKS.find(task => task.id === t.props.task.id)?.instance.current);
+        if (this.tasks?.length >= 2 && this.tasks.every(t => !!t) && this.options.loaded)
+            this.errors.noSingleAddress.isBad = !this.tasks.every(t => t.call.addr.value === addr.value);
 
     }
 
     getTasks() {
 
         try {
-            return this.tasksDOM.map(t => TASKS.find(task => task.id === t.props.task.id).instance.current);
+            this.tasks = this.tasksDOM.map(t => TASKS.find(task => task.id === t.props.task.id).instance.current);
+            return this.tasks;
         } catch(e) {
             throw new Error("Tasks not loaded");
         }
@@ -166,6 +172,30 @@ export default class BatchTask extends Component {
 
         this.forceUpdate();
         EDITOR.forceUpdate();
+
+    }
+
+    // TODO move this to instance
+    displayTaskArgs(t) {
+
+        const args = t.call.args.value;
+        const func = t.call.func.value;
+
+        switch (func) {
+            case "ft_transfer": return (
+                <div className="details">
+                    <p><span>Receiver</span><span className="code">{args.receiver_id?.value}</span></p>
+                    <p><span>Amount</span><span className="code">{args.amount?.value}</span></p>
+                    <p><span>Memo</span><span className="code">{args.memo?.value}</span></p>
+                </div>
+            )
+            case "storage_deposit": return (
+                <div className="details">
+                    <p><span>Account</span><span className="code">{args.account_id?.value}</span></p>
+                </div>
+            )
+            default: return null
+        }
 
     }
 
@@ -200,8 +230,11 @@ export default class BatchTask extends Component {
 
         const {
             name,
+            addr,
             isEdited
         } = this.state;
+
+        const { disguised } = this.options;
 
         const errors = this.errors;
 
@@ -214,56 +247,125 @@ export default class BatchTask extends Component {
             .length > 0
 
         return (
-            <div
-                className={`task-container batch-container ${this.uniqueClassName} ${hasErrors ? "has-errors" : ""} ${isEdited ? "is-edited" : ""}`}
+            <div 
+                className={`task-container ${disguised ? "disguised-batch" + " " + this.uniqueClassName : "batch-container"} ${hasErrors ? "has-errors" : ""} ${isEdited ? "is-edited" : ""}`}
             >
-                <div className="name">
-                    <Tooltip title={<h1 style={{ fontSize: "12px" }}>Edit</h1>} disableInteractive >
-                        <EditOutlined
-                            className="edit icon"
-                            onClick={() => {
-                                EDITOR.edit(id);
-                                MENU.changeTab(1);
-                            }}
-                        />
-                    </Tooltip>
-                    <div className="edit-pseudo"></div>
-                    <Tooltip title={<h1 style={{ fontSize: "12px" }}>Clone card</h1>} disableInteractive >
-                        <MoveDown
-                            className="duplicate icon"
-                            onClick={() => {
-                                LAYOUT.duplicateTask(id);
-                            }}
-                        />
-                    </Tooltip>
-                    <div className="duplicate-pseudo"></div>
-                    <h3>{name.value}</h3>
-                    <Tooltip title={<h1 style={{ fontSize: "12px" }}>Delete</h1>} disableInteractive >
-                        <DeleteOutline
-                            className="delete icon"
-                            onClick={() => {
-                                LAYOUT.deleteTask(id);
-                            }}
-                        />
-                    </Tooltip>
-                    <div className="delete-pseudo"></div>
-                </div>
-                <Droppable 
-                    droppableId={id}
-                    type="task"
-                >
-                    { provided => (
-                        <div 
-                            className="tasks-wrapper"
-                            ref={provided.innerRef}
-                            {...provided.droppableProps}
-                        >
-                            { console.log("BATCH render, tasks", this.tasksDOM) }
-                            { this.tasksDOM }
-                            { provided.placeholder }
+                { disguised ? (
+                    <>
+                        <div className="name">
+                            <Tooltip title={<h1 style={{ fontSize: "12px" }}>Edit</h1>} disableInteractive >
+                                <EditOutlined
+                                    className="edit icon"
+                                    onClick={() => {
+                                        EDITOR.edit(id);
+                                        MENU.changeTab(1);
+                                    }}
+                                />
+                            </Tooltip>
+                            <div className="edit-pseudo"></div>
+                            <Tooltip title={<h1 style={{ fontSize: "12px" }}>Clone card</h1>} disableInteractive >
+                                <MoveDown
+                                    className="duplicate icon"
+                                    onClick={() => {
+                                        LAYOUT.duplicateTask(id);
+                                    }}
+                                />
+                            </Tooltip>
+                            <div className="duplicate-pseudo"></div>
+                            <h3>{name.toString()}</h3>
+                            <Tooltip title={<h1 style={{ fontSize: "12px" }}>Delete</h1>} disableInteractive >
+                                <DeleteOutline
+                                    className="delete icon"
+                                    onClick={() => {
+                                        LAYOUT.deleteTask(id);
+                                    }}
+                                />
+                            </Tooltip>
+                            <div className="delete-pseudo"></div>
+                            <VisibilityOutlined
+                                className="debug icon"
+                                onClick={() => {
+                                    this.options.disguised = false;
+                                    this.forceUpdate();
+                                }}
+                            />
+                            <div className="debug-pseudo"></div>
                         </div>
-                    ) }
-                </Droppable>
+                        <div className="data-container">
+                            <p><span>Contract address</span><a className="code" href={addr.toUrl()} target="_blank" rel="noopener noreferrer">{addr.toString()}</a></p>
+                            <hr/>
+                            { this.tasks.map(t => !!t && (
+                                <div key={t.props.id}>
+                                    <p className="expandable"><span>{t.call.name.value}</span>{
+                                        t.state.showArgs
+                                            ? <a onClick={() => t.setState({ showArgs: false }, () => this.forceUpdate())} >hide</a>
+                                            : <a onClick={() => t.setState({ showArgs: true }, () => this.forceUpdate())} >show</a>
+                                    }</p>
+                                    {t.state.showArgs ? this.displayTaskArgs(t) : null}
+                                </div>
+                            )) }
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        <div className="name">
+                            <Tooltip title={<h1 style={{ fontSize: "12px" }}>Edit</h1>} disableInteractive >
+                                <EditOutlined
+                                    className="edit icon"
+                                    onClick={() => {
+                                        EDITOR.edit(id);
+                                        MENU.changeTab(1);
+                                    }}
+                                />
+                            </Tooltip>
+                            <div className="edit-pseudo"></div>
+                            <Tooltip title={<h1 style={{ fontSize: "12px" }}>Clone card</h1>} disableInteractive >
+                                <MoveDown
+                                    className="duplicate icon"
+                                    onClick={() => {
+                                        LAYOUT.duplicateTask(id);
+                                    }}
+                                />
+                            </Tooltip>
+                            <div className="duplicate-pseudo"></div>
+                            <h3>{name.value}</h3>
+                            <Tooltip title={<h1 style={{ fontSize: "12px" }}>Delete</h1>} disableInteractive >
+                                <DeleteOutline
+                                    className="delete icon"
+                                    onClick={() => {
+                                        LAYOUT.deleteTask(id);
+                                    }}
+                                />
+                            </Tooltip>
+                            <div className="delete-pseudo"></div>
+                            <VisibilityOffOutlined
+                                className="debug icon"
+                                onClick={() => {
+                                    this.options.disguised = true;
+                                    this.forceUpdate();
+                                }}
+                            />
+                            <div className="debug-pseudo"></div>
+                        </div>
+                    </>
+                )}
+                <div className={`test ${disguised ? "hidden" : ""}`}>
+                    <Droppable 
+                        droppableId={id}
+                        type="task"
+                    >
+                        { provided => (
+                            <div 
+                                className="tasks-wrapper"
+                                ref={provided.innerRef}
+                                {...provided.droppableProps}
+                            >
+                                { this.tasksDOM }
+                                { provided.placeholder }
+                            </div>
+                        ) }
+                    </Droppable>
+                </div>
             </div>
         )
 

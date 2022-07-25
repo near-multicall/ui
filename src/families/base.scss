@@ -24,7 +24,7 @@
     -webkit-transform-origin: center center;
     transform: scale($factor); /* Standard Property */
     transform-origin: center center;  /* Standard Property */
-  }
+}
 
 .base-task  {
     background: color.$lightest;
@@ -92,6 +92,14 @@
                     transition: all 300ms ease;
                 }
             }
+            &.debug {
+                position: absolute;
+                left: 1.5 * size.$gap;
+                &:hover + .debug-pseudo {
+                    @include cb-scale(1);
+                    transition: all 300ms ease;
+                }
+            }
         }
         .delete-pseudo {
             @include backdrop;
@@ -107,6 +115,11 @@
             @include backdrop;
             right: 0;
             background-color: rgba(color.$purple, 0.8);
+        }
+        .debug-pseudo {
+            @include backdrop;
+            left: 0;
+            background-color: rgba(color.$yellow, 0.8);
         }
     }
     &:hover > .name > .icon {

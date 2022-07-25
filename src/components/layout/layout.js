@@ -63,6 +63,8 @@ export default class Layout extends Component {
 
     deleteTask = (taskId) => {
 
+        console.log("LAYOUT deleting", taskId);
+
         const layout = window.STORAGE.layout;
         const { columnId, taskIndex } = this.findTaskCoordinates(taskId);
 
