@@ -10,9 +10,13 @@ import { TextInput } from '../editor/elements';
 import { InputAdornment } from '@mui/material'
 import './dao.scss';
 import debounce from 'lodash.debounce';
+import Table from '../../func-components/Table';
+import Tabs from '../../func-components/Tabs';
 
 // minimum balance a multicall instance needs for storage + state.
 const MIN_INSTANCE_BALANCE = toYocto(1); // 1 NEAR
+
+const TableHeader = ['Token', '', 'Ref', 'Near', 'Total']
 
 export default class DaoComponent extends Component {
     static contextType = useWalletSelector();
@@ -50,10 +54,10 @@ export default class DaoComponent extends Component {
             "get_fee",
             {}
         )
-        .then(createMulticallFee => {
-            this.fee = createMulticallFee;
-            this.loadInfos()
-        });
+            .then(createMulticallFee => {
+                this.fee = createMulticallFee;
+                this.loadInfos()
+            });
 
         document.addEventListener('onaddressesupdated', (e) => this.onAddressesUpdated(e))
 
@@ -71,9 +75,9 @@ export default class DaoComponent extends Component {
      * 
      * @returns {object} ID and info of proposal to create multicall instance,
      */
-    proposalAlreadyExists (dao) {
+    proposalAlreadyExists(dao) {
         // Date.now() returns timestamp in milliseconds, SputnikDAO uses nanoseconds
-        const currentTime = Big( Date.now() ).times("1000000");
+        const currentTime = Big(Date.now()).times("1000000");
         const lastProposalId = dao.lastProposalId;
         const proposalPeriod = dao.policy.proposal_period;
 
@@ -85,9 +89,9 @@ export default class DaoComponent extends Component {
             const proposals = res.filter(p => {
                 // discard if not active proposal to create multicall instance
                 if (
-                    ! (p.kind?.FunctionCall?.receiver_id === window.nearConfig.MULTICALL_FACTORY_ADDRESS)
-                    || ! (p.kind?.FunctionCall?.actions?.[0]?.method_name === "create")
-                    || ! (p.status === 'InProgress')
+                    !(p.kind?.FunctionCall?.receiver_id === window.nearConfig.MULTICALL_FACTORY_ADDRESS)
+                    || !(p.kind?.FunctionCall?.actions?.[0]?.method_name === "create")
+                    || !(p.status === 'InProgress')
                 ) {
                     return false;
                 }
@@ -104,8 +108,8 @@ export default class DaoComponent extends Component {
             }
             // No "Create multicall" proposals found.
             else return { proposal_id: -1, proposal_info: {} };
-                
-        }).catch(e => {})
+
+        }).catch(e => { })
 
     }
 
@@ -183,7 +187,7 @@ export default class DaoComponent extends Component {
         };
 
         if (
-            noContract.isBad 
+            noContract.isBad
             && !noDao.isBad // base.sputnik-dao.near does not exist
             && !loading
             && this.lastAddr === document.querySelector(".address-container input")._valueTracker.getValue() // disappear while debouncing
@@ -191,18 +195,18 @@ export default class DaoComponent extends Component {
             // no create multicall proposal exists
             if (proposed === -1) {
                 // ... and user can propose FunctionCall
-                if ( canPropose ) {
+                if (canPropose) {
                     return (
                         <>
                             <div className="info-text">
                                 {/* hint: you can use "genesis" or "test" as DAO to get to this message */}
-                                {`A multicall instance can only be created for `} 
-                                <a href={ dao.getDaoUrl(SputnikUI.ASTRO_UI) } target="_blank" rel="noopener noreferrer">
-                                    { dao.address }
+                                {`A multicall instance can only be created for `}
+                                <a href={dao.getDaoUrl(SputnikUI.ASTRO_UI)} target="_blank" rel="noopener noreferrer">
+                                    {dao.address}
                                 </a>
                                 {` by making a proposal.`}
                             </div>
-                            <button 
+                            <button
                                 className="create-multicall"
                                 onClick={() => { dao.addProposal(args, infos.policy.proposal_bond); }}
                             >
@@ -210,7 +214,7 @@ export default class DaoComponent extends Component {
                             </button>
                         </>
                     )
-                } 
+                }
                 // ... and user cannot propose FunctionCall
                 else {
                     return (
@@ -224,11 +228,11 @@ export default class DaoComponent extends Component {
             // create multicall proposal exists
             else if (proposed !== -1) {
                 // user does not have rights to VoteApprove
-                if ( !canApprove ) {
+                if (!canApprove) {
                     return (
                         <div className="info-text">
                             {`Proposal to create a multicall exists (#${proposed}), but you have no voting permissions on this DAO.`}
-                            <br/>
+                            <br />
                             <a target="_blank" href={dao.getProposalUrl(SputnikUI.ASTRO_UI, proposed)} rel="noopener noreferrer">
                                 Proposal on Astro
                             </a>
@@ -236,11 +240,11 @@ export default class DaoComponent extends Component {
                     )
                 }
                 // user can VoteApprove and already voted
-                else if ( proposedInfo.votes[accountId] ) {
+                else if (proposedInfo.votes[accountId]) {
                     return (
                         <div className="info-text">
                             {`You have voted on creating a multicall instance for this DAO. It will be created as soon as the proposal passes voting.`}
-                            <br/>
+                            <br />
                             <a target="_blank" href={dao.getProposalUrl(SputnikUI.ASTRO_UI, proposed)} rel="noopener noreferrer">
                                 Proposal on Astro
                             </a>
@@ -253,12 +257,12 @@ export default class DaoComponent extends Component {
                         <>
                             <div className="info-text">
                                 {/* hint: you can use "genesis" or "test" as DAO to get to this message */}
-                                {`There exists a proposal (#${proposed}) to create a multicall instance for this DAO. `} 
-                                <a href={ dao.getProposalUrl(SputnikUI.ASTRO_UI, proposed) } target="_blank" rel="noopener noreferrer">
+                                {`There exists a proposal (#${proposed}) to create a multicall instance for this DAO. `}
+                                <a href={dao.getProposalUrl(SputnikUI.ASTRO_UI, proposed)} target="_blank" rel="noopener noreferrer">
                                     Open on AstroDAO
                                 </a>
                             </div>
-                            <button 
+                            <button
                                 className="create-multicall proposal-exists"
                                 onClick={() => {
                                     dao.actProposal(proposed, "VoteApprove");
@@ -273,7 +277,7 @@ export default class DaoComponent extends Component {
         }
     }
 
-    toLink(address, deleteIcon = true) {
+    toLink(address, deleteIcon = false) {
 
         const addr = new ArgsAccount(address);
 
@@ -282,7 +286,7 @@ export default class DaoComponent extends Component {
                 <a href={addr.toUrl()} target="_blank" rel="noopener noreferrer">
                     {addr.value}
                 </a>
-                { deleteIcon ? <DeleteOutline/> : null }
+                {deleteIcon ? <DeleteOutline /> : null}
             </span>
         )
     }
@@ -331,54 +335,54 @@ export default class DaoComponent extends Component {
         let newState = {};
 
         // initialize DAO object
-        SputnikDAO.init(daoAddress).catch(e => {})
-        .then((newDAO) => {
-            // DAO not ready => either no SputnikDAO contract on the chosen address
-            // or some error happened during DAO object init.
-            if (!newDAO.ready) {
-                noContract.isBad = true;
-                noDao.isBad = true;
-                this.setState({
-                    dao: newDAO, 
-                    loading: false 
-                });
-                return;
-            }
-            // DAO correctly initialized, try to fetch multicall info
-            else {
-                Promise.all([
-                    view(multicall, "get_admins", {}).catch(e => {
-                        if (e.type === "AccountDoesNotExist" && e.toString().includes(` ${multicall} `)) {
-                            noContract.isBad = true;
-                        }
-                    }),
-                    view(multicall, "get_tokens", {}).catch(e => {}),
-                    view(multicall, "get_jobs", {}).catch(e => {}),
-                    view(multicall, "get_job_bond", {}).catch(e => {}),
-                    this.proposalAlreadyExists(newDAO).catch(e => {})
-                ])
-                .then(([admins, tokens, jobs, bond, createMulticallProposalInfo]) => {
-                    const { proposal_id, proposal_info } = createMulticallProposalInfo;
-        
-                    newState = {
+        SputnikDAO.init(daoAddress).catch(e => { })
+            .then((newDAO) => {
+                // DAO not ready => either no SputnikDAO contract on the chosen address
+                // or some error happened during DAO object init.
+                if (!newDAO.ready) {
+                    noContract.isBad = true;
+                    noDao.isBad = true;
+                    this.setState({
                         dao: newDAO,
-                        infos: {
-                            admins: admins,
-                            tokens: tokens,
-                            jobs: jobs,
-                            bond: bond
-                        },
-                        loading: false,
-                        proposed: proposal_id,
-                        proposedInfo: proposal_info
-                    }
-        
-                    // update visuals
-                    this.setState(newState);
-                })     
-            }
+                        loading: false
+                    });
+                    return;
+                }
+                // DAO correctly initialized, try to fetch multicall info
+                else {
+                    Promise.all([
+                        view(multicall, "get_admins", {}).catch(e => {
+                            if (e.type === "AccountDoesNotExist" && e.toString().includes(` ${multicall} `)) {
+                                noContract.isBad = true;
+                            }
+                        }),
+                        view(multicall, "get_tokens", {}).catch(e => { }),
+                        view(multicall, "get_jobs", {}).catch(e => { }),
+                        view(multicall, "get_job_bond", {}).catch(e => { }),
+                        this.proposalAlreadyExists(newDAO).catch(e => { })
+                    ])
+                        .then(([admins, tokens, jobs, bond, createMulticallProposalInfo]) => {
+                            const { proposal_id, proposal_info } = createMulticallProposalInfo;
 
-        });
+                            newState = {
+                                dao: newDAO,
+                                infos: {
+                                    admins: admins,
+                                    tokens: tokens,
+                                    jobs: jobs,
+                                    bond: bond
+                                },
+                                loading: false,
+                                proposed: proposal_id,
+                                proposedInfo: proposal_info
+                            }
+
+                            // update visuals
+                            this.setState(newState);
+                        })
+                }
+
+            });
 
     }
 
@@ -398,15 +402,15 @@ export default class DaoComponent extends Component {
         const displayErrors = Object.keys(this.errors)
             .filter(e => this.errors[e].isBad && displayErrorsList.includes(e))
             .map(e => <p key={`p-${e}`} className={"red"}>
-                    <span>{ this.errors[e].isBad ? '\u2717' : '\u2714' }  </span>
-                    { this.errors[e].message }
-                </p>);
+                <span>{this.errors[e].isBad ? '\u2717' : '\u2714'}  </span>
+                {this.errors[e].message}
+            </p>);
 
         if (displayErrors.length > 0)
             return (<>
                 <div className="info-container error">
-                    <div>{ displayErrors }</div>
-                    { this.createMulticall() }
+                    <div>{displayErrors}</div>
+                    {this.createMulticall()}
                 </div>
             </>);
 
@@ -432,12 +436,20 @@ export default class DaoComponent extends Component {
                 </ul>
             </div>
             <div className="info-card tokens">
-                <AddOutlined />
-                <h1 className="title">Tokens</h1>
-                <ul className="list">
-                    {infos.tokens.map(t => <li key={infos.tokens.id}>{this.toLink(t)}</li>)}
-                </ul>
-            </div>
+                <Tabs titles={["Multicall", "DAO", "Whitelist"]} contents={[
+                    <>
+                        <h1 className="title">Tokens</h1>
+                        <Table collapsible header={TableHeader} rows={[["hi", "", "test", "0", "0"], ["hi", "test", "test", "0", "0"], ["hi", "test", "test", "0", "0"], ["hi", "test", "test", "0", "0"]]} />
+                    </>,
+
+                    <><h1 className="title">Tokens</h1>
+                        <ul className="list">
+                            {infos.tokens.map(t => <li key={infos.tokens.id}>{this.toLink(t)}</li>)}
+                        </ul></>
+
+                ]
+                } />
+            </div >
             <div className="info-card jobs">
                 <AddOutlined />
                 <h1 className="title">Jobs</h1>
@@ -450,7 +462,7 @@ export default class DaoComponent extends Component {
                     <span>{`${infos.bond !== "..." ? toNEAR(infos.bond) : "..."} Ⓝ`}</span>
                 </h1>
             </div>
-        </div>
+        </div >
 
     }
 

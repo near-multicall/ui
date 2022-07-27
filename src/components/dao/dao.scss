@@ -1,194 +1,195 @@
-@use 'sass/mixin';
-@use 'sass/size';
-@use 'sass/color';
-@use 'sass/font';
-@use 'sass/animation';
+@use "sass/mixin";
+@use "sass/size";
+@use "sass/color";
+@use "sass/font";
+@use "sass/animation";
 
 .dao-container {
-    @include mixin.page-wrapper;
-    display: flex;
-    flex-flow: column nowrap;
-    .address-container {
-        @include mixin.center-items;
-        flex-flow: row nowrap;
-        width: auto;
-        .MuiTextField-root {
-            width: calc(100% - 2 * size.$gap);
-            max-width: 100ch;
-            text-align: left;
-            margin: calc(size.$gap - 0.5 * size.$large-text) size.$gap;
-            .MuiInputBase-root {
-                font-size: size.$large-text;
-                color: color.$darkish;
-                input {
-                    padding: 0;
-                    padding-left: 0.5 * size.$gap;
-                }
-                &.Mui-error {
-                    color: darken(color.$red, 10%);
-                }
-                
-            }
-            fieldset {
-                border: none;
-                border-bottom: 2px solid currentColor;
-                border-radius: 0;
-            }
-            p {
-                display: none;
-            }
+  @include mixin.page-wrapper;
+  display: flex;
+  flex-flow: column nowrap;
+  .address-container {
+    @include mixin.center-items;
+    flex-flow: row nowrap;
+    width: auto;
+    .MuiTextField-root {
+      width: calc(100% - 2 * size.$gap);
+      max-width: 100ch;
+      text-align: left;
+      margin: calc(size.$gap - 0.5 * size.$large-text) size.$gap;
+      .MuiInputBase-root {
+        font-size: size.$large-text;
+        color: color.$darkish;
+        input {
+          padding: 0;
+          padding-left: 0.5 * size.$gap;
         }
-        .MuiInputAdornment-root {
-            width: fit-content;
-            p {
-                display: block !important;
-                font-size: size.$large-text !important;
-                color: color.$darkish;
-            }
+        &.Mui-error {
+          color: darken(color.$red, 10%);
         }
+      }
+      fieldset {
+        border: none;
+        border-bottom: 2px solid currentColor;
+        border-radius: 0;
+      }
+      p {
+        display: none;
+      }
     }
-    &::before {
-        content: '';
-        position: fixed;
-        top: 0;
-        left: 0;
-        height: calc(2.5 * size.$gap - 0.5 * (size.$gap - size.$large-text));
-        min-width: 100%;
-        background-color: color.$light;
+    .MuiInputAdornment-root {
+      width: fit-content;
+      p {
+        display: block !important;
+        font-size: size.$large-text !important;
+        color: color.$darkish;
+      }
     }
-    .info-container {
-        @include mixin.full;
-        display: grid;
-        justify-items: unset;
-        gap: size.$gap;
-        padding: size.$gap;
-        width: calc(100% - 2* size.$gap);
-        grid-template: repeat(8, 1fr) / repeat(8, 1fr);
-        &.error,
-        &.loader {
-            display: flex;
-            flex-flow: column;
-            justify-content: center;
-            align-items: center;
-            font-size: size.$text;
-            p.red {
-                color: color.$red;
-            }
-            p.green {
-                color: color.$green;
-            }
+  }
+  &::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: calc(2.5 * size.$gap - 0.5 * (size.$gap - size.$large-text));
+    min-width: 100%;
+    background-color: color.$light;
+  }
+  .info-container {
+    @include mixin.full;
+    display: grid;
+    justify-items: unset;
+    gap: size.$gap;
+    padding: size.$gap;
+    width: calc(100% - 2 * size.$gap);
+    grid-template: repeat(8, 1fr) / repeat(8, 1fr);
+    &.error,
+    &.loader {
+      display: flex;
+      flex-flow: column;
+      justify-content: center;
+      align-items: center;
+      font-size: size.$text;
+      p.red {
+        color: color.$red;
+      }
+      p.green {
+        color: color.$green;
+      }
+    }
+    .info-text {
+      font-size: size.$text;
+      color: color.$dark;
+      max-width: 40em;
+      a {
+        color: darken(color.$blue, 20%) !important;
+      }
+    }
+    .info-card {
+      display: flex;
+      position: relative;
+      flex-flow: column nowrap;
+      background-color: rgba(color.$lightest, 0.25);
+      border-radius: size.$task-radius;
+      font-size: size.$small-text;
+      overflow: hidden;
+      .title {
+        padding: 0.5 * size.$gap size.$gap;
+        font-size: size.$large-text;
+        span {
+          float: right;
         }
-        .info-text {
-            font-size: size.$text;
-            color: color.$dark;
-            max-width: 40em;
-            a {
-                color: darken(color.$blue, 20%) !important;
-            }
+      }
+      @for $i from 0 to 3 {
+        .MuiSvgIcon-root:nth-of-type(#{$i + 1}) {
+          position: absolute;
+          font-size: size.$large-text;
+          top: 0.5 * size.$gap;
+          right: calc(
+            0.5 * size.$gap + $i * (size.$large-text + 0.25 * size.$gap)
+          );
+          cursor: pointer;
         }
-        .info-card {
-            display: flex;
+      }
+      ul {
+        display: flex;
+        flex-flow: column nowrap;
+        li {
+          margin-right: 0.5 * size.$gap;
+          span {
             position: relative;
-            flex-flow: column nowrap;
-            background-color: rgba(color.$lightest, 0.25);
+            display: block;
+            width: 100%;
+            a {
+              color: darken(color.$blue, 20%) !important;
+            }
+            .MuiSvgIcon-root {
+              visibility: hidden;
+              position: absolute;
+              font-size: size.$large-text;
+              top: auto !important;
+              bottom: auto !important;
+              right: 0 !important;
+              cursor: pointer;
+            }
+          }
+          &:hover {
+            background-color: color.$lightest;
+            span > .MuiSvgIcon-root {
+              visibility: visible;
+            }
+          }
+        }
+      }
+      &.admins {
+        grid-area: 1 / 1 / 9 / 3;
+      }
+      &.tokens {
+        grid-area: 1 / 3 / 9 / 6;
+      }
+      &.jobs {
+        grid-area: 1 / 6 / 8 / 9;
+        position: relative;
+        .scroll-wrapper {
+          @include mixin.no-scrollbar;
+          overflow-y: scroll;
+          position: absolute;
+          top: calc(size.$large-text + 1.5 * size.$gap);
+          bottom: 0;
+          left: 0;
+          right: 0;
+          .job {
+            position: relative;
+            margin: size.$gap;
+            margin-top: 0;
             border-radius: size.$task-radius;
-            font-size: size.$small-text;
-            overflow: hidden;
-            .title {
-                padding: 0.5 * size.$gap size.$gap;
-                font-size: size.$large-text;
-                span {
-                    float: right;
-                }
+            background-color: color.$lightest;
+            pre {
+              padding: 0.5 * size.$gap;
+              font-family: font.$code;
+              font-size: size.$small-text;
             }
-            @for $i from 0 to 3 {
-                .MuiSvgIcon-root:nth-of-type(#{$i + 1}) {
-                    position: absolute;
-                    font-size: size.$large-text;
-                    top: 0.5 * size.$gap;
-                    right: calc(0.5 * size.$gap + $i * (size.$large-text + 0.25 * size.$gap));
-                    cursor: pointer;
-                }
-            }
-            ul {
-                display: flex;
-                flex-flow: column nowrap;
-                li {
-                    margin-right: 0.5 * size.$gap;
-                    span {
-                        position: relative;
-                        display: block;
-                        width: 100%;
-                        a {
-                            color: darken(color.$blue, 20%) !important;
-                        }
-                        .MuiSvgIcon-root {
-                            visibility: hidden;
-                            position: absolute;
-                            font-size: size.$large-text;
-                            top: auto !important;
-                            bottom: auto !important;
-                            right: 0 !important;
-                            cursor: pointer;
-                        }
-                    }
-                    &:hover {
-                        background-color: color.$lightest;
-                        span > .MuiSvgIcon-root {
-                            visibility: visible;
-                        }
-                    }
-                }
-            }
-            &.admins {
-                grid-area: 1 / 1 / 9 / 3;
-            }
-            &.tokens {
-                grid-area: 1 / 3 / 9 / 5;
-            }
-            &.jobs {
-                grid-area: 1 / 6 / 8 / 9;
-                position: relative;
-                .scroll-wrapper {
-                    @include mixin.no-scrollbar;
-                    overflow-y: scroll;
-                    position: absolute;
-                    top: calc(size.$large-text + 1.5 * size.$gap);
-                    bottom: 0;
-                    left: 0;
-                    right: 0;
-                    .job {
-                        position: relative;
-                        margin: size.$gap;
-                        margin-top: 0;
-                        border-radius: size.$task-radius;
-                        background-color: color.$lightest;
-                        pre {
-                            padding: 0.5 * size.$gap;
-                            font-family: font.$code;
-                            font-size: size.$small-text;
-                        }
-                    }
-                }
-            }
-            &.bond {
-                grid-area: 8 / 6 / 9 / 9;
-                .title {
-                    @include mixin.center-items(space-between, center);
-                    height: 100%;
-                }
-            }
+          }
         }
-        .create-multicall {
-            width: fit-content;
-            align-self: center;
-            font-size: size.$text;
-            padding: 0.25em 0.75em;
-            border-radius: 0.5em;
-            background-color: color.$green;
-            &.proposal-exists {
-                background-color: color.$blue !important;
-            }
+      }
+      &.bond {
+        grid-area: 8 / 6 / 9 / 9;
+        .title {
+          @include mixin.center-items(space-between, center);
+          height: 100%;
         }
+      }
     }
+    .create-multicall {
+      width: fit-content;
+      align-self: center;
+      font-size: size.$text;
+      padding: 0.25em 0.75em;
+      border-radius: 0.5em;
+      background-color: color.$green;
+      &.proposal-exists {
+        background-color: color.$blue !important;
+      }
+    }
+  }
 }
