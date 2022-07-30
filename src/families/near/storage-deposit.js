@@ -70,6 +70,11 @@ export default class StorageDeposit extends BaseTask {
 
     }
 
+    static inferOwnType(json) {
+        // TODO check if address is token address, note requires promise.all in tasks
+        return !!json && json.actions[0].func === "storage_deposit"
+    }
+
     updateFT() {
 
         const { addr, args } = this.call;
