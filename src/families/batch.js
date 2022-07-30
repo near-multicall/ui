@@ -121,6 +121,10 @@ export default class BatchTask extends Component {
         this.forceUpdate();
     }
 
+    static inferOwnType(json) {
+        return !!json && json.action.length > 1 
+    }
+
     loadTasks() {
 
         const { addr } = this.state,

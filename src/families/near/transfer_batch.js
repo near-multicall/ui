@@ -10,7 +10,7 @@ import "./near.scss";
 import BatchTask from '../batch';
 
 
-export default class Transfer extends BatchTask {
+export default class Transfer_Batch extends BatchTask {
 
     uniqueClassName = "near-transfer-task";
     errors = {
@@ -51,8 +51,12 @@ export default class Transfer extends BatchTask {
     }
 
     static inferOwnType(json) {
-        // TODO check if address is token address, note requires promise.all in tasks
-        return !!json && json.actions[0].func === "ft_transfer"
+        return !!json 
+            && json.actions.length > 1 
+            && json.actions.every(a => 
+                a.func === "storage_deposit" 
+                || a.func === "ft_transfer"
+            );
     }
 
     updateFT() {

@@ -118,11 +118,26 @@ export default class Task extends Component {
             default:
                 switch (func) {
                     case "batch":
+
                         const newJson = !!window.COPY
                             ? TASKS.find(t => t.id === window.COPY.from).instance.current.call.toJSON()
                             : json
+
+                        for (let family in Family) {
+                            if (family === "BatchTask")
+                                continue;
+                            for (let task in Family[family])
+                                if (Family[family][task].prototype instanceof Family.BatchTask && 
+                                    Family[family][task].inferOwnType(json)) {
+                                    const TaskComponent = Family[family][task];
+                                    return <TaskComponent ref={this.instance} id={this.id} json={newJson}/>
+                                }
+                        }
+
                         return <Family.BatchTask ref={this.instance} id={this.id} json={newJson}/>
+
                     default:
+
                         for (let family in Family) {
                             if (family === "BaseTask")
                                 continue;
@@ -134,6 +149,7 @@ export default class Task extends Component {
                         }
 
                         return <Family.BaseTask ref={this.instance} id={this.id} json={json}/>
+
                 }
 
         }
