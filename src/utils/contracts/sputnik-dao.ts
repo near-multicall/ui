@@ -122,7 +122,7 @@ class SputnikDAO {
             SputnikDAO.isSputnikDAO(dao_address).catch(err => { return false }),
             // on failure set policy to default policy (empty)
             newDAO.getPolicy().catch(err => { return newDAO.policy }),
-            // on failure ste last proposal ID to default (-1)
+            // on failure set last proposal ID to default (-1)
             newDAO.getLastProposalId().catch(err => { return newDAO.lastProposalId })
         ]);
         newDAO.policy = daoPolicy;

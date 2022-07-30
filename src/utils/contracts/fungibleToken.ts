@@ -23,28 +23,28 @@ class FungibleToken {
   metadata: FungibleTokenMetadata = { spec: "", name: "", symbol: "", decimals: -1 };
   // token total supply
   totalSupply: string = "";
-  // DAO instance is ready when info (policy...) are fetched & assigned correctly
+  // Token instance is ready when info (metadata...) are fetched & assigned correctly
   ready: boolean = false;
 
 
   // shouldn't be used directly, use init() instead
-  constructor(dao_address: string) {
-    this.address = dao_address;
+  constructor(tokenAddress: string) {
+    this.address = tokenAddress;
   }
 
   // used to create and initialize a FungibleToken instance
   static async init (tokenAddress: string): Promise<FungibleToken> {
-    // verify address is a SputnikDAO, fetch DAO info and mark it ready
+    // fetch token info and mark it ready
     const newToken = new FungibleToken(tokenAddress);
     const [ metadata, totalSupply ] = await Promise.all([
-      // on failure set policy to default policy (empty)
+      // on failure set metadata to default metadata (empty)
       newToken.ftMetadata().catch(err => { return newToken.metadata }),
-      // on failure ste last proposal ID to default (-1)
+      // on failure set total supply to default (empty string)
       newToken.ftTotalSupply().catch(err => { return newToken.totalSupply })
     ]);
     newToken.metadata = metadata;
     newToken.totalSupply = totalSupply;
-    // set DAO to ready if address is a DAO and lastProposalID + policy got updated. 
+    // set ready to true if token info successfully got updated. 
     if (
       newToken.totalSupply !== ""
       && newToken.metadata.decimals >= 0
