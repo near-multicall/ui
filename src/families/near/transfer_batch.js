@@ -1,14 +1,13 @@
 import { InputAdornment } from '@mui/material';
-import React from 'react';
-import { TextInput, TextInputWithUnits } from '../../components/editor/elements';
-import { ArgsAccount, ArgsBig, ArgsError, ArgsObject, ArgsString } from "../../utils/args";
-import { Call } from "../../utils/call";
-import { toGas, formatTokenAmount, unitToDecimals } from "../../utils/converter";
-import { view } from "../../utils/wallet";
+import Checkbox from '@mui/material/Checkbox';
 import debounce from "lodash.debounce";
-import "./near.scss";
+import React from 'react';
+import { TextInput } from '../../components/editor/elements';
+import { ArgsAccount, ArgsError, ArgsString } from "../../utils/args";
+import { view } from "../../utils/wallet";
 import BatchTask from '../batch';
-
+import "./near.scss";
+import Transfer from './transfer';
 
 export default class Transfer_Batch extends BatchTask {
 
@@ -17,6 +16,8 @@ export default class Transfer_Batch extends BatchTask {
         ...this.baseErrors,
         noToken: new ArgsError("Address does not belong to token contract", value => this.errors.noToken)
     };
+
+    targets = {};
 
     updateFTDebounced = debounce(() => this.updateFT(), 500);
 
@@ -32,8 +33,8 @@ export default class Transfer_Batch extends BatchTask {
 
         this.state = {
             ...this.state,
-            name: new ArgsString(json?.name ?? "FT transfer"),
-            addr: new ArgsAccount(json?.address ?? window.nearConfig.WNEAR_ADDRESS)
+            name: new ArgsString(json?.name ?? "FT Transfer"),
+            addr: new ArgsAccount(json?.address ?? window.nearConfig.WNEAR_ADDRESS),
         };
         
         this.loadErrors = (() => {
@@ -45,8 +46,24 @@ export default class Transfer_Batch extends BatchTask {
 
             this.updateFT();
 
-        }).bind(this)
+        }).bind(this);
 
+
+    }
+
+    onTasksLoaded() {
+
+        for (let t of this.tasks) {
+            const receiver = t instanceof Transfer
+                ? t.call.args.value.receiver_id.value
+                : t.call.args.value.account_id.value
+            this.targets[receiver] ??= {
+                receiver_id: receiver,
+                ft_transfer: new Set(),
+                storage_deposit: new Set()
+            };
+            this.targets[receiver][t.call.func.value].add(t.props.id);
+        }
 
     }
 
@@ -57,6 +74,29 @@ export default class Transfer_Batch extends BatchTask {
                 a.func === "storage_deposit" 
                 || a.func === "ft_transfer"
             );
+    }
+
+    displayTaskArgs(t) {
+
+        const args = t.call.args.value;
+        const func = t.call.func.value;
+
+        switch (func) {
+            case "ft_transfer": return (
+                <div className="details">
+                    <p><span>Receiver</span><span className="code">{args.receiver_id?.value}</span></p>
+                    <p><span>Amount</span><span className="code">{args.amount?.value}</span></p>
+                    <p><span>Memo</span><span className="code">{args.memo?.value}</span></p>
+                </div>
+            )
+            case "storage_deposit": return (
+                <div className="details">
+                    <p><span>Account</span><span className="code">{args.account_id?.value}</span></p>
+                </div>
+            )
+            default: return null
+        }
+
     }
 
     updateFT() {
@@ -77,16 +117,6 @@ export default class Transfer_Batch extends BatchTask {
             if (e.type === "AccountDoesNotExist" || e.toString().includes("MethodNotFound"))
                 this.errors.noToken.isBad = true;
         })
-        // .then(res => {
-        //     if (res) {
-        //         if (amount.decimals === null) {
-        //             amount.value = formatTokenAmount(amount.value, res.decimals);
-        //         }
-        //         amount.unit = res.symbol;
-        //         amount.decimals = res.decimals;
-        //     }
-        //     this.updateCard()
-        // })
 
     }
 
@@ -94,22 +124,15 @@ export default class Transfer_Batch extends BatchTask {
 
         const {
             name,
-            addr,
-            gas
-        } = this.call;
-
-        const {
-            receiver_id,
-            amount,
-            memo
-        } = this.call.args.value;
+            addr
+        } = this.state;
 
         const errors = this.errors;
 
         return (
             <div className="edit">
-                <TextInput 
-                    value={ name }
+                <TextInput
+                    value={name}
                     variant="standard"
                     margin="normal"
                     autoFocus
@@ -119,39 +142,80 @@ export default class Transfer_Batch extends BatchTask {
                     label="Token address"
                     value={ addr }
                     error={[ errors.addr, errors.noToken ]}
-                    update={ () => {
+                    update={ (e) => {
                         this.updateCard();
                         this.updateFTDebounced();
+                        this.tasks.forEach(t => {
+                            t.call.addr.value = e.target.value;
+                            t.errors.addr.validOrNull(e.target.value);
+                            t.errors.noToken.validOrNull(e.target.value);
+                            t.updateCard();
+                            t.updateFTDebounced();
+                        });
                     } }
                 />
-                <TextInput 
-                    label="Receiver address"
-                    value={ receiver_id }
-                    error={ errors.receiver }
-                    update={ this.updateCard }
-                />
-                <TextInput
-                    label="Transfer amount"
-                    value={ amount }
-                    error={ errors.amount }
-                    update={ this.updateCard }
-                    InputProps={{
-                        endAdornment: <InputAdornment position="end">{amount.unit}</InputAdornment>,
-                    }}
-                />
-                <TextInput 
-                    label="Memo"
-                    value={ memo }
-                    multiline
-                    update={ this.updateCard }
-                />
-                <TextInputWithUnits
-                    label="Allocated gas"
-                    value={ gas }
-                    error={ errors.gas }
-                    options={[ "Tgas", "gas" ]}
-                    update={ this.updateCard }
-                />
+                {
+                    Object.keys(this.targets).map(t => <div className="section">
+                        <h2>{t}</h2>
+                        { [...this.targets[t].ft_transfer].map(id => {
+                            const task = TASKS.find(t => t.id === id).instance.current;
+                            const { amount, memo } = task.call.args.value;
+                            const errors = task.errors;
+                            return (<>
+                                <TextInput
+                                    label="Transfer amount"
+                                    value={ amount }
+                                    error={ errors.amount }
+                                    update={ () => {
+                                        this.updateCard();
+                                        task.updateCard();
+                                    } }
+                                    InputProps={{
+                                        endAdornment: <InputAdornment position="end">{amount.unit}</InputAdornment>,
+                                    }}
+                                />
+                                <TextInput 
+                                    label="Memo"
+                                    value={ memo }
+                                    multiline
+                                    update={ () => {
+                                        this.updateCard();
+                                        task.updateCard();
+                                    } }
+                                />
+                            </>)
+                        }) }
+                        <div className="checkbox">
+                            <Checkbox
+                                checked={this.targets[t].storage_deposit.size > 0}
+                                onChange={e => {
+                                    if (e.target.checked) {
+                                        this.targets[t].storage_deposit.add(this.addNewTask(
+                                            "near", 
+                                            "storage_deposit",
+                                            {
+                                                address: addr.value,
+                                                actions: [{
+                                                    args: {
+                                                        account_id: t,
+                                                        registration_only: true
+                                                    }
+                                                }]
+                                            },
+                                            this.updateCard
+                                        ));
+                                    } else {
+                                        this.targets[t].storage_deposit.forEach(id => LAYOUT.deleteTask(id));
+                                        this.targets[t].storage_deposit.clear();
+                                    }
+                                    this.updateCard();
+                                }}
+                            />
+                            <p>Pay storage deposit</p>
+                        </div>
+                    </div>)
+                }
+                <button className="add-action">Add transfer</button>
             </div>
         );
 

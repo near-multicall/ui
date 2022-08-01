@@ -83,9 +83,6 @@ export default class BatchTask extends Component {
         }))
             .forEach(j => {
                 const id = `task-${LAYOUT.taskID++}`;
-                const existent = TASKS.find(task => task.id === id);
-                if (existent !== undefined && existent.instance.current !== null)
-                    return;
                 STORAGE.layout.columns[this.props.id].taskIds.push(id);
                 STORAGE.layout.tasks[id] = { id: id, addr: "", func: "", json: j }
             })
@@ -151,6 +148,9 @@ export default class BatchTask extends Component {
         if (this.tasks?.length >= 2 && this.tasks.every(t => !!t) && this.options.loaded)
             this.errors.noSingleAddress.isBad = !this.tasks.every(t => t.call.addr.value === addr.value);
 
+        if (this.options.loaded && this.tasks.every(t => !!t))
+            this.onTasksLoaded();
+
     }
 
     getTasks() {
@@ -164,7 +164,27 @@ export default class BatchTask extends Component {
 
     }
 
+    addNewTask(addr = "", func = "", json, callback) {
+
+        const id = `task-${LAYOUT.taskID++}`;
+        STORAGE.layout.columns[this.props.id].taskIds.push(id);
+        STORAGE.layout.tasks[id] = { id: id, addr: addr, func: func, json: json }
+        this.loadTasks();
+
+        const eventHandler = (e) => {
+            if (e.detail.task.id !== id) return;
+            callback();
+            document.removeEventListener('ontaskmounted', eventHandler);
+        };
+        document.addEventListener('ontaskmounted', eventHandler);
+
+        return id;
+
+    }
+
     onAddressesUpdated() {}
+
+    onTasksLoaded() {}
 
     onEditFocus(taskID) {
 
@@ -179,27 +199,10 @@ export default class BatchTask extends Component {
 
     }
 
-    // TODO move this to instance
     displayTaskArgs(t) {
 
-        const args = t.call.args.value;
-        const func = t.call.func.value;
-
-        switch (func) {
-            case "ft_transfer": return (
-                <div className="details">
-                    <p><span>Receiver</span><span className="code">{args.receiver_id?.value}</span></p>
-                    <p><span>Amount</span><span className="code">{args.amount?.value}</span></p>
-                    <p><span>Memo</span><span className="code">{args.memo?.value}</span></p>
-                </div>
-            )
-            case "storage_deposit": return (
-                <div className="details">
-                    <p><span>Account</span><span className="code">{args.account_id?.value}</span></p>
-                </div>
-            )
-            default: return null
-        }
+        // implementation in instance
+        return null; 
 
     }
 

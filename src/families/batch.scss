@@ -69,3 +69,44 @@
         display: none;
     }
 }
+
+.edit {
+    & > .section {
+        @include mixin.full;
+        @include mixin.center-items(flex-start);
+        flex: 0;
+        width: calc(100% - size.$gap);
+        margin: 0.5 * size.$gap 0;
+        padding: 0.5 * size.$gap;
+        border-radius: size.$task-radius;
+        box-shadow: inset 0px 0px 30px 0px rgba(color.$white, 0.1);
+        & > .MuiTextField-root {
+            align-self: flex-end;
+            width: 100%;
+            &:first-of-type > .MuiOutlinedInput-root > fieldset {
+                border-radius: size.$task-radius size.$task-radius 0 0;
+            }
+            &:nth-last-of-type(2) > .MuiOutlinedInput-root > fieldset {
+                border-radius: 0 0 size.$task-radius size.$task-radius;
+            }
+        }
+        & > .checkbox {
+            align-self: flex-end;
+            width: 100%;
+        }
+        h2 {
+            align-self: flex-start;
+            color: color.$light-text;
+            font-family: font.$code;
+            margin-bottom: 0.5 * size.$gap;
+        }
+    }
+    .add-action {
+        width: fit-content;
+        margin: 0.5 * size.$gap auto;
+        padding: 0 size.$gap;
+        font-size: size.$text;
+        border-radius: size.$task-radius;
+        background-color: color.$green;
+    }
+}

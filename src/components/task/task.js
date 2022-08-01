@@ -33,8 +33,6 @@ export default class Task extends Component {
                     options: from.options,
                     errors: from.errors
                 }
-
-                console.log(window.COPY);
             
             }
 
@@ -73,6 +71,12 @@ export default class Task extends Component {
         else 
             window.TASKS = [this];
 
+        document.dispatchEvent(new CustomEvent('ontaskmounted', {
+            detail: {
+                task: this
+            }
+        }))
+
     }
 
     componentWillUnmount() {
@@ -90,6 +94,7 @@ export default class Task extends Component {
 
         const { addr, func } = this.state;
         const { json } = this.props;
+        let newJson;
 
         switch(addr) {
 
@@ -119,7 +124,7 @@ export default class Task extends Component {
                 switch (func) {
                     case "batch":
 
-                        const newJson = !!window.COPY
+                        newJson = !!window.COPY
                             ? TASKS.find(t => t.id === window.COPY.from).instance.current.call.toJSON()
                             : json
 
@@ -128,7 +133,7 @@ export default class Task extends Component {
                                 continue;
                             for (let task in Family[family])
                                 if (Family[family][task].prototype instanceof Family.BatchTask && 
-                                    Family[family][task].inferOwnType(json)) {
+                                    Family[family][task].inferOwnType(newJson)) {
                                     const TaskComponent = Family[family][task];
                                     return <TaskComponent ref={this.instance} id={this.id} json={newJson}/>
                                 }
@@ -138,13 +143,17 @@ export default class Task extends Component {
 
                     default:
 
+                        newJson = !!window.COPY
+                        ? TASKS.find(t => t.id === window.COPY.from).instance.current.call.toJSON()
+                        : json
+
                         for (let family in Family) {
                             if (family === "BaseTask")
                                 continue;
                             for (let task in Family[family])
-                                if (Family[family][task].inferOwnType(json)) {
+                                if (Family[family][task].inferOwnType(newJson)) {
                                     const TaskComponent = Family[family][task];
-                                    return <TaskComponent ref={this.instance} id={this.id} json={json}/>
+                                    return <TaskComponent ref={this.instance} id={this.id} json={newJson}/>
                                 }
                         }
 
