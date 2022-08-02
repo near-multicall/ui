@@ -97,9 +97,15 @@
         }
         h2 {
             align-self: flex-start;
+            @include mixin.center-items(space-between);
+            width: 100%;
             color: color.$light-text;
             font-family: font.$code;
             margin-bottom: 0.5 * size.$gap;
+            .delete-icon {
+                @include mixin.light-icon;
+                cursor: pointer;
+            }
         }
     }
     .add-action {

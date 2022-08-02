@@ -159,7 +159,17 @@ export default class Transfer_Batch extends BatchTask {
                 />
                 {
                     Object.keys(this.targets).map(t => <div className="section">
-                        <h2>{t}</h2>
+                        <h2>
+                            {t}
+                            <Icon 
+                                className="delete-icon"
+                                onClick={() => {
+                                    [...this.targets[t].storage_deposit, ...this.targets[t].ft_transfer].forEach(id => LAYOUT.deleteTask(id));
+                                    delete this.targets[t];
+                                    this.updateCard();
+                                }}
+                            >delete_outline</Icon>
+                        </h2>
                         { [...this.targets[t].ft_transfer].map(id => {
                             const task = TASKS.find(t => t.id === id).instance.current;
                             const { amount, memo } = task.call.args.value;
