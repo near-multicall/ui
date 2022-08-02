@@ -76,6 +76,7 @@
         @include mixin.center-items(flex-start);
         flex: 0;
         width: calc(100% - size.$gap);
+        max-height: unset !important;
         margin: 0.5 * size.$gap 0;
         padding: 0.5 * size.$gap;
         border-radius: size.$task-radius;
@@ -102,11 +103,39 @@
         }
     }
     .add-action {
-        width: fit-content;
-        margin: 0.5 * size.$gap auto;
-        padding: 0 size.$gap;
-        font-size: size.$text;
-        border-radius: size.$task-radius;
-        background-color: color.$green;
+        @include mixin.center-items(stretch);
+        gap: 0.5 * size.$gap;
+        flex-flow: row wrap;
+        & > h2 {
+            width: 100%;
+            color: color.$light-text;
+            font-size: size.$text;
+            text-align: center;
+            margin-top: size.$gap;
+        }
+        .MuiTextField-root {
+            flex: 1;
+            & > .MuiOutlinedInput-root > fieldset {
+                border-radius: size.$task-radius;
+            }
+        }
+        & > button {
+            flex: 0;
+            @include mixin.center-items;
+            height: calc(1.8rem + 17px); // mimic mui's text field height
+            padding: 0.3em;
+            padding-right: 0.6em;
+            font-size: size.$text;
+            border-radius: size.$task-radius;
+            color: color.$green;
+            border: 1px solid color.$green;
+            background-color: rgba(color.$white, 0.1);
+            &:hover {
+                background-color: rgba(color.$white, 0.2); 
+            }
+            & > * {
+                font-size: size.$large-text;
+            }
+        }
     }
 }

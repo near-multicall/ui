@@ -130,8 +130,7 @@ export default class BatchTask extends Component {
         // create tasks
         this.tasksDOM = STORAGE.layout.columns[id].taskIds
             .map(taskId => STORAGE.layout.tasks[taskId])
-            .map((task, index) => 
-                <Task 
+            .map((task, index) => <Task 
                     key={hash(task, { algorithm: 'md5', encoding: 'base64' })} 
                     task={task} 
                     index={index} 
@@ -177,6 +176,8 @@ export default class BatchTask extends Component {
             document.removeEventListener('ontaskmounted', eventHandler);
         };
         document.addEventListener('ontaskmounted', eventHandler);
+
+        this.forceUpdate();
 
         return id;
 

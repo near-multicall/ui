@@ -1,4 +1,4 @@
-import { InputAdornment } from '@mui/material';
+import { Icon, InputAdornment } from '@mui/material';
 import Checkbox from '@mui/material/Checkbox';
 import debounce from "lodash.debounce";
 import React from 'react';
@@ -129,6 +129,9 @@ export default class Transfer_Batch extends BatchTask {
 
         const errors = this.errors;
 
+        const newTarget = new ArgsAccount("");
+        const newAddrError = new ArgsError("Invalid address", value => ArgsAccount.isValid(value));
+
         return (
             <div className="edit">
                 <TextInput
@@ -215,7 +218,46 @@ export default class Transfer_Batch extends BatchTask {
                         </div>
                     </div>)
                 }
-                <button className="add-action">Add transfer</button>
+                <div className="add-action">
+                    <h2>Add Transfer</h2>
+                    <TextInput 
+                        label="Target address"
+                        value={ newTarget }
+                        error={ newAddrError }
+                        update={ (e, textInputComponent) => textInputComponent.forceUpdate() }
+                    />
+                    <button
+                        onClick={() => {
+                            if (newAddrError.isBad) return;
+                            const receiver = newTarget.value;
+
+                            this.targets[receiver] ??= {
+                                receiver_id: receiver,
+                                ft_transfer: new Set(),
+                                storage_deposit: new Set()
+                            };
+
+                            this.targets[receiver].ft_transfer.add(this.addNewTask(
+                                "near", 
+                                "ft_transfer",
+                                {
+                                    address: addr.value,
+                                    actions: [{
+                                        args: {
+                                            receiver_id: receiver,
+                                            amount: 0,
+                                            memo: ""
+                                        }
+                                    }]
+                                },
+                                this.updateCard
+                            ));
+                        }}
+                    >
+                        <Icon>add</Icon>
+                        Add
+                    </button>
+                </div>
             </div>
         );
 
