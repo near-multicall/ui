@@ -5,6 +5,7 @@ import TextField from '@mui/material/TextField';
 import { Base64 } from 'js-base64';
 import React, { Component } from 'react';
 import { ArgsAccount, ArgsBig, ArgsError, ArgsString } from '../../utils/args';
+import { STORAGE } from '../../utils/persistent';
 import { convert, toGas, toNEAR } from '../../utils/converter';
 import { view } from "../../utils/wallet";
 import { useWalletSelector } from '../../contexts/walletSelectorContext';
