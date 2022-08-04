@@ -99,6 +99,91 @@ export default class Transfer_Batch extends BatchTask {
 
     }
 
+    addStorageDeposit(target) {
+
+        if (this.targets[target].storage_deposit.size > 0) return;
+        this.targets[target].storage_deposit.add(this.addNewTask(
+            "near", 
+            "storage_deposit",
+            {
+                address: this.state.addr.value,
+                actions: [{
+                    args: {
+                        account_id: target,
+                        registration_only: true
+                    }
+                }]
+            },
+            this.updateCard
+        ));
+
+    }
+
+    removeStorageDeposit(target) {
+
+        this.targets[target].storage_deposit.forEach(id => LAYOUT.deleteTask(id));
+        this.targets[target].storage_deposit.clear();
+
+    }
+
+    addFtTransfer(target) {
+
+        this.targets[target].ft_transfer.add(this.addNewTask(
+            "near", 
+            "ft_transfer",
+            {
+                address: this.state.addr.value,
+                actions: [{
+                    args: {
+                        receiver_id: target,
+                        amount: 0,
+                        memo: ""
+                    }
+                }]
+            },
+            this.updateCard
+        ));
+
+    }
+
+    removeFtTransfer(target) {
+
+        [
+            ...this.targets[target].storage_deposit, 
+            ...this.targets[target].ft_transfer
+        ]
+            .forEach(id => LAYOUT.deleteTask(id));
+        delete this.targets[target];
+        this.updateCard();
+
+    }
+
+    addNewTarget(newTarget, newAddrError) {
+
+        if (newAddrError.isBad) return;
+        const receiver = newTarget.value;
+
+        this.targets[receiver] ??= {
+            receiver_id: receiver,
+            ft_transfer: new Set(),
+            storage_deposit: new Set()
+        };
+
+        this.addFtTransfer(receiver);
+
+        view(
+            this.state.addr.value,
+            "storage_balance_of",
+            {account_id: receiver}
+        )
+        .catch(e => {})
+        .then((storage) => {
+            if (storage === null)
+                this.addStorageDeposit(receiver);
+        })
+
+    }
+
     updateFT() {
 
         const { addr } = this.state;
@@ -117,6 +202,23 @@ export default class Transfer_Batch extends BatchTask {
             if (e.type === "AccountDoesNotExist" || e.toString().includes("MethodNotFound"))
                 this.errors.noToken.isBad = true;
         })
+
+        Object.keys(this.targets).forEach(t => 
+            view(
+                addr.value,
+                "storage_balance_of",
+                {account_id: t}
+            )
+            .catch(e => {})
+            .then((storage) => {
+                console.log(storage);
+                if (storage === undefined) return;
+                if (storage === null)
+                    this.addStorageDeposit(t)
+                else
+                    this.removeStorageDeposit(t)
+            })
+        )
 
     }
 
@@ -163,11 +265,7 @@ export default class Transfer_Batch extends BatchTask {
                             {t}
                             <Icon 
                                 className="delete-icon"
-                                onClick={() => {
-                                    [...this.targets[t].storage_deposit, ...this.targets[t].ft_transfer].forEach(id => LAYOUT.deleteTask(id));
-                                    delete this.targets[t];
-                                    this.updateCard();
-                                }}
+                                onClick={ () => this.removeFtTransfer(t) }
                             >delete_outline</Icon>
                         </h2>
                         { [...this.targets[t].ft_transfer].map(id => {
@@ -202,25 +300,10 @@ export default class Transfer_Batch extends BatchTask {
                             <Checkbox
                                 checked={this.targets[t].storage_deposit.size > 0}
                                 onChange={e => {
-                                    if (e.target.checked) {
-                                        this.targets[t].storage_deposit.add(this.addNewTask(
-                                            "near", 
-                                            "storage_deposit",
-                                            {
-                                                address: addr.value,
-                                                actions: [{
-                                                    args: {
-                                                        account_id: t,
-                                                        registration_only: true
-                                                    }
-                                                }]
-                                            },
-                                            this.updateCard
-                                        ));
-                                    } else {
-                                        this.targets[t].storage_deposit.forEach(id => LAYOUT.deleteTask(id));
-                                        this.targets[t].storage_deposit.clear();
-                                    }
+                                    if (e.target.checked)
+                                        this.addStorageDeposit(t);
+                                    else 
+                                        this.removeStorageDeposit(t);
                                     this.updateCard();
                                 }}
                             />
@@ -235,34 +318,13 @@ export default class Transfer_Batch extends BatchTask {
                         value={ newTarget }
                         error={ newAddrError }
                         update={ (e, textInputComponent) => textInputComponent.forceUpdate() }
+                        onKeyUp={ e => {
+                            if (e.key === "Enter")
+                                this.addNewTarget(newTarget, newAddrError);
+                        } }
                     />
                     <button
-                        onClick={() => {
-                            if (newAddrError.isBad) return;
-                            const receiver = newTarget.value;
-
-                            this.targets[receiver] ??= {
-                                receiver_id: receiver,
-                                ft_transfer: new Set(),
-                                storage_deposit: new Set()
-                            };
-
-                            this.targets[receiver].ft_transfer.add(this.addNewTask(
-                                "near", 
-                                "ft_transfer",
-                                {
-                                    address: addr.value,
-                                    actions: [{
-                                        args: {
-                                            receiver_id: receiver,
-                                            amount: 0,
-                                            memo: ""
-                                        }
-                                    }]
-                                },
-                                this.updateCard
-                            ));
-                        }}
+                        onClick={ () => this.addNewTarget(newTarget, newAddrError) }
                     >
                         <Icon>add</Icon>
                         Add
