@@ -59,6 +59,7 @@ export default class Transfer_Batch extends BatchTask {
                 : t.call.args.value.account_id.value
             this.targets[receiver] ??= {
                 receiver_id: receiver,
+                expandInEditor: true,
                 ft_transfer: new Set(),
                 storage_deposit: new Set()
             };
@@ -165,6 +166,7 @@ export default class Transfer_Batch extends BatchTask {
 
         this.targets[receiver] ??= {
             receiver_id: receiver,
+            expandInEditor: true,
             ft_transfer: new Set(),
             storage_deposit: new Set()
         };
@@ -181,6 +183,13 @@ export default class Transfer_Batch extends BatchTask {
             if (storage === null)
                 this.addStorageDeposit(receiver);
         })
+
+    }
+
+    toggleExpand(t) {
+
+        this.targets[t].expandInEditor = !this.targets[t].expandInEditor;
+        EDITOR.forceUpdate();
 
     }
 
@@ -260,15 +269,25 @@ export default class Transfer_Batch extends BatchTask {
                     } }
                 />
                 {
-                    Object.keys(this.targets).map(t => <div className="section">
+                    Object.keys(this.targets).map(t => <div className={`section ${this.targets[t].expandInEditor ? "" : "collapsed"}`}>
                         <h2>
-                            {t}
                             <Icon 
-                                className="delete-icon"
+                                className="icon collapse"
+                                onClick={() => this.toggleExpand(t)}
+                                collapsed={ this.targets[t].expandInEditor ? "no" : "yes" }
+                            >expand_more</Icon> 
+                            <p>{t}</p>
+                            <a href={ArgsAccount.toUrl(t)} target="_blank" rel="noopener noreferrer">
+                                <Icon 
+                                    className="icon link"
+                                >open_in_new</Icon>
+                            </a>
+                            <Icon 
+                                className="icon delete"
                                 onClick={ () => this.removeFtTransfer(t) }
                             >delete_outline</Icon>
                         </h2>
-                        { [...this.targets[t].ft_transfer].map(id => {
+                        { this.targets[t].expandInEditor && [...this.targets[t].ft_transfer].map(id => {
                             const task = TASKS.find(t => t.id === id).instance.current;
                             const { amount, memo } = task.call.args.value;
                             const errors = task.errors;

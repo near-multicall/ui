@@ -97,14 +97,53 @@
         }
         h2 {
             align-self: flex-start;
-            @include mixin.center-items(space-between);
+            @include mixin.center-items(flex-start);
+            position: relative;
             width: 100%;
-            color: color.$light-text;
-            font-family: font.$code;
             margin-bottom: 0.5 * size.$gap;
-            .delete-icon {
+            p {
+                color: color.$light-text;
+                font-family: font.$code;
+                max-width: calc(100% - 3 * size.$large-text - 0.5 * size.$gap);
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            .icon {
                 @include mixin.light-icon;
                 cursor: pointer;
+            }
+            .collapse {
+                &[collapsed="yes"] {
+                    transform: rotate(-90deg);
+                }
+                transition: all 50ms linear;
+            }
+            .link {
+                padding-left: 0.25 * size.$gap;
+            }
+            .delete {
+                position: absolute;
+                right: 0;
+            }
+            a {
+                display: contents;
+            }
+        }
+        &.collapsed {
+            h2 {
+                margin: 0;
+                .delete,
+                .link {
+                    visibility: hidden;
+                }
+            }
+            &:hover > h2 .delete,
+            &:hover > h2 .link {
+                visibility: visible;
+            }
+            & > *:not(h2) {
+                display: none;
             }
         }
     }

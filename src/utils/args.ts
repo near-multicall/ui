@@ -98,6 +98,8 @@ class ArgsAccount extends Args {
 
     toUrl = () => `https://explorer.${window.NEAR_ENV}.near.org/accounts/${this.value}`;
 
+    static toUrl = (address: string) => `https://explorer.${window.NEAR_ENV}.near.org/accounts/${address}`;
+
 }
 
 class ArgsNumber extends Args {
