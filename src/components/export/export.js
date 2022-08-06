@@ -156,12 +156,28 @@ export default class Export extends Component {
             ? Object.entries(WALLET_COMPONENT.errors).filter(([k, v]) => v.isBad)[0]?.[1].message
             : null
 
-        const addresses = Object.fromEntries(Object.entries(STORAGE.addresses)
-            .map(([k, v]) => {
-                const account = new ArgsAccount(v)
-                errors[k].validOrNull(account);
-                return [k, account]
-            }));
+        // Multicall args to display for copy/paste
+        let multicallArgs = "";
+        if (this.showArgs) {
+            // Return error message if cards still have errors. Faulty JSON breaks toBase64.
+            if (errors.hasErrors.isBad) { multicallArgs = errors.hasErrors.message; }
+            else {
+                // toBase64 might throw on failure
+                try {
+                    multicallArgs = !this.attachFT
+                        ? JSON.stringify({calls: LAYOUT.toBase64()}) 
+                        : JSON.stringify({
+                            receiver_id: STORAGE.addresses.multicall, 
+                            amount: convert(amount.value, amount.unit, amount.decimals),
+                            msg: JSON.stringify({
+                                function_id: "multicall",
+                                args: Base64.encode(JSON.stringify({"calls":LAYOUT.toBase64()}).toString())
+                            }).toString()
+                        })
+                }
+                catch (e) {multicallArgs = "ERROR: something went wrong during JSON creation"}
+            }
+        }
 
         return (
             <div 
@@ -286,7 +302,7 @@ export default class Export extends Component {
                                 ? <Icon 
                                     className="icon copy"
                                     onClick={ e => {
-                                        navigator.clipboard.writeText(JSON.stringify({calls: LAYOUT.toBase64()}));
+                                        navigator.clipboard.writeText(multicallArgs);
                                         this.updateCopyIcon(e); 
                                     } }
                                 >content_copy</Icon>
@@ -296,17 +312,7 @@ export default class Export extends Component {
                         { this.showArgs 
                             ? <div className="value">
                                 <pre className="code">
-                                    { !this.attachFT
-                                        ? JSON.stringify({calls: LAYOUT.toBase64()}) 
-                                        : JSON.stringify({
-                                            receiver_id: STORAGE.addresses.multicall, 
-                                            amount: convert(amount.value, amount.unit, amount.decimals),
-                                            msg: JSON.stringify({
-                                                function_id: "multicall",
-                                                args: Base64.encode(JSON.stringify({"calls":LAYOUT.toBase64()}).toString())
-                                            }).toString()
-                                        })
-                                    }
+                                    {multicallArgs}
                                 </pre>
                             </div>
                             : <></>
