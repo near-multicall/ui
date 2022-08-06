@@ -144,7 +144,7 @@ export default class DaoComponent extends Component {
         if (this.fee === undefined)
             return;
 
-        const { loading, addr, dao, infos, proposed, proposedInfo } = this.state;
+        const { loading, addr, dao, proposed, proposedInfo } = this.state;
         const { noContract, noDao } = this.errors;
 
         // happens if wallet not logged in or DAO object not initialized yet
@@ -204,7 +204,7 @@ export default class DaoComponent extends Component {
                             </div>
                             <button 
                                 className="create-multicall"
-                                onClick={() => { dao.addProposal(args, infos.policy.proposal_bond); }}
+                                onClick={() => { dao.addProposal(args, dao.policy.proposal_bond); }}
                             >
                                 Propose
                             </button>
