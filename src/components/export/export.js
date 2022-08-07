@@ -5,6 +5,7 @@ import TextField from '@mui/material/TextField';
 import { Base64 } from 'js-base64';
 import React, { Component } from 'react';
 import { ArgsAccount, ArgsBig, ArgsError, ArgsString } from '../../utils/args';
+import { errorMsg } from '../../utils/errors';
 import { convert, toGas, toNEAR } from '../../utils/converter';
 import { view } from "../../utils/wallet";
 import { useWalletSelector } from '../../contexts/walletSelectorContext';
@@ -16,11 +17,11 @@ export default class Export extends Component {
     static contextType = useWalletSelector();
 
     errors = {
-        user: new ArgsError("Invalid address", value => ArgsAccount.isValid(value), true),
+        user: new ArgsError(errorMsg.ERR_INVALID_ADDR, value => ArgsAccount.isValid(value), true),
         dao: new ArgsError("Invalid address", value => ArgsAccount.isValid(value), true),
         multicall: new ArgsError("Invalid address", value => ArgsAccount.isValid(value), true),
-        gas: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value) && value.value !== ""),
-        depo: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value) && value.value !== ""),
+        gas: new ArgsError(errorMsg.ERR_INVALID_GAS_AMOUNT, value => ArgsBig.isValid(value) && value.value !== ""),
+        depo: new ArgsError(errorMsg.ERR_INVALID_DEPO_AMOUNT, value => ArgsBig.isValid(value) && value.value !== ""),
         amount: new ArgsError("Invalid amount", value => ArgsBig.isValid(value) && value.value !== ""),
         token: new ArgsError("Invalid address", value => ArgsAccount.isValid(value)),
         desc: new ArgsError("Invalid proposal description", value => value.value !== "", true),
@@ -159,8 +160,11 @@ export default class Export extends Component {
         // Multicall args to display for copy/paste
         let multicallArgs = "";
         if (this.showArgs) {
-            // Return error message if cards still have errors. Faulty JSON breaks toBase64.
-            if (errors.hasErrors.isBad) { multicallArgs = errors.hasErrors.message; }
+            // Return error message if a card has JSON errors. Faulty JSON breaks toBase64.
+            const hasJsonErrors = errors.hasErrors.isBad && !!allErrors.find(err => err.message === errorMsg.ERR_INVALID_ARGS);
+            if (hasJsonErrors) {
+                multicallArgs = "Please fix invalid JSON errors";
+            }
             else {
                 // toBase64 might throw on failure
                 try {
