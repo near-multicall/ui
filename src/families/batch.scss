@@ -90,6 +90,13 @@
             &:nth-last-of-type(2) > .MuiOutlinedInput-root > fieldset {
                 border-radius: 0 0 size.$task-radius size.$task-radius;
             }
+            .MuiInputAdornment-root {
+                .icon.link {
+                    @include mixin.light-icon;
+                    cursor: pointer;
+                    font-size: size.$text;
+                }
+            }
         }
         & > .checkbox {
             align-self: flex-end;
@@ -104,7 +111,7 @@
             p {
                 color: color.$light-text;
                 font-family: font.$code;
-                max-width: calc(100% - 3 * size.$large-text - 0.5 * size.$gap);
+                max-width: calc(100% - 2 * size.$large-text - 0.25 * size.$gap);
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
@@ -118,9 +125,6 @@
                     transform: rotate(-90deg);
                 }
                 transition: all 50ms linear;
-            }
-            .link {
-                padding-left: 0.25 * size.$gap;
             }
             .delete {
                 position: absolute;

@@ -297,6 +297,7 @@ export default class Transfer_Batch extends BatchTask {
         const newTarget = new ArgsAccount("");
         const newAddrError = new ArgsError("Invalid address", value => ArgsAccount.isValid(value));
 
+        // TODO debounce task.updateCard for performance
         return (
             <div className="edit">
                 <TextInput
@@ -331,11 +332,6 @@ export default class Transfer_Batch extends BatchTask {
                                 collapsed={ this.targets[id].expandInEditor ? "no" : "yes" }
                             >expand_more</Icon> 
                             <p>{this.targets[id].receiver_id}</p>
-                            <a href={ArgsAccount.toUrl(this.targets[id].receiver_id)} target="_blank" rel="noopener noreferrer">
-                                <Icon 
-                                    className="icon link"
-                                >open_in_new</Icon>
-                            </a>
                             <Icon 
                                 className="icon delete"
                                 onClick={ () => this.removeFtTransfer(id) }
@@ -343,9 +339,28 @@ export default class Transfer_Batch extends BatchTask {
                         </h2>
                         { this.targets[id].expandInEditor && [...this.targets[id].ft_transfer].map(fttid => {
                             const task = TASKS.find(t => t.id === fttid).instance.current;
-                            const { amount, memo } = task.call.args.value;
+                            const { receiver_id, amount, memo } = task.call.args.value;
                             const errors = task.errors;
                             return (<>
+                                <TextInput 
+                                    label="Receiver"
+                                    value={ receiver_id }
+                                    error={ errors.receiver }
+                                    update={ () => {
+                                        this.targets[id].receiver_id = receiver_id.value;
+                                        this.updateCard();
+                                        task.updateCard();
+                                    } }
+                                    InputProps={{
+                                        endAdornment: <InputAdornment position="end">
+                                            <a href={ArgsAccount.toUrl(this.targets[id].receiver_id)} target="_blank" rel="noopener noreferrer">
+                                                <Icon 
+                                                    className="icon link"
+                                                >open_in_new</Icon>
+                                            </a>
+                                        </InputAdornment>,
+                                    }}
+                                />
                                 <TextInput
                                     label="Transfer amount"
                                     value={ amount }
