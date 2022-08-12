@@ -22,6 +22,7 @@ export default class Transfer_Batch extends BatchTask {
     sdOffset = 0;
 
     updateFTDebounced = debounce(() => this.updateFT(), 500);
+    updateSDDebounced = debounce((target) => this.updateSD(target), 500);
 
     constructor(props) {
 
@@ -167,6 +168,7 @@ export default class Transfer_Batch extends BatchTask {
         new Set(affectedSDTasks).forEach(id => LAYOUT.deleteTask(id));
 
         affected.forEach(a => a.storage_deposit.clear());
+        this.updateCard();
 
     }
 
@@ -241,10 +243,42 @@ export default class Transfer_Batch extends BatchTask {
 
     }
 
+    removeStray() {
+
+        // only delete storage_deposits, that are not linked anywhere
+        const notStray = Object.values(this.targets).map(t => t.receiver_id);
+        this.tasks.forEach(t => {
+            if (t instanceof StorageDeposit && !notStray.includes(t.call.args.value.account_id.value)) {
+                
+                Object.values(this.targets).forEach(v => v.storage_deposit.delete(t.props.id));
+                LAYOUT.deleteTask(t.props.id);
+
+            }
+        });
+
+    }
+
     toggleExpand(id) {
 
         this.targets[id].expandInEditor = !this.targets[id].expandInEditor;
         EDITOR.forceUpdate();
+
+    }
+
+    updateSD(target) {
+
+        view(
+            this.state.addr.value,
+            "storage_balance_of",
+            {account_id: target}
+        )
+        .catch(e => {})
+        .then((storage) => {
+            if (storage === null) {
+                this.addStorageDeposit(target);
+                this.updateCard();
+            }
+        })
 
     }
 
@@ -267,19 +301,19 @@ export default class Transfer_Batch extends BatchTask {
                 this.errors.noToken.isBad = true;
         })
 
-        Object.keys(this.targets).forEach(t => 
+        Object.keys(this.targets).forEach(id => 
             view(
                 addr.value,
                 "storage_balance_of",
-                {account_id: t}
+                {account_id: this.targets[id].receiver_id}
             )
             .catch(e => {})
             .then((storage) => {
                 if (storage === undefined) return;
                 if (storage === null)
-                    this.addStorageDeposit(t)
+                    this.addStorageDeposit(this.targets[id].receiver_id)
                 else
-                    this.removeStorageDeposit(t)
+                    this.removeStorageDeposit(this.targets[id].receiver_id)
             })
         )
 
@@ -346,8 +380,18 @@ export default class Transfer_Batch extends BatchTask {
                                     label="Receiver"
                                     value={ receiver_id }
                                     error={ errors.receiver }
-                                    update={ () => {
-                                        this.targets[id].receiver_id = receiver_id.value;
+                                    update={ (e) => {
+                                        const target = this.targets[id];
+                                        target.receiver_id = receiver_id.value;
+                                        target.storage_deposit = new Set(
+                                            this.tasks
+                                                .slice(0, this.sdOffset)
+                                                .filter(task => task.call.args.value.account_id.value === receiver_id.value)
+                                                .map(task => task.props.id)
+                                        )
+                                        if (target.storage_deposit.size === 0)
+                                            this.updateSDDebounced(receiver_id.value);
+                                        this.removeStray();
                                         this.updateCard();
                                         task.updateCard();
                                     } }
