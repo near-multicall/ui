@@ -128,6 +128,8 @@ export default class Task extends Component {
                             ? TASKS.find(t => t.id === window.COPY.from).instance.current.call.toJSON()
                             : json
 
+                        console.log(newJson);
+
                         for (let family in Family) {
                             if (family === "BatchTask")
                                 continue;

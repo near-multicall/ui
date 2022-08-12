@@ -5,6 +5,7 @@ export const initialData = {
         'task-i3': { id: 'task-i3', addr: "near", func: "ft_transfer" },
         'task-i4': { id: 'task-i4', addr: "near", func: "storage_deposit" },
         'task-i5': { id: 'task-i5', addr: "", func: "" },
+        'task-i6': { id: 'task-i6', addr: "near", func: "ft_transfer batch" },
     },
     columns: {
         'column-0': {

@@ -7,6 +7,7 @@ import { ArgsAccount, ArgsError, ArgsString } from "../../utils/args";
 import { view } from "../../utils/wallet";
 import BatchTask from '../batch';
 import "./near.scss";
+import StorageDeposit from './storage-deposit';
 import Transfer from './transfer';
 
 export default class Transfer_Batch extends BatchTask {
@@ -18,6 +19,7 @@ export default class Transfer_Batch extends BatchTask {
     };
 
     targets = {};
+    sdOffset = 0;
 
     updateFTDebounced = debounce(() => this.updateFT(), 500);
 
@@ -51,19 +53,44 @@ export default class Transfer_Batch extends BatchTask {
 
     }
 
+    checkIntegrity() {
+
+        const storageDepositTasks = this.tasks.filter(t => t instanceof StorageDeposit);
+        const ftTransferTasks = this.tasks.filter(t => t instanceof Transfer);
+
+        // // sanity check: storageDepositTasks does not mention same target twice
+        // const targets = storageDepositTasks.map(t => t.call.args.value.account_id);
+        // if (targets.length !== new Set(targets).size)
+        //     throw new Error("Duplicate storage_deposit");
+
+        // // sanity check: every storage_deposit belongs to a ft_transfer
+        // if (Object.values(targets).some(t => !ftTransferTasks.find(task => task.call.args.value.receiver_id === t.receiver_id)))
+        //     throw new Error("Found stray storage_deposit");
+
+        // order actions: storage_deposits must appear before ft_transfer
+        this.sdOffset = storageDepositTasks.length;
+        this.tasks = [...storageDepositTasks, ...ftTransferTasks];
+
+    }
+
     onTasksLoaded() {
 
-        for (let t of this.tasks) {
-            const receiver = t instanceof Transfer
-                ? t.call.args.value.receiver_id.value
-                : t.call.args.value.account_id.value
-            this.targets[receiver] ??= {
+        this.checkIntegrity();
+
+        for (let t of this.tasks.slice(this.sdOffset)) {
+            if (t instanceof StorageDeposit) continue;
+            const receiver = t.call.args.value.receiver_id.value;
+            this.targets[t.props.id] ??= {
                 receiver_id: receiver,
                 expandInEditor: true,
-                ft_transfer: new Set(),
-                storage_deposit: new Set()
+                ft_transfer: new Set([t.props.id]),
+                storage_deposit: new Set(
+                    this.tasks
+                        .slice(0, this.sdOffset)
+                        .filter(task => task.call.args.value.account_id.value === receiver)
+                        .map(task => task.props.id)
+                )
             };
-            this.targets[receiver][t.call.func.value].add(t.props.id);
         }
 
     }
@@ -102,8 +129,13 @@ export default class Transfer_Batch extends BatchTask {
 
     addStorageDeposit(target) {
 
-        if (this.targets[target].storage_deposit.size > 0) return;
-        this.targets[target].storage_deposit.add(this.addNewTask(
+        // a storage deposit for this target already exists
+        const alreadyExists = this.tasks
+            .slice(0, this.sdOffset)
+            .some(t => t.call.args.value.account_id.value === target);
+        if (alreadyExists) return;
+
+        const newId = this.addNewTask(
             "near", 
             "storage_deposit",
             {
@@ -116,20 +148,31 @@ export default class Transfer_Batch extends BatchTask {
                 }]
             },
             this.updateCard
-        ));
+        );
+        // add to all transfers to given target
+        Object.values(this.targets)
+            .filter(t => t.receiver_id === target)
+            .forEach(t => t.storage_deposit.add(newId));
 
     }
 
     removeStorageDeposit(target) {
 
-        this.targets[target].storage_deposit.forEach(id => LAYOUT.deleteTask(id));
-        this.targets[target].storage_deposit.clear();
+        const affected = Object.values(this.targets).filter(t => t.receiver_id === target);
+        const affectedSDTasks = affected
+            .map(a => [...a.storage_deposit])
+            .flat();
+
+        // delete all linked storage deposits
+        new Set(affectedSDTasks).forEach(id => LAYOUT.deleteTask(id));
+
+        affected.forEach(a => a.storage_deposit.clear());
 
     }
 
     addFtTransfer(target) {
 
-        this.targets[target].ft_transfer.add(this.addNewTask(
+        const newId = this.addNewTask(
             "near", 
             "ft_transfer",
             {
@@ -143,18 +186,37 @@ export default class Transfer_Batch extends BatchTask {
                 }]
             },
             this.updateCard
-        ));
+        );
+        this.targets[newId] = {
+            receiver_id: target,
+            expandInEditor: true,
+            ft_transfer: new Set([newId]),
+            storage_deposit: new Set(
+                this.tasks
+                    .filter(t => t instanceof StorageDeposit)
+                    .filter(task => task.call.args.value.account_id.value === target)
+                    .map(task => task.props.id)
+            )
+        };
 
     }
 
-    removeFtTransfer(target) {
+    removeFtTransfer(taskId) {
 
-        [
-            ...this.targets[target].storage_deposit, 
-            ...this.targets[target].ft_transfer
-        ]
-            .forEach(id => LAYOUT.deleteTask(id));
-        delete this.targets[target];
+        const target = this.targets[taskId] 
+        target.ft_transfer.forEach(id => LAYOUT.deleteTask(id));
+
+        // only delete storage_deposits, that are not linked elsewhere
+        const notAffected = Object.entries(this.targets).filter(([k, v]) => k !== taskId);
+        const notAffectedSDTasks = new Set(notAffected
+            .map(([k, v]) => [...v.storage_deposit])
+            .flat());
+        target.storage_deposit.forEach(id => {
+            if (!notAffectedSDTasks.has(id))
+                LAYOUT.deleteTask(id);
+        });
+
+        delete this.targets[taskId];
         this.updateCard();
 
     }
@@ -163,13 +225,6 @@ export default class Transfer_Batch extends BatchTask {
 
         if (newAddrError.isBad) return;
         const receiver = newTarget.value;
-
-        this.targets[receiver] ??= {
-            receiver_id: receiver,
-            expandInEditor: true,
-            ft_transfer: new Set(),
-            storage_deposit: new Set()
-        };
 
         this.addFtTransfer(receiver);
 
@@ -186,9 +241,9 @@ export default class Transfer_Batch extends BatchTask {
 
     }
 
-    toggleExpand(t) {
+    toggleExpand(id) {
 
-        this.targets[t].expandInEditor = !this.targets[t].expandInEditor;
+        this.targets[id].expandInEditor = !this.targets[id].expandInEditor;
         EDITOR.forceUpdate();
 
     }
@@ -220,7 +275,6 @@ export default class Transfer_Batch extends BatchTask {
             )
             .catch(e => {})
             .then((storage) => {
-                console.log(storage);
                 if (storage === undefined) return;
                 if (storage === null)
                     this.addStorageDeposit(t)
@@ -269,26 +323,26 @@ export default class Transfer_Batch extends BatchTask {
                     } }
                 />
                 {
-                    Object.keys(this.targets).map(t => <div className={`section ${this.targets[t].expandInEditor ? "" : "collapsed"}`}>
+                    Object.keys(this.targets).map(id => <div className={`section ${this.targets[id].expandInEditor ? "" : "collapsed"}`}>
                         <h2>
                             <Icon 
                                 className="icon collapse"
-                                onClick={() => this.toggleExpand(t)}
-                                collapsed={ this.targets[t].expandInEditor ? "no" : "yes" }
+                                onClick={() => this.toggleExpand(id)}
+                                collapsed={ this.targets[id].expandInEditor ? "no" : "yes" }
                             >expand_more</Icon> 
-                            <p>{t}</p>
-                            <a href={ArgsAccount.toUrl(t)} target="_blank" rel="noopener noreferrer">
+                            <p>{this.targets[id].receiver_id}</p>
+                            <a href={ArgsAccount.toUrl(this.targets[id].receiver_id)} target="_blank" rel="noopener noreferrer">
                                 <Icon 
                                     className="icon link"
                                 >open_in_new</Icon>
                             </a>
                             <Icon 
                                 className="icon delete"
-                                onClick={ () => this.removeFtTransfer(t) }
+                                onClick={ () => this.removeFtTransfer(id) }
                             >delete_outline</Icon>
                         </h2>
-                        { this.targets[t].expandInEditor && [...this.targets[t].ft_transfer].map(id => {
-                            const task = TASKS.find(t => t.id === id).instance.current;
+                        { this.targets[id].expandInEditor && [...this.targets[id].ft_transfer].map(fttid => {
+                            const task = TASKS.find(t => t.id === fttid).instance.current;
                             const { amount, memo } = task.call.args.value;
                             const errors = task.errors;
                             return (<>
@@ -317,12 +371,12 @@ export default class Transfer_Batch extends BatchTask {
                         }) }
                         <div className="checkbox">
                             <Checkbox
-                                checked={this.targets[t].storage_deposit.size > 0}
+                                checked={this.targets[id].storage_deposit.size > 0}
                                 onChange={e => {
                                     if (e.target.checked)
-                                        this.addStorageDeposit(t);
+                                        this.addStorageDeposit(this.targets[id].receiver_id);
                                     else 
-                                        this.removeStorageDeposit(t);
+                                        this.removeStorageDeposit(this.targets[id].receiver_id);
                                     this.updateCard();
                                 }}
                             />
