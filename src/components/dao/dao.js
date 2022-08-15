@@ -2,6 +2,7 @@ import { DeleteOutline, EditOutlined, AddOutlined, PauseOutlined, PlayArrowOutli
 import { Base64 } from 'js-base64';
 import React, { Component } from 'react';
 import { ArgsAccount, ArgsError } from '../../utils/args';
+import { STORAGE } from '../../utils/persistent';
 import { toNEAR, toYocto, Big } from '../../utils/converter';
 import { view } from '../../utils/wallet';
 import { useWalletSelector } from '../../contexts/walletSelectorContext';
@@ -18,7 +19,7 @@ export default class DaoComponent extends Component {
     static contextType = useWalletSelector();
 
     errors = {
-        addr: new ArgsError("Invalid NEAR address", value => ArgsAccount.isValid(value), !ArgsAccount.isValid(STORAGE.addresses?.dao ?? "")),
+        addr: new ArgsError("Invalid NEAR address", value => ArgsAccount.isValid(value), !ArgsAccount.isValid(STORAGE.addresses.dao)),
         noDao: new ArgsError("Sputnik DAO not found on given address", value => this.errors.noDao.isBad),
         noContract: new ArgsError("DAO has no multicall instance", value => this.errors.noContract.isBad),
     }
@@ -32,8 +33,8 @@ export default class DaoComponent extends Component {
         super(props);
 
         this.state = {
-            addr: this.getBaseAddress(STORAGE.addresses?.dao ?? ""),
-            dao: new SputnikDAO(STORAGE.addresses?.dao ?? ""),
+            addr: this.getBaseAddress(STORAGE.addresses.dao),
+            dao: new SputnikDAO(STORAGE.addresses.dao),
             loading: false,
             proposed: -1,
             proposedInfo: {},

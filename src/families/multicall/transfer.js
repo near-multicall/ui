@@ -2,6 +2,7 @@ import Checkbox from '@mui/material/Checkbox';
 import React from 'react';
 import { ArgsAccount, ArgsBig, ArgsString, ArgsObject, ArgsError } from "../../utils/args";
 import Call from "../../utils/call";
+import { STORAGE } from '../../utils/persistent';
 import { toGas, toYocto, formatTokenAmount, unitToDecimals } from "../../utils/converter";
 import BaseTask from "../base";
 import Multicall from '../../utils/contracts/multicall';
@@ -32,7 +33,7 @@ export default class Transfer extends BaseTask {
 
         this.call = new Call({
             name: new ArgsString(json?.name ?? "Transfer Near"),
-            addr: new ArgsAccount(STORAGE.addresses.multicall ?? ""),
+            addr: new ArgsAccount(STORAGE.addresses.multicall),
             func: new ArgsString(actions?.func ?? "near_transfer"),
             args: new ArgsObject(actions?.args 
                 ? {
