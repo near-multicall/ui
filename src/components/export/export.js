@@ -158,11 +158,17 @@ export default class Export extends Component {
             ? Object.entries(WALLET_COMPONENT.errors).filter(([k, v]) => v.isBad)[0]?.[1].message
             : null
 
+        // update internal state of address errors
+        Object.entries(STORAGE.addresses).forEach(([k, v]) => {
+            const account = new ArgsAccount(v)
+            errors[k].validOrNull(account);
+        });
+
         // Multicall args to display for copy/paste
         let multicallArgs = "";
         if (this.showArgs) {
             // Return error message if a card has JSON errors. Faulty JSON breaks toBase64.
-            const hasJsonErrors = errors.hasErrors.isBad && !!allErrors.find(err => err.message === errorMsg.ERR_INVALID_ARGS);
+            const hasJsonErrors = errors.hasErrors.isBad && allErrors.some(err => err.message === errorMsg.ERR_INVALID_ARGS);
             if (hasJsonErrors) {
                 multicallArgs = "Please fix invalid JSON errors";
             }
