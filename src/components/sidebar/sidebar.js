@@ -9,6 +9,7 @@ import Discord from '../../assets/discord.svg';
 import Github from '../../assets/github.svg';
 import Twitter from '../../assets/twitter.svg';
 import { Wallet } from '../../components';
+import { STORAGE } from '../../utils/persistent';
 import { SputnikDAO } from '../../utils/contracts/sputnik-dao';
 import { ArgsError, ArgsString } from '../../utils/args';
 import { Base64 } from 'js-base64';
@@ -91,7 +92,7 @@ export default class Sidebar extends Component {
                         <NavLink 
                             className={({ isActive }) => isActive ? "active" : ""} 
                             to="/dao"
-                            onClick={() => window.STORAGE.save()}
+                            onClick={() => STORAGE.save()}
                         >
                             Dao
                         </NavLink>

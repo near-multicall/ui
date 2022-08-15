@@ -6,6 +6,7 @@ import { Base64 } from 'js-base64';
 import React, { Component } from 'react';
 import { ArgsAccount, ArgsBig, ArgsError, ArgsString } from '../../utils/args';
 import { errorMsg } from '../../utils/errors';
+import { STORAGE } from '../../utils/persistent';
 import { convert, toGas, toNEAR } from '../../utils/converter';
 import { view } from "../../utils/wallet";
 import { useWalletSelector } from '../../contexts/walletSelectorContext';

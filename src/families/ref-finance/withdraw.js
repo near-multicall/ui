@@ -1,5 +1,6 @@
 import { ArgsAccount, ArgsBig, ArgsJSON, ArgsString, ArgsError } from "../../utils/args";
 import Call from "../../utils/call";
+import { STORAGE } from "../../utils/persistent";
 import { toGas } from "../../utils/converter";
 import { errorMsg } from "../../utils/errors";
 import BaseTask from "../base";
@@ -21,7 +22,7 @@ export default class Withdraw extends BaseTask {
 
         this.call = new Call({
             name: new ArgsString(json?.name ?? "Withdraw from Ref"),
-            addr: new ArgsAccount(STORAGE.addresses.multicall ?? ""),
+            addr: new ArgsAccount(STORAGE.addresses.multicall),
             func: new ArgsString(actions?.func ?? "withdraw_from_ref"),
             /*args: new ArgsObject(json?.args 
                 ? {
