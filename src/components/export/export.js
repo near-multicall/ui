@@ -5,6 +5,7 @@ import TextField from '@mui/material/TextField';
 import { Base64 } from 'js-base64';
 import React, { Component } from 'react';
 import { ArgsAccount, ArgsBig, ArgsError, ArgsString } from '../../utils/args';
+import { errorMsg } from '../../utils/errors';
 import { STORAGE } from '../../utils/persistent';
 import { convert, toGas, toNEAR } from '../../utils/converter';
 import { view } from "../../utils/wallet";
@@ -17,11 +18,11 @@ export default class Export extends Component {
     static contextType = useWalletSelector();
 
     errors = {
-        user: new ArgsError("Invalid address", value => ArgsAccount.isValid(value), true),
+        user: new ArgsError(errorMsg.ERR_INVALID_ADDR, value => ArgsAccount.isValid(value), true),
         dao: new ArgsError("Invalid address", value => ArgsAccount.isValid(value), true),
         multicall: new ArgsError("Invalid address", value => ArgsAccount.isValid(value), true),
-        gas: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value) && value.value !== ""),
-        depo: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value) && value.value !== ""),
+        gas: new ArgsError(errorMsg.ERR_INVALID_GAS_AMOUNT, value => ArgsBig.isValid(value) && value.value !== ""),
+        depo: new ArgsError(errorMsg.ERR_INVALID_DEPO_AMOUNT, value => ArgsBig.isValid(value) && value.value !== ""),
         amount: new ArgsError("Invalid amount", value => ArgsBig.isValid(value) && value.value !== ""),
         token: new ArgsError("Invalid address", value => ArgsAccount.isValid(value)),
         desc: new ArgsError("Invalid proposal description", value => value.value !== "", true),
@@ -157,12 +158,37 @@ export default class Export extends Component {
             ? Object.entries(WALLET_COMPONENT.errors).filter(([k, v]) => v.isBad)[0]?.[1].message
             : null
 
-        const addresses = Object.fromEntries(Object.entries(STORAGE.addresses)
-            .map(([k, v]) => {
-                const account = new ArgsAccount(v)
-                errors[k].validOrNull(account);
-                return [k, account]
-            }));
+        // update internal state of address errors
+        Object.entries(STORAGE.addresses).forEach(([k, v]) => {
+            const account = new ArgsAccount(v)
+            errors[k].validOrNull(account);
+        });
+
+        // Multicall args to display for copy/paste
+        let multicallArgs = "";
+        if (this.showArgs) {
+            // Return error message if a card has JSON errors. Faulty JSON breaks toBase64.
+            const hasJsonErrors = errors.hasErrors.isBad && allErrors.some(err => err.message === errorMsg.ERR_INVALID_ARGS);
+            if (hasJsonErrors) {
+                multicallArgs = "Please fix invalid JSON errors";
+            }
+            else {
+                // toBase64 might throw on failure
+                try {
+                    multicallArgs = !this.attachFT
+                        ? JSON.stringify({calls: LAYOUT.toBase64()}) 
+                        : JSON.stringify({
+                            receiver_id: STORAGE.addresses.multicall, 
+                            amount: convert(amount.value, amount.unit, amount.decimals),
+                            msg: JSON.stringify({
+                                function_id: "multicall",
+                                args: Base64.encode(JSON.stringify({"calls":LAYOUT.toBase64()}).toString())
+                            }).toString()
+                        })
+                }
+                catch (e) {multicallArgs = "ERROR: something went wrong during JSON creation"}
+            }
+        }
 
         return (
             <div 
@@ -287,7 +313,7 @@ export default class Export extends Component {
                                 ? <Icon 
                                     className="icon copy"
                                     onClick={ e => {
-                                        navigator.clipboard.writeText(JSON.stringify({calls: LAYOUT.toBase64()}));
+                                        navigator.clipboard.writeText(multicallArgs);
                                         this.updateCopyIcon(e); 
                                     } }
                                 >content_copy</Icon>
@@ -297,17 +323,7 @@ export default class Export extends Component {
                         { this.showArgs 
                             ? <div className="value">
                                 <pre className="code">
-                                    { !this.attachFT
-                                        ? JSON.stringify({calls: LAYOUT.toBase64()}) 
-                                        : JSON.stringify({
-                                            receiver_id: STORAGE.addresses.multicall, 
-                                            amount: convert(amount.value, amount.unit, amount.decimals),
-                                            msg: JSON.stringify({
-                                                function_id: "multicall",
-                                                args: Base64.encode(JSON.stringify({"calls":LAYOUT.toBase64()}).toString())
-                                            }).toString()
-                                        })
-                                    }
+                                    {multicallArgs}
                                 </pre>
                             </div>
                             : <></>
