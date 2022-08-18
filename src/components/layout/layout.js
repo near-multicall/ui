@@ -3,6 +3,7 @@ import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import { Column, Menu } from '../../components.js';
 import { initialData } from '../../initial-data.js';
 import { Base64 } from 'js-base64';
+import { STORAGE } from '../../utils/persistent';
 import './layout.scss'
 
 export default class Layout extends Component {
@@ -25,7 +26,7 @@ export default class Layout extends Component {
     componentDidMount() {
 
         window.LAYOUT = this;
-        window.STORAGE.load();
+        STORAGE.load();
 
     }
 
@@ -33,9 +34,9 @@ export default class Layout extends Component {
 
     getColumnID = () => this.columnID;
 
-    getTasks = () => window.STORAGE.layout.tasks;
+    getTasks = () => STORAGE.layout.tasks;
 
-    getColumns = () => window.STORAGE.layout.columns;
+    getColumns = () => STORAGE.layout.columns;
 
     // TODO delete elements after exjecting from tasklist / columnlist
     
@@ -47,7 +48,7 @@ export default class Layout extends Component {
      */
     static findTaskCoordinates = (taskId) => {
         let index;
-        const layout = window.STORAGE.layout;
+        const layout = STORAGE.layout;
         const colId = layout.columnOrder.find((colId) => {
             index = layout.columns[colId].taskIds.indexOf(taskId);
             return index >= 0;
@@ -58,7 +59,7 @@ export default class Layout extends Component {
 
     deleteTask = (taskId) => {
 
-        const layout = window.STORAGE.layout;
+        const layout = STORAGE.layout;
         const { columnId, taskIndex } = Layout.findTaskCoordinates(taskId);
 
         if (columnId == undefined || taskIndex == undefined) {
@@ -82,13 +83,13 @@ export default class Layout extends Component {
             }
         }
 
-        window.STORAGE.setLayout(newLayout);
+        STORAGE.setLayout(newLayout);
 
     }
 
     duplicateTask = (taskId) => {
 
-        const layout = window.STORAGE.layout;
+        const layout = STORAGE.layout;
         const { columnId, taskIndex } = Layout.findTaskCoordinates(taskId);
 
         if (columnId == undefined || taskIndex == undefined) {
@@ -128,7 +129,7 @@ export default class Layout extends Component {
             to: taskClone.id
         }
 
-        window.STORAGE.setLayout(newLayout);
+        STORAGE.setLayout(newLayout);
 
     }
 
@@ -143,13 +144,13 @@ export default class Layout extends Component {
         this.taskID = 0;
         this.columnID = 1;
 
-        window.STORAGE.setLayout(initialData);
+        STORAGE.setLayout(initialData);
 
     }
 
     deleteColumn = index => {
 
-        const layout = window.STORAGE.layout;
+        const layout = STORAGE.layout;
         const newColumnOrder = Array.from(layout.columnOrder);
         newColumnOrder.splice(index, 1);
 
@@ -173,7 +174,7 @@ export default class Layout extends Component {
                 columnOrder: [`column-${this.columnID++}`]
             }
 
-        window.STORAGE.setLayout(newLayout);
+        STORAGE.setLayout(newLayout);
 
     }
 
@@ -185,7 +186,7 @@ export default class Layout extends Component {
             taskIds: []
         };
 
-        const layout = window.STORAGE.layout;
+        const layout = STORAGE.layout;
         const newColumnOrder = Array.from(layout.columnOrder);
         newColumnOrder.push(`column-${this.columnID}`);
 
@@ -200,13 +201,13 @@ export default class Layout extends Component {
 
         this.columnID++;
 
-        window.STORAGE.setLayout(newLayout);
+        STORAGE.setLayout(newLayout);
 
     }
 
     onDragEnd = result => {
 
-        const layout = window.STORAGE.layout;
+        const layout = STORAGE.layout;
         const { destination, source, draggableId, type } = result;
     
         if (!destination)
@@ -228,7 +229,7 @@ export default class Layout extends Component {
                 columnOrder: newColumnOrder
             };
 
-            window.STORAGE.setLayout(newLayout);
+            STORAGE.setLayout(newLayout);
 
             return;
 
@@ -264,7 +265,7 @@ export default class Layout extends Component {
                 }
             }
 
-            window.STORAGE.setLayout(newLayout);
+            STORAGE.setLayout(newLayout);
 
         } else {
 
@@ -284,7 +285,7 @@ export default class Layout extends Component {
                 // create new task
                 const taskClone = JSON.parse(JSON.stringify(layout.tasks[taskId.toString()]));
                 taskClone.id = `task-${this.taskID}`;
-                window.STORAGE.layout.tasks[taskClone.id] = taskClone;
+                STORAGE.layout.tasks[taskClone.id] = taskClone;
 
                 this.taskID++;
 
@@ -320,7 +321,7 @@ export default class Layout extends Component {
                 }
             }
 
-            window.STORAGE.setLayout(newLayout);
+            STORAGE.setLayout(newLayout);
 
         }
 
@@ -329,7 +330,7 @@ export default class Layout extends Component {
     fromJSON(json) {
         this.clear();
 
-        const layout = window.STORAGE.layout;
+        const layout = STORAGE.layout;
 
         if (!Array.isArray(json) || !json.length)
             return;
@@ -373,13 +374,13 @@ export default class Layout extends Component {
             }
         }
 
-        window.STORAGE.setLayout(newLayout);
+        STORAGE.setLayout(newLayout);
     }
 
     fromBase64(json) {
         this.clear();
 
-        const layout = window.STORAGE.layout;
+        const layout = STORAGE.layout;
 
         if (!Array.isArray(json) || !json.length)
             return;
@@ -439,12 +440,12 @@ export default class Layout extends Component {
             }
         }
 
-        window.STORAGE.setLayout(newLayout);
+        STORAGE.setLayout(newLayout);
     }
 
     toJSON() {
 
-        const layout = window.STORAGE.layout;
+        const layout = STORAGE.layout;
         let output = [];
 
         for (let c of layout.columnOrder) {
@@ -468,7 +469,7 @@ export default class Layout extends Component {
 
     toBase64() {
 
-        const layout = window.STORAGE.layout;
+        const layout = STORAGE.layout;
         let output = [];
 
         for (let c of layout.columnOrder) {
@@ -492,7 +493,7 @@ export default class Layout extends Component {
 
     toErrors() {
         
-        const layout = window.STORAGE.layout;
+        const layout = STORAGE.layout;
         let output = [];
 
         if (!window?.TASKS)
@@ -524,7 +525,7 @@ export default class Layout extends Component {
 
     empty() {
 
-        const layout = window.STORAGE.layout;
+        const layout = STORAGE.layout;
         return layout.columnOrder.length === 1 && layout.columns[layout.columnOrder[0]].taskIds.length === 0
 
     }
@@ -539,7 +540,7 @@ export default class Layout extends Component {
 
     render() {
 
-        const layout = window.STORAGE.layout;
+        const layout = STORAGE.layout;
 
         return (
             <DragDropContext

@@ -1,5 +1,8 @@
+import { STORAGE } from "./persistent";
+
+
 window.onbeforeunload = function(e) {
-    window.STORAGE.save();
+    STORAGE.save();
 
     // e = e || window.event;
 

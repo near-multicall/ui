@@ -41,9 +41,6 @@ declare global {
         TEMP: CardInfo | null
         COPY: CardCopy | null
 
-        // Storing data, persists reloads
-        STORAGE: Persistent
-
         // Wallet definitions
         WALLET_COMPONENT: Promise<nearAPI.WalletConnection> | Component
         NEAR_ENV: NetworkId

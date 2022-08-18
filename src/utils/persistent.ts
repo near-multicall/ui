@@ -1,18 +1,24 @@
-import { initialData } from '../initial-data.js'
+import { initialData } from '../initial-data.js';
 import debounce from 'lodash.debounce';
 
 
-export class Persistent {
-    static STORAGE_KEY_ADDRESSES = "multicall_addresses";
-    static STORAGE_KEY_JSON = "multicall_json";
+const STORAGE_KEY_ADDRESSES = "multicall_addresses";
+const STORAGE_KEY_JSON = "multicall_json";
 
-    addresses = {
-        user: "",
-        multicall: "",
-        dao: ""
+
+// Singleton for storing + persisting addresses and layout on local storage.
+class Persistent {
+
+    // addresses relevant to multicall interactions. Initialize with empty strings.
+    addresses: { user: string; multicall: string; dao: string } = { user: "", multicall: "", dao: "" };
+    // TODO: type layout
+    layout: object = JSON.parse(JSON.stringify(initialData));
+
+    constructor () {
+        // try initializing with values from local storage
+        let storedAddresses = localStorage.getItem(STORAGE_KEY_ADDRESSES);
+        this.addresses = storedAddresses ? JSON.parse(storedAddresses) : this.addresses;
     }
-
-    layout = JSON.parse(JSON.stringify(initialData));
 
     setAddresses = debounce(
         // debounced function
@@ -37,7 +43,6 @@ export class Persistent {
         100
     );
 
-    // TODO type layout
     setLayout(newLayout: any) {
 
         this.layout = {
@@ -56,17 +61,19 @@ export class Persistent {
     save() {
         if (window.PAGE !== "app") return;
 
-        localStorage.setItem(Persistent.STORAGE_KEY_ADDRESSES, JSON.stringify(this.addresses));
-        localStorage.setItem(Persistent.STORAGE_KEY_JSON, JSON.stringify(window.LAYOUT.toBase64()));
+        localStorage.setItem(STORAGE_KEY_ADDRESSES, JSON.stringify(this.addresses));
+        localStorage.setItem(STORAGE_KEY_JSON, JSON.stringify(window.LAYOUT.toBase64()));
         // localStorage.setItem("multicall_layout", JSON.stringify(this.layout));
     }
 
     load() {
-        this.setAddresses(JSON.parse(localStorage.getItem(Persistent.STORAGE_KEY_ADDRESSES) ?? "{}"));
-        window.LAYOUT?.fromBase64(JSON.parse(localStorage.getItem(Persistent.STORAGE_KEY_JSON) ?? "[]"));
+        this.setAddresses(JSON.parse(localStorage.getItem(STORAGE_KEY_ADDRESSES) ?? "{}"));
+        window.LAYOUT?.fromBase64(JSON.parse(localStorage.getItem(STORAGE_KEY_JSON) ?? "[]"));
         // this.setLayout(JSON.parse(localStorage.getItem("multicall_layout") ?? "{}"));
     }
 
 }
 
-window.STORAGE = new Persistent();
+const STORAGE = new Persistent();
+
+export { STORAGE }

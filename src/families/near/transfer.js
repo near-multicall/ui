@@ -5,6 +5,7 @@ import { ArgsAccount, ArgsBig, ArgsError, ArgsObject, ArgsString } from "../../u
 import Call from "../../utils/call";
 import { toGas, formatTokenAmount, unitToDecimals } from "../../utils/converter";
 import { view } from "../../utils/wallet";
+import { errorMsg } from '../../utils/errors';
 import BaseTask from "../base";
 import debounce from "lodash.debounce";
 import "./near.scss";
@@ -15,12 +16,12 @@ export default class Transfer extends BaseTask {
     uniqueClassName = "near-transfer-task";
     errors = {
         ...this.baseErrors,
-        addr: new ArgsError("Invalid address", value => ArgsAccount.isValid(value)),
-        func: new ArgsError("Cannot be empty", value => value != ""),
-        args: new ArgsError("Invalid JSON", value => true),
+        addr: new ArgsError(errorMsg.ERR_INVALID_ADDR, value => ArgsAccount.isValid(value)),
+        func: new ArgsError(errorMsg.ERR_INVALID_FUNC, value => value != ""),
+        args: new ArgsError(errorMsg.ERR_INVALID_ARGS, value => true),
         receiver: new ArgsError("Invalid address", value => ArgsAccount.isValid(value), !ArgsAccount.isValid(this.call.args.value.receiver_id)),
         amount: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value)),
-        gas: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value)),
+        gas: new ArgsError(errorMsg.ERR_INVALID_GAS_AMOUNT, value => ArgsBig.isValid(value)),
         noToken: new ArgsError("Address does not belong to token contract", value => this.errors.noToken)
     };
 

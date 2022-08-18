@@ -2,6 +2,8 @@ import Checkbox from '@mui/material/Checkbox';
 import React from 'react';
 import { ArgsAccount, ArgsBig, ArgsString, ArgsObject, ArgsError } from "../../utils/args";
 import Call from "../../utils/call";
+import { errorMsg } from '../../utils/errors';
+import { STORAGE } from '../../utils/persistent';
 import { toGas, toYocto, formatTokenAmount, unitToDecimals } from "../../utils/converter";
 import BaseTask from "../base";
 import Multicall from '../../utils/contracts/multicall';
@@ -13,12 +15,12 @@ export default class Transfer extends BaseTask {
     uniqueClassName = "multicall-transfer-task";
     errors = {
         ...this.baseErrors,
-        addr: new ArgsError("Invalid address", value => true),
-        func: new ArgsError("Cannot be empty", value => value != ""),
-        args: new ArgsError("Invalid JSON", value => true),
+        addr: new ArgsError(errorMsg.ERR_INVALID_ADDR, value => true),
+        func: new ArgsError(errorMsg.ERR_INVALID_FUNC, value => value != ""),
+        args: new ArgsError(errorMsg.ERR_INVALID_ARGS, value => true),
         receiver: new ArgsError("Invalid address", value => ArgsAccount.isValid(value), !ArgsAccount.isValid(this.call.args.value.account_id)),
         amount: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value)),
-        gas: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value)),
+        gas: new ArgsError(errorMsg.ERR_INVALID_GAS_AMOUNT, value => ArgsBig.isValid(value)),
     };
 
     options = {
@@ -32,7 +34,7 @@ export default class Transfer extends BaseTask {
 
         this.call = new Call({
             name: new ArgsString(json?.name ?? "Transfer Near"),
-            addr: new ArgsAccount(STORAGE.addresses.multicall ?? ""),
+            addr: new ArgsAccount(STORAGE.addresses.multicall),
             func: new ArgsString(actions?.func ?? "near_transfer"),
             args: new ArgsObject(actions?.args 
                 ? {

@@ -1,7 +1,8 @@
-import React from 'react';
 import { ArgsAccount, ArgsBig, ArgsJSON, ArgsString, ArgsError } from "../../utils/args";
 import Call from "../../utils/call";
+import { STORAGE } from "../../utils/persistent";
 import { toGas } from "../../utils/converter";
+import { errorMsg } from "../../utils/errors";
 import BaseTask from "../base";
 import "./ref-finance.scss";
 
@@ -10,9 +11,9 @@ export default class Withdraw extends BaseTask {
     uniqueClassName = "ref-withdraw-task";
     errors = {
         ...this.baseErrors,
-        addr: new ArgsError("Invalid address", value => ArgsAccount.isValid(value), !ArgsAccount.isValid(this.call.addr)),
-        func: new ArgsError("Cannot be empty", value => value != ""),
-        gas: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value)),
+        addr: new ArgsError(errorMsg.ERR_INVALID_ADDR, value => ArgsAccount.isValid(value), !ArgsAccount.isValid(this.call.addr)),
+        func: new ArgsError(errorMsg.ERR_INVALID_FUNC, value => value != ""),
+        gas: new ArgsError(errorMsg.ERR_INVALID_GAS_AMOUNT, value => ArgsBig.isValid(value)),
     };
 
     init(json = null) {
@@ -21,7 +22,7 @@ export default class Withdraw extends BaseTask {
 
         this.call = new Call({
             name: new ArgsString(json?.name ?? "Withdraw from Ref"),
-            addr: new ArgsAccount(STORAGE.addresses.multicall ?? ""),
+            addr: new ArgsAccount(STORAGE.addresses.multicall),
             func: new ArgsString(actions?.func ?? "withdraw_from_ref"),
             /*args: new ArgsObject(json?.args 
                 ? {
