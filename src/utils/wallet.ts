@@ -73,8 +73,10 @@ async function view (
         method_name: func,
         args_base64: encodedArgs,
     });
-    // RPC returns JSON-serialized returns, needs parsing.
-    return JSON.parse( String.fromCharCode(... response.result) );
+    // RPC returns JSON-serialized, needs parsing.
+    // Fix "Maximum call stack size exceeded" for large response data. See: https://stackoverflow.com/a/49124600
+    const strResult = (<Array<number>> response.result).reduce((data, byte) => data + String.fromCharCode(byte), '');
+    return JSON.parse(strResult);
 }
 
 
