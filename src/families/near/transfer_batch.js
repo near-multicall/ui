@@ -30,14 +30,6 @@ export default class Transfer_Batch extends BatchTask {
     updateFTDebounced = debounce(() => this.updateFT(), 500);
     updateSDDebounced = debounce((target) => this.updateSD(target), 500);
 
-    constructor(props) {
-
-        super(props);
-
-        this.updateFT();
-        
-    }
-
     init(json = null) {
 
         const actions = json?.actions;
@@ -85,6 +77,11 @@ export default class Transfer_Batch extends BatchTask {
 
         }).bind(this);
 
+    }
+
+    componentDidMount() {
+
+        this.updateFT();
 
     }
 
@@ -238,7 +235,7 @@ export default class Transfer_Batch extends BatchTask {
                     gas: SDgas.toString()
                 }]
             },
-            this.updateCard
+            () => this.updateCard()
         );
         // add to all transfers to given target
         Object.values(this.targets)
@@ -280,7 +277,7 @@ export default class Transfer_Batch extends BatchTask {
                     gas: FTTgas.toString()
                 }]
             },
-            this.updateCard
+            () => this.updateCard()
         );
         this.targets[newId] = {
             receiver_id: target,

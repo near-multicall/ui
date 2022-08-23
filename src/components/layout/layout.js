@@ -314,6 +314,22 @@ export default class Layout extends Component {
 
                 this.taskID++;
 
+                // draggable is a batch
+                if (layout.columns[draggableId] !== undefined) {
+                    const taskIds = [];
+                    layout.columns[draggableId].taskIds.forEach(id => {
+                        const clone = JSON.parse(JSON.stringify(layout.tasks[id.toString()]));
+                        clone.id = `task-${this.taskID++}`;
+                        taskIds.push(clone.id);
+                        window.STORAGE.layout.tasks[clone.id] = clone; 
+                    })
+                    window.STORAGE.layout.columns[taskClone.id] = {
+                        id: taskClone.id,
+                        title: "Drag here",
+                        taskIds: taskIds
+                    };
+                }
+
                 newStart = {
                     ...start,
                     taskIds: startTaskIds

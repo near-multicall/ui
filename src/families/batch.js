@@ -81,15 +81,16 @@ export default class BatchTask extends Component {
         if (window.TEMP !== null) // Batch is moved
             return; 
         
-        this.props.json.actions.map(a => ({
-            address: this.props.json.address,
-            actions: [a]            
-        }))
-            .forEach(j => {
-                const id = `task-${LAYOUT.taskID++}`;
-                STORAGE.layout.columns[this.props.id].taskIds.push(id);
-                STORAGE.layout.tasks[id] = { id: id, addr: "", func: "", json: j }
-            })
+        if (!!this.props?.json)
+            this.props.json.actions.map(a => ({
+                address: this.props.json.address,
+                actions: [a]            
+            }))
+                .forEach(j => {
+                    const id = `task-${LAYOUT.taskID++}`;
+                    STORAGE.layout.columns[this.props.id].taskIds.push(id);
+                    STORAGE.layout.tasks[id] = { id: id, addr: "", func: "", json: j }
+                })
 
         STORAGE.setLayout({}); // trigger callbacks
 
@@ -143,11 +144,13 @@ export default class BatchTask extends Component {
             );
 
         // delete empty batches
-        if (STORAGE.layout.columns[id].taskIds.length === 0 && this.options.loaded)
+        if (STORAGE.layout.columns[id].taskIds.length === 0 && this.options.loaded) {
+            console.log("deleting empty batch");
             LAYOUT.deleteTask(id);
+        }
 
         // evaluate errors
-        this.tasks = this.tasksDOM.map(t => TASKS.find(task => task.id === t.props.task.id)?.instance.current);
+        this.tasks = this.tasksDOM.map(t => window.TASKS?.find(task => task.id === t.props.task.id)?.instance.current);
         if (this.tasks?.length >= 2 && this.tasks.every(t => !!t) && this.options.loaded)
             this.errors.noSingleAddress.isBad = !this.tasks.every(t => t.call.addr.value === addr.value);
 

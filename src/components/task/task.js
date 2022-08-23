@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { Draggable } from 'react-beautiful-dnd';
 import { Family } from '../../components';
-import hash from 'object-hash';
 import './task.scss'
 
 export default class Task extends Component {
@@ -111,7 +110,9 @@ export default class Task extends Component {
                     case "ft_transfer":
                         return <Family.Near.Transfer ref={this.instance} id={this.id} json={json}/>        
                     case "storage_deposit":
-                        return <Family.Near.StorageDeposit ref={this.instance} id={this.id} json={json}/>        
+                        return <Family.Near.StorageDeposit ref={this.instance} id={this.id} json={json}/>
+                    case "ft_transfer batch":
+                        return <Family.Near.Transfer_Batch ref={this.instance} id={this.id} json={json}/>    
                 }
 
             case "ref-finance":
