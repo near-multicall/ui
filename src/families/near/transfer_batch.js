@@ -17,17 +17,18 @@ export default class Transfer_Batch extends BatchTask {
     errors = {
         ...this.baseErrors,
         noToken: new ArgsError("Address does not belong to token contract", value => this.errors.noToken),
-        gas: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value)),
+        FTTgas: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value)),
+        SDgas: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value)),
         totalGas: new ArgsError("Total gas amount exceeds 300 Tgas limit", value => this.calculateTotalGas().lt(toGas(300)))
     };
 
     targets = {};
     SDOffset = 0;
 
+    showAdvancedGasOptions = false;
+
     updateFTDebounced = debounce(() => this.updateFT(), 500);
     updateSDDebounced = debounce((target) => this.updateSD(target), 500);
-
-    gasPerSD = toGas(10);
 
     constructor(props) {
 
@@ -46,9 +47,19 @@ export default class Transfer_Batch extends BatchTask {
             ...this.options.call,
             name: new ArgsString(json?.name ?? "FT Transfer"),
             addr: new ArgsAccount(json?.address ?? window.nearConfig.WNEAR_ADDRESS),
-            gas: new ArgsBig(
+            FTTgas: new ArgsBig(
                 formatTokenAmount(
-                    actions?.[0].gas ?? toGas("10"), 
+                    actions?.filter(a => a.func === "ft_transfer")?.[0].gas ?? toGas("10"), 
+                    units?.gas.decimals ?? unitToDecimals["Tgas"]
+                ),
+                toGas("1"), 
+                toGas("300"), 
+                units?.gas?.unit ?? "Tgas",
+                units?.gas?.decimals
+            ),
+            SDgas: new ArgsBig(
+                formatTokenAmount(
+                    actions?.filter(a => a.func === "storage_deposit")?.[0].gas ?? toGas("10"), 
                     units?.gas.decimals ?? unitToDecimals["Tgas"]
                 ),
                 toGas("1"), 
@@ -66,8 +77,9 @@ export default class Transfer_Batch extends BatchTask {
                 this.errors[e].validOrNull(call[e])
 
             this.errors.noToken.validOrNull(call.addr);
-            this.errors.gas.validOrNull(call.gas);
-            this.errors.totalGas.validOrNull(call.gas);
+            this.errors.FTTgas.validOrNull(call.FTTgas);
+            this.errors.SDgas.validOrNull(call.SDgas);
+            this.errors.totalGas.validOrNull("0");
 
             this.updateFT();
 
@@ -166,12 +178,12 @@ export default class Transfer_Batch extends BatchTask {
         const storageDepositTasks = this.tasks.filter(t => t instanceof StorageDeposit);
         const ftTransferTasks = this.tasks.filter(t => t instanceof Transfer);
 
-        const { gas } = this.options.call;
+        const { FTTgas, SDgas } = this.options.call;
 
-        return Big(convert(gas.value === "" ? "0" : gas.value, gas.unit))
+        return Big(convert(FTTgas.value === "" ? "0" : FTTgas.value, FTTgas.unit))
             .mul(ftTransferTasks.length)
             .add(
-                Big(this.gasPerSD)
+                Big(convert(SDgas.value === "" ? "0" : SDgas.value, SDgas.unit))
                     .mul(storageDepositTasks.length)
             ); 
 
@@ -179,12 +191,15 @@ export default class Transfer_Batch extends BatchTask {
 
     setActionGas() {
 
-        const { gas } = this.options.call;
+        const { FTTgas, SDgas } = this.options.call;
 
         this.tasks
             .slice(0, this.SDOffset)
             .forEach(t => {
-                t.call.gas.value = formatTokenAmount(this.gasPerSD, unitToDecimals[t.call.gas.unit]);
+                t.call.gas.value = formatTokenAmount(
+                    convert(SDgas.value === "" ? "0" : SDgas.value, SDgas.unit),
+                    unitToDecimals[t.call.gas.unit]
+                );
                 t.updateCard();
             });
 
@@ -192,7 +207,7 @@ export default class Transfer_Batch extends BatchTask {
             .slice(this.SDOffset)
             .forEach(t => {
                 t.call.gas.value = formatTokenAmount(
-                    convert(gas.value === "" ? "0" : gas.value, gas.unit), 
+                    convert(FTTgas.value === "" ? "0" : FTTgas.value, FTTgas.unit), 
                     unitToDecimals[t.call.gas.unit]
                 );
                 t.updateCard();
@@ -202,7 +217,7 @@ export default class Transfer_Batch extends BatchTask {
 
     addStorageDeposit(target) {
 
-        const call = this.options;
+        const { SDgas, addr } = this.options.call;
 
         // a storage deposit for this target already exists
         const alreadyExists = this.tasks
@@ -214,13 +229,13 @@ export default class Transfer_Batch extends BatchTask {
             "near", 
             "storage_deposit",
             {
-                address: call.addr.value,
+                address: addr.value,
                 actions: [{
                     args: {
                         account_id: target,
                         registration_only: true
                     },
-                    gas: call.gas.toString()
+                    gas: SDgas.toString()
                 }]
             },
             this.updateCard
@@ -249,20 +264,20 @@ export default class Transfer_Batch extends BatchTask {
 
     addFtTransfer(target) {
 
-        const { call } = this.options;
+        const { FTTgas, addr } = this.options.call;
 
         const newId = this.addNewTask(
             "near", 
             "ft_transfer",
             {
-                address: call.addr.value,
+                address: addr.value,
                 actions: [{
                     args: {
                         receiver_id: target,
                         amount: 0,
                         memo: ""
                     },
-                    gas: call.gas.toString()
+                    gas: FTTgas.toString()
                 }]
             },
             this.updateCard
@@ -402,7 +417,8 @@ export default class Transfer_Batch extends BatchTask {
         const {
             name,
             addr,
-            gas
+            FTTgas,
+            SDgas
         } = this.options.call;
 
         const errors = this.errors;
@@ -410,7 +426,7 @@ export default class Transfer_Batch extends BatchTask {
         const newTarget = new ArgsAccount("");
         const newAddrError = new ArgsError("Invalid address", value => ArgsAccount.isValid(value));
 
-        errors.totalGas.validOrNull(gas?.value ?? "0");
+        errors.totalGas.validOrNull("0");
 
         // TODO debounce task.updateCard for performance
         return (
@@ -438,23 +454,50 @@ export default class Transfer_Batch extends BatchTask {
                         });
                     } }
                 />
-                <TextInputWithUnits
-                    label="Gas per transfer"
-                    value={ gas }
-                    error={ errors.gas }
-                    options={[ "Tgas", "gas" ]}
-                    update={ () => {
-                        this.setActionGas();
-                        this.updateCard();
-                    } }
-                />
+                <div className="gas-options">
+                    <h2>
+                        <Icon 
+                            className="icon collapse"
+                            onClick={() => {
+                                this.showAdvancedGasOptions = !this.showAdvancedGasOptions;
+                                this.updateCard();
+                            }}
+                            collapsed={ this.showAdvancedGasOptions ? "no" : "yes" }
+                        >expand_more</Icon> 
+                        <p>Advanced gas options</p>
+                    </h2>
+                    { this.showAdvancedGasOptions && 
+                        <>
+                            <TextInputWithUnits
+                                label="Gas per transfer"
+                                value={ FTTgas }
+                                error={ errors.FTTgas }
+                                options={[ "Tgas", "gas" ]}
+                                update={ () => {
+                                    this.setActionGas();
+                                    this.updateCard();
+                                } }
+                            />
+                            <TextInputWithUnits
+                                label="Gas per storage deposit"
+                                value={ SDgas }
+                                error={ errors.SDgas }
+                                options={[ "Tgas", "gas" ]}
+                                update={ () => {
+                                    this.setActionGas();
+                                    this.updateCard();
+                                } }
+                            />
+                        </> 
+                    }
+                </div>
                 <p><b>Total gas amount: </b>{toTGas(this.calculateTotalGas())} TGas {" "}
                     <Tooltip 
                         title={
                             <h1 
                                 style={{ fontSize: "12px" }}
                             >
-                                {`${this.tasks.length - this.SDOffset} Transfers * ${gas.value} ${gas.unit} per Transfer + ${this.SDOffset} Storage Deposits * ${toTGas(this.gasPerSD)} Tgas per Storage Deposit = ${toTGas(this.calculateTotalGas())} Tgas`}
+                                {`${this.tasks.length - this.SDOffset} Transfers * ${FTTgas.value} ${FTTgas.unit} per Transfer + ${this.SDOffset} Storage Deposits * ${SDgas.value} ${SDgas.unit} per Storage Deposit = ${toTGas(this.calculateTotalGas())} Tgas`}
                             </h1>
                         } 
                         disableInteractive
