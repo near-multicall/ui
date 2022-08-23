@@ -42,8 +42,8 @@ export default class Transfer_Batch extends BatchTask {
         const actions = json?.actions;
         const units = json?.units?.actions?.[0]; // first action is enough to determine unit
 
-        this.state = {
-            ...this.state,
+        this.options.call = {
+            ...this.options.call,
             name: new ArgsString(json?.name ?? "FT Transfer"),
             addr: new ArgsAccount(json?.address ?? window.nearConfig.WNEAR_ADDRESS),
             gas: new ArgsBig(
@@ -60,12 +60,14 @@ export default class Transfer_Batch extends BatchTask {
         
         this.loadErrors = (() => {
 
-            for (let e in this.baseErrors)
-                this.errors[e].validOrNull(this.state[e])
+            const { call } = this.options;
 
-            this.errors.noToken.validOrNull(this.state.addr);
-            this.errors.gas.validOrNull(this.state.gas);
-            this.errors.totalGas.validOrNull(this.state.gas);
+            for (let e in this.baseErrors)
+                this.errors[e].validOrNull(call[e])
+
+            this.errors.noToken.validOrNull(call.addr);
+            this.errors.gas.validOrNull(call.gas);
+            this.errors.totalGas.validOrNull(call.gas);
 
             this.updateFT();
 
@@ -164,7 +166,9 @@ export default class Transfer_Batch extends BatchTask {
         const storageDepositTasks = this.tasks.filter(t => t instanceof StorageDeposit);
         const ftTransferTasks = this.tasks.filter(t => t instanceof Transfer);
 
-        return Big(convert(this.state.gas.value === "" ? "0" : this.state.gas.value, this.state.gas.unit))
+        const { gas } = this.options.call;
+
+        return Big(convert(gas.value === "" ? "0" : gas.value, gas.unit))
             .mul(ftTransferTasks.length)
             .add(
                 Big(this.gasPerSD)
@@ -174,6 +178,8 @@ export default class Transfer_Batch extends BatchTask {
     }
 
     setActionGas() {
+
+        const { gas } = this.options.call;
 
         this.tasks
             .slice(0, this.SDOffset)
@@ -186,7 +192,7 @@ export default class Transfer_Batch extends BatchTask {
             .slice(this.SDOffset)
             .forEach(t => {
                 t.call.gas.value = formatTokenAmount(
-                    convert(this.state.gas.value === "" ? "0" : this.state.gas.value, this.state.gas.unit), 
+                    convert(gas.value === "" ? "0" : gas.value, gas.unit), 
                     unitToDecimals[t.call.gas.unit]
                 );
                 t.updateCard();
@@ -195,6 +201,8 @@ export default class Transfer_Batch extends BatchTask {
     }
 
     addStorageDeposit(target) {
+
+        const call = this.options;
 
         // a storage deposit for this target already exists
         const alreadyExists = this.tasks
@@ -206,13 +214,13 @@ export default class Transfer_Batch extends BatchTask {
             "near", 
             "storage_deposit",
             {
-                address: this.state.addr.value,
+                address: call.addr.value,
                 actions: [{
                     args: {
                         account_id: target,
                         registration_only: true
                     },
-                    gas: this.state.gas.toString()
+                    gas: call.gas.toString()
                 }]
             },
             this.updateCard
@@ -241,18 +249,20 @@ export default class Transfer_Batch extends BatchTask {
 
     addFtTransfer(target) {
 
+        const { call } = this.options;
+
         const newId = this.addNewTask(
             "near", 
             "ft_transfer",
             {
-                address: this.state.addr.value,
+                address: call.addr.value,
                 actions: [{
                     args: {
                         receiver_id: target,
                         amount: 0,
                         memo: ""
                     },
-                    gas: this.state.gas.toString()
+                    gas: call.gas.toString()
                 }]
             },
             this.updateCard
@@ -299,7 +309,7 @@ export default class Transfer_Batch extends BatchTask {
         this.addFtTransfer(receiver);
 
         view(
-            this.state.addr.value,
+            this.options.call.addr.value,
             "storage_balance_of",
             {account_id: receiver}
         )
@@ -336,7 +346,7 @@ export default class Transfer_Batch extends BatchTask {
     updateSD(target) {
 
         view(
-            this.state.addr.value,
+            this.options.call.addr.value,
             "storage_balance_of",
             {account_id: target}
         )
@@ -352,7 +362,7 @@ export default class Transfer_Batch extends BatchTask {
 
     updateFT() {
 
-        const { addr } = this.state;
+        const { addr } = this.options.call;
 
         this.errors.noToken.isBad = false;
 
@@ -393,14 +403,14 @@ export default class Transfer_Batch extends BatchTask {
             name,
             addr,
             gas
-        } = this.state;
+        } = this.options.call;
 
         const errors = this.errors;
 
         const newTarget = new ArgsAccount("");
         const newAddrError = new ArgsError("Invalid address", value => ArgsAccount.isValid(value));
 
-        errors.totalGas.validOrNull(gas.value);
+        errors.totalGas.validOrNull(gas?.value ?? "0");
 
         // TODO debounce task.updateCard for performance
         return (

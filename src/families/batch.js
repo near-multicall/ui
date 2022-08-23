@@ -22,7 +22,8 @@ export default class BatchTask extends Component {
     errors = { ...this.baseErrors };
     options = {
         loaded: false,
-        disguised: true
+        disguised: true,
+        call: []
     };
 
     tasks = [];
@@ -31,8 +32,8 @@ export default class BatchTask extends Component {
     get call() {
 
         this.calls.setCalls(this.getTasks().map(t => t.call));
-        this.calls.name.value = this.state.name.value;
-        this.calls.addr.value = this.state.addr.value;
+        this.calls.name.value = this.options.call.name.value;
+        this.calls.addr.value = this.options.call.addr.value;
         return this.calls;
 
     }
@@ -43,16 +44,19 @@ export default class BatchTask extends Component {
 
         this.state = {
             showArgs: false,
-            isEdited: false,
+            isEdited: false
+        }
+
+        this.options.call = {
+            ...this.options.call,
             name: new ArgsString(""),
             addr: new ArgsAccount("")
         }
 
         if (window.TEMP) {
 
-            this.state.name.value = TEMP.call.name.value;
-            this.state.addr.value = TEMP.call.addr.value;
             this.state.showArgs = TEMP.showArgs;
+            this.state.isEdited = TEMP.isEdited;
             this.options = TEMP.options;
             this.errors = TEMP.errors;
 
@@ -101,14 +105,14 @@ export default class BatchTask extends Component {
 
     init(json = null) {
 
-        this.state = {
-            ...this.state,
+        this.options.call = {
+            ...this.options.call,
             name: new ArgsString(json?.name ?? "Batch"),
             addr: new ArgsAccount(json?.address ?? "")
         };
 
         this.loadErrors = (() => {
-            this.errors.addr.validOrNull(this.state.addr);
+            this.errors.addr.validOrNull(this.options.call.addr);
         }).bind(this);
 
     }
@@ -124,7 +128,7 @@ export default class BatchTask extends Component {
 
     loadTasks() {
 
-        const { addr } = this.state,
+        const { addr } = this.options.call,
               { id } = this.props;
 
         // create tasks
@@ -212,7 +216,7 @@ export default class BatchTask extends Component {
         const {
             name,
             addr
-        } = this.state;
+        } = this.options.call;
 
         return (
             <div className="edit">
@@ -238,9 +242,10 @@ export default class BatchTask extends Component {
 
         const {
             name,
-            addr,
-            isEdited
-        } = this.state;
+            addr
+        } = this.options.call;
+
+        const { isEdited } = this.state;
 
         const { disguised } = this.options;
 
