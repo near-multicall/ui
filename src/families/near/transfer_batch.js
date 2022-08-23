@@ -1,28 +1,33 @@
-import { Icon, InputAdornment } from '@mui/material';
+import { Icon, InputAdornment, Tooltip } from '@mui/material';
 import Checkbox from '@mui/material/Checkbox';
 import debounce from "lodash.debounce";
 import React from 'react';
-import { TextInput } from '../../components/editor/elements';
-import { ArgsAccount, ArgsError, ArgsString } from "../../utils/args";
+import { TextInput, TextInputWithUnits } from '../../components/editor/elements';
+import { ArgsAccount, ArgsBig, ArgsError, ArgsString } from "../../utils/args";
 import { view } from "../../utils/wallet";
 import BatchTask from '../batch';
 import "./near.scss";
 import StorageDeposit from './storage-deposit';
 import Transfer from './transfer';
+import { formatTokenAmount, toGas, unitToDecimals, Big, toTGas, parseTokenAmount, convert } from '../../utils/converter';
 
 export default class Transfer_Batch extends BatchTask {
 
     uniqueClassName = "near-transfer-task";
     errors = {
         ...this.baseErrors,
-        noToken: new ArgsError("Address does not belong to token contract", value => this.errors.noToken)
+        noToken: new ArgsError("Address does not belong to token contract", value => this.errors.noToken),
+        gas: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value)),
+        totalGas: new ArgsError("Total gas amount exceeds 300 Tgas limit", value => this.calculateTotalGas().lt(toGas(300)))
     };
 
     targets = {};
-    sdOffset = 0;
+    SDOffset = 0;
 
     updateFTDebounced = debounce(() => this.updateFT(), 500);
     updateSDDebounced = debounce((target) => this.updateSD(target), 500);
+
+    gasPerSD = toGas(10);
 
     constructor(props) {
 
@@ -34,10 +39,23 @@ export default class Transfer_Batch extends BatchTask {
 
     init(json = null) {
 
+        const actions = json?.actions;
+        const units = json?.units?.actions?.[0]; // first action is enough to determine unit
+
         this.state = {
             ...this.state,
             name: new ArgsString(json?.name ?? "FT Transfer"),
             addr: new ArgsAccount(json?.address ?? window.nearConfig.WNEAR_ADDRESS),
+            gas: new ArgsBig(
+                formatTokenAmount(
+                    actions?.[0].gas ?? toGas("10"), 
+                    units?.gas.decimals ?? unitToDecimals["Tgas"]
+                ),
+                toGas("1"), 
+                toGas("300"), 
+                units?.gas?.unit ?? "Tgas",
+                units?.gas?.decimals
+            )
         };
         
         this.loadErrors = (() => {
@@ -46,6 +64,8 @@ export default class Transfer_Batch extends BatchTask {
                 this.errors[e].validOrNull(this.state[e])
 
             this.errors.noToken.validOrNull(this.state.addr);
+            this.errors.gas.validOrNull(this.state.gas);
+            this.errors.totalGas.validOrNull(this.state.gas);
 
             this.updateFT();
 
@@ -54,31 +74,25 @@ export default class Transfer_Batch extends BatchTask {
 
     }
 
-    checkIntegrity() {
+    orderTasksDOM() {
 
-        const storageDepositTasks = this.tasks.filter(t => t instanceof StorageDeposit);
-        const ftTransferTasks = this.tasks.filter(t => t instanceof Transfer);
-
-        // // sanity check: storageDepositTasks does not mention same target twice
-        // const targets = storageDepositTasks.map(t => t.call.args.value.account_id);
-        // if (targets.length !== new Set(targets).size)
-        //     throw new Error("Duplicate storage_deposit");
-
-        // // sanity check: every storage_deposit belongs to a ft_transfer
-        // if (Object.values(targets).some(t => !ftTransferTasks.find(task => task.call.args.value.receiver_id === t.receiver_id)))
-        //     throw new Error("Found stray storage_deposit");
+        const storageDepositTasksDOM = this.tasksDOM
+            .filter(t => TASKS.find(task => task.id === t.props.task.id).instance.current instanceof StorageDeposit);
+        const ftTransferTasksDOM = this.tasksDOM
+            .filter(t => TASKS.find(task => task.id === t.props.task.id).instance.current instanceof Transfer);
 
         // order actions: storage_deposits must appear before ft_transfer
-        this.sdOffset = storageDepositTasks.length;
-        this.tasks = [...storageDepositTasks, ...ftTransferTasks];
+        this.SDOffset = storageDepositTasksDOM.length;
+        this.tasksDOM = [...storageDepositTasksDOM, ...ftTransferTasksDOM];
+        this.tasks = this.getTasks();
 
     }
 
     onTasksLoaded() {
 
-        this.checkIntegrity();
+        this.orderTasksDOM();
 
-        for (let t of this.tasks.slice(this.sdOffset)) {
+        for (let t of this.tasks.slice(this.SDOffset)) {
             if (t instanceof StorageDeposit) continue;
             const receiver = t.call.args.value.receiver_id.value;
             this.targets[t.props.id] ??= {
@@ -87,7 +101,7 @@ export default class Transfer_Batch extends BatchTask {
                 ft_transfer: new Set([t.props.id]),
                 storage_deposit: new Set(
                     this.tasks
-                        .slice(0, this.sdOffset)
+                        .slice(0, this.SDOffset)
                         .filter(task => task.call.args.value.account_id.value === receiver)
                         .map(task => task.props.id)
                 )
@@ -97,8 +111,25 @@ export default class Transfer_Batch extends BatchTask {
     }
 
     static inferOwnType(json) {
-        return !!json 
-            && json.actions.length > 1 
+
+        if (!json) return false;
+
+        // sanity check: storageDepositTasks does not mention same target twice
+        const targets = json.actions
+            .filter(a => a.func === "storage_deposit")
+            .map(a => a.args.account_id);
+        if (targets.length !== new Set(targets).size)
+            return false; // dulicate storage deposit
+
+        // sanity check: every storage_deposit belongs to a ft_transfer
+        if (Object.values(targets).some(t => 
+                !json.actions
+                    .filter(a => a.func === "ft_transfer")
+                    .find(a => a.args.receiver_id === t)
+            ))
+        return false // stray storage_deposit
+
+        return json.actions.length > 1 
             && json.actions.every(a => 
                 a.func === "storage_deposit" 
                 || a.func === "ft_transfer"
@@ -128,11 +159,46 @@ export default class Transfer_Batch extends BatchTask {
 
     }
 
+    calculateTotalGas() {
+
+        const storageDepositTasks = this.tasks.filter(t => t instanceof StorageDeposit);
+        const ftTransferTasks = this.tasks.filter(t => t instanceof Transfer);
+
+        return Big(convert(this.state.gas.value === "" ? "0" : this.state.gas.value, this.state.gas.unit))
+            .mul(ftTransferTasks.length)
+            .add(
+                Big(this.gasPerSD)
+                    .mul(storageDepositTasks.length)
+            ); 
+
+    }
+
+    setActionGas() {
+
+        this.tasks
+            .slice(0, this.SDOffset)
+            .forEach(t => {
+                t.call.gas.value = formatTokenAmount(this.gasPerSD, unitToDecimals[t.call.gas.unit]);
+                t.updateCard();
+            });
+
+        this.tasks
+            .slice(this.SDOffset)
+            .forEach(t => {
+                t.call.gas.value = formatTokenAmount(
+                    convert(this.state.gas.value === "" ? "0" : this.state.gas.value, this.state.gas.unit), 
+                    unitToDecimals[t.call.gas.unit]
+                );
+                t.updateCard();
+            });
+
+    }
+
     addStorageDeposit(target) {
 
         // a storage deposit for this target already exists
         const alreadyExists = this.tasks
-            .slice(0, this.sdOffset)
+            .slice(0, this.SDOffset)
             .some(t => t.call.args.value.account_id.value === target);
         if (alreadyExists) return;
 
@@ -145,7 +211,8 @@ export default class Transfer_Batch extends BatchTask {
                     args: {
                         account_id: target,
                         registration_only: true
-                    }
+                    },
+                    gas: this.state.gas.toString()
                 }]
             },
             this.updateCard
@@ -184,7 +251,8 @@ export default class Transfer_Batch extends BatchTask {
                         receiver_id: target,
                         amount: 0,
                         memo: ""
-                    }
+                    },
+                    gas: this.state.gas.toString()
                 }]
             },
             this.updateCard
@@ -323,13 +391,16 @@ export default class Transfer_Batch extends BatchTask {
 
         const {
             name,
-            addr
+            addr,
+            gas
         } = this.state;
 
         const errors = this.errors;
 
         const newTarget = new ArgsAccount("");
         const newAddrError = new ArgsError("Invalid address", value => ArgsAccount.isValid(value));
+
+        errors.totalGas.validOrNull(gas.value);
 
         // TODO debounce task.updateCard for performance
         return (
@@ -357,6 +428,31 @@ export default class Transfer_Batch extends BatchTask {
                         });
                     } }
                 />
+                <TextInputWithUnits
+                    label="Gas per transfer"
+                    value={ gas }
+                    error={ errors.gas }
+                    options={[ "Tgas", "gas" ]}
+                    update={ () => {
+                        this.setActionGas();
+                        this.updateCard();
+                    } }
+                />
+                <p><b>Total gas amount: </b>{toTGas(this.calculateTotalGas())} TGas {" "}
+                    <Tooltip 
+                        title={
+                            <h1 
+                                style={{ fontSize: "12px" }}
+                            >
+                                {`${this.tasks.length - this.SDOffset} Transfers * ${gas.value} ${gas.unit} per Transfer + ${this.SDOffset} Storage Deposits * ${toTGas(this.gasPerSD)} Tgas per Storage Deposit = ${toTGas(this.calculateTotalGas())} Tgas`}
+                            </h1>
+                        } 
+                        disableInteractive
+                    >
+                        <Icon className="info">info_outlined</Icon>
+                    </Tooltip>
+                </p>
+                { errors.totalGas.isBad ? <p className="error">{errors.totalGas.message}</p> : null }
                 {
                     Object.keys(this.targets).map(id => <div className={`section ${this.targets[id].expandInEditor ? "" : "collapsed"}`}>
                         <h2>
@@ -385,7 +481,7 @@ export default class Transfer_Batch extends BatchTask {
                                         target.receiver_id = receiver_id.value;
                                         target.storage_deposit = new Set(
                                             this.tasks
-                                                .slice(0, this.sdOffset)
+                                                .slice(0, this.SDOffset)
                                                 .filter(task => task.call.args.value.account_id.value === receiver_id.value)
                                                 .map(task => task.props.id)
                                         )

@@ -314,6 +314,18 @@
             border-radius: 0 0 size.$task-radius size.$task-radius;
         }
     }
+    p {
+        color: color.$light-text;
+        font-family: font.$text;
+        font-size: size.$small-text;
+        &.error {
+            color: color.$red;
+            font-weight: 800;
+            &::before {
+                content: 'Error: '
+            }
+        }
+    }
 }
 
 .MuiMenuItem-root {

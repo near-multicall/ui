@@ -19,6 +19,13 @@
     }
 }
 
+.edit {
+    .info {
+        font-size: size.$large-text;
+        vertical-align: text-bottom;
+    }
+}
+
 .MuiInputAdornment-root {
     width: fit-content;
     p {
