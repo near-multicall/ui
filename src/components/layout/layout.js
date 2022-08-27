@@ -37,6 +37,9 @@ export default class Layout extends Component {
 
     getColumns = () => window.STORAGE.layout.columns;
 
+    getMenuColumns = () => Object.values(window.STORAGE.layout.columns)
+        .filter(c => c.id === 'menu' || window.STORAGE.layout.columns.menu.taskIds.includes(c.id))
+
     // TODO delete elements after exjecting from tasklist / columnlist
     
     /**
@@ -418,9 +421,7 @@ export default class Layout extends Component {
         let newLayout = {
             ...layout,
             columnOrder: [],
-            columns: {
-                "menu": layout.columns.menu,
-            }
+            columns: Object.fromEntries(this.getMenuColumns().map(c => [c.id, c]))
         }
 
         for (let c in json) {
@@ -495,9 +496,7 @@ export default class Layout extends Component {
         let newLayout = {
             ...layout,
             columnOrder: [],
-            columns: {
-                "menu": layout.columns.menu
-            }
+            columns: Object.fromEntries(this.getMenuColumns().map(c => [c.id, c]))
         }
 
         for (let c in json) {
@@ -630,7 +629,7 @@ export default class Layout extends Component {
             return output;
 
         const tasks = TASKS
-            .filter(t => !layout.columns['menu'].taskIds.includes(t.id))
+            .filter(t => !this.getMenuColumns().some(c => c.taskIds.includes(t.id)))
             .map(t => t.instance.current);
 
         for (let t of tasks)

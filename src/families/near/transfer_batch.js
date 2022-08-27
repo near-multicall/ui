@@ -518,7 +518,11 @@ export default class Transfer_Batch extends BatchTask {
                             >delete_outline</Icon>
                         </h2>
                         { this.targets[id].expandInEditor && [...this.targets[id].ft_transfer].map(fttid => {
-                            const task = TASKS.find(t => t.id === fttid).instance.current;
+                            const task = TASKS.find(t => t.id === fttid)?.instance.current;
+                            if (!task) {
+                                console.error(`Task ${id} was removed unexpectedly`);
+                                return;
+                            }
                             const { receiver_id, amount, memo } = task.call.args.value;
                             const errors = task.errors;
                             return (<>
