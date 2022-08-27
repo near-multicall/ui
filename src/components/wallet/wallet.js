@@ -2,6 +2,7 @@ import { Base64 } from 'js-base64';
 import React, { Component } from 'react';
 import { toGas, Big } from '../../utils/converter';
 import { tx, view } from '../../utils/wallet';
+import { STORAGE } from '../../utils/persistent';
 import { useWalletSelector } from '../../contexts/walletSelectorContext';
 import { SputnikDAO, ProposalKind, ProposalAction } from '../../utils/contracts/sputnik-dao';
 import Autocomplete from '@mui/material/Autocomplete';
@@ -38,7 +39,7 @@ export default class Wallet extends Component {
         super(props, context);
 
         this.state = {
-            currentDAO: new SputnikDAO(STORAGE.addresses?.dao ?? ""),
+            currentDAO: new SputnikDAO(STORAGE.addresses.dao),
             expanded: {
                 user: false,
                 dao: false || (STORAGE.addresses.dao === "")
@@ -370,7 +371,7 @@ export default class Wallet extends Component {
                         />
                     </div>
                     <div className="peek">
-                        {STORAGE?.addresses?.dao ?? ""}
+                        {STORAGE.addresses.dao}
                     </div>
                 </div>
             </div>

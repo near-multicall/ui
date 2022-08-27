@@ -3,6 +3,7 @@ import React from 'react';
 import { TextInput, TextInputWithUnits } from '../../components/editor/elements';
 import { ArgsAccount, ArgsBig, ArgsError, ArgsNumber, ArgsString, ArgsObject, ArgsArray } from "../../utils/args";
 import { Call } from "../../utils/call";
+import { errorMsg } from '../../utils/errors';
 import { toGas } from "../../utils/converter";
 import BaseTask from "../base";
 import "./ref-finance.scss";
@@ -12,15 +13,15 @@ export default class Swap extends BaseTask {
     uniqueClassName = "ref-swap-task";
     errors = {
         ...this.baseErrors,
-        addr: new ArgsError("Invalid address", value => true),
-        args: new ArgsError("Invalid JSON", value => true),
+        addr: new ArgsError(errorMsg.ERR_INVALID_ADDR, value => true),
+        args: new ArgsError(errorMsg.ERR_INVALID_ARGS, value => true),
         pool_id: new ArgsError("Invalid pool id", value => ArgsNumber.isValid(value)),
         token_in: new ArgsError("Invalid address", value => ArgsAccount.isValid(value)),
         amount_in: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value)),
         token_out: new ArgsError("Invalid address", value => ArgsAccount.isValid(value)),
         min_amount_out: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value)),
-        func: new ArgsError("Cannot be empty", value => value != ""),
-        gas: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value)),
+        func: new ArgsError(errorMsg.ERR_INVALID_FUNC, value => value != ""),
+        gas: new ArgsError(errorMsg.ERR_INVALID_GAS_AMOUNT, value => ArgsBig.isValid(value)),
     };
 
     init(json = null) {

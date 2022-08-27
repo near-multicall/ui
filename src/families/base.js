@@ -5,6 +5,7 @@ import { TextInput, TextInputWithUnits } from '../components/editor/elements';
 import { ArgsAccount, ArgsBig, ArgsError, ArgsJSON, ArgsString } from '../utils/args';
 import { Call } from '../utils/call';
 import { toGas, toYocto, formatTokenAmount, unitToDecimals } from '../utils/converter';
+import { errorMsg } from '../utils/errors';
 import { hasContract } from '../utils/contracts/generic';
 import debounce from "lodash.debounce";
 import './base.scss';
@@ -15,11 +16,11 @@ export default class BaseTask extends Component {
     call;
     loadErrors;
     baseErrors = {
-        addr: new ArgsError("Invalid address", value => ArgsAccount.isValid(value), true),
-        func: new ArgsError("Cannot be empty", value => value.value != "", true),
-        args: new ArgsError("Invalid JSON", value => JSON.parse(value.value)),
-        gas: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value), true),
-        depo: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value) && value.value !== ""),
+        addr: new ArgsError(errorMsg.ERR_INVALID_ADDR, value => ArgsAccount.isValid(value), true),
+        func: new ArgsError(errorMsg.ERR_INVALID_FUNC, value => value.value != "", true),
+        args: new ArgsError(errorMsg.ERR_INVALID_ARGS, value => JSON.parse(value.value)),
+        gas: new ArgsError(errorMsg.ERR_INVALID_GAS_AMOUNT, value => ArgsBig.isValid(value), true),
+        depo: new ArgsError(errorMsg.ERR_INVALID_DEPO_AMOUNT, value => ArgsBig.isValid(value) && value.value !== ""),
         noContract: new ArgsError("Address is not a smart contract", value => this.errors.noContract)
     };
     errors = this.baseErrors;
