@@ -7,6 +7,7 @@ import { Task } from '../components.js';
 import { TextInput } from '../components/editor/elements';
 import { ArgsAccount, ArgsError, ArgsString } from '../utils/args';
 import { BatchCall } from '../utils/call';
+import { STORAGE } from '../utils/persistent';
 import './base.scss';
 import './batch.scss';
 

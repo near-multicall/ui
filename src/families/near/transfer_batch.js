@@ -82,6 +82,7 @@ export default class Transfer_Batch extends BatchTask {
     componentDidMount() {
 
         this.updateFT();
+        this.forceUpdate();
 
     }
 
@@ -274,7 +275,7 @@ export default class Transfer_Batch extends BatchTask {
                         amount: 0,
                         memo: ""
                     },
-                    gas: FTTgas.toString()
+                    gas: convert(FTTgas.value === "" ? "0" : FTTgas.value, FTTgas.unit).toString()
                 }]
             },
             () => this.updateCard()
