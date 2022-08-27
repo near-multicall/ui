@@ -299,14 +299,14 @@ export default class BatchTask extends Component {
                                 />
                             </Tooltip>
                             <div className="delete-pseudo"></div>
-                            <VisibilityOutlined
+                            {/* <VisibilityOutlined
                                 className="debug icon"
                                 onClick={() => {
                                     this.options.disguised = false;
                                     this.forceUpdate();
                                 }}
                             />
-                            <div className="debug-pseudo"></div>
+                            <div className="debug-pseudo"></div> */}
                         </div>
                         <div className="data-container">
                             <p><span>Contract address</span><a className="code" href={addr.toUrl()} target="_blank" rel="noopener noreferrer">{addr.toString()}</a></p>
