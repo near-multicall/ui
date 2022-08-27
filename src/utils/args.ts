@@ -63,6 +63,8 @@ class ArgsBool extends Args {
 
     }
 
+    toString = () => this.value as boolean;
+
 }
 
 class ArgsString extends Args {
@@ -200,7 +202,9 @@ class ArgsObject extends Args {
 
         for (let k in this.value)
             if (!this.value[k].omit)
-                res[k] = convert(this.value[k].value, this.value[k].unit, this.value[k].decimals).toString();
+                res[k] = this.value[k] instanceof ArgsBig || this.value[k] instanceof ArgsNumber 
+                    ? convert(this.value[k].value, this.value[k].unit, this.value[k].decimals).toString()
+                    : this.value[k].toString();
 
         return res; // JSON.stringify(res, null, "  ");
 

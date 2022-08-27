@@ -41,7 +41,7 @@ export default class Transfer_Batch extends BatchTask {
             addr: new ArgsAccount(json?.address ?? window.nearConfig.WNEAR_ADDRESS),
             FTTgas: new ArgsBig(
                 formatTokenAmount(
-                    actions?.filter(a => a.func === "ft_transfer")?.[0].gas ?? toGas("10"), 
+                    actions?.filter(a => a.func === "ft_transfer")?.[0]?.gas ?? toGas("10"), 
                     units?.gas.decimals ?? unitToDecimals["Tgas"]
                 ),
                 toGas("1"), 
@@ -51,7 +51,7 @@ export default class Transfer_Batch extends BatchTask {
             ),
             SDgas: new ArgsBig(
                 formatTokenAmount(
-                    actions?.filter(a => a.func === "storage_deposit")?.[0].gas ?? toGas("10"), 
+                    actions?.filter(a => a.func === "storage_deposit")?.[0]?.gas ?? toGas("10"), 
                     units?.gas.decimals ?? unitToDecimals["Tgas"]
                 ),
                 toGas("1"), 
