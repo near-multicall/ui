@@ -22,7 +22,11 @@
 .edit {
     .info {
         font-size: size.$large-text;
-        vertical-align: text-bottom;
+        vertical-align: sub;
+    }
+    p {
+        color: color.$light-text;
+        font-size: size.$text
     }
     h2 {
         align-self: flex-start;
@@ -30,9 +34,6 @@
         position: relative;
         width: 100%;
         margin-bottom: 0.5 * size.$gap;
-        p {
-            color: color.$light-text;
-        }
         .icon {
             @include mixin.light-icon;
             cursor: pointer;
@@ -42,11 +43,6 @@
                 transform: rotate(-90deg);
             }
             transition: all 50ms linear;
-        }
-    }
-    .add-action {
-        h2 {
-            display: block;
         }
     }
 }

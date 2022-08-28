@@ -24,7 +24,7 @@ export default class BatchTask extends Component {
     options = {
         loaded: false,
         disguised: true,
-        call: []
+        call: {}
     };
 
     tasks = [];
@@ -243,6 +243,10 @@ export default class BatchTask extends Component {
     }
 
     render() {
+
+        // happens on development after saving a file
+        if (this.options.call === undefined)
+            this.init(this.props.json);
 
         const {
             name,

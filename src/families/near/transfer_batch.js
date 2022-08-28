@@ -314,26 +314,6 @@ export default class Transfer_Batch extends BatchTask {
 
     }
 
-    addNewTarget(newTarget, newAddrError) {
-
-        if (newAddrError.isBad) return;
-        const receiver = newTarget.value;
-
-        this.addFtTransfer(receiver);
-
-        view(
-            this.options.call.addr.value,
-            "storage_balance_of",
-            {account_id: receiver}
-        )
-        .catch(e => {})
-        .then((storage) => {
-            if (storage === null)
-                this.addStorageDeposit(receiver);
-        })
-
-    }
-
     removeStray() {
 
         // only delete storage_deposits, that are not linked anywhere
@@ -420,9 +400,6 @@ export default class Transfer_Batch extends BatchTask {
         } = this.options.call;
 
         const errors = this.errors;
-
-        const newTarget = new ArgsAccount("");
-        const newAddrError = new ArgsError("Invalid address", value => ArgsAccount.isValid(value));
 
         errors.totalGas.validOrNull("0");
 
@@ -595,22 +572,11 @@ export default class Transfer_Batch extends BatchTask {
                     </div>)
                 }
                 <div className="add-action">
-                    <h2>Add Transfer</h2>
-                    <TextInput 
-                        label="Target address"
-                        value={ newTarget }
-                        error={ newAddrError }
-                        update={ (e, textInputComponent) => textInputComponent.forceUpdate() }
-                        onKeyUp={ e => {
-                            if (e.key === "Enter")
-                                this.addNewTarget(newTarget, newAddrError);
-                        } }
-                    />
                     <button
-                        onClick={ () => this.addNewTarget(newTarget, newAddrError) }
+                        onClick={ () => this.addFtTransfer("") }
                     >
                         <Icon>add</Icon>
-                        Add
+                        Add Transfer
                     </button>
                 </div>
             </div>

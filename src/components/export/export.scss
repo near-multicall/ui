@@ -107,11 +107,11 @@
         margin: 0.25 * size.$gap 0;
         p {
             color: color.$light-text;
-            font-size: size.$small-text;
+            font-size: size.$text;
         }
         button {
             height: 2em;
-            margin: 0 0.5ch;
+            margin: 0 1ch;
             padding: 0 1em;
             border-radius: size.$task-radius;
             border: 1px solid color.$light;

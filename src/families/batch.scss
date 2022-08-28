@@ -152,26 +152,13 @@
         }
     }
     .add-action {
-        @include mixin.center-items(stretch);
-        gap: 0.5 * size.$gap;
-        flex-flow: row wrap;
-        & > h2 {
-            width: 100%;
-            color: color.$light-text;
-            font-size: size.$text;
-            text-align: center;
-            margin-top: size.$gap;
-        }
-        .MuiTextField-root {
-            flex: 1;
-            & > .MuiOutlinedInput-root > fieldset {
-                border-radius: size.$task-radius;
-            }
-        }
+        display: flex;
+        width: 100%;
         & > button {
-            flex: 0;
             @include mixin.center-items;
             height: calc(1.8rem + 17px); // mimic mui's text field height
+            margin: 0 auto;
+            margin-top: 0.5 * size.$gap;
             padding: 0.3em;
             padding-right: 0.6em;
             font-size: size.$text;
