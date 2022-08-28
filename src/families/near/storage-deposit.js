@@ -98,7 +98,8 @@ export default class StorageDeposit extends BaseTask {
                 throw e;
         })
         .then((storage) => {
-            this.errors.paid.isBad = storage !== null;
+            if (!this.errors.noToken.isBad)
+                this.errors.paid.isBad = storage !== null;
             this.updateCard();
         })
 
