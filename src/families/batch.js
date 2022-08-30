@@ -263,9 +263,9 @@ export default class BatchTask extends Component {
 
         this.loadTasks();
 
-        const hasErrors = Object.entries(errors)
-            .filter(([k, v]) => v.isBad)
-            .length > 0
+        const hasErrors = Object.values(errors).some(v => v.isBad) 
+            || this.tasks.some(t => !!t && Object.values(t.errors).some(v => v.isBad));
+
 
         return (
             <div 
@@ -303,14 +303,14 @@ export default class BatchTask extends Component {
                                 />
                             </Tooltip>
                             <div className="delete-pseudo"></div>
-                            <VisibilityOutlined
+                            {/* <VisibilityOutlined
                                 className="debug icon"
                                 onClick={() => {
                                     this.options.disguised = false;
                                     this.forceUpdate();
                                 }}
                             />
-                            <div className="debug-pseudo"></div>
+                            <div className="debug-pseudo"></div> */}
                         </div>
                         <div className="data-container">
                             <p><span>Contract address</span><a className="code" href={addr.toUrl()} target="_blank" rel="noopener noreferrer">{addr.toString()}</a></p>
