@@ -80,15 +80,6 @@
     }
     .save, .load, .clear {
         position: relative;
-        .MuiSvgIcon-root {
-            color: color.$light;
-            padding: 0.25 * size.$sidebar-width;
-            font-size: 1.5 * size.$large-text;
-            cursor: pointer;
-            &:hover {
-                background-color: rgba(color.$light, 0.1);
-            }
-        }
         &:hover div {
             visibility: visible !important;
         }
@@ -98,7 +89,7 @@
             left: size.$sidebar-width;
             top: 0;
             padding-left: 0.5 * size.$gap;
-            width: max-content;   
+            width: max-content;
             ul {
                 padding: 0;
                 margin-left: 0;
@@ -130,6 +121,23 @@
             }
         }
     }
+}
+
+.sidebar-button {
+	&.MuiButtonBase-root {
+		padding: 0;
+	}
+
+	.MuiSvgIcon-root {
+		color: color.$light;
+		padding: 0.25 * size.$sidebar-width;
+		font-size: 1.5 * size.$large-text;
+		cursor: pointer;
+
+		&:hover {
+				background-color: rgba(color.$light, 0.1);
+		}
+}
 }
 
 .warn {
