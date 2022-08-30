@@ -13,7 +13,8 @@
     "start:testnet": "NEAR_ENV=testnet yarn start",
     "start:mainnet": "NEAR_ENV=mainnet yarn start",
     "dev": "nodemon --watch contract -e ts --exec \"yarn start\"",
-    "test": "jest test --runInBand"
+    "test": "jest test --runInBand",
+    "fmt": "eslint --fix ./"
   },
   "devDependencies": {
     "@babel/core": "^7.17.7",
