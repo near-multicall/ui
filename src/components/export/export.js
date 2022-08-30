@@ -32,7 +32,7 @@ export default class Export extends Component {
     };
 
     total = {
-        gas: new ArgsBig("270", toGas("1"), toGas("270"), "Tgas"),
+        gas: new ArgsBig("267.5", toGas("1"), toGas("270"), "Tgas"),
         depo: new ArgsBig(toNEAR("1"), "1", null, "NEAR"),
         desc: new ArgsString("")
     }
@@ -67,7 +67,7 @@ export default class Export extends Component {
     onAddressesUpdated() {
 
         this.updateFT();
-        
+
     }
 
     updateCopyIcon(e) {
@@ -81,7 +81,7 @@ export default class Export extends Component {
         setTimeout(() => {
             e.target.innerHTML = oldIcon;
         }, 1000);
-        
+
     }
 
     toggleShowArgs() {
@@ -154,7 +154,7 @@ export default class Export extends Component {
 
         errors.hasErrors.isBad = allErrors.length > 0;
 
-        const walletError = window?.WALLET_COMPONENT?.errors 
+        const walletError = window?.WALLET_COMPONENT?.errors
             ? Object.entries(WALLET_COMPONENT.errors).filter(([k, v]) => v.isBad)[0]?.[1].message
             : null
 
@@ -176,9 +176,9 @@ export default class Export extends Component {
                 // toBase64 might throw on failure
                 try {
                     multicallArgs = !this.attachFT
-                        ? JSON.stringify({calls: LAYOUT.toBase64()}) 
+                        ? JSON.stringify({calls: LAYOUT.toBase64()})
                         : JSON.stringify({
-                            receiver_id: STORAGE.addresses.multicall, 
+                            receiver_id: STORAGE.addresses.multicall,
                             amount: convert(amount.value, amount.unit, amount.decimals),
                             msg: JSON.stringify({
                                 function_id: "multicall",
@@ -191,21 +191,21 @@ export default class Export extends Component {
         }
 
         return (
-            <div 
+            <div
                 value={2}
                 className="tab-panel"
             >
                 <div className="export-container">
 
                     <div className="input-container">
-                        <TextInput 
+                        <TextInput
                             label="Proposal description"
                             value={ desc }
                             error={ errors.desc }
                             multiline
                             update={ this.update }
                         />
-                        <TextInputWithUnits 
+                        <TextInputWithUnits
                             label="Total allocated gas"
                             value={ gas }
                             error={ errors.gas }
@@ -214,8 +214,8 @@ export default class Export extends Component {
                         />
                         <div className="attachment">
                             <p>Attach</p>
-                            <button 
-                                className={this.attachNEAR ? "selected" : ""} 
+                            <button
+                                className={this.attachNEAR ? "selected" : ""}
                                 onClick={() => {
                                     this.attachNEAR = !this.attachNEAR;
                                     this.attachFT = false;
@@ -225,7 +225,7 @@ export default class Export extends Component {
                                 NEAR
                             </button>
                             <p>or</p>
-                            <button 
+                            <button
                                 className={this.attachFT ? "selected" : ""}
                                 onClick={() => {
                                     this.attachNEAR = false;
@@ -237,7 +237,7 @@ export default class Export extends Component {
                             </button>
                         </div>
                         { this.attachNEAR ?
-                            <TextInputWithUnits 
+                            <TextInputWithUnits
                                 label="Total attached deposit"
                                 value={ depo }
                                 error={ errors.depo }
@@ -283,13 +283,13 @@ export default class Export extends Component {
                             <h3>{`Errors (${allErrors.length})`}</h3>
                         </div>
                         <div className="error-list">
-                            { allErrors.map((e, i) => 
+                            { allErrors.map((e, i) =>
                                 <div className="error" key={`error-${i}`}>
                                     <p className="msg">
                                         {`[${e.task.call.name}] Error: ${e.message}`}
                                     </p>
-                                    <EditOutlinedIcon 
-                                        className="icon" 
+                                    <EditOutlinedIcon
+                                        className="icon"
                                         onClick={ () => {
                                             EDITOR.edit(e.task.props.id);
                                             MENU.changeTab(1);
@@ -301,26 +301,26 @@ export default class Export extends Component {
                     </div> }
                     <div className="section">
                         <div className="sidebar">
-                            <Icon 
+                            <Icon
                                 className="icon collapse"
                                 onClick={ () => this.toggleShowArgs() }
                                 collapsed={ this.showArgs ? "no" : "yes" }
-                            >expand_more</Icon> 
+                            >expand_more</Icon>
                             <h3
                                 onClick={ () => this.toggleShowArgs() }
                             >Multicall args</h3>
-                            { this.showArgs 
-                                ? <Icon 
+                            { this.showArgs
+                                ? <Icon
                                     className="icon copy"
                                     onClick={ e => {
                                         navigator.clipboard.writeText(multicallArgs);
-                                        this.updateCopyIcon(e); 
+                                        this.updateCopyIcon(e);
                                     } }
                                 >content_copy</Icon>
                                 : <></>
                             }
                         </div>
-                        { this.showArgs 
+                        { this.showArgs
                             ? <div className="value">
                                 <pre className="code">
                                     {multicallArgs}
@@ -330,8 +330,8 @@ export default class Export extends Component {
                         }
                     </div>
                     <div className="spacer"></div>
-                    { walletSelector.isSignedIn() 
-                        ? <button 
+                    { walletSelector.isSignedIn()
+                        ? <button
                             className="propose button"
                             disabled={
                                 errors.dao.isBad
@@ -357,7 +357,7 @@ export default class Export extends Component {
                             {`Propose on ${STORAGE.addresses.dao}`}
                             { walletError ? <p>{ walletError }</p> : <></> }
                         </button>
-                    : <button 
+                    : <button
                         className="login button"
                         onClick={() => WALLET_COMPONENT.signIn()}
                     >
