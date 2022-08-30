@@ -22,13 +22,17 @@
     "@parcel/transformer-sass": "^2.4.1",
     "@types/big.js": "^6.1.5",
     "@types/lodash.debounce": "^4.0.7",
+    "@typescript-eslint/parser": "^5.36.1",
     "babel-jest": "^28.0.2",
     "env-cmd": "~10.1.0",
+    "eslint": "^8.23.0",
+    "eslint-plugin-prettier": "^4.2.1",
     "gh-pages": "^4.0.0",
     "jest": "^28.1.2",
     "jest-environment-node": "^28.0.2",
     "near-cli": "^3.4.0",
     "nodemon": "~2.0.19",
+    "prettier": "^2.7.1",
     "process": "^0.11.10",
     "react-test-renderer": "^18.0.0",
     "sass": "^1.43.3",
@@ -94,5 +98,22 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "eslintConfig": {
+    "env": {
+      "browser": true,
+      "es2021": true
+    },
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+      "ecmaVersion": 12,
+      "sourceType": "module"
+    },
+    "plugins": [
+      "eslint-plugin-prettier"
+    ],
+    "rules": {
+      "prettier/prettier": "error"
+    }
   }
 }
