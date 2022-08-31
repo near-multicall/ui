@@ -1,26 +1,24 @@
-import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
-import FileUploadOutlinedIcon from '@mui/icons-material/FileUploadOutlined';
-import ScienceOutlinedIcon from '@mui/icons-material/ScienceOutlined';
-import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined';
-import { Chip, Icon, TextField } from '@mui/material';
-import React, { Component } from 'react';
+import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
+import FileUploadOutlinedIcon from "@mui/icons-material/FileUploadOutlined";
+import ScienceOutlinedIcon from "@mui/icons-material/ScienceOutlined";
+import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
+import { Chip, Icon, TextField } from "@mui/material";
+import React, { Component } from "react";
 import { NavLink } from "react-router-dom";
-import Discord from '../../assets/discord.svg';
-import Github from '../../assets/github.svg';
-import Twitter from '../../assets/twitter.svg';
-import { Wallet } from '../../components';
-import { STORAGE } from '../../utils/persistent';
-import { SputnikDAO } from '../../utils/contracts/sputnik-dao';
-import { ArgsError, ArgsString } from '../../utils/args';
-import { Base64 } from 'js-base64';
-import { readFile, saveFile } from '../../utils/loader';
-import Dialog from '../dialog/dialog';
-import { TextInput } from '../editor/elements';
-import './sidebar.scss';
+import Discord from "../../assets/discord.svg";
+import Github from "../../assets/github.svg";
+import Twitter from "../../assets/twitter.svg";
+import { Wallet } from "../../components";
+import { STORAGE } from "../../utils/persistent";
+import { SputnikDAO } from "../../utils/contracts/sputnik-dao";
+import { ArgsError, ArgsString } from "../../utils/args";
+import { Base64 } from "js-base64";
+import { readFile, saveFile } from "../../utils/loader";
+import Dialog from "../dialog/dialog";
+import { TextInput } from "../editor/elements";
+import "./sidebar.scss";
 export default class Sidebar extends Component {
-
     constructor(props) {
-
         super(props);
 
         this.state = {
@@ -28,115 +26,131 @@ export default class Sidebar extends Component {
                 saveAsJSON: false,
                 loadFromJSON: false,
                 loadFromProposal: false,
-                clearAll: false
-            }
-        }
+                clearAll: false,
+            },
+        };
     }
 
     componentDidMount() {
-
         window.SIDEBAR = this;
-
     }
 
     openDialog(name) {
-
-        const newDialogs = {...this.state.dialogs};
+        const newDialogs = { ...this.state.dialogs };
         newDialogs[name] = true;
 
-        this.setState({ dialogs: newDialogs })
-
+        this.setState({ dialogs: newDialogs });
     }
 
     saveMenu() {
-
-        return <div className="save-menu">
-            <ul>
-                <li onClick={ () => this.openDialog("saveAsJSON") }>Save as JSON</li>
-                <li>Share as Link <Chip label="coming soon!"/></li>
-            </ul>
-        </div>
-
+        return (
+            <div className="save-menu">
+                <ul>
+                    <li onClick={() => this.openDialog("saveAsJSON")}>Save as JSON</li>
+                    <li>
+                        Share as Link <Chip label="coming soon!" />
+                    </li>
+                </ul>
+            </div>
+        );
     }
 
     loadMenu() {
-
-        return <div className="load-menu">
-            <ul>
-                <li onClick={ () => this.openDialog("loadFromJSON") }>Load from JSON</li>
-                <li onClick={ () => this.openDialog("loadFromProposal") }>Load from Proposal</li>
-                {/* <li>Load from Link <Chip label="coming soon!"/></li> */}
-            </ul>
-        </div>
-
+        return (
+            <div className="load-menu">
+                <ul>
+                    <li onClick={() => this.openDialog("loadFromJSON")}>Load from JSON</li>
+                    <li onClick={() => this.openDialog("loadFromProposal")}>Load from Proposal</li>
+                    {/* <li>Load from Link <Chip label="coming soon!"/></li> */}
+                </ul>
+            </div>
+        );
     }
 
     render() {
-
         return (
             <div className="sidebar-wrapper">
                 <div className="sidebar-container">
                     <div className="title">
                         <Icon className="logo">dynamic_feed</Icon>
-                        <span className="env" env={window.NEAR_ENV}>
-                            <ScienceOutlinedIcon className="icon"/>
+                        <span
+                            className="env"
+                            env={window.NEAR_ENV}
+                        >
+                            <ScienceOutlinedIcon className="icon" />
                         </span>
                     </div>
                     <nav>
-                        <NavLink 
-                            className={({ isActive }) => isActive ? "active" : ""} 
+                        <NavLink
+                            className={({ isActive }) => (isActive ? "active" : "")}
                             to="/app"
                         >
                             App
                         </NavLink>
-                        <NavLink 
-                            className={({ isActive }) => isActive ? "active" : ""} 
+                        <NavLink
+                            className={({ isActive }) => (isActive ? "active" : "")}
                             to="/dao"
                             onClick={() => STORAGE.save()}
                         >
                             Dao
                         </NavLink>
                     </nav>
-                    <hr/>
-                    { window.PAGE === "app"
-                      ? <>
+                    <hr />
+                    {window.PAGE === "app" ? (
+                        <>
                             <div className="save">
-                                <FileDownloadOutlinedIcon/>
-                                { this.saveMenu() }
+                                <FileDownloadOutlinedIcon />
+                                {this.saveMenu()}
                             </div>
                             <div className="load">
-                                <FileUploadOutlinedIcon/>
-                                { this.loadMenu() }
+                                <FileUploadOutlinedIcon />
+                                {this.loadMenu()}
                             </div>
                             <div className="clear">
-                                <DeleteForeverOutlinedIcon 
-                                    onClick={ () => this.openDialog("clearAll") }
-                                />
+                                <DeleteForeverOutlinedIcon onClick={() => this.openDialog("clearAll")} />
                             </div>
                         </>
-                      : null
-                    }
-                    <hr/>
-                    <a target="_blank" rel="noopener noreferrer" href='https://twitter.com/near_multicall'>
-                        <img src={Twitter} alt="Twitter"/>
+                    ) : null}
+                    <hr />
+                    <a
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        href="https://twitter.com/near_multicall"
+                    >
+                        <img
+                            src={Twitter}
+                            alt="Twitter"
+                        />
                     </a>
-                    <a target="_blank" rel="noopener noreferrer" href='https://discord.gg/wc6T6bPvdr'>
-                        <img src={Discord} alt="Discord"/>
+                    <a
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        href="https://discord.gg/wc6T6bPvdr"
+                    >
+                        <img
+                            src={Discord}
+                            alt="Discord"
+                        />
                     </a>
-                    <a target="_blank" rel="noopener noreferrer" href='https://github.com/near-multicall'>
-                        <img src={Github} alt="Github"/>
+                    <a
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        href="https://github.com/near-multicall"
+                    >
+                        <img
+                            src={Github}
+                            alt="Github"
+                        />
                     </a>
                     {/* <img src={Telegram}/> */}
-                    <Wallet/>
+                    <Wallet />
                 </div>
-                { this.dialogs() }
+                {this.dialogs()}
             </div>
         );
-
     }
 
     dialogs() {
-
         const { dialogs } = this.state;
         const dialogComponent = React.createRef();
 
@@ -146,12 +160,19 @@ export default class Sidebar extends Component {
 
         // Load from Proposal
         const proposalURL = new ArgsString("");
-        const proposalURLInvalid = new ArgsError("Invalid URL", urlInput => !! SputnikDAO.getInfoFromProposalUrl(urlInput.value), true);
-        const proposalNonExistent = new ArgsError("The specified URL does not link to a proposal", urlInput => proposalNonExistent.isBad);
+        const proposalURLInvalid = new ArgsError(
+            "Invalid URL",
+            (urlInput) => !!SputnikDAO.getInfoFromProposalUrl(urlInput.value),
+            true
+        );
+        const proposalNonExistent = new ArgsError(
+            "The specified URL does not link to a proposal",
+            (urlInput) => proposalNonExistent.isBad
+        );
         let argsFromProposal;
 
         return [
-            <Dialog 
+            <Dialog
                 key="Save as JSON"
                 title="Save as JSON"
                 open={dialogs.saveAsJSON}
@@ -169,7 +190,7 @@ export default class Sidebar extends Component {
                     variant="filled"
                     className="light-textfield"
                     helperText="Please give a name to your multicall"
-                    onChange={(e) => fileName = e.target.value}
+                    onChange={(e) => (fileName = e.target.value)}
                 />
             </Dialog>,
             <Dialog
@@ -181,15 +202,15 @@ export default class Sidebar extends Component {
                     this.forceUpdate();
                 }}
                 onCancel={() => {}}
-                onDone={() => readFile(uploadedFile, json => LAYOUT.fromBase64(json))}
+                onDone={() => readFile(uploadedFile, (json) => LAYOUT.fromBase64(json))}
                 doneRename="Load"
             >
-                <input 
+                <input
                     accept=".json,application/JSON"
                     type="file"
-                    onChange={(e) => uploadedFile = e.target.files[0]}
+                    onChange={(e) => (uploadedFile = e.target.files[0])}
                 />
-                <br/>
+                <br />
                 <b className="warn">Your current multicall will be replaced!</b>
             </Dialog>,
             <Dialog
@@ -210,8 +231,8 @@ export default class Sidebar extends Component {
             >
                 <TextInput
                     label="Proposal URL"
-                    value={ proposalURL }
-                    error={[ proposalURLInvalid, proposalNonExistent ]}
+                    value={proposalURL}
+                    error={[proposalURLInvalid, proposalNonExistent]}
                     update={(e, textInputComponent) => {
                         // don't fetch proposal info from bad URL.
                         if (proposalURLInvalid.isBad) {
@@ -223,7 +244,8 @@ export default class Sidebar extends Component {
                         // on that address. We use constructor here because of previous logic checks.
                         const daoObj = new SputnikDAO(dao);
                         // fetch proposal info from DAO contract
-                        daoObj.getProposal(proposalId)
+                        daoObj
+                            .getProposal(proposalId)
                             .catch((e) => {
                                 proposalNonExistent.isBad = true;
                                 return;
@@ -232,18 +254,21 @@ export default class Sidebar extends Component {
                                 if (!!propOrUndefined) {
                                     let multicallArgs;
                                     const currProposal = propOrUndefined.kind?.FunctionCall;
-                                    const multicallAction = currProposal?.actions.find(action => {
+                                    const multicallAction = currProposal?.actions.find((action) => {
                                         // is it normal multicall?
                                         if (action.method_name === "multicall") {
-                                            multicallArgs = JSON.parse( Base64.decode(action.args) );
+                                            multicallArgs = JSON.parse(Base64.decode(action.args));
                                             return true;
                                         }
                                         // is it multicall with attached FT?
                                         else if (action.method_name === "ft_transfer_call") {
-                                            const ftTransferArgs = JSON.parse( Base64.decode(action.args) );
-                                            const ftTransferMsg = JSON.parse( ftTransferArgs.msg );
-                                            if (ftTransferMsg.function_id && ftTransferMsg.function_id === "multicall") {
-                                                multicallArgs = JSON.parse( Base64.decode(ftTransferMsg.args) );
+                                            const ftTransferArgs = JSON.parse(Base64.decode(action.args));
+                                            const ftTransferMsg = JSON.parse(ftTransferArgs.msg);
+                                            if (
+                                                ftTransferMsg.function_id &&
+                                                ftTransferMsg.function_id === "multicall"
+                                            ) {
+                                                multicallArgs = JSON.parse(Base64.decode(ftTransferMsg.args));
                                                 return true;
                                             }
                                         }
@@ -261,7 +286,7 @@ export default class Sidebar extends Component {
                     variant="filled"
                     className="light-textfield"
                 />
-                <br/>
+                <br />
                 <p>Enter proposal link from AstroDAO or base UI</p>
                 <b className="warn">Your current multicall will be replaced!</b>
             </Dialog>,
@@ -277,9 +302,12 @@ export default class Sidebar extends Component {
                 onDone={() => LAYOUT.clear()}
                 doneRename="Yes, clear all"
             >
-                <b className="warn">Are you sure you want to clear your multicall?<br/>You cannot undo this action!</b>
+                <b className="warn">
+                    Are you sure you want to clear your multicall?
+                    <br />
+                    You cannot undo this action!
+                </b>
             </Dialog>,
-        ]
+        ];
     }
-
 }
