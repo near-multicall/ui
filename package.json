@@ -24,10 +24,6 @@
         "**/*.{ts,tsx}": "tsc-files --noEmit",
         "*.{js,jsx,ts,tsx,json,md}": [
             "prettier --write"
-        ],
-        "*.{css,scss}": [
-            "stylelint --quiet --syntax=scss --fix",
-            "prettier --write"
         ]
     },
     "devDependencies": {
