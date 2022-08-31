@@ -59,6 +59,7 @@
     "@near-wallet-selector/sender": "^5.0.0",
     "@types/react": "^18.0.0",
     "big.js": "^6.2.1",
+    "clsx": "^1.2.1",
     "js-base64": "^3.7.2",
     "lodash.debounce": "^4.0.8",
     "near-api-js": "^0.45.1",
