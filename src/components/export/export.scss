@@ -1,8 +1,8 @@
-@use 'sass/base';
-@use 'sass/color';
-@use 'sass/size';
-@use 'sass/mixin';
-@use 'sass/font';
+@use "sass/base";
+@use "sass/color";
+@use "sass/size";
+@use "sass/mixin";
+@use "sass/font";
 
 .export-container {
     @include mixin.full;
@@ -135,7 +135,7 @@
             font-family: font.$text;
             font-size: size.$small-text;
             &::before {
-                content: 'Error: '
+                content: "Error: ";
             }
         }
         label {
@@ -149,7 +149,8 @@
             }
         }
         .MuiOutlinedInput-root {
-            input, textarea {
+            input,
+            textarea {
                 color: color.$white;
                 font-family: font.$code;
                 font-size: size.$small-text;
@@ -223,7 +224,6 @@
     font-size: size.$small-text !important;
 }
 
-
 .error-container {
     width: 100%;
     .header {
@@ -286,4 +286,3 @@
         background-color: color.$light;
     }
 }
-

@@ -1,8 +1,8 @@
-@use 'sass/mixin';
-@use 'sass/size';
-@use 'sass/color';
-@use 'sass/font';
-@use 'sass/animation';
+@use "sass/mixin";
+@use "sass/size";
+@use "sass/color";
+@use "sass/font";
+@use "sass/animation";
 
 .dao-container {
     @include mixin.page-wrapper;
@@ -27,7 +27,6 @@
                 &.Mui-error {
                     color: darken(color.$red, 10%);
                 }
-                
             }
             fieldset {
                 border: none;
@@ -48,7 +47,7 @@
         }
     }
     &::before {
-        content: '';
+        content: "";
         position: fixed;
         top: 0;
         left: 0;
@@ -62,7 +61,7 @@
         justify-items: unset;
         gap: size.$gap;
         padding: size.$gap;
-        width: calc(100% - 2* size.$gap);
+        width: calc(100% - 2 * size.$gap);
         grid-template: repeat(8, 1fr) / repeat(8, 1fr);
         &.error,
         &.loader {

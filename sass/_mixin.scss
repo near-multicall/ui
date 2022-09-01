@@ -1,5 +1,5 @@
-@use 'sass/size';
-@use 'sass/color';
+@use "sass/size";
+@use "sass/color";
 
 @mixin full {
     position: relative;
@@ -15,7 +15,7 @@
     width: calc(100% - size.$sidebar-width);
     left: size.$sidebar-width;
     &::before {
-        content: '';
+        content: "";
         position: fixed;
         top: 0;
         left: 0;
@@ -27,8 +27,8 @@
 
 @mixin available-width {
     width: 100%;
-    width: -moz-available;          /* WebKit-based browsers will ignore this. */
-    width: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */
+    width: -moz-available; /* WebKit-based browsers will ignore this. */
+    width: -webkit-fill-available; /* Mozilla-based browsers will ignore this. */
     width: fill-available;
 }
 
@@ -47,9 +47,9 @@
 }
 
 @mixin no-wrap {
-    overflow: hidden; 
+    overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;  
+    white-space: nowrap;
 }
 
 @mixin popup {
@@ -64,7 +64,8 @@
     top: 0;
     left: 0;
     background-color: rgba(255, 255, 255, 0.87);
-    button, .button-container {
+    button,
+    .button-container {
         position: absolute;
         bottom: size.$gap;
         right: size.$gap;

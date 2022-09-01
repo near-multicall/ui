@@ -1,7 +1,7 @@
-@use 'sass/size';
-@use 'sass/color';
-@use 'sass/mixin';
-@use 'sass/font';
+@use "sass/size";
+@use "sass/color";
+@use "sass/mixin";
+@use "sass/font";
 
 @mixin avatar {
     margin-left: -1px;
@@ -94,7 +94,8 @@
                     .MuiOutlinedInput-root {
                         height: 100%;
                         padding: 0;
-                        input, textarea {
+                        input,
+                        textarea {
                             height: 100%;
                             width: 25rem;
                             padding: 0;

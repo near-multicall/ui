@@ -1,7 +1,7 @@
-@use 'sass/color';
-@use 'sass/size';
-@use 'sass/font';
-@use 'sass/mixin';
+@use "sass/color";
+@use "sass/size";
+@use "sass/font";
+@use "sass/mixin";
 
 // displays
 // alignment
@@ -16,7 +16,9 @@
     // background-color: rgba(aqua, 0.1);
 }
 
-body, html, #root {
+body,
+html,
+#root {
     width: 100%;
     height: 100vh;
     background-color: color.$white;
@@ -34,7 +36,7 @@ a {
     cursor: pointer;
 }
 
-button {    
+button {
     padding: 0.5 * size.$gap 2 * size.$gap;
     background-color: color.$light;
     border: none;

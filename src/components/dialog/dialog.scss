@@ -1,6 +1,6 @@
-@use 'sass/size';
-@use 'sass/color';
-@use 'sass/font';
+@use "sass/size";
+@use "sass/color";
+@use "sass/font";
 
 .dialog {
     .title {
@@ -22,7 +22,7 @@
             font-family: font.$text;
             font-size: size.$small-text;
             &::before {
-                content: 'Error: '
+                content: "Error: ";
             }
         }
     }
