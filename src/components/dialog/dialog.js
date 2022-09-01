@@ -29,7 +29,11 @@ export default class Dialog extends Component {
         const { className, onClose, onDone, doneRename, onCancel, cancelRename, disable, children } = this.props;
 
         return (
-            <MUIDialog onClose={() => onClose()} open={open} className={clsx("dialog", className)}>
+            <MUIDialog
+                onClose={() => onClose()}
+                open={open}
+                className={clsx("dialog", className)}
+            >
                 <MUIDialogTitle className="title">{title}</MUIDialogTitle>
                 <MUIDialogContent className="content">{children}</MUIDialogContent>
                 <MUIDialogAction className="action">

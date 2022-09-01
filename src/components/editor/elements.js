@@ -4,7 +4,7 @@ import MenuItem from "@mui/material/MenuItem";
 
 class TextInput extends Component {
     render() {
-        const { label, value, error, update, onChange, ...props } = this.props;
+        const { label, value, error, update, ...props } = this.props;
 
         const errors = Array.isArray(error) ? error : [error]; // works with undefined too
 
@@ -15,7 +15,6 @@ class TextInput extends Component {
                 margin="dense"
                 size="small"
                 onChange={(e) => {
-                    onChange?.(e.target.value);
                     value.value = e.target.value;
                     errors.forEach((e) => e?.validOrNull(value));
                     update?.(e, this);
