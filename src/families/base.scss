@@ -1,7 +1,7 @@
-@use 'sass/color';
-@use 'sass/size';
-@use 'sass/font';
-@use 'sass/mixin';
+@use "sass/color";
+@use "sass/size";
+@use "sass/font";
+@use "sass/mixin";
 
 @mixin backdrop {
     @include cb-scale(0);
@@ -23,10 +23,10 @@
     -webkit-transform: scale($factor); /* Safari And Chrome */
     -webkit-transform-origin: center center;
     transform: scale($factor); /* Standard Property */
-    transform-origin: center center;  /* Standard Property */
-  }
+    transform-origin: center center; /* Standard Property */
+}
 
-.base-task  {
+.base-task {
     background: color.$lightest;
     .name {
         color: color.$text !important;
@@ -220,7 +220,7 @@
             font-family: font.$text;
             font-size: size.$small-text;
             &::before {
-                content: 'Error: '
+                content: "Error: ";
             }
         }
         label {
@@ -234,7 +234,8 @@
             }
         }
         .MuiOutlinedInput-root {
-            input, textarea {
+            input,
+            textarea {
                 color: color.$white;
                 font-family: font.$code;
                 font-size: size.$small-text;
