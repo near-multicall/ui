@@ -168,7 +168,10 @@ export default class Export extends Component {
         }
 
         return (
-            <div value={2} className="tab-panel">
+            <div
+                value={2}
+                className="tab-panel"
+            >
                 <div className="export-container">
                     <div className="input-container">
                         <TextInput
@@ -256,7 +259,10 @@ export default class Export extends Component {
                             </div>
                             <div className="error-list">
                                 {allErrors.map((e, i) => (
-                                    <div className="error" key={`error-${i}`}>
+                                    <div
+                                        className="error"
+                                        key={`error-${i}`}
+                                    >
                                         <p className="msg">{`[${e.task.call.name}] Error: ${e.message}`}</p>
                                         <EditOutlinedIcon
                                             className="icon"
@@ -343,7 +349,10 @@ export default class Export extends Component {
                             {walletError ? <p>{walletError}</p> : <></>}
                         </button>
                     ) : (
-                        <button className="login button" onClick={() => WALLET_COMPONENT.signIn()}>
+                        <button
+                            className="login button"
+                            onClick={() => WALLET_COMPONENT.signIn()}
+                        >
                             Connect to Wallet
                         </button>
                     )}
