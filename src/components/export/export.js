@@ -4,6 +4,7 @@ import Icon from "@mui/material/Icon";
 import TextField from "@mui/material/TextField";
 import { Base64 } from "js-base64";
 import React, { Component } from "react";
+import { Link } from "react-router-dom";
 import { ArgsAccount, ArgsBig, ArgsError, ArgsString } from "../../utils/args";
 import { errorMsg } from "../../utils/errors";
 import { STORAGE } from "../../utils/persistent";
@@ -118,8 +119,84 @@ export default class Export extends Component {
         });
     }
 
-    render() {
+    renderProposeButton() {
         const { selector: walletSelector } = this.context;
+        const walletError = window?.WALLET_COMPONENT?.errors
+            ? Object.entries(WALLET_COMPONENT.errors).filter(([k, v]) => v.isBad)[0]?.[1].message
+            : null;
+
+        // if user not logged in, button will do login.
+        if (!walletSelector.isSignedIn()) {
+            return (
+                <button
+                    className="login button"
+                    onClick={() => WALLET_COMPONENT.signIn()}
+                >
+                    Connect to Wallet
+                </button>
+            );
+        }
+        // if specified DAO not have a multicall instance, button will re-direct to DAO page so they can get an instance.
+        else if (walletError === errorMsg.ERR_DAO_HAS_NO_MTCL) {
+            return (
+                <Link
+                    to="/dao"
+                    class="propose button"
+                >
+                    {walletError}. Get one now!
+                </Link>
+            );
+        }
+        // normal propose multicall to DAO functionality
+        else {
+            const { gas, depo, desc } = this.total;
+            const errors = this.errors;
+            // check if "propose" button is disabled
+            const isProposeDisabled =
+                errors.dao.isBad ||
+                errors.multicall.isBad ||
+                errors.depo.isBad ||
+                errors.desc.isBad ||
+                errors.hasErrors.isBad ||
+                (this.attachFT &&
+                    (errors.amount.isBad ||
+                        errors.token.isBad ||
+                        errors.noToken.isBad ||
+                        errors.notWhitelisted.isBad)) ||
+                walletError;
+
+            return (
+                <button
+                    className="propose button"
+                    disabled={isProposeDisabled}
+                    onClick={() => {
+                        // multicall with attached FT
+                        if (this.attachFT)
+                            WALLET_COMPONENT.proposeFT(
+                                desc.value,
+                                convert(gas.value, gas.unit),
+                                token.value,
+                                convert(amount.value, amount.unit, amount.decimals)
+                            );
+                        // multicall with attached NEAR
+                        else if (this.attachNEAR)
+                            WALLET_COMPONENT.propose(
+                                desc.value,
+                                convert(depo.value, depo.unit),
+                                convert(gas.value, gas.unit)
+                            );
+                        // attach NEAR disabled, ignore depo amount and attach 1 yocto.
+                        else WALLET_COMPONENT.propose(desc.value, "1", convert(gas.value, gas.unit));
+                    }}
+                >
+                    {`Propose on ${STORAGE.addresses.dao}`}
+                    {walletError ? <p>{walletError}</p> : <></>}
+                </button>
+            );
+        }
+    }
+
+    render() {
         const LAYOUT = this.props.layout; // ususally global parameter
 
         const { gas, depo, desc } = this.total;
@@ -129,10 +206,6 @@ export default class Export extends Component {
         const errors = this.errors;
 
         errors.hasErrors.isBad = allErrors.length > 0;
-
-        const walletError = window?.WALLET_COMPONENT?.errors
-            ? Object.entries(WALLET_COMPONENT.errors).filter(([k, v]) => v.isBad)[0]?.[1].message
-            : null;
 
         // update internal state of address errors
         Object.entries(STORAGE.addresses).forEach(([k, v]) => {
@@ -252,10 +325,11 @@ export default class Export extends Component {
                             </>
                         ) : null}
                     </div>
+                    {/* Display cards' errors */}
                     {allErrors.length > 0 && (
                         <div className="error-container">
                             <div className="header">
-                                <h3>{`Errors (${allErrors.length})`}</h3>
+                                <h3>{`Card errors (${allErrors.length})`}</h3>
                             </div>
                             <div className="error-list">
                                 {allErrors.map((e, i) => (
@@ -309,53 +383,7 @@ export default class Export extends Component {
                         )}
                     </div>
                     <div className="spacer"></div>
-                    {walletSelector.isSignedIn() ? (
-                        <button
-                            className="propose button"
-                            disabled={
-                                errors.dao.isBad ||
-                                errors.multicall.isBad ||
-                                errors.depo.isBad ||
-                                errors.desc.isBad ||
-                                errors.hasErrors.isBad ||
-                                (this.attachFT &&
-                                    (errors.amount.isBad ||
-                                        errors.token.isBad ||
-                                        errors.noToken.isBad ||
-                                        errors.notWhitelisted.isBad)) ||
-                                walletError
-                            }
-                            onClick={() => {
-                                // multicall with attached FT
-                                if (this.attachFT)
-                                    WALLET_COMPONENT.proposeFT(
-                                        desc.value,
-                                        convert(gas.value, gas.unit),
-                                        token.value,
-                                        convert(amount.value, amount.unit, amount.decimals)
-                                    );
-                                // multicall with attached NEAR
-                                else if (this.attachNEAR)
-                                    WALLET_COMPONENT.propose(
-                                        desc.value,
-                                        convert(depo.value, depo.unit),
-                                        convert(gas.value, gas.unit)
-                                    );
-                                // attach NEAR disabled, ignore depo amount and attach 1 yocto.
-                                else WALLET_COMPONENT.propose(desc.value, "1", convert(gas.value, gas.unit));
-                            }}
-                        >
-                            {`Propose on ${STORAGE.addresses.dao}`}
-                            {walletError ? <p>{walletError}</p> : <></>}
-                        </button>
-                    ) : (
-                        <button
-                            className="login button"
-                            onClick={() => WALLET_COMPONENT.signIn()}
-                        >
-                            Connect to Wallet
-                        </button>
-                    )}
+                    {this.renderProposeButton()}
                 </div>
             </div>
         );
