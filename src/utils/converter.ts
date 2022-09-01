@@ -22,6 +22,7 @@ const parseTokenAmount = (amount: BigSource, decimals: number): string =>
     Big(amount).times(Big(10).pow(decimals)).toFixed();
 // indivisible units -> token amount
 const formatTokenAmount = (amount: BigSource, decimals: number = 0, precision: number = Big.DP): string => {
+    if (amount === "") amount = 0;
     const formattedAmount: string = Big(amount).div(Big(10).pow(decimals)).toFixed(precision);
     return removeTrailingZeros(formattedAmount);
 };
