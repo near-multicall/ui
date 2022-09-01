@@ -33,6 +33,7 @@
         "@parcel/transformer-sass": "^2.4.1",
         "@types/big.js": "^6.1.5",
         "@types/lodash.debounce": "^4.0.7",
+        "@types/validator": "^13.7.6",
         "@typescript-eslint/parser": "^5.36.1",
         "babel-jest": "^28.0.2",
         "env-cmd": "~10.1.0",
@@ -72,6 +73,7 @@
         "@types/react": "^18.0.0",
         "big.js": "^6.2.1",
         "clsx": "^1.2.1",
+        "is-url": "^1.2.4",
         "js-base64": "^3.7.2",
         "lodash.debounce": "^4.0.8",
         "near-api-js": "^0.45.1",
@@ -82,7 +84,8 @@
         "react-dom": "^18.0.0",
         "react-router-dom": "6",
         "regenerator-runtime": "^0.13.9",
-        "rxjs": "^7.5.6"
+        "rxjs": "^7.5.6",
+        "validator": "^13.7.0"
     },
     "resolutions": {
         "near-api-js": "0.45.1"

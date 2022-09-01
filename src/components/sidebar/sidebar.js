@@ -8,9 +8,10 @@ import {
 
 import { Chip, Icon, IconButton, TextField, Tooltip } from "@mui/material";
 import { Base64 } from "js-base64";
-import React, { Component, createElement as h } from "react";
+import React, { Component, createElement as h, useEffect, useMemo, useReducer, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { map } from "lodash";
+import isUrl from "validator/es/lib/isUrl";
 
 import Discord from "../../assets/discord.svg";
 import Github from "../../assets/github.svg";
@@ -38,10 +39,10 @@ const PopupMenu = ({ Icon, items }) => (
     </div>
 );
 
-const DAPP_LOGIN_METHODS = [
-    { key: "daoDappLogin", title: "Login in dApp as DAO" },
-    { key: "multicallDappLogin", title: "Login in dApp as Multicall" },
-];
+const DAPP_LOGIN_METHODS = {
+    dao: { actorKey: "dao", key: "daoDappLogin", title: "Login in dApp as DAO" },
+    multicall: { actorKey: "multicall", key: "multicallDappLogin", title: "Login in dApp as Multicall" },
+};
 
 const DappLoginInstructions = () => (
     <ul style={{ listStyleType: "auto" }}>
@@ -53,28 +54,37 @@ const DappLoginInstructions = () => (
     </ul>
 );
 
-const DappLoginDialog = ({ onClose, open, title }) => {
-    const dappURL = new ArgsString("");
-    const invalidDappURL = new ArgsError("Invalid URL", (urlInput) => urlInput !== "test", true);
+const DappLoginDialog = ({ actorKey, onClose, open, title }) => {
+    const dAppURL = useMemo(() => new ArgsString(""), []);
+    const dappURLError = useMemo(() => new ArgsError("Invalid URL", ({ value }) => isUrl(value), true), []);
+
+    const requestParams =
+        `account_id=${STORAGE.addresses[actorKey]}` +
+        `&public_key=ed25519%3ADEaoD65LomNHAMzhNZva15LC85ntwBHdcTbCnZRXciZH` +
+        `&all_keys=ed25519%3A9jeqkc8ybv7aYSA7uLNFUEn8cgKo759yue4771bBWsSr`;
+
+    const [requestURL, requestURLUpdate] = useReducer((currentValue, event) =>
+        dappURLError.isBad ? currentValue : new URL(event.target.value).origin + "/?" + requestParams
+    );
 
     return (
         <Dialog
             className="modal-dialog"
             onCancel={() => {}}
-            onDone={() => {}}
+            onDone={() => window.open(requestURL, "_blank")}
             doneRename="Proceed"
-            disable={() => invalidDappURL.isBad}
+            disable={() => dappURLError.isBad}
             {...{ onClose, open, title }}
         >
             <DappLoginInstructions />
 
             <TextInput
-                label="dApp URL"
-                value={dappURL}
-                error={invalidDappURL}
-                update={(event, textInputComponent) => {}}
-                variant="filled"
                 className="light-textfield"
+                error={dappURLError}
+                label="dApp URL"
+                update={requestURLUpdate}
+                value={dAppURL}
+                variant="filled"
             />
         </Dialog>
     );
@@ -133,8 +143,9 @@ export default class Sidebar extends Component {
         let argsFromProposal;
 
         return [
-            ...map(DAPP_LOGIN_METHODS, ({ key, title }) =>
+            ...map(Object.values(DAPP_LOGIN_METHODS), ({ actorKey, key, title }) =>
                 h(DappLoginDialog, {
+                    actorKey,
                     key,
                     onClose: () => this.dialogClose(key),
                     open: dialogs[key],
@@ -281,13 +292,19 @@ export default class Sidebar extends Component {
                     <div className="title">
                         <Icon className="logo">dynamic_feed</Icon>
 
-                        <span className="env" env={window.NEAR_ENV}>
+                        <span
+                            className="env"
+                            env={window.NEAR_ENV}
+                        >
                             <ScienceOutlined className="icon" />
                         </span>
                     </div>
 
                     <nav>
-                        <NavLink className={({ isActive }) => (isActive ? "active" : "")} to="/app">
+                        <NavLink
+                            className={({ isActive }) => (isActive ? "active" : "")}
+                            to="/app"
+                        >
                             App
                         </NavLink>
 
@@ -303,7 +320,7 @@ export default class Sidebar extends Component {
 
                     <PopupMenu
                         Icon={<LinkOutlined />}
-                        items={map(DAPP_LOGIN_METHODS, ({ key, title }) => ({
+                        items={map(Object.values(DAPP_LOGIN_METHODS), ({ key, title }) => ({
                             onClick: () => this.openDialog(key),
                             title,
                         }))}
@@ -346,7 +363,10 @@ export default class Sidebar extends Component {
                             />
 
                             <div className="popup-menu sidebar-button">
-                                <Tooltip title={<h1 style={{ fontSize: "12px" }}>Clear All</h1>} placement="right">
+                                <Tooltip
+                                    title={<h1 style={{ fontSize: "12px" }}>Clear All</h1>}
+                                    placement="right"
+                                >
                                     <IconButton
                                         disableRipple
                                         className="sidebar-button"
@@ -360,14 +380,35 @@ export default class Sidebar extends Component {
                     ) : null}
                     <hr />
 
-                    <a target="_blank" rel="noopener noreferrer" href="https://twitter.com/near_multicall">
-                        <img src={Twitter} alt="Twitter" />
+                    <a
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        href="https://twitter.com/near_multicall"
+                    >
+                        <img
+                            src={Twitter}
+                            alt="Twitter"
+                        />
                     </a>
-                    <a target="_blank" rel="noopener noreferrer" href="https://discord.gg/wc6T6bPvdr">
-                        <img src={Discord} alt="Discord" />
+                    <a
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        href="https://discord.gg/wc6T6bPvdr"
+                    >
+                        <img
+                            src={Discord}
+                            alt="Discord"
+                        />
                     </a>
-                    <a target="_blank" rel="noopener noreferrer" href="https://github.com/near-multicall">
-                        <img src={Github} alt="Github" />
+                    <a
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        href="https://github.com/near-multicall"
+                    >
+                        <img
+                            src={Github}
+                            alt="Github"
+                        />
                     </a>
 
                     {/* <img src={Telegram}/> */}
