@@ -2,27 +2,29 @@ import {
     DeleteForeverOutlined,
     FileDownloadOutlined,
     FileUploadOutlined,
-    LinkOutlined,
+    PreviewOutlined,
     ScienceOutlined,
 } from "@mui/icons-material";
 
-import { Chip, Icon, IconButton, TextField, Tooltip } from "@mui/material";
-import { Base64 } from "js-base64";
-import React, { Component, createElement as h, useEffect, useMemo, useReducer, useState } from "react";
-import { NavLink } from "react-router-dom";
+import { Chip, Icon, IconButton, Tooltip } from "@mui/material";
 import { map } from "lodash";
-import isUrl from "validator/es/lib/isUrl";
+import React, { Component } from "react";
+import { NavLink } from "react-router-dom";
+
+import {
+    DappLoginDialog,
+    DAPP_LOGIN_METHODS,
+    LoadFromJsonDialog,
+    LoadFromProposalDialog,
+    SaveAsJsonDialog,
+    ClearAllDialog,
+} from "./dialogs";
 
 import Discord from "../../assets/discord.svg";
 import Github from "../../assets/github.svg";
 import Twitter from "../../assets/twitter.svg";
 import { Wallet } from "../../components";
-import Dialog from "../dialog/dialog";
-import { TextInput } from "../editor/elements";
 import { STORAGE } from "../../utils/persistent";
-import { SputnikDAO } from "../../utils/contracts/sputnik-dao";
-import { ArgsError, ArgsString } from "../../utils/args";
-import { readFile, saveFile } from "../../utils/loader";
 import "./sidebar.scss";
 
 const PopupMenu = ({ Icon, items }) => (
@@ -31,64 +33,19 @@ const PopupMenu = ({ Icon, items }) => (
 
         <div className="popup-menu-content">
             <ul>
-                {map(items, ({ label, onClick, title }) =>
-                    h("li", { key: title, onClick }, title, label && h(Chip, { label }))
-                )}
+                {map(items, ({ label, onClick, title }) => (
+                    <li
+                        key={title}
+                        onClick={onClick}
+                    >
+                        {title}
+                        {label && <Chip label={label} />}
+                    </li>
+                ))}
             </ul>
         </div>
     </div>
 );
-
-const DAPP_LOGIN_METHODS = {
-    dao: { actorKey: "dao", key: "daoDappLogin", title: "Login in dApp as DAO" },
-    multicall: { actorKey: "multicall", key: "multicallDappLogin", title: "Login in dApp as Multicall" },
-};
-
-const DappLoginInstructions = () => (
-    <ul style={{ listStyleType: "auto" }}>
-        <li>Go to the dApp website you want to use</li>
-        <li>Log out your current wallet</li>
-        <li>Copy the dApp URL</li>
-        <li>Paste the URL in an input field below</li>
-        <li>Click "Proceed" to continue</li>
-    </ul>
-);
-
-const DappLoginDialog = ({ actorKey, onClose, open, title }) => {
-    const dAppURL = useMemo(() => new ArgsString(""), []);
-    const dappURLError = useMemo(() => new ArgsError("Invalid URL", ({ value }) => isUrl(value), true), []);
-
-    const requestParams =
-        `account_id=${STORAGE.addresses[actorKey]}` +
-        `&public_key=ed25519%3ADEaoD65LomNHAMzhNZva15LC85ntwBHdcTbCnZRXciZH` +
-        `&all_keys=ed25519%3A9jeqkc8ybv7aYSA7uLNFUEn8cgKo759yue4771bBWsSr`;
-
-    const [requestURL, requestURLUpdate] = useReducer((currentValue, event) =>
-        dappURLError.isBad ? currentValue : new URL(event.target.value).origin + "/?" + requestParams
-    );
-
-    return (
-        <Dialog
-            className="modal-dialog"
-            onCancel={() => {}}
-            onDone={() => window.open(requestURL, "_blank")}
-            doneRename="Proceed"
-            disable={() => dappURLError.isBad}
-            {...{ onClose, open, title }}
-        >
-            <DappLoginInstructions />
-
-            <TextInput
-                className="light-textfield"
-                error={dappURLError}
-                label="dApp URL"
-                update={requestURLUpdate}
-                value={dAppURL}
-                variant="filled"
-            />
-        </Dialog>
-    );
-};
 
 export default class Sidebar extends Component {
     constructor(props) {
@@ -114,174 +71,38 @@ export default class Sidebar extends Component {
         this.setState({ dialogs: { ...this.state.dialogs, [name]: true } });
     }
 
-    dialogClose(name) {
-        this.setState({ dialogs: { [name]: false } });
+    closeDialog(name) {
+        this.setState({ dialogs: { ...this.state.dialogs, [name]: false } });
         this.forceUpdate();
     }
 
     dialogs() {
         const { dialogs } = this.state;
-        const dialogComponent = React.createRef();
-
-        // Load from JSON
-        let fileName = "my-multicall";
-        let uploadedFile;
-
-        // Load from Proposal
-        const proposalURL = new ArgsString("");
-        const proposalURLInvalid = new ArgsError(
-            "Invalid URL",
-            (urlInput) => !!SputnikDAO.getInfoFromProposalUrl(urlInput.value),
-            true
-        );
-
-        const proposalNonExistent = new ArgsError(
-            "The specified URL does not link to a proposal",
-            (urlInput) => proposalNonExistent.isBad
-        );
-
-        let argsFromProposal;
 
         return [
-            ...map(Object.values(DAPP_LOGIN_METHODS), ({ actorKey, key, title }) =>
-                h(DappLoginDialog, {
-                    actorKey,
-                    key,
-                    onClose: () => this.dialogClose(key),
-                    open: dialogs[key],
-                    title,
-                })
-            ),
-
-            <Dialog
-                className="modal-dialog"
-                key="Save as JSON"
-                title="Save as JSON"
+            ...map(Object.values(DAPP_LOGIN_METHODS), (props) => (
+                <DappLoginDialog
+                    onClose={() => this.closeDialog(props.key)}
+                    open={dialogs[props.key]}
+                    {...props}
+                />
+            )),
+            <SaveAsJsonDialog
+                onClose={() => this.closeDialog("saveAsJSON")}
                 open={dialogs.saveAsJSON}
-                onClose={() => this.dialogClose("saveAsJSON")}
-                onCancel={() => {}}
-                onDone={() => saveFile(`${fileName}.json`, [JSON.stringify(LAYOUT.toBase64(), null, 2)])}
-                doneRename="Download"
-            >
-                <TextField
-                    label="Multicall title"
-                    defaultValue="my-multicall"
-                    variant="filled"
-                    className="light-textfield"
-                    helperText="Please give a name to your multicall"
-                    onChange={(e) => (fileName = e.target.value)}
-                />
-            </Dialog>,
-
-            <Dialog
-                className="modal-dialog"
-                key="Load from JSON"
-                title="Load from JSON"
+            />,
+            <LoadFromJsonDialog
+                onClose={() => this.closeDialog("loadFromJSON")}
                 open={dialogs.loadFromJSON}
-                onClose={() => this.dialogClose("loadFromJSON")}
-                onCancel={() => {}}
-                onDone={() => readFile(uploadedFile, (json) => LAYOUT.fromBase64(json))}
-                doneRename="Load"
-            >
-                <input
-                    accept=".json,application/JSON"
-                    type="file"
-                    onChange={(e) => (uploadedFile = e.target.files[0])}
-                />
-
-                <b className="warn">Your current multicall will be replaced!</b>
-            </Dialog>,
-
-            <Dialog
-                className="modal-dialog"
-                key="Load from Proposal"
-                title="Load from Proposal"
+            />,
+            <LoadFromProposalDialog
+                onClose={() => this.closeDialog("loadFromProposal")}
                 open={dialogs.loadFromProposal}
-                onClose={() => this.dialogClose("loadFromProposal")}
-                onCancel={() => {}}
-                onDone={() => window.LAYOUT.fromBase64(argsFromProposal)}
-                doneRename="Load"
-                disable={() => proposalURLInvalid.isBad || proposalNonExistent.isBad}
-                ref={dialogComponent}
-            >
-                <TextInput
-                    label="Proposal URL"
-                    value={proposalURL}
-                    error={[proposalURLInvalid, proposalNonExistent]}
-                    update={(e, textInputComponent) => {
-                        // don't fetch proposal info from bad URL.
-                        if (proposalURLInvalid.isBad) {
-                            proposalNonExistent.isBad = false;
-                            return;
-                        }
-                        const { dao, proposalId } = SputnikDAO.getInfoFromProposalUrl(proposalURL.value);
-                        // !!! creating SputnikDAO instance must be done using init() to make sure DAO exists
-                        // on that address. We use constructor here because of previous logic checks.
-                        const daoObj = new SputnikDAO(dao);
-                        // fetch proposal info from DAO contract
-                        daoObj
-                            .getProposal(proposalId)
-                            .catch((e) => {
-                                proposalNonExistent.isBad = true;
-                                return;
-                            })
-                            .then((propOrUndefined) => {
-                                if (!!propOrUndefined) {
-                                    let multicallArgs;
-                                    const currProposal = propOrUndefined.kind?.FunctionCall;
-                                    const multicallAction = currProposal?.actions.find((action) => {
-                                        // is it normal multicall?
-                                        if (action.method_name === "multicall") {
-                                            multicallArgs = JSON.parse(Base64.decode(action.args));
-                                            return true;
-                                        }
-                                        // is it multicall with attached FT?
-                                        else if (action.method_name === "ft_transfer_call") {
-                                            const ftTransferArgs = JSON.parse(Base64.decode(action.args));
-                                            const ftTransferMsg = JSON.parse(ftTransferArgs.msg);
-                                            if (
-                                                ftTransferMsg.function_id &&
-                                                ftTransferMsg.function_id === "multicall"
-                                            ) {
-                                                multicallArgs = JSON.parse(Base64.decode(ftTransferMsg.args));
-                                                return true;
-                                            }
-                                        }
-                                    });
-                                    if (multicallAction) {
-                                        proposalNonExistent.isBad = false;
-                                        argsFromProposal = multicallArgs.calls;
-                                    }
-                                }
-                                textInputComponent.forceUpdate();
-                                dialogComponent.current.forceUpdate();
-                            });
-                        dialogComponent.current.forceUpdate();
-                    }}
-                    variant="filled"
-                    className="light-textfield"
-                />
-
-                <p>Enter proposal link from AstroDAO or base UI</p>
-                <b className="warn">Your current multicall will be replaced!</b>
-            </Dialog>,
-
-            <Dialog
-                className="modal-dialog"
-                key="Clear All"
-                title="Clear All"
+            />,
+            <ClearAllDialog
+                onClose={() => this.closeDialog("clearAll")}
                 open={dialogs.clearAll}
-                onClose={() => this.dialogClose("clearAll")}
-                onCancel={() => {}}
-                onDone={() => LAYOUT.clear()}
-                doneRename="Yes, clear all"
-            >
-                <b className="warn">
-                    Are you sure you want to clear your multicall?
-                    <br />
-                    You cannot undo this action!
-                </b>
-            </Dialog>,
+            />,
         ];
     }
 
@@ -317,15 +138,6 @@ export default class Sidebar extends Component {
                         </NavLink>
                     </nav>
                     <hr />
-
-                    <PopupMenu
-                        Icon={<LinkOutlined />}
-                        items={map(Object.values(DAPP_LOGIN_METHODS), ({ key, title }) => ({
-                            onClick: () => this.openDialog(key),
-                            title,
-                        }))}
-                    />
-
                     {window.PAGE === "app" ? (
                         <>
                             <PopupMenu
@@ -376,10 +188,17 @@ export default class Sidebar extends Component {
                                     </IconButton>
                                 </Tooltip>
                             </div>
+                            <hr />
                         </>
                     ) : null}
+                    <PopupMenu
+                        Icon={<PreviewOutlined />}
+                        items={map(Object.values(DAPP_LOGIN_METHODS), ({ key, title }) => ({
+                            onClick: () => this.openDialog(key),
+                            title,
+                        }))}
+                    />
                     <hr />
-
                     <a
                         target="_blank"
                         rel="noopener noreferrer"
