@@ -1,7 +1,7 @@
-@use 'sass/size';
-@use 'sass/mixin';
-@use 'sass/base';
-@use 'sass/color';
+@use "sass/size";
+@use "sass/mixin";
+@use "sass/base";
+@use "sass/color";
 
 .placeholder {
     @include mixin.center-items;

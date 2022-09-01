@@ -1,9 +1,9 @@
-@use 'sass/mixin';
-@use 'sass/base';
-@use 'sass/color';
-@use 'sass/size';
-@use 'sass/font';
-@use 'sass/animation';
+@use "sass/mixin";
+@use "sass/base";
+@use "sass/color";
+@use "sass/size";
+@use "sass/font";
+@use "sass/animation";
 
 .sidebar-wrapper {
     position: fixed;
@@ -12,7 +12,7 @@
     height: 100%;
     width: size.$sidebar-width;
     background-color: color.$black;
-    box-shadow: 1px 10px 20px 0 rgba(0,0,0,0.2);
+    box-shadow: 1px 10px 20px 0 rgba(0, 0, 0, 0.2);
     z-index: 2;
 }
 
@@ -78,7 +78,9 @@
             opacity: 1;
         }
     }
-    .save, .load, .clear {
+    .save,
+    .load,
+    .clear {
         position: relative;
         .MuiSvgIcon-root {
             color: color.$light;
@@ -92,13 +94,14 @@
         &:hover div {
             visibility: visible !important;
         }
-        div.save-menu, div.load-menu {
+        div.save-menu,
+        div.load-menu {
             visibility: hidden;
             position: absolute;
             left: size.$sidebar-width;
             top: 0;
             padding-left: 0.5 * size.$gap;
-            width: max-content;   
+            width: max-content;
             ul {
                 padding: 0;
                 margin-left: 0;
@@ -115,7 +118,7 @@
                         padding-bottom: 0.5 * size.$gap;
                     }
                     &:first-of-type {
-                        padding-top:  0.5 * size.$gap;
+                        padding-top: 0.5 * size.$gap;
                     }
                     &:hover {
                         background-color: rgba(color.$light, 0.1);

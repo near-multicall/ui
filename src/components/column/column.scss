@@ -1,6 +1,6 @@
-@use 'sass/size';
-@use 'sass/color';
-@use 'sass/mixin';
+@use "sass/size";
+@use "sass/color";
+@use "sass/mixin";
 
 .column-container {
     flex: 0 0 size.$task-width;
