@@ -1,121 +1,133 @@
 {
-  "homepage": "http://near-multicall.github.io/ui",
-  "name": "ui",
-  "version": "0.1.0",
-  "license": "UNLICENSED",
-  "scripts": {
-    "build": "parcel build src/index.html --public-url ./",
-    "build:testnet": "NEAR_ENV=testnet yarn build",
-    "build:mainnet": "NEAR_ENV=mainnet yarn build",
-    "deploy:pages": "echo 'testnet.multicall.app' > ./dist/CNAME && gh-pages -d dist/",
-    "deploy": "yarn build && yarn deploy:pages",
-    "start": "echo The app is starting! It will automatically open in your browser when ready && parcel src/index.html --open",
-    "start:testnet": "NEAR_ENV=testnet yarn start",
-    "start:mainnet": "NEAR_ENV=mainnet yarn start",
-    "dev": "nodemon --watch contract -e ts --exec \"yarn start\"",
-    "test": "jest test --runInBand",
-    "fmt": "eslint --fix ./"
-  },
-  "devDependencies": {
-    "@babel/core": "^7.17.7",
-    "@babel/preset-react": "^7.16.7",
-    "@netlify/plugin-lighthouse": "^3.2.0",
-    "@parcel/transformer-sass": "^2.4.1",
-    "@types/big.js": "^6.1.5",
-    "@types/lodash.debounce": "^4.0.7",
-    "@typescript-eslint/parser": "^5.36.1",
-    "babel-jest": "^28.0.2",
-    "env-cmd": "~10.1.0",
-    "eslint": "^8.23.0",
-    "eslint-plugin-prettier": "^4.2.1",
-    "gh-pages": "^4.0.0",
-    "jest": "^28.1.2",
-    "jest-environment-node": "^28.0.2",
-    "near-cli": "^3.4.0",
-    "nodemon": "~2.0.19",
-    "prettier": "^2.7.1",
-    "process": "^0.11.10",
-    "react-test-renderer": "^18.0.0",
-    "sass": "^1.43.3",
-    "shelljs": "~0.8.4",
-    "typescript": "^4.5.2",
-    "util": "^0.12.4"
-  },
-  "dependencies": {
-    "@babel/plugin-transform-runtime": "^7.16.4",
-    "@babel/preset-env": "^7.16.11",
-    "@babel/preset-typescript": "^7.16.7",
-    "@babel/runtime": "^7.16.3",
-    "@emotion/react": "^11.7.0",
-    "@emotion/styled": "^11.9.3",
-    "@mui/icons-material": "^5.2.0",
-    "@mui/lab": "^5.0.0-alpha.58",
-    "@mui/material": "^5.0.0",
-    "@near-wallet-selector/core": "^5.0.0",
-    "@near-wallet-selector/math-wallet": "^5.0.0",
-    "@near-wallet-selector/modal-ui": "^5.0.0",
-    "@near-wallet-selector/my-near-wallet": "^5.0.0",
-    "@near-wallet-selector/near-wallet": "^5.0.0",
-    "@near-wallet-selector/sender": "^5.0.0",
-    "@types/react": "^18.0.0",
-    "big.js": "^6.2.1",
-    "clsx": "^1.2.1",
-    "js-base64": "^3.7.2",
-    "lodash.debounce": "^4.0.8",
-    "near-api-js": "^0.45.1",
-    "object-hash": "^3.0.0",
-    "parcel": "^2.4.0",
-    "react": "^18.0.0",
-    "react-beautiful-dnd": "^13.1.0",
-    "react-dom": "^18.0.0",
-    "react-router-dom": "6",
-    "regenerator-runtime": "^0.13.9",
-    "rxjs": "^7.5.6"
-  },
-  "resolutions": {
-    "near-api-js": "0.45.1"
-  },
-  "jest": {
-    "moduleNameMapper": {
-      "\\.(jpg|ico|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/src/__mocks__/fileMock.js",
-      "\\.(css|less)$": "<rootDir>/src/__mocks__/fileMock.js"
+    "homepage": "http://near-multicall.github.io/ui",
+    "name": "ui",
+    "version": "0.1.0",
+    "license": "UNLICENSED",
+    "scripts": {
+        "build": "parcel build src/index.html --public-url ./",
+        "build:testnet": "NEAR_ENV=testnet yarn build",
+        "build:mainnet": "NEAR_ENV=mainnet yarn build",
+        "deploy:pages": "echo 'testnet.multicall.app' > ./dist/CNAME && gh-pages -d dist/",
+        "deploy": "yarn build && yarn deploy:pages",
+        "start": "echo The app is starting! It will automatically open in your browser when ready && parcel src/index.html --open",
+        "start:testnet": "NEAR_ENV=testnet yarn start",
+        "start:mainnet": "NEAR_ENV=mainnet yarn start",
+        "dev": "nodemon --watch contract -e ts --exec \"yarn start\"",
+        "test": "jest test --runInBand",
+        "prettier": "prettier --write \"./**/*.{ts,tsx,js,jsx,css,scss,html}\"",
+        "prepare": "husky install"
     },
-    "setupFiles": [
-      "<rootDir>/src/jest.init.js"
-    ],
-    "testEnvironment": "near-cli/test_environment",
-    "testPathIgnorePatterns": [
-      "<rootDir>/contract/",
-      "<rootDir>/node_modules/"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
-  "eslintConfig": {
-    "env": {
-      "browser": true,
-      "es2021": true
+    "lint-staged": {
+        "*.{ts,tsx}": [
+            "eslint --color --max-warnings 0 --no-ignore"
+        ],
+        "**/*.{ts,tsx}": "tsc-files --noEmit",
+        "*.{js,jsx,ts,tsx,json,md}": [
+            "prettier --write"
+        ]
     },
-    "parser": "@typescript-eslint/parser",
-    "parserOptions": {
-      "ecmaVersion": 12,
-      "sourceType": "module"
+    "devDependencies": {
+        "@babel/core": "^7.17.7",
+        "@babel/preset-react": "^7.16.7",
+        "@netlify/plugin-lighthouse": "^3.2.0",
+        "@parcel/transformer-sass": "^2.4.1",
+        "@types/big.js": "^6.1.5",
+        "@types/lodash.debounce": "^4.0.7",
+        "@typescript-eslint/parser": "^5.36.1",
+        "babel-jest": "^28.0.2",
+        "env-cmd": "~10.1.0",
+        "eslint": "^8.23.0",
+        "eslint-plugin-prettier": "^4.2.1",
+        "gh-pages": "^4.0.0",
+        "husky": "^8.0.0",
+        "jest": "^28.1.2",
+        "jest-environment-node": "^28.0.2",
+        "lint-staged": "^13.0.3",
+        "near-cli": "^3.4.0",
+        "nodemon": "~2.0.19",
+        "prettier": "^2.7.1",
+        "process": "^0.11.10",
+        "react-test-renderer": "^18.0.0",
+        "sass": "^1.43.3",
+        "shelljs": "~0.8.4",
+        "typescript": "^4.5.2",
+        "util": "^0.12.4"
     },
-    "plugins": [
-      "eslint-plugin-prettier"
-    ],
-    "rules": {
-      "prettier/prettier": "error"
+    "dependencies": {
+        "@babel/plugin-transform-runtime": "^7.16.4",
+        "@babel/preset-env": "^7.16.11",
+        "@babel/preset-typescript": "^7.16.7",
+        "@babel/runtime": "^7.16.3",
+        "@emotion/react": "^11.7.0",
+        "@emotion/styled": "^11.9.3",
+        "@mui/icons-material": "^5.2.0",
+        "@mui/lab": "^5.0.0-alpha.58",
+        "@mui/material": "^5.0.0",
+        "@near-wallet-selector/core": "^5.0.0",
+        "@near-wallet-selector/math-wallet": "^5.0.0",
+        "@near-wallet-selector/modal-ui": "^5.0.0",
+        "@near-wallet-selector/my-near-wallet": "^5.0.0",
+        "@near-wallet-selector/near-wallet": "^5.0.0",
+        "@near-wallet-selector/sender": "^5.0.0",
+        "@types/react": "^18.0.0",
+        "big.js": "^6.2.1",
+        "clsx": "^1.2.1",
+        "js-base64": "^3.7.2",
+        "lodash.debounce": "^4.0.8",
+        "near-api-js": "^0.45.1",
+        "object-hash": "^3.0.0",
+        "parcel": "^2.4.0",
+        "react": "^18.0.0",
+        "react-beautiful-dnd": "^13.1.0",
+        "react-dom": "^18.0.0",
+        "react-router-dom": "6",
+        "regenerator-runtime": "^0.13.9",
+        "rxjs": "^7.5.6"
+    },
+    "resolutions": {
+        "near-api-js": "0.45.1"
+    },
+    "jest": {
+        "moduleNameMapper": {
+            "\\.(jpg|ico|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/src/__mocks__/fileMock.js",
+            "\\.(css|less)$": "<rootDir>/src/__mocks__/fileMock.js"
+        },
+        "setupFiles": [
+            "<rootDir>/src/jest.init.js"
+        ],
+        "testEnvironment": "near-cli/test_environment",
+        "testPathIgnorePatterns": [
+            "<rootDir>/contract/",
+            "<rootDir>/node_modules/"
+        ]
+    },
+    "browserslist": {
+        "production": [
+            ">0.2%",
+            "not dead",
+            "not op_mini all"
+        ],
+        "development": [
+            "last 1 chrome version",
+            "last 1 firefox version",
+            "last 1 safari version"
+        ]
+    },
+    "eslintConfig": {
+        "env": {
+            "browser": true,
+            "es2021": true
+        },
+        "parser": "@typescript-eslint/parser",
+        "parserOptions": {
+            "ecmaVersion": 12,
+            "sourceType": "module"
+        },
+        "plugins": [
+            "eslint-plugin-prettier"
+        ],
+        "rules": {
+            "prettier/prettier": "error"
+        }
     }
-  }
 }

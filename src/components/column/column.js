@@ -1,15 +1,13 @@
-import React, { Component } from 'react'
-import { Droppable, Draggable } from 'react-beautiful-dnd';
-import Icon from '@mui/material/Icon';
-import { Task } from '../../components.js'
-import hash from 'object-hash';
-import './column.scss';
+import React, { Component } from "react";
+import { Droppable, Draggable } from "react-beautiful-dnd";
+import Icon from "@mui/material/Icon";
+import { Task } from "../../components.js";
+import hash from "object-hash";
+import "./column.scss";
 
 export default class Column extends Component {
-
     render() {
-
-        const menuColumn = this.props.column.id === 'menu';
+        const menuColumn = this.props.column.id === "menu";
 
         return (
             <Draggable
@@ -17,68 +15,67 @@ export default class Column extends Component {
                 index={this.props.index}
                 {...this.props}
             >
-                { (provided, snapshot) => 
-                    <div 
+                {(provided, snapshot) => (
+                    <div
                         className="column-container"
-                        showpseudo={ snapshot.isDragging
-                            ? "no"
-                            : "yes"
-                        }
-                        { ...(!menuColumn
-                            ? provided.draggableProps 
-                            : {}
-                        ) }
+                        showpseudo={snapshot.isDragging ? "no" : "yes"}
+                        {...(!menuColumn ? provided.draggableProps : {})}
                         ref={provided.innerRef}
                     >
-                        { !menuColumn
-                            ? <>
+                        {!menuColumn ? (
+                            <>
                                 <Icon
                                     className="drag-handle"
                                     {...provided.dragHandleProps}
-                                >drag_handle</Icon>
-                                <Icon 
+                                >
+                                    drag_handle
+                                </Icon>
+                                <Icon
                                     className="delete-column"
-                                    onClick={ () => LAYOUT.deleteColumn(this.props.index) }
-                                >delete_outline</Icon>
+                                    onClick={() => LAYOUT.deleteColumn(this.props.index)}
+                                >
+                                    delete_outline
+                                </Icon>
                             </>
-                            : <div 
+                        ) : (
+                            <div
                                 className="hidden"
                                 {...provided.dragHandleProps}
                             ></div>
-                        }
-                        <Droppable 
+                        )}
+                        <Droppable
                             droppableId={this.props.column.id}
                             type="task"
                         >
-                            { provided => (
-                                <div 
+                            {(provided) => (
+                                <div
                                     className="tasks-wrapper"
                                     ref={provided.innerRef}
                                     {...provided.droppableProps}
                                 >
-                                    { this.props.tasks.map((task, index) => 
-                                        <Task 
-                                            key={hash(task, { algorithm: 'md5', encoding: 'base64' })} 
-                                            task={task} 
-                                            index={index} 
+                                    {this.props.tasks.map((task, index) => (
+                                        <Task
+                                            key={hash(task, { algorithm: "md5", encoding: "base64" })}
+                                            task={task}
+                                            index={index}
                                             json={task.json}
                                         />
-                                    ) }
-                                    { provided.placeholder }
+                                    ))}
+                                    {provided.placeholder}
                                 </div>
-                            ) }
+                            )}
                         </Droppable>
-                        { !menuColumn && 
-                            <Icon 
+                        {!menuColumn && (
+                            <Icon
                                 className="add-column"
-                                onClick={ () => LAYOUT.addColumn() }
-                            >add</Icon> 
-                        }
+                                onClick={() => LAYOUT.addColumn()}
+                            >
+                                add
+                            </Icon>
+                        )}
                     </div>
-                }
+                )}
             </Draggable>
         );
-
     }
-
 }
