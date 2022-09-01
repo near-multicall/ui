@@ -1,15 +1,13 @@
-import React from 'react';
-import { Layout, Sidebar } from '../components.js';
+import React from "react";
+import { Layout, Sidebar } from "../components.js";
 
 export default function AppPage() {
-
     window.PAGE = "app";
 
-    return(
+    return (
         <>
-            <Sidebar/>
-            <Layout/>
+            <Sidebar />
+            <Layout />
         </>
     );
-
 }

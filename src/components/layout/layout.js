@@ -1,33 +1,28 @@
-import React, { Component } from 'react';
-import { DragDropContext, Droppable } from 'react-beautiful-dnd';
-import { Column, Menu } from '../../components.js';
-import { initialData } from '../../initial-data.js';
-import { Base64 } from 'js-base64';
-import { STORAGE } from '../../utils/persistent';
-import './layout.scss'
+import React, { Component } from "react";
+import { DragDropContext, Droppable } from "react-beautiful-dnd";
+import { Column, Menu } from "../../components.js";
+import { initialData } from "../../initial-data.js";
+import { Base64 } from "js-base64";
+import { STORAGE } from "../../utils/persistent";
+import "./layout.scss";
 
 export default class Layout extends Component {
-
     taskID = 0;
     columnID = 1;
 
     expanded = false;
 
     constructor(props) {
-
         super(props);
 
         this.clear();
 
-        document.addEventListener('onlayoutupdated', () => this.forceUpdate())
-
+        document.addEventListener("onlayoutupdated", () => this.forceUpdate());
     }
 
     componentDidMount() {
-
         window.LAYOUT = this;
         STORAGE.load();
-
     }
 
     getTaskID = () => this.taskID;
@@ -38,19 +33,20 @@ export default class Layout extends Component {
 
     getColumns = () => STORAGE.layout.columns;
 
-    getMenuColumns = () => Object.values(STORAGE.layout.columns)
-        .filter(c => c.id === 'menu' || STORAGE.layout.columns.menu.taskIds.includes(c.id))
+    getMenuColumns = () =>
+        Object.values(STORAGE.layout.columns).filter(
+            (c) => c.id === "menu" || STORAGE.layout.columns.menu.taskIds.includes(c.id)
+        );
 
     // TODO delete elements after exjecting from tasklist / columnlist
-    
+
     /**
      * returns column ID and index inside column's taskIds for a given taskId
-     * 
+     *
      * @param {string} taskId
-     * @returns {object} 
+     * @returns {object}
      */
     findTaskCoordinates = (taskId) => {
-
         const layout = STORAGE.layout;
 
         for (let c in layout.columns)
@@ -58,15 +54,13 @@ export default class Layout extends Component {
                 if (layout.columns[c].taskIds[i] === taskId)
                     return {
                         columnId: c,
-                        taskIndex: i
-                    }
+                        taskIndex: i,
+                    };
 
-        return { columnId: undefined, taskIndex: undefined }
-
-    }
+        return { columnId: undefined, taskIndex: undefined };
+    };
 
     deleteTask = (taskId) => {
-
         const layout = STORAGE.layout;
         const { columnId, taskIndex } = this.findTaskCoordinates(taskId);
 
@@ -80,7 +74,7 @@ export default class Layout extends Component {
         taskIds.splice(taskIndex, 1);
         const newColumn = {
             ...column,
-            taskIds: taskIds
+            taskIds: taskIds,
         };
 
         const newLayout = {
@@ -88,15 +82,13 @@ export default class Layout extends Component {
             columns: {
                 ...layout.columns,
                 [columnId]: newColumn,
-            }
-        }
+            },
+        };
 
         STORAGE.setLayout(newLayout);
-
-    }
+    };
 
     duplicateTask = (taskId) => {
-
         const layout = STORAGE.layout;
         const { columnId, taskIndex } = this.findTaskCoordinates(taskId);
 
@@ -119,7 +111,7 @@ export default class Layout extends Component {
 
         const newColumn = {
             ...column,
-            taskIds: taskIds
+            taskIds: taskIds,
         };
 
         const newLayout = {
@@ -134,55 +126,51 @@ export default class Layout extends Component {
                     id: taskClone.id,
                     addr: taskClone.addr,
                     func: taskClone.func,
-                }
-            }
-        }
+                },
+            },
+        };
 
         if (task.addr === "" && task.func === "batch")
             newLayout.columns[taskClone.id] = {
                 id: taskClone.id,
-                title: 'Drag here',
-                taskIds: []
-            }    
+                title: "Drag here",
+                taskIds: [],
+            };
 
         window.COPY = {
             from: taskId,
-            to: taskClone.id
-        }
+            to: taskClone.id,
+        };
 
         STORAGE.setLayout(newLayout);
 
-        const batchTask = TASKS.find(t => t.id === newColumn.id);
-        if (!!batchTask) // update batch if necessary
+        const batchTask = TASKS.find((t) => t.id === newColumn.id);
+        if (!!batchTask)
+            // update batch if necessary
             batchTask.instance.current.forceUpdate();
-
-    }
+    };
 
     clear = () => {
-
         console.warn("layout cleared");
 
         // clear card content
-        if (window.TASKS)
-            window.TASKS = [];
+        if (window.TASKS) window.TASKS = [];
 
         this.taskID = 0;
         this.columnID = 1;
 
         STORAGE.setLayout(initialData);
+    };
 
-    }
-
-    deleteColumn = index => {
-
+    deleteColumn = (index) => {
         const layout = STORAGE.layout;
         const newColumnOrder = Array.from(layout.columnOrder);
         newColumnOrder.splice(index, 1);
 
         let newLayout = {
             ...layout,
-            columnOrder: newColumnOrder
-        }
+            columnOrder: newColumnOrder,
+        };
 
         // list should never be empty
         if (newColumnOrder.length === 0)
@@ -192,23 +180,21 @@ export default class Layout extends Component {
                     ...layout.columns,
                     [`column-${this.columnID}`]: {
                         id: `column-${this.columnID}`,
-                        title: 'Drag here',
-                        taskIds: []
-                    }
+                        title: "Drag here",
+                        taskIds: [],
+                    },
                 },
-                columnOrder: [`column-${this.columnID++}`]
-            }
+                columnOrder: [`column-${this.columnID++}`],
+            };
 
         STORAGE.setLayout(newLayout);
-
-    }
+    };
 
     addColumn = () => {
-
         const newColumn = {
             id: `column-${this.columnID}`,
-            title: 'Drag here',
-            taskIds: []
+            title: "Drag here",
+            taskIds: [],
         };
 
         const layout = STORAGE.layout;
@@ -219,35 +205,28 @@ export default class Layout extends Component {
             ...layout,
             columns: {
                 ...layout.columns,
-                [`column-${this.columnID}`]: newColumn
+                [`column-${this.columnID}`]: newColumn,
             },
-            columnOrder: newColumnOrder
-        }
+            columnOrder: newColumnOrder,
+        };
 
         this.columnID++;
 
         STORAGE.setLayout(newLayout);
+    };
 
-    }
-
-    onDragEnd = result => {
-
+    onDragEnd = (result) => {
         const layout = STORAGE.layout;
         const { destination, source, draggableId, type } = result;
-    
-        if (!destination)
-            return;
 
-        if (destination.droppableId === source.droppableId &&
-            destination.index === source.index)
-            return;
+        if (!destination) return;
+
+        if (destination.droppableId === source.droppableId && destination.index === source.index) return;
 
         // batch attempts to hold itself
-        if (destination.droppableId === draggableId)
-            return;
+        if (destination.droppableId === draggableId) return;
 
-        if (type === 'column') {
-            
+        if (type === "column") {
             const newColumnOrder = Array.from(layout.columnOrder);
 
             newColumnOrder.splice(source.index, 1);
@@ -255,27 +234,23 @@ export default class Layout extends Component {
 
             const newLayout = {
                 ...layout,
-                columnOrder: newColumnOrder
+                columnOrder: newColumnOrder,
             };
 
             STORAGE.setLayout(newLayout);
 
             return;
-
         }
 
         const start = layout.columns[source.droppableId];
         const finish = layout.columns[destination.droppableId];
 
         if (!start || !finish) {
-
             console.warn(`Something went wrong when dragging from ${start} to ${finish}`);
             return;
-
         }
 
         if (start === finish) {
-            
             const newTaskIds = Array.from(start.taskIds);
 
             newTaskIds.splice(source.index, 1);
@@ -283,28 +258,24 @@ export default class Layout extends Component {
 
             const newColumn = {
                 ...start,
-                taskIds: newTaskIds
+                taskIds: newTaskIds,
             };
 
             const newLayout = {
                 ...layout,
                 columns: {
                     ...layout.columns,
-                    [newColumn.id]: newColumn
-                }
-            }
+                    [newColumn.id]: newColumn,
+                },
+            };
 
             STORAGE.setLayout(newLayout);
-
         } else {
-
             let newStart;
 
-            if (finish.id === 'menu')
-                return;
+            if (finish.id === "menu") return;
 
-            if (start.id === 'menu') {
-
+            if (start.id === "menu") {
                 const startTaskIds = Array.from(start.taskIds);
 
                 // change taskId
@@ -321,53 +292,81 @@ export default class Layout extends Component {
                 // draggable is a batch
                 if (layout.columns[draggableId] !== undefined) {
                     const taskIds = [];
-                    layout.columns[draggableId].taskIds.forEach(id => {
+                    layout.columns[draggableId].taskIds.forEach((id) => {
                         const clone = JSON.parse(JSON.stringify(layout.tasks[id.toString()]));
                         clone.id = `task-${this.taskID++}`;
                         taskIds.push(clone.id);
-                        STORAGE.layout.tasks[clone.id] = clone; 
-                    })
+                        STORAGE.layout.tasks[clone.id] = clone;
+                    });
                     STORAGE.layout.columns[taskClone.id] = {
                         id: taskClone.id,
                         title: "Drag here",
-                        taskIds: taskIds
+                        taskIds: taskIds,
                     };
                 }
 
                 newStart = {
                     ...start,
-                    taskIds: startTaskIds
+                    taskIds: startTaskIds,
                 };
-
             } else {
-
                 const startTaskIds = Array.from(start.taskIds);
                 startTaskIds.splice(source.index, 1);
                 newStart = {
                     ...start,
-                    taskIds: startTaskIds
+                    taskIds: startTaskIds,
                 };
-
             }
 
             // dropping in batch
             if (layout.tasks[destination.droppableId] !== undefined) {
-
-                const draggableAddr = TASKS.find(t => t.id === draggableId).instance.current.call.addr.value;
-                const droppableAddr = TASKS.find(t => t.id === destination.droppableId).instance.current.call.addr.value;
+                const draggableAddr = TASKS.find((t) => t.id === draggableId).instance.current.call.addr.value;
+                const droppableAddr = TASKS.find((t) => t.id === destination.droppableId).instance.current.call.addr
+                    .value;
 
                 // user attempted to add card with alien address to batch
-                if (draggableAddr !== droppableAddr)
-                    return;
+                if (draggableAddr !== droppableAddr) return;
 
                 // user is merging two batches with same address
                 if (layout.tasks[draggableId] !== undefined && layout.columns[draggableId] !== undefined) {
-                   
+                    // dropping in batch
+                    if (layout.tasks[destination.droppableId] !== undefined) {
+                        const draggableAddr = TASKS.find((t) => t.id === draggableId).instance.current.call.addr.value;
+                        const droppableAddr = TASKS.find((t) => t.id === destination.droppableId).instance.current.call
+                            .addr.value;
+
+                        // user attempted to add card with alien address to batch
+                        if (draggableAddr !== droppableAddr) return;
+
+                        // user is merging two batches with same address
+                        if (layout.tasks[draggableId] !== undefined && layout.columns[draggableId] !== undefined) {
+                            const finishTaskIds = Array.from(finish.taskIds);
+                            finishTaskIds.splice(destination.index, 0, ...layout.columns[draggableId].taskIds);
+                            const newFinish = {
+                                ...finish,
+                                taskIds: finishTaskIds,
+                            };
+
+                            const newLayout = {
+                                ...layout,
+                                columns: {
+                                    ...layout.columns,
+                                    [newStart.id]: newStart,
+                                    [newFinish.id]: newFinish,
+                                },
+                            };
+
+                            window.STORAGE.setLayout(newLayout);
+
+                            return;
+                        }
+                    }
+
                     const finishTaskIds = Array.from(finish.taskIds);
-                    finishTaskIds.splice(destination.index, 0, ...layout.columns[draggableId].taskIds);
+                    finishTaskIds.splice(destination.index, 0, draggableId);
                     const newFinish = {
                         ...finish,
-                        taskIds: finishTaskIds
+                        taskIds: finishTaskIds,
                     };
 
                     const newLayout = {
@@ -375,23 +374,19 @@ export default class Layout extends Component {
                         columns: {
                             ...layout.columns,
                             [newStart.id]: newStart,
-                            [newFinish.id]: newFinish
-                        }
-                    }
+                            [newFinish.id]: newFinish,
+                        },
+                    };
 
-                    window.STORAGE.setLayout(newLayout);
-
-                    return;
-
+                    STORAGE.setLayout(newLayout);
                 }
-            
             }
 
             const finishTaskIds = Array.from(finish.taskIds);
             finishTaskIds.splice(destination.index, 0, draggableId);
             const newFinish = {
                 ...finish,
-                taskIds: finishTaskIds
+                taskIds: finishTaskIds,
             };
 
             const newLayout = {
@@ -399,79 +394,71 @@ export default class Layout extends Component {
                 columns: {
                     ...layout.columns,
                     [newStart.id]: newStart,
-                    [newFinish.id]: newFinish
-                }
-            }
+                    [newFinish.id]: newFinish,
+                },
+            };
 
             STORAGE.setLayout(newLayout);
-
         }
-
-    }
+    };
 
     fromJSON(json) {
         this.clear();
 
         const layout = STORAGE.layout;
 
-        if (!Array.isArray(json) || !json.length)
-            return;
+        if (!Array.isArray(json) || !json.length) return;
 
         this.columnID = 0;
 
         let newLayout = {
             ...layout,
             columnOrder: [],
-            columns: Object.fromEntries(this.getMenuColumns().map(c => [c.id, c]))
-        }
+            columns: Object.fromEntries(this.getMenuColumns().map((c) => [c.id, c])),
+        };
 
         for (let c in json) {
-
             const newColumn = {
                 id: `column-${this.columnID}`,
-                title: 'Drag here',
-                taskIds: []
+                title: "Drag here",
+                taskIds: [],
             };
-    
+
             const newColumnOrder = Array.from(newLayout.columnOrder);
             newColumnOrder.push(`column-${this.columnID}`);
-    
+
             newLayout = {
                 ...newLayout,
                 columns: {
                     ...newLayout.columns,
-                    [`column-${this.columnID}`]: newColumn
+                    [`column-${this.columnID}`]: newColumn,
                 },
-                columnOrder: newColumnOrder
-            }
-    
+                columnOrder: newColumnOrder,
+            };
+
             this.columnID++;
-            
+
             for (let t in json[c]) {
-
                 let task;
-                if (json[c][t].actions.length > 1) { 
-
+                if (json[c][t].actions.length > 1) {
                     const newBatch = {
                         id: `task-${this.taskID}`,
-                        title: 'Drag here',
-                        taskIds: []
+                        title: "Drag here",
+                        taskIds: [],
                     };
 
                     newLayout = {
                         ...newLayout,
                         columns: {
                             ...newLayout.columns,
-                            [`task-${this.taskID}`]: newBatch
+                            [`task-${this.taskID}`]: newBatch,
                         },
-                    }
+                    };
 
                     console.log("created new column", `task-${this.taskID}`);
 
-                    task = {id: `task-${this.taskID++}`, addr: "", func: "batch", json: json[c][t]}
-                    
-                } else
-                    task = {id: `task-${this.taskID++}`, addr: "", func: "", json: json[c][t]};
+                    task = { id: `task-${this.taskID++}`, addr: "", func: "batch", json: json[c][t] };
+                } else task = { id: `task-${this.taskID++}`, addr: "", func: "", json: json[c][t] };
                 newLayout.columns[newColumn.id].taskIds.push(task.id);
                 newLayout.tasks[task.id] = task;
             }
@@ -485,41 +472,38 @@ export default class Layout extends Component {
 
         const layout = STORAGE.layout;
 
-        if (!Array.isArray(json) || !json.length)
-            return;
+        if (!Array.isArray(json) || !json.length) return;
 
         this.columnID = 0;
 
         let newLayout = {
             ...layout,
             columnOrder: [],
-            columns: Object.fromEntries(this.getMenuColumns().map(c => [c.id, c]))
-        }
+            columns: Object.fromEntries(this.getMenuColumns().map((c) => [c.id, c])),
+        };
 
         for (let c in json) {
-
             const newColumn = {
                 id: `column-${this.columnID}`,
-                title: 'Drag here',
-                taskIds: []
+                title: "Drag here",
+                taskIds: [],
             };
-    
+
             const newColumnOrder = Array.from(newLayout.columnOrder);
             newColumnOrder.push(`column-${this.columnID}`);
-    
+
             newLayout = {
                 ...newLayout,
                 columns: {
                     ...newLayout.columns,
-                    [`column-${this.columnID}`]: newColumn
+                    [`column-${this.columnID}`]: newColumn,
                 },
-                columnOrder: newColumnOrder
-            }
-    
-            this.columnID++;
-            
-            for (let t in json[c]) {
+                columnOrder: newColumnOrder,
+            };
 
+            this.columnID++;
+
+            for (let t in json[c]) {
                 const { address: jsonAddress, actions: jsonActions } = json[c][t];
                 let task = {
                     id: `task-${this.taskID}`,
@@ -527,37 +511,33 @@ export default class Layout extends Component {
                     func: "",
                     json: {
                         address: jsonAddress,
-                        actions: jsonActions.map((action) => (
-                            {
-                                func: action.func,
-                                args: JSON.parse( Base64.decode(action.args) ),
-                                gas: action.gas,
-                                depo: action.depo
-                            }
-                        ))
-                    }
+                        actions: jsonActions.map((action) => ({
+                            func: action.func,
+                            args: JSON.parse(Base64.decode(action.args)),
+                            gas: action.gas,
+                            depo: action.depo,
+                        })),
+                    },
                 };
 
-                if (json[c][t].actions.length > 1) { 
-
+                if (json[c][t].actions.length > 1) {
                     const newBatch = {
                         id: `task-${this.taskID}`,
-                        title: 'Drag here',
-                        taskIds: []
+                        title: "Drag here",
+                        taskIds: [],
                     };
 
                     newLayout = {
                         ...newLayout,
                         columns: {
                             ...newLayout.columns,
-                            [`task-${this.taskID}`]: newBatch
+                            [`task-${this.taskID}`]: newBatch,
                         },
-                    }
+                    };
 
                     console.log("created new column", `task-${this.taskID}`);
 
                     task.func = "batch";
-                    
                 }
 
                 this.taskID++;
@@ -570,149 +550,116 @@ export default class Layout extends Component {
     }
 
     toJSON() {
-
         const layout = STORAGE.layout;
         let output = [];
 
         for (let c of layout.columnOrder) {
-        
-            if (layout.columns[c].taskIds.length === 0)
-                continue;
+            if (layout.columns[c].taskIds.length === 0) continue;
             output.push([]);
             for (let t of layout.columns[c].taskIds) {
-                const task = TASKS.find(task => task.id === t);
-                if (task)
-                    output[output.length -1].push(task.instance.current.call.toJSON());
-                else
-                    console.warn(`no task with id ${t}`);
+                const task = TASKS.find((task) => task.id === t);
+                if (task) output[output.length - 1].push(task.instance.current.call.toJSON());
+                else console.warn(`no task with id ${t}`);
             }
-        
         }
 
         return output;
-
     }
 
     toBase64() {
-
         const layout = STORAGE.layout;
         let output = [];
 
         for (let c of layout.columnOrder) {
-        
-            if (layout.columns[c].taskIds.length === 0)
-                continue;
+            if (layout.columns[c].taskIds.length === 0) continue;
             output.push([]);
             for (let t of layout.columns[c].taskIds) {
-                const task = TASKS.find(task => task.id === t);
-                if (task)
-                    output[output.length -1].push(task.instance.current.call.toBase64());
-                else
-                    console.warn(`no task with id ${t}`);
+                const task = TASKS.find((task) => task.id === t);
+                if (task) output[output.length - 1].push(task.instance.current.call.toBase64());
+                else console.warn(`no task with id ${t}`);
             }
-        
         }
 
         return output;
-
     }
 
     toErrors() {
-        
         const layout = STORAGE.layout;
         let output = [];
 
-        if (!window?.TASKS)
-            return output;
+        if (!window?.TASKS) return output;
 
-        const tasks = TASKS
-            .filter(t => !this.getMenuColumns().some(c => c.taskIds.includes(t.id)))
-            .map(t => t.instance.current);
+        const tasks = TASKS.filter((t) => !this.getMenuColumns().some((c) => c.taskIds.includes(t.id))).map(
+            (t) => t.instance.current
+        );
 
         for (let t of tasks)
             for (let e in t.errors)
                 if (t.errors[e].isBad)
                     output.push({
                         task: t,
-                        message: t.errors[e].message
+                        message: t.errors[e].message,
                     });
 
         return output;
-
     }
 
     export() {
-
         return JSON.stringify({
-            schedules: this.toBase64()
+            schedules: this.toBase64(),
         });
-
     }
 
     empty() {
-
         const layout = STORAGE.layout;
-        return layout.columnOrder.length === 1 && layout.columns[layout.columnOrder[0]].taskIds.length === 0
-
+        return layout.columnOrder.length === 1 && layout.columns[layout.columnOrder[0]].taskIds.length === 0;
     }
 
     setExpanded(expanded) {
-
         this.expanded = expanded;
         this.forceUpdate();
         SIDEBAR.forceUpdate();
-
     }
 
     render() {
-
         const layout = STORAGE.layout;
 
         return (
-            <DragDropContext
-                onDragEnd={this.onDragEnd}
-            >
+            <DragDropContext onDragEnd={this.onDragEnd}>
                 <Droppable
                     droppableId="layout"
                     direction="horizontal"
                     type="column"
                 >
-                    { provided => (
+                    {(provided) => (
                         <div className="layout-wrapper">
-                            <div 
+                            <div
                                 className="layout-container"
-                                tutorial={ this.empty()
-                                    ? "yes"
-                                    : "no"
-                                }
+                                tutorial={this.empty() ? "yes" : "no"}
                                 {...provided.droppableProps}
                                 ref={provided.innerRef}
                             >
-                                { layout.columnOrder.map((columnId, index) => {
-                                
+                                {layout.columnOrder.map((columnId, index) => {
                                     const column = layout.columns[columnId];
-                                    const tasks = column.taskIds.map(taskId => layout.tasks[taskId]);
+                                    const tasks = column.taskIds.map((taskId) => layout.tasks[taskId]);
 
                                     return (
-                                        <Column 
-                                            key={column.id} 
-                                            column={column} 
-                                            tasks={tasks} 
-                                            index={index} 
+                                        <Column
+                                            key={column.id}
+                                            column={column}
+                                            tasks={tasks}
+                                            index={index}
                                         />
-                                    )
-
-                                }) }
-                                { provided.placeholder }
+                                    );
+                                })}
+                                {provided.placeholder}
                             </div>
                             <div className={`empty-container ${this.expanded ? "expanded-empty" : ""}`}></div>
                         </div>
-                    ) }
+                    )}
                 </Droppable>
-                <Menu layout={this}/>
+                <Menu layout={this} />
             </DragDropContext>
-        )
-
+        );
     }
-
 }

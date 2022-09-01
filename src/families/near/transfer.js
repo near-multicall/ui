@@ -1,28 +1,30 @@
-import { InputAdornment } from '@mui/material';
-import React from 'react';
-import { TextInput, TextInputWithUnits } from '../../components/editor/elements';
+import { InputAdornment } from "@mui/material";
+import React from "react";
+import { TextInput, TextInputWithUnits } from "../../components/editor/elements";
 import { ArgsAccount, ArgsBig, ArgsError, ArgsObject, ArgsString } from "../../utils/args";
 import { Call } from "../../utils/call";
 import { toGas, formatTokenAmount, unitToDecimals } from "../../utils/converter";
 import { view } from "../../utils/wallet";
-import { errorMsg } from '../../utils/errors';
+import { errorMsg } from "../../utils/errors";
 import BaseTask from "../base";
 import debounce from "lodash.debounce";
 import "./near.scss";
 
-
 export default class Transfer extends BaseTask {
-
     uniqueClassName = "near-transfer-task";
     errors = {
         ...this.baseErrors,
-        addr: new ArgsError(errorMsg.ERR_INVALID_ADDR, value => ArgsAccount.isValid(value)),
-        func: new ArgsError(errorMsg.ERR_INVALID_FUNC, value => value != ""),
-        args: new ArgsError(errorMsg.ERR_INVALID_ARGS, value => true),
-        receiver: new ArgsError("Invalid address", value => ArgsAccount.isValid(value), !ArgsAccount.isValid(this.call.args.value.receiver_id)),
-        amount: new ArgsError("Amount out of bounds", value => ArgsBig.isValid(value)),
-        gas: new ArgsError(errorMsg.ERR_INVALID_GAS_AMOUNT, value => ArgsBig.isValid(value)),
-        noToken: new ArgsError("Address does not belong to token contract", value => this.errors.noToken)
+        addr: new ArgsError(errorMsg.ERR_INVALID_ADDR, (value) => ArgsAccount.isValid(value)),
+        func: new ArgsError(errorMsg.ERR_INVALID_FUNC, (value) => value != ""),
+        args: new ArgsError(errorMsg.ERR_INVALID_ARGS, (value) => true),
+        receiver: new ArgsError(
+            "Invalid address",
+            (value) => ArgsAccount.isValid(value),
+            !ArgsAccount.isValid(this.call.args.value.receiver_id)
+        ),
+        amount: new ArgsError("Amount out of bounds", (value) => ArgsBig.isValid(value)),
+        gas: new ArgsError(errorMsg.ERR_INVALID_GAS_AMOUNT, (value) => ArgsBig.isValid(value)),
+        noToken: new ArgsError("Address does not belong to token contract", (value) => this.errors.noToken),
     };
 
     updateFTDebounced = debounce(() => this.updateFT(), 500);
@@ -34,7 +36,6 @@ export default class Transfer extends BaseTask {
     }
 
     init(json = null) {
-
         const actions = json?.actions?.[0];
         const units = json?.units?.actions?.[0];
 
@@ -42,151 +43,129 @@ export default class Transfer extends BaseTask {
             name: new ArgsString(json?.name ?? "FT Transfer"),
             addr: new ArgsAccount(json?.address ?? window.nearConfig.WNEAR_ADDRESS),
             func: new ArgsString(actions?.func ?? "ft_transfer"),
-            args: new ArgsObject(actions?.args 
-                ? {
-                    receiver_id: new ArgsAccount(actions.args.receiver_id),
-                    amount: new ArgsBig(
-                        formatTokenAmount(actions.args.amount, units?.args.amount.decimals),
-                        "0",
-                        null,
-                        units?.args.amount.unit ?? "unknown",
-                        units?.args.amount.decimals
-                    ),
-                    memo: new ArgsString(actions.args.memo)
-                }
-                : {
-                    receiver_id: new ArgsAccount(""),
-                    amount: new ArgsBig("0", "0", null, "yocto"),
-                    memo: new ArgsString("")
-                }    
+            args: new ArgsObject(
+                actions?.args
+                    ? {
+                          receiver_id: new ArgsAccount(actions.args.receiver_id),
+                          amount: new ArgsBig(
+                              formatTokenAmount(actions.args.amount, units?.args.amount.decimals),
+                              "0",
+                              null,
+                              units?.args.amount.unit ?? "unknown",
+                              units?.args.amount.decimals
+                          ),
+                          memo: new ArgsString(actions.args.memo),
+                      }
+                    : {
+                          receiver_id: new ArgsAccount(""),
+                          amount: new ArgsBig("0", "0", null, "yocto"),
+                          memo: new ArgsString(""),
+                      }
             ),
             gas: new ArgsBig(
                 formatTokenAmount(actions?.gas ?? toGas("10"), units?.gas.decimals ?? unitToDecimals["Tgas"]),
-                toGas("1"), 
-                toGas("300"), 
+                toGas("1"),
+                toGas("300"),
                 units?.gas?.unit ?? "Tgas",
                 units?.gas?.decimals
             ),
-            depo: new ArgsBig("1", "1", "1", "yocto")
+            depo: new ArgsBig("1", "1", "1", "yocto"),
         });
-        
-        this.loadErrors = (() => {
 
-            for (let e in this.baseErrors)
-                this.errors[e].validOrNull(this.call[e])
+        this.loadErrors = (() => {
+            for (let e in this.baseErrors) this.errors[e].validOrNull(this.call[e]);
 
             this.errors.receiver.validOrNull(this.call.args.value.receiver_id);
             this.errors.amount.validOrNull(this.call.args.value.amount);
 
             this.updateFT();
-
-        }).bind(this)
-
-
+        }).bind(this);
     }
 
     static inferOwnType(json) {
         // TODO check if address is token address, note requires promise.all in tasks
-        return !!json && json.actions[0].func === "ft_transfer"
+        return !!json && json.actions[0].func === "ft_transfer";
     }
 
     updateFT() {
-
         const { addr, args } = this.call;
         const { amount } = args.value;
 
         this.errors.noToken.isBad = false;
 
-        if (this.errors.addr.isBad)
-            return;
+        if (this.errors.addr.isBad) return;
 
-        view(
-            addr.value,
-            "ft_metadata",
-            {}
-        )
-        .catch(e => {
-            if (e.type === "AccountDoesNotExist" || e.toString().includes("MethodNotFound"))
-                this.errors.noToken.isBad = true;
-        })
-        .then(res => {
-            if (res) {
-                if (amount.decimals === null) {
-                    amount.value = formatTokenAmount(amount.value, res.decimals);
+        view(addr.value, "ft_metadata", {})
+            .catch((e) => {
+                if (e.type === "AccountDoesNotExist" || e.toString().includes("MethodNotFound"))
+                    this.errors.noToken.isBad = true;
+            })
+            .then((res) => {
+                if (res) {
+                    if (amount.decimals === null) {
+                        amount.value = formatTokenAmount(amount.value, res.decimals);
+                    }
+                    amount.unit = res.symbol;
+                    amount.decimals = res.decimals;
                 }
-                amount.unit = res.symbol;
-                amount.decimals = res.decimals;
-            }
-            this.updateCard()
-        })
-
+                this.updateCard();
+            });
     }
 
     renderEditor() {
+        const { name, addr, gas } = this.call;
 
-        const {
-            name,
-            addr,
-            gas
-        } = this.call;
-
-        const {
-            receiver_id,
-            amount,
-            memo
-        } = this.call.args.value;
+        const { receiver_id, amount, memo } = this.call.args.value;
 
         const errors = this.errors;
 
         return (
             <div className="edit">
-                <TextInput 
-                    value={ name }
+                <TextInput
+                    value={name}
                     variant="standard"
                     margin="normal"
                     autoFocus
-                    update={ this.updateCard }
+                    update={this.updateCard}
                 />
-                <TextInput 
+                <TextInput
                     label="Token address"
-                    value={ addr }
-                    error={[ errors.addr, errors.noToken ]}
-                    update={ () => {
+                    value={addr}
+                    error={[errors.addr, errors.noToken]}
+                    update={() => {
                         this.updateCard();
                         this.updateFTDebounced();
-                    } }
+                    }}
                 />
-                <TextInput 
+                <TextInput
                     label="Receiver address"
-                    value={ receiver_id }
-                    error={ errors.receiver }
-                    update={ this.updateCard }
+                    value={receiver_id}
+                    error={errors.receiver}
+                    update={this.updateCard}
                 />
                 <TextInput
                     label="Transfer amount"
-                    value={ amount }
-                    error={ errors.amount }
-                    update={ this.updateCard }
+                    value={amount}
+                    error={errors.amount}
+                    update={this.updateCard}
                     InputProps={{
                         endAdornment: <InputAdornment position="end">{amount.unit}</InputAdornment>,
                     }}
                 />
-                <TextInput 
+                <TextInput
                     label="Memo"
-                    value={ memo }
+                    value={memo}
                     multiline
-                    update={ this.updateCard }
+                    update={this.updateCard}
                 />
                 <TextInputWithUnits
                     label="Allocated gas"
-                    value={ gas }
-                    error={ errors.gas }
-                    options={[ "Tgas", "gas" ]}
-                    update={ this.updateCard }
+                    value={gas}
+                    error={errors.gas}
+                    options={["Tgas", "gas"]}
+                    update={this.updateCard}
                 />
             </div>
         );
-
     }
-
 }

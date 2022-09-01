@@ -1,5 +1,3 @@
 import Transfer from "./transfer";
 
-export {
-    Transfer
-}
+export { Transfer };

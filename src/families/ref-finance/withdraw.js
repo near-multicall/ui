@@ -7,17 +7,19 @@ import BaseTask from "../base";
 import "./ref-finance.scss";
 
 export default class Withdraw extends BaseTask {
-
     uniqueClassName = "ref-withdraw-task";
     errors = {
         ...this.baseErrors,
-        addr: new ArgsError(errorMsg.ERR_INVALID_ADDR, value => ArgsAccount.isValid(value), !ArgsAccount.isValid(this.call.addr)),
-        func: new ArgsError(errorMsg.ERR_INVALID_FUNC, value => value != ""),
-        gas: new ArgsError(errorMsg.ERR_INVALID_GAS_AMOUNT, value => ArgsBig.isValid(value)),
+        addr: new ArgsError(
+            errorMsg.ERR_INVALID_ADDR,
+            (value) => ArgsAccount.isValid(value),
+            !ArgsAccount.isValid(this.call.addr)
+        ),
+        func: new ArgsError(errorMsg.ERR_INVALID_FUNC, (value) => value != ""),
+        gas: new ArgsError(errorMsg.ERR_INVALID_GAS_AMOUNT, (value) => ArgsBig.isValid(value)),
     };
 
     init(json = null) {
-
         const actions = json?.actions?.[0];
 
         this.call = new Call({
@@ -42,19 +44,19 @@ export default class Withdraw extends BaseTask {
                     deposit: new ArgsBig("1", "1", null, "yocto")                    
                 }    
             ),*/
-            args: new ArgsJSON(actions?.args ? JSON.stringify(actions?.args, null, "  ") : "{\n  \"ref_address\": \"ref-finance-101.testnet\",\n  \"tokens\": [\n    \"nusdc.ft-fin.testnet\"\n  ],\n  \"receiver_id\": \"\",\n  \"withdrawal_gas\": \"55000000000000\",\n  \"token_transfer_gas\": \"4000000000000\",\n  \"deposit\": \"1\"\n}"),
+            args: new ArgsJSON(
+                actions?.args
+                    ? JSON.stringify(actions?.args, null, "  ")
+                    : '{\n  "ref_address": "ref-finance-101.testnet",\n  "tokens": [\n    "nusdc.ft-fin.testnet"\n  ],\n  "receiver_id": "",\n  "withdrawal_gas": "55000000000000",\n  "token_transfer_gas": "4000000000000",\n  "deposit": "1"\n}'
+            ),
             gas: new ArgsBig(actions?.gas ?? "95", toGas("1"), toGas("300"), "Tgas"),
-            depo: new ArgsBig(actions?.depo ?? "0", "0", null, "yocto")
+            depo: new ArgsBig(actions?.depo ?? "0", "0", null, "yocto"),
         });
-
     }
 
     onAddressesUpdated() {
-
         this.call.addr.value = STORAGE.addresses.multicall;
         this.errors.addr.validOrNull(this.call.addr.value);
         this.forceUpdate();
-
     }
-
 }

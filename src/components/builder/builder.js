@@ -1,18 +1,16 @@
-import React, { Component } from 'react';
-import { Droppable } from 'react-beautiful-dnd';
-import { Column } from '../../components.js';
-import './builder.scss';
+import React, { Component } from "react";
+import { Droppable } from "react-beautiful-dnd";
+import { Column } from "../../components.js";
+import "./builder.scss";
 
 export default class Builder extends Component {
-
     render() {
-
         const LAYOUT = this.props.layout; // ususally global parameter
 
-        const menuColumn = LAYOUT.getColumns()['menu'];
+        const menuColumn = LAYOUT.getColumns()["menu"];
 
         return (
-            <div 
+            <div
                 value={0}
                 className="tab-panel"
             >
@@ -20,28 +18,24 @@ export default class Builder extends Component {
                     droppableId="special"
                     type="special"
                 >
-                    { provided => (
+                    {(provided) => (
                         <div
                             className="builder-container"
                             {...provided.droppableProps}
                             ref={provided.innerRef}
                         >
-                            <div 
-                                className="selector"
-                            >
-                                <Column 
-                                    key={'menu'} 
-                                    column={menuColumn} 
-                                    tasks={menuColumn.taskIds.map(taskId => LAYOUT.getTasks()[taskId])} 
+                            <div className="selector">
+                                <Column
+                                    key={"menu"}
+                                    column={menuColumn}
+                                    tasks={menuColumn.taskIds.map((taskId) => LAYOUT.getTasks()[taskId])}
                                     index={LAYOUT.getColumnID()}
                                 />
                             </div>
                         </div>
-                    ) }
+                    )}
                 </Droppable>
             </div>
         );
-
     }
-
 }
