@@ -1,12 +1,16 @@
-import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
-import FileUploadOutlinedIcon from "@mui/icons-material/FileUploadOutlined";
-import ScienceOutlinedIcon from "@mui/icons-material/ScienceOutlined";
-import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
+import {
+    DeleteForeverOutlined,
+    FileDownloadOutlined,
+    FileUploadOutlined,
+    LinkOutlined,
+    ScienceOutlined,
+} from "@mui/icons-material";
+
 import { Chip, Icon, IconButton, TextField, Tooltip } from "@mui/material";
-import { LinkOutlined } from "@mui/icons-material";
 import { Base64 } from "js-base64";
-import React, { Component } from "react";
+import React, { Component, createElement as h } from "react";
 import { NavLink } from "react-router-dom";
+import { map } from "lodash";
 
 import Discord from "../../assets/discord.svg";
 import Github from "../../assets/github.svg";
@@ -20,6 +24,62 @@ import { ArgsError, ArgsString } from "../../utils/args";
 import { readFile, saveFile } from "../../utils/loader";
 import "./sidebar.scss";
 
+const PopupMenu = ({ Icon, items }) => (
+    <div className="popup-menu sidebar-button">
+        {Icon}
+
+        <div className="popup-menu-content">
+            <ul>
+                {map(items, ({ label, onClick, title }) =>
+                    h("li", { key: title, onClick }, title, label && h(Chip, { label }))
+                )}
+            </ul>
+        </div>
+    </div>
+);
+
+const DAPP_LOGIN_METHODS = [
+    { key: "daoDappLogin", title: "Login in dApp as DAO" },
+    { key: "multicallDappLogin", title: "Login in dApp as Multicall" },
+];
+
+const DappLoginInstructions = () => (
+    <ul style={{ listStyleType: "auto" }}>
+        <li>Go to the dApp website you want to use</li>
+        <li>Log out your current wallet</li>
+        <li>Copy the dApp URL</li>
+        <li>Paste the URL in an input field below</li>
+        <li>Click "Proceed" to continue</li>
+    </ul>
+);
+
+const DappLoginDialog = ({ onClose, open, title }) => {
+    const dappURL = new ArgsString("");
+    const invalidDappURL = new ArgsError("Invalid URL", (urlInput) => urlInput !== "test", true);
+
+    return (
+        <Dialog
+            className="modal-dialog"
+            onCancel={() => {}}
+            onDone={() => {}}
+            doneRename="Proceed"
+            disable={() => invalidDappURL.isBad}
+            {...{ onClose, open, title }}
+        >
+            <DappLoginInstructions />
+
+            <TextInput
+                label="dApp URL"
+                value={dappURL}
+                error={invalidDappURL}
+                update={(event, textInputComponent) => {}}
+                variant="filled"
+                className="light-textfield"
+            />
+        </Dialog>
+    );
+};
+
 export default class Sidebar extends Component {
     constructor(props) {
         super(props);
@@ -30,7 +90,8 @@ export default class Sidebar extends Component {
                 loadFromJSON: false,
                 loadFromProposal: false,
                 clearAll: false,
-                loginToDapp: false,
+                daoDappLogin: false,
+                multicallDappLogin: false,
             },
         };
     }
@@ -43,104 +104,9 @@ export default class Sidebar extends Component {
         this.setState({ dialogs: { ...this.state.dialogs, [name]: true } });
     }
 
-    saveMenu() {
-        return (
-            <div className="save-menu">
-                <ul>
-                    <li onClick={() => this.openDialog("saveAsJSON")}>Save as JSON</li>
-                    <li>
-                        Share as Link <Chip label="coming soon!" />
-                    </li>
-                </ul>
-            </div>
-        );
-    }
-
-    loadMenu() {
-        return (
-            <div className="load-menu">
-                <ul>
-                    <li onClick={() => this.openDialog("loadFromJSON")}>Load from JSON</li>
-                    <li onClick={() => this.openDialog("loadFromProposal")}>Load from Proposal</li>
-                    {/* <li>Load from Link <Chip label="coming soon!"/></li> */}
-                </ul>
-            </div>
-        );
-    }
-
-    render() {
-        return (
-            <div className="sidebar-wrapper">
-                <div className="sidebar-container">
-                    <div className="title">
-                        <Icon className="logo">dynamic_feed</Icon>
-
-                        <span className="env" env={window.NEAR_ENV}>
-                            <ScienceOutlinedIcon className="icon" />
-                        </span>
-                    </div>
-
-                    <nav>
-                        <NavLink className={({ isActive }) => (isActive ? "active" : "")} to="/app">
-                            App
-                        </NavLink>
-
-                        <NavLink
-                            className={({ isActive }) => (isActive ? "active" : "")}
-                            to="/dao"
-                            onClick={() => STORAGE.save()}
-                        >
-                            Dao
-                        </NavLink>
-                    </nav>
-                    <hr />
-
-                    <Tooltip title={<h1 style={{ fontSize: "12px" }}>Login to dApp</h1>} placement="right">
-                        <IconButton
-                            disableRipple
-                            className="sidebar-button"
-                            onClick={() => this.openDialog("loginToDapp")}
-                        >
-                            <LinkOutlined />
-                        </IconButton>
-                    </Tooltip>
-
-                    {window.PAGE === "app" ? (
-                        <>
-                            <div className="save sidebar-button">
-                                <FileDownloadOutlinedIcon />
-                                {this.saveMenu()}
-                            </div>
-
-                            <div className="load sidebar-button">
-                                <FileUploadOutlinedIcon />
-                                {this.loadMenu()}
-                            </div>
-
-                            <div className="clear sidebar-button">
-                                <DeleteForeverOutlinedIcon onClick={() => this.openDialog("clearAll")} />
-                            </div>
-                        </>
-                    ) : null}
-                    <hr />
-
-                    <a target="_blank" rel="noopener noreferrer" href="https://twitter.com/near_multicall">
-                        <img src={Twitter} alt="Twitter" />
-                    </a>
-                    <a target="_blank" rel="noopener noreferrer" href="https://discord.gg/wc6T6bPvdr">
-                        <img src={Discord} alt="Discord" />
-                    </a>
-                    <a target="_blank" rel="noopener noreferrer" href="https://github.com/near-multicall">
-                        <img src={Github} alt="Github" />
-                    </a>
-
-                    {/* <img src={Telegram}/> */}
-                    <Wallet />
-                </div>
-
-                {this.dialogs()}
-            </div>
-        );
+    dialogClose(name) {
+        this.setState({ dialogs: { [name]: false } });
+        this.forceUpdate();
     }
 
     dialogs() {
@@ -167,57 +133,21 @@ export default class Sidebar extends Component {
         let argsFromProposal;
 
         return [
-            <Dialog
-                key="Login to dApp"
-                title="Login to dApp"
-                open={dialogs.loginToDapp}
-                onClose={() => {
-                    dialogs.loginToDapp = false;
-                    this.forceUpdate();
-                }}
-                onCancel={() => {}}
-                onDone={() => window.LAYOUT.fromBase64(argsFromProposal)}
-                doneRename="Login using DAO"
-                disable={() => proposalURLInvalid.isBad || proposalNonExistent.isBad}
-                ref={dialogComponent}
-            >
-                <p>Login to dApp using a DAO or multicall instance account</p>
-
-                <ul style={{ listStyleType: "auto" }}>
-                    <li>Go to the dApp website you want to use</li>
-                    <li>Log out your current wallet</li>
-                    <li>Copy the dApp URL</li>
-                    <li>Paste the URL in an input field below</li>
-                </ul>
-
-                <br />
-
-                <TextInput
-                    label="dApp URL"
-                    value={proposalURL}
-                    error={[proposalURLInvalid, proposalNonExistent]}
-                    update={(e, textInputComponent) => {
-                        // don't fetch proposal info from bad URL.
-                        if (proposalURLInvalid.isBad) {
-                            proposalNonExistent.isBad = false;
-                            return;
-                        }
-
-                        dialogComponent.current.forceUpdate();
-                    }}
-                    variant="filled"
-                    className="light-textfield"
-                />
-            </Dialog>,
+            ...map(DAPP_LOGIN_METHODS, ({ key, title }) =>
+                h(DappLoginDialog, {
+                    key,
+                    onClose: () => this.dialogClose(key),
+                    open: dialogs[key],
+                    title,
+                })
+            ),
 
             <Dialog
+                className="modal-dialog"
                 key="Save as JSON"
                 title="Save as JSON"
                 open={dialogs.saveAsJSON}
-                onClose={() => {
-                    dialogs.saveAsJSON = false;
-                    this.forceUpdate();
-                }}
+                onClose={() => this.dialogClose("saveAsJSON")}
                 onCancel={() => {}}
                 onDone={() => saveFile(`${fileName}.json`, [JSON.stringify(LAYOUT.toBase64(), null, 2)])}
                 doneRename="Download"
@@ -233,13 +163,11 @@ export default class Sidebar extends Component {
             </Dialog>,
 
             <Dialog
+                className="modal-dialog"
                 key="Load from JSON"
                 title="Load from JSON"
                 open={dialogs.loadFromJSON}
-                onClose={() => {
-                    dialogs.loadFromJSON = false;
-                    this.forceUpdate();
-                }}
+                onClose={() => this.dialogClose("loadFromJSON")}
                 onCancel={() => {}}
                 onDone={() => readFile(uploadedFile, (json) => LAYOUT.fromBase64(json))}
                 doneRename="Load"
@@ -250,22 +178,17 @@ export default class Sidebar extends Component {
                     onChange={(e) => (uploadedFile = e.target.files[0])}
                 />
 
-                <br />
                 <b className="warn">Your current multicall will be replaced!</b>
             </Dialog>,
 
             <Dialog
+                className="modal-dialog"
                 key="Load from Proposal"
                 title="Load from Proposal"
                 open={dialogs.loadFromProposal}
-                onClose={() => {
-                    dialogs.loadFromProposal = false;
-                    this.forceUpdate();
-                }}
+                onClose={() => this.dialogClose("loadFromProposal")}
                 onCancel={() => {}}
-                onDone={() => {
-                    window.LAYOUT.fromBase64(argsFromProposal);
-                }}
+                onDone={() => window.LAYOUT.fromBase64(argsFromProposal)}
                 doneRename="Load"
                 disable={() => proposalURLInvalid.isBad || proposalNonExistent.isBad}
                 ref={dialogComponent}
@@ -327,19 +250,17 @@ export default class Sidebar extends Component {
                     variant="filled"
                     className="light-textfield"
                 />
-                <br />
+
                 <p>Enter proposal link from AstroDAO or base UI</p>
                 <b className="warn">Your current multicall will be replaced!</b>
             </Dialog>,
 
             <Dialog
+                className="modal-dialog"
                 key="Clear All"
                 title="Clear All"
                 open={dialogs.clearAll}
-                onClose={() => {
-                    dialogs.clearAll = false;
-                    this.forceUpdate();
-                }}
+                onClose={() => this.dialogClose("clearAll")}
                 onCancel={() => {}}
                 onDone={() => LAYOUT.clear()}
                 doneRename="Yes, clear all"
@@ -351,5 +272,110 @@ export default class Sidebar extends Component {
                 </b>
             </Dialog>,
         ];
+    }
+
+    render() {
+        return (
+            <div className="sidebar-wrapper">
+                <div className="sidebar-container">
+                    <div className="title">
+                        <Icon className="logo">dynamic_feed</Icon>
+
+                        <span className="env" env={window.NEAR_ENV}>
+                            <ScienceOutlined className="icon" />
+                        </span>
+                    </div>
+
+                    <nav>
+                        <NavLink className={({ isActive }) => (isActive ? "active" : "")} to="/app">
+                            App
+                        </NavLink>
+
+                        <NavLink
+                            className={({ isActive }) => (isActive ? "active" : "")}
+                            to="/dao"
+                            onClick={() => STORAGE.save()}
+                        >
+                            Dao
+                        </NavLink>
+                    </nav>
+                    <hr />
+
+                    <PopupMenu
+                        Icon={<LinkOutlined />}
+                        items={map(DAPP_LOGIN_METHODS, ({ key, title }) => ({
+                            onClick: () => this.openDialog(key),
+                            title,
+                        }))}
+                    />
+
+                    {window.PAGE === "app" ? (
+                        <>
+                            <PopupMenu
+                                Icon={<FileDownloadOutlined />}
+                                items={[
+                                    {
+                                        onClick: () => this.openDialog("saveAsJSON"),
+                                        title: "Save as JSON",
+                                    },
+                                    {
+                                        title: "Share as Link",
+                                        label: "coming soon!",
+                                    },
+                                ]}
+                            />
+
+                            <PopupMenu
+                                Icon={<FileUploadOutlined />}
+                                items={[
+                                    {
+                                        onClick: () => this.openDialog("loadFromJSON"),
+                                        title: "Load from JSON",
+                                    },
+                                    {
+                                        onClick: () => this.openDialog("loadFromProposal"),
+                                        title: "Load from Proposal",
+                                    },
+                                    /*
+                                    {
+                                        title: "Load from Link",
+                                        label: "coming soon!",
+                                    },
+                                    */
+                                ]}
+                            />
+
+                            <div className="popup-menu sidebar-button">
+                                <Tooltip title={<h1 style={{ fontSize: "12px" }}>Clear All</h1>} placement="right">
+                                    <IconButton
+                                        disableRipple
+                                        className="sidebar-button"
+                                        onClick={() => this.openDialog("clearAll")}
+                                    >
+                                        <DeleteForeverOutlined />
+                                    </IconButton>
+                                </Tooltip>
+                            </div>
+                        </>
+                    ) : null}
+                    <hr />
+
+                    <a target="_blank" rel="noopener noreferrer" href="https://twitter.com/near_multicall">
+                        <img src={Twitter} alt="Twitter" />
+                    </a>
+                    <a target="_blank" rel="noopener noreferrer" href="https://discord.gg/wc6T6bPvdr">
+                        <img src={Discord} alt="Discord" />
+                    </a>
+                    <a target="_blank" rel="noopener noreferrer" href="https://github.com/near-multicall">
+                        <img src={Github} alt="Github" />
+                    </a>
+
+                    {/* <img src={Telegram}/> */}
+                    <Wallet />
+                </div>
+
+                {this.dialogs()}
+            </div>
+        );
     }
 }
