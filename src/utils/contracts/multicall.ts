@@ -1,4 +1,4 @@
-import { rpcProvider } from "../wallet";
+import { viewAccount } from "../wallet";
 
 const FACTORY_ADDRESS_SELECTOR: Record<string, string> = {
     "mainnet": "v1.multicall.near",
@@ -33,11 +33,7 @@ export default class Multicall {
      * @param accountId 
      */
      static async isMulticall(accountId: string): Promise<boolean> {
-        const accountInfo: any = await rpcProvider.query({
-            request_type: "view_account",
-            finality: "final",
-            account_id: accountId
-        });
+        const accountInfo = await viewAccount(accountId);
         const codeHash: string = accountInfo.code_hash;
         return Multicall.CONTRACT_CODE_HASHES.includes(codeHash);
     }
