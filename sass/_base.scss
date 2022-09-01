@@ -1,11 +1,12 @@
-@use 'sass/color';
-@use 'sass/size';
-@use 'sass/font';
-@use 'sass/mixin';
+@use "sass/color";
+@use "sass/size";
+@use "sass/font";
+@use "sass/mixin";
 
 .light-textfield {
     &.MuiTextField-root {
-        .MuiInputLabel-root, .MuiFilledInput-root.Mui-focused {
+        .MuiInputLabel-root,
+        .MuiFilledInput-root.Mui-focused {
             &:not(.Mui-error) {
                 color: color.$light-text !important;
             }
@@ -13,23 +14,27 @@
                 color: color.$red !important;
             }
         }
-        .MuiFilledInput-root, .MuiFilledInput-root:hover {
+        .MuiFilledInput-root,
+        .MuiFilledInput-root:hover {
             background-color: rgba(color.$white, 0.06) !important;
-            &::before, &:hover::before {
+            &::before,
+            &:hover::before {
                 border-bottom: 1px solid rgba(color.$white, 0.42);
             }
             &::after {
                 border-bottom: 2px solid color.$white;
             }
             &.Mui-error {
-                &::before, &:hover::before {
+                &::before,
+                &:hover::before {
                     border-bottom: 1px solid rgba(color.$red, 0.42) !important;
                 }
                 &::after {
                     border-bottom: 2px solid color.$red !important;
                 }
             }
-            input, textarea {
+            input,
+            textarea {
                 color: color.$white;
                 font-size: size.$text;
             }

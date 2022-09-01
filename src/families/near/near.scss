@@ -1,6 +1,6 @@
-@use 'sass/color';
-@use 'sass/mixin';
-@use 'sass/size';
+@use "sass/color";
+@use "sass/mixin";
+@use "sass/size";
 
 .near-transfer-task {
     background: color.$lightest;
@@ -11,7 +11,7 @@
         }
         .icon {
             fill: color.$text;
-        } 
+        }
     }
     * > a {
         color: darken(color.$blue, 20%) !important;
