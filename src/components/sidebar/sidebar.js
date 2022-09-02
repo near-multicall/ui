@@ -7,9 +7,15 @@ import {
 } from "@mui/icons-material";
 
 import { Chip, Icon, IconButton, Tooltip } from "@mui/material";
-import { map } from "lodash";
+import clsx from "clsx";
 import React, { Component } from "react";
 import { NavLink } from "react-router-dom";
+
+import Discord from "../../assets/discord.svg";
+import Github from "../../assets/github.svg";
+import Twitter from "../../assets/twitter.svg";
+import { Wallet } from "../../components";
+import { STORAGE } from "../../utils/persistent";
 
 import {
     DappLoginDialog,
@@ -20,26 +26,21 @@ import {
     ClearAllDialog,
 } from "./dialogs";
 
-import Discord from "../../assets/discord.svg";
-import Github from "../../assets/github.svg";
-import Twitter from "../../assets/twitter.svg";
-import { Wallet } from "../../components";
-import { STORAGE } from "../../utils/persistent";
 import "./sidebar.scss";
 
-const PopupMenu = ({ Icon, items }) => (
-    <div className="popup-menu sidebar-button">
+const PopupMenu = ({ Icon, items, triggerClassName }) => (
+    <div className={clsx("popup-menu", triggerClassName)}>
         {Icon}
 
         <div className="popup-menu-content">
             <ul>
-                {map(items, ({ label, onClick, title }) => (
+                {items.map(({ label, onClick, title }) => (
                     <li
                         key={title}
-                        onClick={onClick}
+                        {...{ onClick }}
                     >
                         {title}
-                        {label && <Chip label={label} />}
+                        {label && <Chip {...{ label }} />}
                     </li>
                 ))}
             </ul>
@@ -80,25 +81,29 @@ export default class Sidebar extends Component {
         const { dialogs } = this.state;
 
         return [
-            ...map(Object.values(DAPP_LOGIN_METHODS), (props) => (
+            ...Object.values(DAPP_LOGIN_METHODS).map((props) => (
                 <DappLoginDialog
                     onClose={() => this.closeDialog(props.key)}
                     open={dialogs[props.key]}
                     {...props}
                 />
             )),
+
             <SaveAsJsonDialog
                 onClose={() => this.closeDialog("saveAsJSON")}
                 open={dialogs.saveAsJSON}
             />,
+
             <LoadFromJsonDialog
                 onClose={() => this.closeDialog("loadFromJSON")}
                 open={dialogs.loadFromJSON}
             />,
+
             <LoadFromProposalDialog
                 onClose={() => this.closeDialog("loadFromProposal")}
                 open={dialogs.loadFromProposal}
             />,
+
             <ClearAllDialog
                 onClose={() => this.closeDialog("clearAll")}
                 open={dialogs.clearAll}
@@ -138,6 +143,7 @@ export default class Sidebar extends Component {
                         </NavLink>
                     </nav>
                     <hr />
+
                     {window.PAGE === "app" ? (
                         <>
                             <PopupMenu
@@ -152,6 +158,7 @@ export default class Sidebar extends Component {
                                         label: "coming soon!",
                                     },
                                 ]}
+                                triggerClassName="sidebar-button"
                             />
 
                             <PopupMenu
@@ -172,9 +179,10 @@ export default class Sidebar extends Component {
                                     },
                                     */
                                 ]}
+                                triggerClassName="sidebar-button"
                             />
 
-                            <div className="popup-menu sidebar-button">
+                            <div className="sidebar-button">
                                 <Tooltip
                                     title={<h1 style={{ fontSize: "12px" }}>Clear All</h1>}
                                     placement="right"
@@ -191,13 +199,16 @@ export default class Sidebar extends Component {
                             <hr />
                         </>
                     ) : null}
+
                     <PopupMenu
                         Icon={<PreviewOutlined />}
-                        items={map(Object.values(DAPP_LOGIN_METHODS), ({ key, title }) => ({
+                        items={Object.values(DAPP_LOGIN_METHODS).map(({ key, title }) => ({
                             onClick: () => this.openDialog(key),
                             title,
                         }))}
+                        triggerClassName="sidebar-button"
                     />
+
                     <hr />
                     <a
                         target="_blank"
