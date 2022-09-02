@@ -6,8 +6,7 @@ import {
     ScienceOutlined,
 } from "@mui/icons-material";
 
-import { Chip, Icon, IconButton, Tooltip } from "@mui/material";
-import clsx from "clsx";
+import { Icon, IconButton, Tooltip } from "@mui/material";
 import React, { Component } from "react";
 import { NavLink } from "react-router-dom";
 
@@ -16,6 +15,7 @@ import Github from "../../assets/github.svg";
 import Twitter from "../../assets/twitter.svg";
 import { Wallet } from "../../components";
 import { STORAGE } from "../../utils/persistent";
+import { PopupMenu } from "../popup-menu/index.js";
 
 import {
     DappLoginDialog,
@@ -27,26 +27,6 @@ import {
 } from "./dialogs";
 
 import "./sidebar.scss";
-
-const PopupMenu = ({ Icon, items, triggerClassName }) => (
-    <div className={clsx("popup-menu", triggerClassName)}>
-        {Icon}
-
-        <div className="popup-menu-content">
-            <ul>
-                {items.map(({ label, onClick, title }) => (
-                    <li
-                        key={title}
-                        {...{ onClick }}
-                    >
-                        {title}
-                        {label && <Chip {...{ label }} />}
-                    </li>
-                ))}
-            </ul>
-        </div>
-    </div>
-);
 
 export default class Sidebar extends Component {
     constructor(props) {
