@@ -3,9 +3,9 @@ import clsx from "clsx";
 
 import "./index.scss";
 
-export const PopupMenu = ({ Icon, items, triggerClassName }) => (
+export const PopupMenu = ({ icon, items, triggerClassName }) => (
     <div className={clsx("popup-menu", triggerClassName)}>
-        {Icon}
+        {icon}
 
         <div className="popup-menu-content">
             <ul>

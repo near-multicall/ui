@@ -19,7 +19,6 @@ import { PopupMenu } from "../popup-menu/index.js";
 
 import {
     DappLoginDialog,
-    DAPP_LOGIN_METHODS,
     LoadFromJsonDialog,
     LoadFromProposalDialog,
     SaveAsJsonDialog,
@@ -27,6 +26,11 @@ import {
 } from "./dialogs";
 
 import "./sidebar.scss";
+
+const DAPP_LOGIN_METHODS = {
+    dao: { actorType: "dao", key: "daoDappLogin", title: "Login in dApp as DAO" },
+    multicall: { actorType: "multicall", key: "multicallDappLogin", title: "Login in dApp as Multicall" },
+};
 
 export default class Sidebar extends Component {
     constructor(props) {
@@ -70,21 +74,25 @@ export default class Sidebar extends Component {
             )),
 
             <SaveAsJsonDialog
+                key="saveAsJSON"
                 onClose={() => this.closeDialog("saveAsJSON")}
                 open={dialogs.saveAsJSON}
             />,
 
             <LoadFromJsonDialog
+                key="loadFromJSON"
                 onClose={() => this.closeDialog("loadFromJSON")}
                 open={dialogs.loadFromJSON}
             />,
 
             <LoadFromProposalDialog
+                key="loadFromProposal"
                 onClose={() => this.closeDialog("loadFromProposal")}
                 open={dialogs.loadFromProposal}
             />,
 
             <ClearAllDialog
+                key="clearAll"
                 onClose={() => this.closeDialog("clearAll")}
                 open={dialogs.clearAll}
             />,
@@ -127,7 +135,7 @@ export default class Sidebar extends Component {
                     {window.PAGE === "app" ? (
                         <>
                             <PopupMenu
-                                Icon={<FileDownloadOutlined />}
+                                icon={<FileDownloadOutlined />}
                                 items={[
                                     {
                                         onClick: () => this.openDialog("saveAsJSON"),
@@ -142,7 +150,7 @@ export default class Sidebar extends Component {
                             />
 
                             <PopupMenu
-                                Icon={<FileUploadOutlined />}
+                                icon={<FileUploadOutlined />}
                                 items={[
                                     {
                                         onClick: () => this.openDialog("loadFromJSON"),
@@ -181,7 +189,7 @@ export default class Sidebar extends Component {
                     ) : null}
 
                     <PopupMenu
-                        Icon={<PreviewOutlined />}
+                        icon={<PreviewOutlined />}
                         items={Object.values(DAPP_LOGIN_METHODS).map(({ key, title }) => ({
                             onClick: () => this.openDialog(key),
                             title,
