@@ -1,3 +1,4 @@
+import { InfoOutlined } from "@mui/icons-material";
 import { TextField } from "@mui/material";
 import { Base64 } from "js-base64";
 import React, { useMemo, useReducer, useState } from "react";
@@ -8,7 +9,16 @@ import { readFile, saveFile } from "../../utils/loader";
 import { STORAGE } from "../../utils/persistent";
 import Dialog from "../dialog/dialog";
 import { TextInput } from "../editor/elements";
+import { Tooltip } from "../tooltip/index.js";
 import "./dialogs.scss";
+
+const DAPP_LOGIN_INSTRUCTIONS = [
+    { text: "Go to the dApp website you want to use", hint: "" },
+    { text: "Log out your current wallet", hint: "" },
+    { text: "Copy the dApp URL", hint: "" },
+    { text: "Paste the URL in an input field below", hint: "" },
+    { text: 'Click "Proceed" to continue', hint: "" },
+];
 
 export const DappLoginDialog = ({ actorType, onClose, open, title }) => {
     const dAppURL = useMemo(() => new ArgsString(""), []);
@@ -32,12 +42,21 @@ export const DappLoginDialog = ({ actorType, onClose, open, title }) => {
             disable={() => dAppURLError.isBad}
             {...{ onClose, open, title }}
         >
-            <ul style={{ listStyleType: "auto" }}>
-                <li>Go to the dApp website you want to use</li>
-                <li>Log out your current wallet</li>
-                <li>Copy the dApp URL</li>
-                <li>Paste the URL in an input field below</li>
-                <li>Click "Proceed" to continue</li>
+            <ul style={{ listStyleType: "decimal", padding: "0 20px" }}>
+                {DAPP_LOGIN_INSTRUCTIONS.map(({ text, hint }) => (
+                    <li key={text}>
+                        {text}
+
+                        {hint && (
+                            <Tooltip
+                                placement="right"
+                                title={hint}
+                            >
+                                <InfoOutlined sx={{ pl: 1 }} />
+                            </Tooltip>
+                        )}
+                    </li>
+                ))}
             </ul>
 
             <TextInput
