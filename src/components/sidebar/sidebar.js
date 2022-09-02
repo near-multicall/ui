@@ -6,7 +6,7 @@ import {
     ScienceOutlined,
 } from "@mui/icons-material";
 
-import { Icon, IconButton, Tooltip } from "@mui/material";
+import { Icon, IconButton } from "@mui/material";
 import React, { Component } from "react";
 import { NavLink } from "react-router-dom";
 
@@ -16,6 +16,7 @@ import Twitter from "../../assets/twitter.svg";
 import { Wallet } from "../../components";
 import { STORAGE } from "../../utils/persistent";
 import { PopupMenu } from "../popup-menu/index.js";
+import { Tooltip } from "../tooltip/index.js";
 
 import {
     DappLoginDialog,
@@ -172,7 +173,7 @@ export default class Sidebar extends Component {
 
                             <div className="sidebar-button">
                                 <Tooltip
-                                    title={<h1 style={{ fontSize: "12px" }}>Clear All</h1>}
+                                    title="Clear All"
                                     placement="right"
                                 >
                                     <IconButton
