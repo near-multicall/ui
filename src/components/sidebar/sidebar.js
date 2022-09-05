@@ -29,8 +29,8 @@ import {
 import "./sidebar.scss";
 
 const DAPP_LOGIN_METHODS = {
-    dao: { actorType: "dao", key: "daoDappLogin", title: "Login in dApp as DAO" },
-    multicall: { actorType: "multicall", key: "multicallDappLogin", title: "Login in dApp as Multicall" },
+    dao: { actorType: "dao", key: "daoDappLogin", title: "Login in dApps as DAO" },
+    multicall: { actorType: "multicall", key: "multicallDappLogin", title: "Login in dApps as Multicall" },
 };
 
 export default class Sidebar extends Component {
