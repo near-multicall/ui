@@ -11,7 +11,7 @@ import Twitter from "../../assets/twitter.svg";
 import { Wallet } from "../../components";
 import { STORAGE } from "../../utils/persistent";
 import { SputnikDAO } from "../../utils/contracts/sputnik-dao";
-import { ArgsError, ArgsString } from "../../utils/args";
+import { args } from "../../utils/args";
 import { Base64 } from "js-base64";
 import { readFile, saveFile } from "../../utils/loader";
 import Dialog from "../dialog/dialog";
@@ -143,7 +143,7 @@ export default class Sidebar extends Component {
                         />
                     </a>
                     {/* <img src={Telegram}/> */}
-                    <Wallet />
+                    {/* <Wallet /> */}
                 </div>
                 {this.dialogs()}
             </div>
@@ -159,15 +159,17 @@ export default class Sidebar extends Component {
         let uploadedFile;
 
         // Load from Proposal
-        const proposalURL = new ArgsString("");
-        const proposalURLInvalid = new ArgsError(
-            "Invalid URL",
-            (urlInput) => !!SputnikDAO.getInfoFromProposalUrl(urlInput.value),
-            true
-        );
-        const proposalNonExistent = new ArgsError(
-            "The specified URL does not link to a proposal",
-            (urlInput) => proposalNonExistent.isBad
+        const proposalURL = "";
+        const proposalURLInvalid = args.error(
+            args
+                .string()
+                .url("URL invalid")
+                .test({
+                    name: "proposalUrl",
+                    message: "URL does not belong to a proposal",
+                    test: (value) => value == null || !!SputnikDAO.getInfoFromProposalUrl(value),
+                }),
+            { initial: true }
         );
         let argsFromProposal;
 
@@ -229,7 +231,7 @@ export default class Sidebar extends Component {
                 disable={() => proposalURLInvalid.isBad || proposalNonExistent.isBad}
                 ref={dialogComponent}
             >
-                <TextInput
+                {/* <TextInput
                     label="Proposal URL"
                     value={proposalURL}
                     error={[proposalURLInvalid, proposalNonExistent]}
@@ -285,7 +287,7 @@ export default class Sidebar extends Component {
                     }}
                     variant="filled"
                     className="light-textfield"
-                />
+                /> */}
                 <br />
                 <p>Enter proposal link from AstroDAO or base UI</p>
                 <b className="warn">Your current multicall will be replaced!</b>

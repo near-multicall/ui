@@ -82,7 +82,8 @@
         "react-dom": "^18.0.0",
         "react-router-dom": "6",
         "regenerator-runtime": "^0.13.9",
-        "rxjs": "^7.5.6"
+        "rxjs": "^7.5.6",
+        "yup": "^0.32.11"
     },
     "resolutions": {
         "near-api-js": "0.45.1"
