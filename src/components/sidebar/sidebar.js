@@ -24,7 +24,7 @@ import {
     LoadFromProposalDialog,
     SaveAsJsonDialog,
     ClearAllDialog,
-} from "./dialogs";
+} from "./dialogs.js";
 
 import "./sidebar.scss";
 
