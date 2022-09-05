@@ -139,12 +139,12 @@ export default class Export extends Component {
         // if specified DAO not have a multicall instance, button will re-direct to DAO page so they can get an instance.
         else if (walletError === errorMsg.ERR_DAO_HAS_NO_MTCL) {
             return (
-                <Link
-                    to="/dao"
-                    class="propose button"
+                <button
+                    className="propose button"
+                    disabled
                 >
-                    {walletError}. Get one now!
-                </Link>
+                    {walletError}. <Link to="/dao">Get one now!</Link>
+                </button>
             );
         }
         // normal propose multicall to DAO functionality
