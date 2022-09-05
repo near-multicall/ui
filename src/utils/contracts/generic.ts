@@ -4,8 +4,8 @@ import { viewAccount } from "../wallet"
 /**
  * check if there's a contract deployed on given NEAR address.
  * Accounts without contract have code_hash '11111111111111111111111111111111'.
- * 
- * @param {string} address 
+ *
+ * @param {string} address
  */
 async function hasContract (address: string): Promise<boolean> {
   const accountInfo = await viewAccount(address);
@@ -15,6 +15,4 @@ async function hasContract (address: string): Promise<boolean> {
 
 // TODO: method to list all available functions from a contract
 
-export {
-  hasContract
-}
+export { hasContract };
