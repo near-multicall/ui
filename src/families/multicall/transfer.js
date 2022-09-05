@@ -5,12 +5,12 @@ import Call from "../../utils/call";
 import { errorMsg } from "../../utils/errors";
 import { STORAGE } from "../../utils/persistent";
 import { toGas, toYocto, formatTokenAmount, unitToDecimals } from "../../utils/converter";
-import BaseTask from "../base";
+import { BaseTask } from "../base";
 import Multicall from "../../utils/contracts/multicall";
 import "./multicall.scss";
 import { TextInput, TextInputWithUnits } from "../../components/editor/elements";
 
-export default class Transfer extends BaseTask {
+export class Transfer extends BaseTask {
     uniqueClassName = "multicall-transfer-task";
     errors = {
         ...this.baseErrors,
