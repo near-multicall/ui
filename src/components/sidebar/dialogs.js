@@ -13,11 +13,23 @@ import { Tooltip } from "../tooltip/index.js";
 import "./dialogs.scss";
 
 const DAPP_LOGIN_INSTRUCTIONS = [
-    { text: "Go to the dApp website you want to use", hint: "" },
-    { text: "Log out your current wallet", hint: "" },
-    { text: "Copy the dApp URL", hint: "" },
-    { text: "Paste the URL in an input field below", hint: "" },
-    { text: 'Click "Proceed" to continue', hint: "" },
+    {
+        text: "Go to the dApp website you want to use",
+        hint: "In all your travels, have you ever seen a star go supernova? Well, I have. I saw a star explode and send out the building blocks of the Universe. Other stars, other planets and eventually other life. A supernova! Creation itself! I was there. I wanted to see it and be part of the moment. And you know how I perceived one of the most glorious events in the universe? With these ridiculous gelatinous orbs in my skull! With eyes designed to perceive only a tiny fraction of the EM spectrum. With ears designed only to hear vibrations in the air.",
+    },
+    {
+        text: "Log out your current wallet",
+        hint: "We can't define consciousness because consciousness does not exist. Humans fancy that there's something special about the way we perceive the world, and yet we live in loops as tight and as closed as the hosts do, seldom questioning our choices, content, for the most part, to be told what to do next.",
+    },
+    {
+        text: "Copy the dApp URL",
+        hint: "A long time ago, the Ancients made a discovery. They found evidence of a structure buried deep within the background radiation. They believed that, at one time, this structure had genuine complexity, coherence, therefore could not have occurred naturally.",
+    },
+    {
+        text: "Paste the URL in an input field below",
+        hint: "Humanity has spread to the stars. We set out like ancient seafarers to explore the limitless ocean of space. But no matter how far we venture into the unknown, the worst monsters are those we bring with us.",
+    },
+    { text: 'Click "Proceed" to continue' },
 ];
 
 export const DappLoginDialog = ({ actorType, onClose, open, title }) => {
