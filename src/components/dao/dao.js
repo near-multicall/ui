@@ -1,10 +1,10 @@
-import { DeleteOutline, EditOutlined, AddOutlined, PauseOutlined, PlayArrowOutlined } from '@mui/icons-material';
+import { DeleteOutline, EditOutlined, AddOutlined, PauseOutlined, PlayArrowOutlined, ConstructionOutlined } from '@mui/icons-material';
 import { Base64 } from 'js-base64';
 import React, { Component } from 'react';
 import { ArgsAccount, ArgsError } from '../../utils/args';
 import { STORAGE } from '../../utils/persistent';
-import { toNEAR, toYocto, Big } from '../../utils/converter';
-import { view } from '../../utils/wallet';
+import { toNEAR, toYocto, Big, formatTokenAmount } from '../../utils/converter';
+import { view, viewAccount } from '../../utils/wallet';
 import { useWalletSelector } from '../../contexts/walletSelectorContext';
 import { SputnikDAO, SputnikUI, ProposalKind, ProposalAction } from '../../utils/contracts/sputnik-dao';
 import { TextInput } from '../editor/elements';
@@ -13,11 +13,13 @@ import './dao.scss';
 import debounce from 'lodash.debounce';
 import Table from '../../func-components/Table';
 import Tabs from '../../func-components/Tabs';
-
+import PageTabs from '../../func-components/Tabs/PageTabs';
+import { FungibleToken } from '../../utils/contracts/fungibleToken';
+import * as nearAPI from 'near-api-js'
 // minimum balance a multicall instance needs for storage + state.
 const MIN_INSTANCE_BALANCE = toYocto(1); // 1 NEAR
 
-const TableHeader = ['Token', '', 'Ref', 'Near', 'Total']
+const TableHeader = ['Token', '', 'Multicall', 'DAO', 'Total']
 
 export default class DaoComponent extends Component {
     static contextType = useWalletSelector();
@@ -42,6 +44,7 @@ export default class DaoComponent extends Component {
             loading: false,
             proposed: -1,
             proposedInfo: {},
+            rowContent: null,
             infos: {
                 admins: [],
                 tokens: [],
@@ -295,7 +298,7 @@ export default class DaoComponent extends Component {
     job(job) {
 
         return (
-            <div class="job">
+            <div className="job">
                 <EditOutlined />
                 <DeleteOutline />
                 {job.is_active
@@ -360,13 +363,17 @@ export default class DaoComponent extends Component {
                         view(multicall, "get_tokens", {}).catch(e => { }),
                         view(multicall, "get_jobs", {}).catch(e => { }),
                         view(multicall, "get_job_bond", {}).catch(e => { }),
-                        this.proposalAlreadyExists(newDAO).catch(e => { })
+                        this.proposalAlreadyExists(newDAO).catch(e => { }),
+                        this.balancesToRows(multicall, newDAO).catch(e => { }),
+                        this.nearInfo(multicall, newDAO).catch(e => { })
                     ])
-                        .then(([admins, tokens, jobs, bond, createMulticallProposalInfo]) => {
+                        .then(([admins, tokens, jobs, bond, createMulticallProposalInfo, rows, nearBalance]) => {
                             const { proposal_id, proposal_info } = createMulticallProposalInfo;
+                            rows.unshift(nearBalance)
 
                             newState = {
                                 dao: newDAO,
+                                rowContent: rows,
                                 infos: {
                                     admins: admins,
                                     tokens: tokens,
@@ -387,9 +394,61 @@ export default class DaoComponent extends Component {
 
     }
 
+    async tokenInfo(multicall, dao) {
+        const tokenAddrList = await FungibleToken.getLikelyTokenContracts(multicall)
+
+        const likelyTokenList = await Promise.all(tokenAddrList.map((address) =>
+            FungibleToken.init(address)
+        ))
+
+        const tokenList = likelyTokenList.filter(tkn => tkn.ready === true)
+
+        const balances = await Promise.all(tokenList.map(async (tkn) => {
+            const [multicallBalance, daoBalance] = await Promise.all([tkn.ftBalanceOf(multicall), tkn.ftBalanceOf(dao.address)])
+            return {
+                token: tkn,
+                multicallBalance: multicallBalance,
+                daoBalance: daoBalance,
+                total: Big(multicallBalance).add(daoBalance).toFixed()
+            }
+        }))
+
+        return balances.filter(el => Big(el.total).gt('0'))
+    }
+
+
+    balancesToRows(multicall, dao) {
+        return this.tokenInfo(multicall, dao).then(
+            res => res.map(
+                row => [row.token.metadata.symbol, row.token.metadata.icon, formatTokenAmount(row.multicallBalance, row.token.metadata.decimals, 2), formatTokenAmount(row.daoBalance, row.token.metadata.decimals, 2), formatTokenAmount(row.total, row.token.metadata.decimals, 2)]
+            )
+        )
+    }
+
+    async nearInfo() {
+
+        const { addr, dao } = this.state;
+
+        const multicall = `${addr.value}.${window.nearConfig.MULTICALL_FACTORY_ADDRESS}`;
+
+        const nearBalanceMulticall = (await viewAccount(multicall)).amount
+        const nearBalanceDao = (await viewAccount(dao.address)).amount
+
+        return ['NEAR', 'https://s2.coinmarketcap.com/static/img/coins/64x64/6535.png', formatTokenAmount(nearBalanceMulticall, 24, 2), formatTokenAmount(nearBalanceDao, 24, 2), formatTokenAmount(Big(nearBalanceDao).add(nearBalanceMulticall).toFixed(), 24, 2)]
+    }
+
+    displayToken() {
+        // format to show small balances
+    }
+
+
+
+
+
     getContent() {
         const { selector: walletSelector } = this.context;
-        const { infos, loading } = this.state;
+        const { infos, loading, rowContent } = this.state;
+
 
         // if user not logged in, remind him to sign in.
         // TODO: only require signIn when DAO has no multicall instance (to know if user can propose or vote on existing proposal to create multicall)
@@ -428,43 +487,46 @@ export default class DaoComponent extends Component {
         }
 
         // infos found
-        return <div className="info-container">
-            <div className="info-card admins">
-                <AddOutlined />
-                <h1 className="title">Admins</h1>
-                <ul className="list">
-                    {infos.admins.map(a => <li key={infos.admins.id}>{this.toLink(a)}</li>)}
-                </ul>
-            </div>
-            <div className="info-card tokens">
-                <Tabs titles={["Multicall", "DAO", "Whitelist"]} contents={[
-                    <>
-                        <h1 className="title">Tokens</h1>
-                        <Table collapsible header={TableHeader} rows={[["hi", "", "test", "0", "0"], ["hi", "test", "test", "0", "0"], ["hi", "test", "test", "0", "0"], ["hi", "test", "test", "0", "0"]]} />
-                    </>,
+        return (
+            <PageTabs contents={[
+                <div className="info-container">
+                    <div className="info-card admins">
+                        <AddOutlined />
+                        <h1 className="title">Admins</h1>
+                        <ul className="list">
+                            {infos.admins.map(a => <li key={infos.admins.id}>{this.toLink(a)}</li>)}
+                        </ul>
+                    </div>
+                    <div className="info-card jobs">
+                        <AddOutlined />
+                        <h1 className="title">Jobs</h1>
+                        <div className="scroll-wrapper">
+                            {infos.jobs.map(j => this.job(j))}
+                        </div>
+                    </div><div className="info-card bond">
+                        <h1 className="title">Job Bond
+                            <span>{`${infos.bond !== "..." ? toNEAR(infos.bond) : "..."} Ⓝ`}</span>
+                        </h1>
+                    </div>
+                </div >,
+                <div className="info-container">
+                    <div className="info-card tokens">
 
-                    <><h1 className="title">Tokens</h1>
+
+                        <h1 className="title">Token Balances</h1>
+
+                        <Table header={TableHeader} rows={rowContent ?? [['...', '', '...', '...', '...']]} />
+                    </div>
+                    <div className="info-card wtokens">
+                        <h1 className="title">Whitelisted Tokens</h1>
                         <ul className="list">
                             {infos.tokens.map(t => <li key={infos.tokens.id}>{this.toLink(t)}</li>)}
-                        </ul></>
+                        </ul>
 
-                ]
-                } />
-            </div >
-            <div className="info-card jobs">
-                <AddOutlined />
-                <h1 className="title">Jobs</h1>
-                <div className="scroll-wrapper">
-                    {infos.jobs.map(j => this.job(j))}
+                    </div>
                 </div>
-            </div>
-            <div className="info-card bond">
-                <h1 className="title">Job Bond
-                    <span>{`${infos.bond !== "..." ? toNEAR(infos.bond) : "..."} Ⓝ`}</span>
-                </h1>
-            </div>
-        </div >
 
+            ]} />)
     }
 
     render() {

@@ -172,6 +172,7 @@ export default function Table({
   order,
   orderBy,
   createSortfunction,
+  icons,
 }: {
   sortHeaders?: string[];
   header: string[];
@@ -183,6 +184,7 @@ export default function Table({
   order?: "asc" | "desc";
   orderBy?: string;
   createSortfunction?: (label: string) => () => void;
+  icons?: boolean;
 }) {
   const matches = useBreakpoint("md");
 
@@ -333,7 +335,11 @@ function Row({
         }
       >
         {row.map((data, idx) => (
-          <TableCell key={idx}>{data}</TableCell>
+          <>
+            <TableCell sx={{ fontFamily: "Titillium Web" }} key={idx}>
+              {idx === 1 ? <img key={idx} src={data as string} /> : data}
+            </TableCell>
+          </>
         ))}
         {collapsible && (
           <TableCell>

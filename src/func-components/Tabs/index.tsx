@@ -6,6 +6,7 @@ interface Props {
   contents: React.ReactNode[];
   customCurrentTab?: number;
   customOnChange?: (val: number) => void;
+  CustomTab?: React.FC<TabProps & { selected?: boolean }>;
   tabPadding?: string;
   fontWeight?: number;
 }
@@ -23,8 +24,14 @@ function TabPanel({
 }
 
 export default function Tabs(props: Props) {
-  const { titles, contents, customCurrentTab, customOnChange, tabPadding } =
-    props;
+  const {
+    titles,
+    contents,
+    customCurrentTab,
+    customOnChange,
+    tabPadding,
+    CustomTab,
+  } = props;
   const [value, setValue] = React.useState(0);
 
   const onChange = useCallback(
@@ -36,39 +43,43 @@ export default function Tabs(props: Props) {
 
   return (
     <Box sx={{ width: "100%" }}>
-      <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+      <Box
+        sx={CustomTab ? undefined : { borderBottom: 1, borderColor: "divider" }}
+      >
         <MuiTabs
           allowScrollButtonsMobile
           scrollButtons="auto"
           value={customCurrentTab !== undefined ? customCurrentTab : value}
           onChange={onChange}
           sx={{ mb: -1, marginRight: 0 }}
-          TabIndicatorProps={{
-            style: {
-              display: "none",
-            },
-          }}
+          TabIndicatorProps={
+            CustomTab ? { style: { display: "none" } } : undefined
+          }
         >
-          {titles.map((tab, idx) => (
-            <Tab
-              disableRipple
-              key={idx}
-              label={tab}
-              sx={{
-                fontSize: { xs: 16 },
-                fontWeight: 700,
-                padding: tabPadding,
-                mr: { xs: 23, md: 28 },
-                textTransform: "none",
-                color: (theme) => theme.palette.text.primary,
-                opacity: 0.4,
-                "&.Mui-selected": {
-                  color: (theme) => theme.palette.text.primary,
-                  opacity: 1,
-                },
-              }}
-            />
-          ))}
+          {CustomTab
+            ? titles.map((tab, idx) => <CustomTab key={idx} label={tab} />)
+            : titles.map((tab, idx) => (
+                <Tab
+                  disableRipple
+                  key={idx}
+                  label={tab}
+                  sx={{
+                    minWidth: "fit-content",
+                    fontSize: { xs: 16 },
+                    fontFamily: "Titillium Web",
+                    fontWeight: "bold",
+                    padding: tabPadding,
+                    mr: { xs: 23, md: 28 },
+                    textTransform: "none",
+                    color: (theme) => theme.palette.text.primary,
+                    opacity: 0.4,
+                    "&.Mui-selected": {
+                      color: (theme) => theme.palette.text.primary,
+                      opacity: 1,
+                    },
+                  }}
+                />
+              ))}
         </MuiTabs>
       </Box>
       {contents.map((content, idx) => (
