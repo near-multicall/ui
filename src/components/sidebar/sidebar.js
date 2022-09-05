@@ -133,6 +133,16 @@ export default class Sidebar extends Component {
                     </nav>
                     <hr />
 
+                    <PopupMenu
+                        icon={<PreviewOutlined />}
+                        items={Object.values(DAPP_LOGIN_METHODS).map(({ key, title }) => ({
+                            onClick: () => this.openDialog(key),
+                            title,
+                        }))}
+                        triggerClassName="sidebar-button"
+                    />
+                    <hr />
+
                     {window.PAGE === "app" ? (
                         <>
                             <PopupMenu
@@ -189,16 +199,6 @@ export default class Sidebar extends Component {
                         </>
                     ) : null}
 
-                    <PopupMenu
-                        icon={<PreviewOutlined />}
-                        items={Object.values(DAPP_LOGIN_METHODS).map(({ key, title }) => ({
-                            onClick: () => this.openDialog(key),
-                            title,
-                        }))}
-                        triggerClassName="sidebar-button"
-                    />
-
-                    <hr />
                     <a
                         target="_blank"
                         rel="noopener noreferrer"
