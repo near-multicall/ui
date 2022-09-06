@@ -1,25 +1,25 @@
-import { DeleteOutline, EditOutlined, AddOutlined, PauseOutlined, PlayArrowOutlined, ConstructionOutlined } from '@mui/icons-material';
-import { Base64 } from 'js-base64';
-import React, { Component } from 'react';
-import { ArgsAccount, ArgsError } from '../../utils/args';
-import { STORAGE } from '../../utils/persistent';
-import { toNEAR, toYocto, Big, formatTokenAmount } from '../../utils/converter';
-import { view, viewAccount } from '../../utils/wallet';
-import { useWalletSelector } from '../../contexts/walletSelectorContext';
-import { SputnikDAO, SputnikUI, ProposalKind, ProposalAction } from '../../utils/contracts/sputnik-dao';
-import { TextInput } from '../editor/elements';
-import { InputAdornment } from '@mui/material'
-import './dao.scss';
-import debounce from 'lodash.debounce';
-import Table from '../../func-components/Table';
-import Tabs from '../../func-components/Tabs';
-import PageTabs from '../../func-components/Tabs/PageTabs';
-import { FungibleToken } from '../../utils/contracts/fungibleToken';
-import * as nearAPI from 'near-api-js'
+import { DeleteOutline, EditOutlined, AddOutlined, PauseOutlined, PlayArrowOutlined } from "@mui/icons-material";
+import { Base64 } from "js-base64";
+import React, { Component } from "react";
+import { ArgsAccount, ArgsError } from "../../utils/args";
+import { STORAGE } from "../../utils/persistent";
+import { toNEAR, toYocto, Big, formatTokenAmount } from "../../utils/converter";
+import { view, viewAccount } from "../../utils/wallet";
+import { useWalletSelector } from "../../contexts/walletSelectorContext";
+import { SputnikDAO, SputnikUI, ProposalKind, ProposalAction } from "../../utils/contracts/sputnik-dao";
+import { TextInput } from "../editor/elements";
+import { InputAdornment } from "@mui/material";
+import "./dao.scss";
+import debounce from "lodash.debounce";
+import Table from "../../func-components/Table";
+import Tabs from "../../func-components/Tabs";
+import PageTabs from "../../func-components/Tabs/PageTabs";
+import { FungibleToken } from "../../utils/contracts/fungibleToken";
+import * as nearAPI from "near-api-js";
 // minimum balance a multicall instance needs for storage + state.
 const MIN_INSTANCE_BALANCE = toYocto(1); // 1 NEAR
 
-const TableHeader = ['Token', '', 'Multicall', 'DAO', 'Total']
+const TableHeader = ["Token", "", "Multicall", "DAO", "Total"];
 
 export default class DaoComponent extends Component {
     static contextType = useWalletSelector();
@@ -101,16 +101,15 @@ export default class DaoComponent extends Component {
                     return expirationTime.gt(currentTime) ? true : false;
                 });
 
-            // If there many "Create multicall" proposals, return latest.
-            if (proposals.length > 0) {
-                const lastProposal = proposals.pop();
-                return { proposal_id: lastProposal.id, proposal_info: lastProposal };
-            }
-            // No "Create multicall" proposals found.
-            else return { proposal_id: -1, proposal_info: {} };
-
-        }).catch(e => { })
-
+                // If there many "Create multicall" proposals, return latest.
+                if (proposals.length > 0) {
+                    const lastProposal = proposals.pop();
+                    return { proposal_id: lastProposal.id, proposal_info: lastProposal };
+                }
+                // No "Create multicall" proposals found.
+                else return { proposal_id: -1, proposal_info: {} };
+            })
+            .catch((e) => {});
     }
 
     onAddressesUpdated() {
@@ -186,10 +185,10 @@ export default class DaoComponent extends Component {
         };
 
         if (
-            noContract.isBad
-            && !noDao.isBad // base.sputnik-dao.near does not exist
-            && !loading
-            && this.lastAddr === document.querySelector(".address-container input")._valueTracker.getValue() // disappear while debouncing
+            noContract.isBad &&
+            !noDao.isBad && // base.sputnik-dao.near does not exist
+            !loading &&
+            this.lastAddr === document.querySelector(".address-container input")._valueTracker.getValue() // disappear while debouncing
         ) {
             // no create multicall proposal exists
             if (proposed === -1) {
@@ -200,7 +199,11 @@ export default class DaoComponent extends Component {
                             <div className="info-text">
                                 {/* hint: you can use "genesis" or "test" as DAO to get to this message */}
                                 {`A multicall instance can only be created for `}
-                                <a href={dao.getDaoUrl(SputnikUI.ASTRO_UI)} target="_blank" rel="noopener noreferrer">
+                                <a
+                                    href={dao.getDaoUrl(SputnikUI.ASTRO_UI)}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
                                     {dao.address}
                                 </a>
                                 {` by making a proposal.`}
@@ -214,7 +217,7 @@ export default class DaoComponent extends Component {
                                 Propose
                             </button>
                         </>
-                    )
+                    );
                 }
                 // ... and user cannot propose FunctionCall
                 else {
@@ -234,7 +237,11 @@ export default class DaoComponent extends Component {
                         <div className="info-text">
                             {`Proposal to create a multicall exists (#${proposed}), but you have no voting permissions on this DAO.`}
                             <br />
-                            <a target="_blank" href={dao.getProposalUrl(SputnikUI.ASTRO_UI, proposed)} rel="noopener noreferrer">
+                            <a
+                                target="_blank"
+                                href={dao.getProposalUrl(SputnikUI.ASTRO_UI, proposed)}
+                                rel="noopener noreferrer"
+                            >
                                 Proposal on Astro
                             </a>
                         </div>
@@ -246,7 +253,11 @@ export default class DaoComponent extends Component {
                         <div className="info-text">
                             {`You have voted on creating a multicall instance for this DAO. It will be created as soon as the proposal passes voting.`}
                             <br />
-                            <a target="_blank" href={dao.getProposalUrl(SputnikUI.ASTRO_UI, proposed)} rel="noopener noreferrer">
+                            <a
+                                target="_blank"
+                                href={dao.getProposalUrl(SputnikUI.ASTRO_UI, proposed)}
+                                rel="noopener noreferrer"
+                            >
                                 Proposal on Astro
                             </a>
                         </div>
@@ -259,7 +270,11 @@ export default class DaoComponent extends Component {
                             <div className="info-text">
                                 {/* hint: you can use "genesis" or "test" as DAO to get to this message */}
                                 {`There exists a proposal (#${proposed}) to create a multicall instance for this DAO. `}
-                                <a href={dao.getProposalUrl(SputnikUI.ASTRO_UI, proposed)} target="_blank" rel="noopener noreferrer">
+                                <a
+                                    href={dao.getProposalUrl(SputnikUI.ASTRO_UI, proposed)}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
                                     Open on AstroDAO
                                 </a>
                             </div>
@@ -279,7 +294,6 @@ export default class DaoComponent extends Component {
     }
 
     toLink(address, deleteIcon = false) {
-
         const addr = new ArgsAccount(address);
 
         return (
@@ -355,95 +369,98 @@ export default class DaoComponent extends Component {
                                 noContract.isBad = true;
                             }
                         }),
-                        view(multicall, "get_tokens", {}).catch(e => { }),
-                        view(multicall, "get_jobs", {}).catch(e => { }),
-                        view(multicall, "get_job_bond", {}).catch(e => { }),
-                        this.proposalAlreadyExists(newDAO).catch(e => { }),
-                        this.balancesToRows(multicall, newDAO).catch(e => { }),
-                        this.nearInfo(multicall, newDAO).catch(e => { })
-                    ])
-                        .then(([admins, tokens, jobs, bond, createMulticallProposalInfo, rows, nearBalance]) => {
-                            const { proposal_id, proposal_info } = createMulticallProposalInfo;
-                            rows.unshift(nearBalance)
+                        view(multicall, "get_tokens", {}).catch((e) => {}),
+                        view(multicall, "get_jobs", {}).catch((e) => {}),
+                        view(multicall, "get_job_bond", {}).catch((e) => {}),
+                        this.proposalAlreadyExists(newDAO).catch((e) => {}),
+                        this.balancesToRows(multicall, newDAO).catch((e) => {}),
+                        this.nearInfo(multicall, newDAO).catch((e) => {}),
+                    ]).then(([admins, tokens, jobs, bond, createMulticallProposalInfo, rows, nearBalance]) => {
+                        const { proposal_id, proposal_info } = createMulticallProposalInfo;
+                        rows.unshift(nearBalance);
 
-                            newState = {
-                                dao: newDAO,
-                                rowContent: rows,
-                                infos: {
-                                    admins: admins,
-                                    tokens: tokens,
-                                    jobs: jobs,
-                                    bond: bond
-                                },
-                                loading: false,
-                                proposed: proposal_id,
-                                proposedInfo: proposal_info
-                            }
+                        newState = {
+                            dao: newDAO,
+                            rowContent: rows,
+                            infos: {
+                                admins: admins,
+                                tokens: tokens,
+                                jobs: jobs,
+                                bond: bond,
+                            },
+                            loading: false,
+                            proposed: proposal_id,
+                            proposedInfo: proposal_info,
+                        };
 
-                            // update visuals
-                            this.setState(newState);
-                        })
+                        // update visuals
+                        this.setState(newState);
+                    });
                 }
-
             });
-
     }
 
     async tokenInfo(multicall, dao) {
-        const tokenAddrList = await FungibleToken.getLikelyTokenContracts(multicall)
+        const tokenAddrList = await FungibleToken.getLikelyTokenContracts(multicall);
 
-        const likelyTokenList = await Promise.all(tokenAddrList.map((address) =>
-            FungibleToken.init(address)
-        ))
+        const likelyTokenList = await Promise.all(tokenAddrList.map((address) => FungibleToken.init(address)));
 
-        const tokenList = likelyTokenList.filter(tkn => tkn.ready === true)
+        const tokenList = likelyTokenList.filter((tkn) => tkn.ready === true);
 
-        const balances = await Promise.all(tokenList.map(async (tkn) => {
-            const [multicallBalance, daoBalance] = await Promise.all([tkn.ftBalanceOf(multicall), tkn.ftBalanceOf(dao.address)])
-            return {
-                token: tkn,
-                multicallBalance: multicallBalance,
-                daoBalance: daoBalance,
-                total: Big(multicallBalance).add(daoBalance).toFixed()
-            }
-        }))
+        const balances = await Promise.all(
+            tokenList.map(async (tkn) => {
+                const [multicallBalance, daoBalance] = await Promise.all([
+                    tkn.ftBalanceOf(multicall),
+                    tkn.ftBalanceOf(dao.address),
+                ]);
+                return {
+                    token: tkn,
+                    multicallBalance: multicallBalance,
+                    daoBalance: daoBalance,
+                    total: Big(multicallBalance).add(daoBalance).toFixed(),
+                };
+            })
+        );
 
-        return balances.filter(el => Big(el.total).gt('0'))
+        return balances.filter((el) => Big(el.total).gt("0"));
     }
 
-
     balancesToRows(multicall, dao) {
-        return this.tokenInfo(multicall, dao).then(
-            res => res.map(
-                row => [row.token.metadata.symbol, row.token.metadata.icon, formatTokenAmount(row.multicallBalance, row.token.metadata.decimals, 2), formatTokenAmount(row.daoBalance, row.token.metadata.decimals, 2), formatTokenAmount(row.total, row.token.metadata.decimals, 2)]
-            )
-        )
+        return this.tokenInfo(multicall, dao).then((res) =>
+            res.map((row) => [
+                row.token.metadata.symbol,
+                row.token.metadata.icon,
+                formatTokenAmount(row.multicallBalance, row.token.metadata.decimals, 2),
+                formatTokenAmount(row.daoBalance, row.token.metadata.decimals, 2),
+                formatTokenAmount(row.total, row.token.metadata.decimals, 2),
+            ])
+        );
     }
 
     async nearInfo() {
-
         const { addr, dao } = this.state;
 
         const multicall = `${addr.value}.${window.nearConfig.MULTICALL_FACTORY_ADDRESS}`;
 
-        const nearBalanceMulticall = (await viewAccount(multicall)).amount
-        const nearBalanceDao = (await viewAccount(dao.address)).amount
+        const nearBalanceMulticall = (await viewAccount(multicall)).amount;
+        const nearBalanceDao = (await viewAccount(dao.address)).amount;
 
-        return ['NEAR', 'https://s2.coinmarketcap.com/static/img/coins/64x64/6535.png', formatTokenAmount(nearBalanceMulticall, 24, 2), formatTokenAmount(nearBalanceDao, 24, 2), formatTokenAmount(Big(nearBalanceDao).add(nearBalanceMulticall).toFixed(), 24, 2)]
+        return [
+            "NEAR",
+            "https://s2.coinmarketcap.com/static/img/coins/64x64/6535.png",
+            formatTokenAmount(nearBalanceMulticall, 24, 2),
+            formatTokenAmount(nearBalanceDao, 24, 2),
+            formatTokenAmount(Big(nearBalanceDao).add(nearBalanceMulticall).toFixed(), 24, 2),
+        ];
     }
 
     displayToken() {
         // format to show small balances
     }
 
-
-
-
-
     getContent() {
         const { selector: walletSelector } = this.context;
         const { infos, loading, rowContent } = this.state;
-
 
         // if user not logged in, remind him to sign in.
         // TODO: only require signIn when DAO has no multicall instance (to know if user can propose or vote on existing proposal to create multicall)
@@ -452,19 +469,26 @@ export default class DaoComponent extends Component {
         // errors to display
         const displayErrorsList = ["addr", "noDao", "noContract"];
         const displayErrors = Object.keys(this.errors)
-            .filter(e => this.errors[e].isBad && displayErrorsList.includes(e))
-            .map(e => <p key={`p-${e}`} className={"red"}>
-                <span>{this.errors[e].isBad ? '\u2717' : '\u2714'}  </span>
-                {this.errors[e].message}
-            </p>);
+            .filter((e) => this.errors[e].isBad && displayErrorsList.includes(e))
+            .map((e) => (
+                <p
+                    key={`p-${e}`}
+                    className={"red"}
+                >
+                    <span>{this.errors[e].isBad ? "\u2717" : "\u2714"} </span>
+                    {this.errors[e].message}
+                </p>
+            ));
 
         if (displayErrors.length > 0)
-            return (<>
-                <div className="info-container error">
-                    <div>{displayErrors}</div>
-                    {this.createMulticall()}
-                </div>
-            </>);
+            return (
+                <>
+                    <div className="info-container error">
+                        <div>{displayErrors}</div>
+                        {this.createMulticall()}
+                    </div>
+                </>
+            );
 
         // loading ...
         if (loading) return <div className="info-container loader"></div>;
@@ -477,45 +501,51 @@ export default class DaoComponent extends Component {
 
         // infos found
         return (
-            <PageTabs contents={[
-                <div className="info-container">
-                    <div className="info-card admins">
-                        <AddOutlined />
-                        <h1 className="title">Admins</h1>
-                        <ul className="list">
-                            {infos.admins.map(a => <li key={infos.admins.id}>{this.toLink(a)}</li>)}
-                        </ul>
-                    </div>
-                    <div className="info-card jobs">
-                        <AddOutlined />
-                        <h1 className="title">Jobs</h1>
-                        <div className="scroll-wrapper">
-                            {infos.jobs.map(j => this.job(j))}
+            <PageTabs
+                contents={[
+                    <div className="info-container">
+                        <div className="info-card admins">
+                            <AddOutlined />
+                            <h1 className="title">Admins</h1>
+                            <ul className="list">
+                                {infos.admins.map((a) => (
+                                    <li key={infos.admins.id}>{this.toLink(a)}</li>
+                                ))}
+                            </ul>
                         </div>
-                    </div><div className="info-card bond">
-                        <h1 className="title">Job Bond
-                            <span>{`${infos.bond !== "..." ? toNEAR(infos.bond) : "..."} Ⓝ`}</span>
-                        </h1>
-                    </div>
-                </div >,
-                <div className="info-container">
-                    <div className="info-card tokens">
+                        <div className="info-card jobs">
+                            <AddOutlined />
+                            <h1 className="title">Jobs</h1>
+                            <div className="scroll-wrapper">{infos.jobs.map((j) => this.job(j))}</div>
+                        </div>
+                        <div className="info-card bond">
+                            <h1 className="title">
+                                Job Bond
+                                <span>{`${infos.bond !== "..." ? toNEAR(infos.bond) : "..."} Ⓝ`}</span>
+                            </h1>
+                        </div>
+                    </div>,
+                    <div className="info-container">
+                        <div className="info-card tokens">
+                            <h1 className="title">Token Balances</h1>
 
-
-                        <h1 className="title">Token Balances</h1>
-
-                        <Table header={TableHeader} rows={rowContent ?? [['...', '', '...', '...', '...']]} />
-                    </div>
-                    <div className="info-card wtokens">
-                        <h1 className="title">Whitelisted Tokens</h1>
-                        <ul className="list">
-                            {infos.tokens.map(t => <li key={infos.tokens.id}>{this.toLink(t)}</li>)}
-                        </ul>
-
-                    </div>
-                </div>
-
-            ]} />)
+                            <Table
+                                header={TableHeader}
+                                rows={rowContent ?? [["...", "", "...", "...", "..."]]}
+                            />
+                        </div>
+                        <div className="info-card wtokens">
+                            <h1 className="title">Whitelisted Tokens</h1>
+                            <ul className="list">
+                                {infos.tokens.map((t) => (
+                                    <li key={infos.tokens.id}>{this.toLink(t)}</li>
+                                ))}
+                            </ul>
+                        </div>
+                    </div>,
+                ]}
+            />
+        );
     }
 
     render() {

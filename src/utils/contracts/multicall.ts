@@ -31,7 +31,7 @@ export default class Multicall {
      *
      * @param accountId
      */
-     static async isMulticall(accountId: string): Promise<boolean> {
+    static async isMulticall(accountId: string): Promise<boolean> {
         const accountInfo = await viewAccount(accountId);
         const codeHash: string = accountInfo.code_hash;
         return Multicall.CONTRACT_CODE_HASHES.includes(codeHash);
