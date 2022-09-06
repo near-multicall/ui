@@ -14,7 +14,7 @@ import debounce from "lodash.debounce";
 import Table from "../../func-components/Table";
 import Tabs from "../../func-components/Tabs";
 import PageTabs from "../../func-components/Tabs/PageTabs";
-import { FungibleToken } from "../../utils/contracts/fungibleToken";
+import { FungibleToken } from "../../utils/standards/fungibleToken";
 import * as nearAPI from "near-api-js";
 // minimum balance a multicall instance needs for storage + state.
 const MIN_INSTANCE_BALANCE = toYocto(1); // 1 NEAR
