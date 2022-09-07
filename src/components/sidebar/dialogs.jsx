@@ -7,7 +7,7 @@ import { ArgsError, ArgsString } from "../../utils/args";
 import { SputnikDAO } from "../../utils/contracts/sputnik-dao";
 import { readFile, saveFile } from "../../utils/loader";
 import { STORAGE } from "../../utils/persistent";
-import Dialog from "../dialog/dialog";
+import { Dialog } from "../dialog/dialog";
 import { TextInput } from "../editor/elements";
 import { Tooltip } from "../tooltip/index.jsx";
 import "./dialogs.scss";

@@ -15,7 +15,7 @@ import debounce from "lodash.debounce";
 // minimum balance a multicall instance needs for storage + state.
 const MIN_INSTANCE_BALANCE = toYocto(1); // 1 NEAR
 
-export default class DaoComponent extends Component {
+export class Dao extends Component {
     static contextType = useWalletSelector();
 
     errors = {

@@ -12,7 +12,7 @@ import "./wallet.scss";
 import { ArgsAccount, ArgsError } from "../../utils/args";
 import debounce from "lodash.debounce";
 
-export default class Wallet extends Component {
+export class Wallet extends Component {
     static contextType = useWalletSelector();
 
     errors = {

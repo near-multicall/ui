@@ -13,7 +13,7 @@ import { NavLink } from "react-router-dom";
 import Discord from "../../assets/discord.svg";
 import Github from "../../assets/github.svg";
 import Twitter from "../../assets/twitter.svg";
-import { Wallet } from "../../components";
+import { Wallet } from "../wallet/wallet.jsx";
 import { STORAGE } from "../../utils/persistent";
 import { PopupMenu } from "../popup-menu/index.jsx";
 import { Tooltip } from "../tooltip/index.jsx";
@@ -33,7 +33,7 @@ const DAPP_LOGIN_METHODS = {
     multicall: { actorType: "multicall", key: "multicallDappLogin", title: "Login in dApps as Multicall" },
 };
 
-export default class Sidebar extends Component {
+export class Sidebar extends Component {
     constructor(props) {
         super(props);
 

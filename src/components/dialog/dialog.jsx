@@ -9,7 +9,7 @@ import React, { Component } from "react";
 
 import "./dialog.scss";
 
-export default class Dialog extends Component {
+export class Dialog extends Component {
     constructor(props) {
         super(props);
 

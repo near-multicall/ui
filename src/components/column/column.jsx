@@ -1,11 +1,11 @@
 import React, { Component } from "react";
 import { Droppable, Draggable } from "react-beautiful-dnd";
 import Icon from "@mui/material/Icon";
-import { Task } from "../../components.js";
+import { Task } from "../task/task.jsx";
 import hash from "object-hash";
 import "./column.scss";
 
-export default class Column extends Component {
+export class Column extends Component {
     render() {
         const menuColumn = this.props.column.id === "menu";
 
