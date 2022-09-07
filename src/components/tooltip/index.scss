@@ -1,0 +1,10 @@
+@use "sass/mixin";
+@use "sass/base";
+@use "sass/color";
+@use "sass/size";
+@use "sass/font";
+@use "sass/animation";
+
+.tooltip-title {
+    font-size: size.$medium-text;
+}

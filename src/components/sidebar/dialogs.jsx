@@ -9,13 +9,12 @@ import { readFile, saveFile } from "../../utils/loader";
 import { STORAGE } from "../../utils/persistent";
 import Dialog from "../dialog/dialog";
 import { TextInput } from "../editor/elements";
-import { Tooltip } from "../tooltip/index.js";
+import { Tooltip } from "../tooltip/index.jsx";
 import "./dialogs.scss";
 
 const DAPP_LOGIN_INSTRUCTIONS = [
     {
         text: "Open the dApp in another browser tab",
-        hint: "",
     },
     {
         text: "Log out your account on the dApp",
@@ -23,11 +22,9 @@ const DAPP_LOGIN_INSTRUCTIONS = [
     },
     {
         text: "Copy the dApp's URL",
-        hint: "",
     },
     {
         text: "Paste the URL in the input field below",
-        hint: "",
     },
     {
         text: 'Click "Proceed"',
@@ -57,19 +54,27 @@ export const DappLoginDialog = ({ actorType, onClose, open, title }) => {
             disable={() => dAppURLError.isBad}
             {...{ onClose, open, title }}
         >
-            <ul style={{ listStyleType: "decimal", padding: "0 20px" }}>
+            <ul className="dapp-login-steps">
                 {DAPP_LOGIN_INSTRUCTIONS.map(({ text, hint }) => (
-                    <li key={text}>
-                        {text}
+                    <li
+                        className="item"
+                        key={text}
+                    >
+                        <span className="content">
+                            {text}
 
-                        {hint && (
-                            <Tooltip
-                                placement="right"
-                                title={hint}
-                            >
-                                <InfoOutlined sx={{ pl: 1 }} />
-                            </Tooltip>
-                        )}
+                            {hint && (
+                                <Tooltip
+                                    placement="right"
+                                    title={hint}
+                                >
+                                    <InfoOutlined
+                                        className="dapp-login-step-tooltip-icon"
+                                        fontSize="large"
+                                    />
+                                </Tooltip>
+                            )}
+                        </span>
                     </li>
                 ))}
             </ul>

@@ -1,7 +1,34 @@
+@use "sass/mixin";
+@use "sass/base";
+@use "sass/color";
+@use "sass/size";
+@use "sass/font";
+@use "sass/animation";
+
 .modal-dialog {
     .MuiDialogContent-root {
         display: flex;
         flex-direction: column;
-        gap: 16px;
+        gap: size.$gap;
     }
+}
+
+.dapp-login-steps {
+    display: flex;
+    flex-direction: column;
+    gap: calc(size.$medium-text / 2);
+    padding: 0 20px;
+    list-style-type: decimal;
+    font-size: size.$medium-text;
+
+    .item {
+        .content {
+            display: flex;
+            align-items: center;
+        }
+    }
+}
+
+.dapp-login-step-tooltip-icon {
+    padding-left: 8px;
 }

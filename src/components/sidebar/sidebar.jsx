@@ -16,7 +16,7 @@ import Twitter from "../../assets/twitter.svg";
 import { Wallet } from "../../components";
 import { STORAGE } from "../../utils/persistent";
 import { PopupMenu } from "../popup-menu/index.js";
-import { Tooltip } from "../tooltip/index.js";
+import { Tooltip } from "../tooltip/index.jsx";
 
 import {
     DappLoginDialog,
@@ -24,7 +24,7 @@ import {
     LoadFromProposalDialog,
     SaveAsJsonDialog,
     ClearAllDialog,
-} from "./dialogs.js";
+} from "./dialogs.jsx";
 
 import "./sidebar.scss";
 

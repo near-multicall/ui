@@ -1,8 +1,10 @@
 import { Tooltip as MuiTooltip } from "@mui/material";
 
+import "./index.scss";
+
 export const Tooltip = ({ children, title, ...props }) => (
     <MuiTooltip
-        title={<h1 style={{ fontSize: "12px" }}>{title}</h1>}
+        title={<h1 className="tooltip-title">{title}</h1>}
         {...props}
     >
         {children}

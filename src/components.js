@@ -6,7 +6,7 @@ import Builder from "./components/builder/builder.js";
 import Editor from "./components/editor/editor.js";
 import Export from "./components/export/export.js";
 import Wallet from "./components/wallet/wallet.js";
-import Sidebar from "./components/sidebar/sidebar.js";
+import Sidebar from "./components/sidebar/sidebar.jsx";
 import Dao from "./components/dao/dao.js";
 
 import * as Family from "./families/families.js";
