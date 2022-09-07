@@ -15,7 +15,7 @@ import Github from "../../assets/github.svg";
 import Twitter from "../../assets/twitter.svg";
 import { Wallet } from "../../components";
 import { STORAGE } from "../../utils/persistent";
-import { PopupMenu } from "../popup-menu/index.js";
+import { PopupMenu } from "../popup-menu/index.jsx";
 import { Tooltip } from "../tooltip/index.jsx";
 
 import {
