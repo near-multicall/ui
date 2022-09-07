@@ -1,6 +1,12 @@
+// TODO: use token functions in proposeMulticallFT
+
 import { tx, view, rpcProvider } from "../wallet";
-import { toGas } from "../converter";
+import { toGas, Big } from "../converter";
 import { ArgsAccount } from "../args";
+import { STORAGE } from "../../utils/persistent";
+import { Base64 } from "js-base64";
+
+import type { MulticallArgs } from "./multicall";
 
 const FACTORY_ADDRESS_SELECTOR: Record<string, string> = {
     mainnet: "sputnik-dao.near",
@@ -111,24 +117,24 @@ class SputnikDAO {
     ready: boolean = false;
 
     // shouldn't be used directly, use init() instead
-    constructor(dao_address: string) {
-        this.address = dao_address;
+    constructor(daoAddress: string) {
+        this.address = daoAddress;
     }
 
     // used to create and initialize a DAO instance
-    static async init(dao_address: string): Promise<SputnikDAO> {
+    static async init(daoAddress: string): Promise<SputnikDAO> {
         // verify address is a SputnikDAO, fetch DAO info and mark it ready
-        const newDAO = new SputnikDAO(dao_address);
+        const newDAO = new SputnikDAO(daoAddress);
         const [isDAO, daoPolicy, daoLastProposalId] = await Promise.all([
             // on failure set isDAO to false
-            SputnikDAO.isSputnikDAO(dao_address).catch((err) => {
+            SputnikDAO.isSputnikDAO(daoAddress).catch((err) => {
                 return false;
             }),
             // on failure set policy to default policy (empty)
             newDAO.getPolicy().catch((err) => {
                 return newDAO.policy;
             }),
-            // on failure ste last proposal ID to default (-1)
+            // on failure set last proposal ID to default (-1)
             newDAO.getLastProposalId().catch((err) => {
                 return newDAO.lastProposalId;
             }),
@@ -158,13 +164,13 @@ class SputnikDAO {
         return SputnikDAO.CONTRACT_CODE_HASHES.includes(codeHash);
     }
 
-    async addProposal(args: object | Uint8Array, proposal_bond: string) {
+    async addProposal(args: object | Uint8Array) {
         return tx(
             this.address,
             "add_proposal",
             args,
-            toGas("10"), // 10 Tgas
-            proposal_bond
+            toGas("25"), // 25 Tgas
+            this.policy.proposal_bond
         );
     }
 
@@ -317,6 +323,111 @@ class SputnikDAO {
         });
 
         return canDoAction;
+    }
+
+    /**
+     * propose a multicall using args from LAYOUT
+     *
+     * @param {string} desc DAO proposal description
+     * @param {MulticallArgs} multicallArgs input to the multicall function
+     * @param {string} depo NEAR amount to be attached to multicall
+     * @param {string} gas Gas amount dedicated to multicall execution
+     */
+    async proposeMulticall(desc: string, multicallArgs: MulticallArgs, depo: string, gas: string): Promise<void> {
+        const { multicall } = STORAGE.addresses;
+
+        const proposalArgs = {
+            proposal: {
+                description: desc,
+                kind: {
+                    FunctionCall: {
+                        receiver_id: multicall,
+                        actions: [
+                            {
+                                method_name: "multicall",
+                                args: Base64.encode(JSON.stringify(multicallArgs)),
+                                deposit: `${depo}`,
+                                gas: `${gas}`,
+                            },
+                        ],
+                    },
+                },
+            },
+        };
+
+        // fire the add_proposal transaction
+        this.addProposal(proposalArgs);
+    }
+
+    /**
+     * propose multicall with attached FT using args from LAYOUT
+     *
+     * @param {string} desc DAO proposal description
+     * @param {MulticallArgs} multicallArgs input to the multicall function
+     * @param {string} gas gas for the multicall action
+     * @param {string} tokenAddress attached FT address
+     * @param {string} amount attached FT amount
+     */
+    async proposeMulticallFT(
+        desc: string,
+        multicallArgs: MulticallArgs,
+        gas: string,
+        tokenAddress: string,
+        amount: string
+    ): Promise<void> {
+        const { multicall } = STORAGE.addresses;
+
+        const proposalArgs = {
+            proposal: {
+                description: desc,
+                kind: {
+                    FunctionCall: {
+                        receiver_id: tokenAddress,
+                        actions: [
+                            {
+                                method_name: "ft_transfer_call",
+                                args: Base64.encode(
+                                    JSON.stringify({
+                                        receiver_id: multicall,
+                                        amount: amount,
+                                        msg: JSON.stringify({
+                                            function_id: "multicall",
+                                            args: Base64.encode(JSON.stringify(multicallArgs).toString()),
+                                        }).toString(),
+                                    })
+                                ),
+                                deposit: "1", // nep-141: ft_transfer_call expects EXACTLY 1 yocto
+                                gas: gas,
+                            },
+                        ],
+                    },
+                },
+            },
+        };
+
+        // check if multicall has enough storage on Token
+        const [storageBalance, storageBounds] = await Promise.all([
+            // get storage balance of multicall on the token
+            view(tokenAddress, "storage_balance_of", { account_id: multicall }).catch((e) => "0"), // return 0 if failed
+            // get storage balance bounds in case multicall has no storage on the token and it needs to be paid
+            view(tokenAddress, "storage_balance_bounds", {}).catch((e) => {}),
+        ]);
+        const totalStorageBalance = Big(storageBalance?.total ?? "0");
+        const storageMinBound = Big(storageBounds.min);
+
+        // if storage balance is less than minimum bound, add proposal action to pay for storage
+        if (totalStorageBalance.lt(storageMinBound)) {
+            // push to beginning of actions array. Has to execute before ft_transfer_call
+            proposalArgs.proposal.kind.FunctionCall.actions.unshift({
+                method_name: "storage_deposit",
+                args: Base64.encode(JSON.stringify({ account_id: multicall })),
+                deposit: storageMinBound.sub(totalStorageBalance).toFixed(), // difference between current storage total and required minimum
+                gas: toGas("5"), // 5 Tgas
+            });
+        }
+
+        // fire the add_proposal transaction
+        this.addProposal(proposalArgs);
     }
 }
 

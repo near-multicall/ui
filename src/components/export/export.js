@@ -140,29 +140,32 @@ export default class Export extends Component {
             errors[k].validOrNull(account);
         });
 
-        // Multicall args to display for copy/paste
-        let multicallArgs = "";
+        // Multicall args used in making the proposal
+        let multicallArgs = {};
+        // Multicall args in text form to display for copy/pasting args
+        let multicallArgsText = "";
         if (this.showArgs) {
             // Return error message if a card has JSON errors. Faulty JSON breaks toBase64.
             const hasJsonErrors =
                 errors.hasErrors.isBad && allErrors.some((err) => err.message === errorMsg.ERR_INVALID_ARGS);
             if (hasJsonErrors) {
-                multicallArgs = "Please fix invalid JSON errors";
+                multicallArgsText = "Please fix invalid JSON errors";
             } else {
                 // toBase64 might throw on failure
                 try {
-                    multicallArgs = !this.attachFT
-                        ? JSON.stringify({ calls: LAYOUT.toBase64() })
+                    multicallArgs = { calls: LAYOUT.toBase64() };
+                    multicallArgsText = !this.attachFT
+                        ? JSON.stringify(multicallArgs)
                         : JSON.stringify({
                               receiver_id: STORAGE.addresses.multicall,
                               amount: convert(amount.value, amount.unit, amount.decimals),
                               msg: JSON.stringify({
                                   function_id: "multicall",
-                                  args: Base64.encode(JSON.stringify({ calls: LAYOUT.toBase64() }).toString()),
+                                  args: Base64.encode(JSON.stringify(multicallArgs).toString()),
                               }).toString(),
                           });
                 } catch (e) {
-                    multicallArgs = "ERROR: something went wrong during JSON creation";
+                    multicallArgsText = "ERROR: something went wrong during JSON creation";
                 }
             }
         }
@@ -290,7 +293,7 @@ export default class Export extends Component {
                                 <Icon
                                     className="icon copy"
                                     onClick={(e) => {
-                                        navigator.clipboard.writeText(multicallArgs);
+                                        navigator.clipboard.writeText(multicallArgsText);
                                         this.updateCopyIcon(e);
                                     }}
                                 >
@@ -302,7 +305,7 @@ export default class Export extends Component {
                         </div>
                         {this.showArgs ? (
                             <div className="value">
-                                <pre className="code">{multicallArgs}</pre>
+                                <pre className="code">{multicallArgsText}</pre>
                             </div>
                         ) : (
                             <></>
@@ -328,21 +331,29 @@ export default class Export extends Component {
                             onClick={() => {
                                 // multicall with attached FT
                                 if (this.attachFT)
-                                    WALLET_COMPONENT.proposeFT(
+                                    WALLET_COMPONENT.state.currentDAO.proposeMulticallFT(
                                         desc.value,
+                                        multicallArgs,
                                         convert(gas.value, gas.unit),
                                         token.value,
                                         convert(amount.value, amount.unit, amount.decimals)
                                     );
                                 // multicall with attached NEAR
                                 else if (this.attachNEAR)
-                                    WALLET_COMPONENT.propose(
+                                    WALLET_COMPONENT.state.currentDAO.proposeMulticall(
                                         desc.value,
+                                        multicallArgs,
                                         convert(depo.value, depo.unit),
                                         convert(gas.value, gas.unit)
                                     );
                                 // attach NEAR disabled, ignore depo amount and attach 1 yocto.
-                                else WALLET_COMPONENT.propose(desc.value, "1", convert(gas.value, gas.unit));
+                                else
+                                    WALLET_COMPONENT.state.currentDAO.proposeMulticall(
+                                        desc.value,
+                                        multicallArgs,
+                                        "1",
+                                        convert(gas.value, gas.unit)
+                                    );
                             }}
                         >
                             {`Propose on ${STORAGE.addresses.dao}`}

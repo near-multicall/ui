@@ -3,7 +3,7 @@ import { Base64 } from "js-base64";
 import React, { Component } from "react";
 import { ArgsAccount, ArgsError } from "../../utils/args";
 import { STORAGE } from "../../utils/persistent";
-import { toNEAR, toYocto, Big } from "../../utils/converter";
+import { toNEAR, toYocto, toGas, Big } from "../../utils/converter";
 import { view } from "../../utils/wallet";
 import { useWalletSelector } from "../../contexts/walletSelectorContext";
 import { SputnikDAO, SputnikUI, ProposalKind, ProposalAction } from "../../utils/contracts/sputnik-dao";
@@ -169,7 +169,7 @@ export default class DaoComponent extends Component {
                                     })
                                 ),
                                 deposit: depo.toFixed(),
-                                gas: "150000000000000",
+                                gas: toGas("150"), // 150 Tgas
                             },
                         ],
                     },
@@ -204,7 +204,7 @@ export default class DaoComponent extends Component {
                             <button
                                 className="create-multicall"
                                 onClick={() => {
-                                    dao.addProposal(args, dao.policy.proposal_bond);
+                                    dao.addProposal(args);
                                 }}
                             >
                                 Propose
