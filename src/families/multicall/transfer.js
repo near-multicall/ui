@@ -26,11 +26,11 @@ export class Transfer extends BaseTask {
         gas: new ArgsError(errorMsg.ERR_INVALID_GAS_AMOUNT, (value) => ArgsBig.isValid(value)),
     };
 
-    options = {
-        all: false,
-    };
-
     init(json = null) {
+        this.options = {
+            all: false,
+        };
+
         const actions = json?.actions?.[0];
         const units = json?.units?.actions?.[0];
 
@@ -118,7 +118,7 @@ export class Transfer extends BaseTask {
                 />
                 <div className="checkbox">
                     <Checkbox
-                        checked={this.transferAll}
+                        checked={this.options.all}
                         onChange={(e) => {
                             this.options.all = e.target.checked;
                             this.call.args.value.amount.omit = e.target.checked;
