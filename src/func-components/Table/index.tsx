@@ -11,12 +11,13 @@ import {
     Collapse,
     TableSortLabel,
 } from "@mui/material";
-import { useState } from "react";
-import useBreakpoint from "../../hooks/useBreakpoint";
+
+// import { visuallyHidden } from '@mui/utils'
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import React from "react";
-// import { visuallyHidden } from '@mui/utils'
+import React, { useState } from "react";
+
+import useBreakpoint from "../../hooks/useBreakpoint";
 
 const StyledTableContainer = styled(TableContainer)({
     display: "table",
@@ -76,9 +77,11 @@ const StyledTableRow = styled(TableRow, { shouldForwardProp: () => true })<{
     position: "relative",
     whiteSpace: "pre",
     background: variant === "outlined" ? "transparent" : "#b4ccca",
+
     "& + tr .MuiCollapse-root": {
         background: variant === "outlined" ? "transparent" : theme.palette.background.default,
     },
+
     "& .MuiTableCell-root": {
         fontSize: (fontSize ?? "16px") + "!important",
         justifyContent: "flex-start",
@@ -87,9 +90,11 @@ const StyledTableRow = styled(TableRow, { shouldForwardProp: () => true })<{
         borderColor: variant === "outlined" ? "#00000010" : "transparent",
         borderRight: "none",
         borderLeft: "none",
+
         "& .MuiTypography-root": {
             fontSize: (fontSize ?? "16px") + "!important",
         },
+
         "&:first-of-type": {
             borderLeft: "1px solid",
             borderColor: variant === "outlined" ? "#00000010" : "transparent",
@@ -97,6 +102,7 @@ const StyledTableRow = styled(TableRow, { shouldForwardProp: () => true })<{
             borderTopLeftRadius: 16,
             borderBottomLeftRadius: 16,
         },
+
         "&:last-child": {
             borderRight: "1px solid",
             borderColor: variant === "outlined" ? "#00000010" : "transparent",
@@ -105,10 +111,12 @@ const StyledTableRow = styled(TableRow, { shouldForwardProp: () => true })<{
             borderBottomRightRadius: 16,
         },
     },
+
     "&:hover": {
         "& + tr .MuiCollapse-root": {
             backgroundColor: variant === "outlined" ? "#E2E7F020" : "#dcefea",
         },
+
         backgroundColor: variant === "outlined" ? "#E2E7F020" : "#dcefea",
     },
 }));
@@ -118,6 +126,7 @@ const Card = styled("div")({
     border: "1px solid rgba(0, 0, 0, 0.1)",
     borderRadius: 16,
     padding: 16,
+
     "& > div": {
         width: "100%",
     },
@@ -137,6 +146,7 @@ const sortIcon = ({ className }: { className: string }) => (
             d="M1.0875 6.5791L3 8.48743L4.9125 6.5791L5.5 7.1666L3 9.6666L0.5 7.1666L1.0875 6.5791Z"
             fill="#00000099"
         />
+
         <path
             className="sort-up"
             d="M1.0875 3.421L3 1.51266L4.9125 3.421L5.5 2.8335L3 0.333496L0.5 2.8335L1.0875 3.421Z"
@@ -149,9 +159,11 @@ const CardRow = styled("div")(`
     display: flex;
     justify-content: space-between;
     grid-template-columns: auto 100%;
+
     > div:first-of-type {
       white-space: nowrap;
     }
+
     > div:last-child {
       width: 100%;
       display: flex;
@@ -160,7 +172,7 @@ const CardRow = styled("div")(`
     }
   `);
 
-export default function Table({
+export const Table = ({
     header,
     rows,
     variant = "grey",
@@ -184,7 +196,7 @@ export default function Table({
     orderBy?: string;
     createSortfunction?: (label: string) => () => void;
     icons?: boolean;
-}) {
+}) => {
     const matches = useBreakpoint("md");
 
     return (
@@ -209,12 +221,14 @@ export default function Table({
                                         >
                                             {headerString}
                                         </Typography>
+
                                         <Typography
                                             sx={{ color: (theme) => theme.palette.text.secondary }}
                                             component="div"
                                         >
                                             {data[index] ?? null}
                                         </Typography>
+
                                         {collapsible && index + 1 === header.length && (
                                             <IconButton
                                                 aria-label="expand row"
@@ -237,8 +251,8 @@ export default function Table({
                     <table>
                         <StyledTableHead>
                             <TableRow>
-                                {header.map((string, idx) => (
-                                    <TableCell key={idx}>
+                                {header.map((string, index) => (
+                                    <TableCell key={index}>
                                         {sortHeaders &&
                                         sortHeaders.includes(string) &&
                                         order &&
@@ -254,6 +268,7 @@ export default function Table({
                                                         transform: "none",
                                                         opacity: 1,
                                                     },
+
                                                     "& .MuiTableSortLabel-iconDirectionDesc .sort-down": {
                                                         fill: (theme) =>
                                                             orderBy === string
@@ -262,6 +277,7 @@ export default function Table({
                                                                     : "#00000099"
                                                                 : "#00000099",
                                                     },
+
                                                     "& .MuiTableSortLabel-iconDirectionAsc .sort-up": {
                                                         fill: (theme) =>
                                                             orderBy === string
@@ -285,15 +301,16 @@ export default function Table({
                                 ))}
                             </TableRow>
                         </StyledTableHead>
+
                         <TableBody>
-                            {rows.map((row, idx) => (
+                            {rows.map((row, index) => (
                                 <Row
                                     fontSize={fontSize}
                                     row={row}
                                     collapsible={collapsible}
-                                    key={row[0].toString() + idx}
+                                    key={`row-${index}`}
                                     variant={variant}
-                                    hiddenPart={hiddenParts && hiddenParts[idx]}
+                                    hiddenPart={hiddenParts && hiddenParts[index]}
                                 />
                             ))}
                         </TableBody>
@@ -302,9 +319,9 @@ export default function Table({
             )}
         </>
     );
-}
+};
 
-function Row({
+const Row = ({
     row,
     variant,
     collapsible,
@@ -316,7 +333,7 @@ function Row({
     collapsible?: boolean;
     hiddenPart?: JSX.Element;
     fontSize?: string;
-}) {
+}) => {
     const [isOpen, setIsOpen] = useState(false);
 
     return (
@@ -329,6 +346,7 @@ function Row({
                         ? {
                               borderBottomLeftRadius: 0,
                               borderBottomRightRadius: 0,
+
                               "& .MuiTableCell-root": {
                                   "&:first-of-type": { borderBottomLeftRadius: 0 },
                                   "&:last-child": { borderBottomRightRadius: 0 },
@@ -337,23 +355,22 @@ function Row({
                         : undefined
                 }
             >
-                {row.map((data, idx) => (
-                    <>
-                        <TableCell
-                            sx={{ fontFamily: "Titillium Web" }}
-                            key={idx}
-                        >
-                            {idx === 1 ? (
-                                <img
-                                    key={idx}
-                                    src={data as string}
-                                />
-                            ) : (
-                                data
-                            )}
-                        </TableCell>
-                    </>
+                {row.map((data, index) => (
+                    <TableCell
+                        sx={{ fontFamily: "Titillium Web" }}
+                        key={index}
+                    >
+                        {index === 1 ? (
+                            <img
+                                key={index}
+                                src={data as string}
+                            />
+                        ) : (
+                            data
+                        )}
+                    </TableCell>
                 ))}
+
                 {collapsible && (
                     <TableCell>
                         <IconButton
@@ -367,6 +384,7 @@ function Row({
                     </TableCell>
                 )}
             </StyledTableRow>
+
             {collapsible && (
                 <TableRow>
                     <TableCell
@@ -401,4 +419,4 @@ function Row({
             )}
         </>
     );
-}
+};

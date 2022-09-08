@@ -1,6 +1,10 @@
+import { InputAdornment } from "@mui/material";
 import { DeleteOutline, EditOutlined, AddOutlined, PauseOutlined, PlayArrowOutlined } from "@mui/icons-material";
 import { Base64 } from "js-base64";
+import debounce from "lodash.debounce";
+import * as nearAPI from "near-api-js";
 import React, { Component } from "react";
+
 import { ArgsAccount, ArgsError } from "../../utils/args";
 import { STORAGE } from "../../utils/persistent";
 import { toNEAR, toYocto, Big, formatTokenAmount } from "../../utils/converter";
@@ -8,14 +12,11 @@ import { view, viewAccount } from "../../utils/wallet";
 import { useWalletSelector } from "../../contexts/walletSelectorContext";
 import { SputnikDAO, SputnikUI, ProposalKind, ProposalAction } from "../../utils/contracts/sputnik-dao";
 import { TextInput } from "../editor/elements";
-import { InputAdornment } from "@mui/material";
-import "./dao.scss";
-import debounce from "lodash.debounce";
-import Table from "../../func-components/Table";
-import Tabs from "../../func-components/Tabs";
-import PageTabs from "../../func-components/Tabs/PageTabs";
+import { Table } from "../../func-components/Table";
+import { PageTabs } from "../../func-components/Tabs/PageTabs";
 import { FungibleToken } from "../../utils/standards/fungibleToken";
-import * as nearAPI from "near-api-js";
+import "./dao.scss";
+
 // minimum balance a multicall instance needs for storage + state.
 const MIN_INSTANCE_BALANCE = toYocto(1); // 1 NEAR
 
@@ -550,8 +551,6 @@ export default class DaoComponent extends Component {
 
     render() {
         const { addr } = this.state;
-
-        console.log(this.state);
 
         return (
             <div className="dao-container">
