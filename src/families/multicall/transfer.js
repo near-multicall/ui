@@ -5,12 +5,12 @@ import Call from "../../utils/call";
 import { errorMsg } from "../../utils/errors";
 import { STORAGE } from "../../utils/persistent";
 import { toGas, toYocto, formatTokenAmount, unitToDecimals } from "../../utils/converter";
-import BaseTask from "../base";
+import { BaseTask } from "../base";
 import Multicall from "../../utils/contracts/multicall";
 import "./multicall.scss";
 import { TextInput, TextInputWithUnits } from "../../components/editor/elements";
 
-export default class Transfer extends BaseTask {
+export class Transfer extends BaseTask {
     uniqueClassName = "multicall-transfer-task";
     errors = {
         ...this.baseErrors,
@@ -26,11 +26,11 @@ export default class Transfer extends BaseTask {
         gas: new ArgsError(errorMsg.ERR_INVALID_GAS_AMOUNT, (value) => ArgsBig.isValid(value)),
     };
 
-    options = {
-        all: false,
-    };
-
     init(json = null) {
+        this.options = {
+            all: false,
+        };
+
         const actions = json?.actions?.[0];
         const units = json?.units?.actions?.[0];
 
@@ -118,7 +118,7 @@ export default class Transfer extends BaseTask {
                 />
                 <div className="checkbox">
                     <Checkbox
-                        checked={this.transferAll}
+                        checked={this.options.all}
                         onChange={(e) => {
                             this.options.all = e.target.checked;
                             this.call.args.value.amount.omit = e.target.checked;
