@@ -1,17 +1,7 @@
 @use "sass/size";
 @use "sass/mixin";
 
-.modal-dialog {
-    .MuiDialogContent-root {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5 * size.$gap;
-    }
-}
-
 .dapp-login-steps {
-    display: flex;
-    flex-direction: column;
     padding: 0 size.$gap;
     list-style-type: decimal;
     font-size: size.$text;
@@ -19,9 +9,10 @@
     .item {
         .content {
             @include mixin.center-items(flex-start, center);
+            flex-flow: row nowrap;
+            gap: 0.5ch;
             padding-left: 0.25 * size.$gap;
             .icon {
-                padding-left: 0.5ch;
                 @include mixin.light-icon;
             }
         }
