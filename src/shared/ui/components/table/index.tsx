@@ -355,19 +355,12 @@ const Row = ({
                         : undefined
                 }
             >
-                {row.map((data, index) => (
+                {row.map((content, index) => (
                     <TableCell
                         sx={{ fontFamily: "Titillium Web" }}
                         key={index}
                     >
-                        {index === 1 ? (
-                            <img
-                                key={index}
-                                src={data as string}
-                            />
-                        ) : (
-                            data
-                        )}
+                        {content}
                     </TableCell>
                 ))}
 
