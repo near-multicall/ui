@@ -34,7 +34,7 @@ export default class DaoComponent extends Component {
         noContract: new ArgsError("DAO has no multicall instance", (value) => this.errors.noContract.isBad),
     };
 
-    loadInfoDebounced = debounce(() => this.loadInfos(), 400);
+    loadInfoDebounced = debounce(() => this.loadInfo(), 400);
 
     lastAddr;
 
@@ -48,7 +48,7 @@ export default class DaoComponent extends Component {
             proposed: -1,
             proposedInfo: {},
             rowContent: null,
-            infos: {
+            info: {
                 admins: [],
                 tokens: [],
                 jobs: [],
@@ -58,7 +58,7 @@ export default class DaoComponent extends Component {
 
         view(window.nearConfig.MULTICALL_FACTORY_ADDRESS, "get_fee", {}).then((createMulticallFee) => {
             this.fee = createMulticallFee;
-            this.loadInfos();
+            this.loadInfo();
         });
 
         document.addEventListener("onaddressesupdated", (e) => this.onAddressesUpdated(e));
@@ -120,7 +120,7 @@ export default class DaoComponent extends Component {
                 },
                 () => {
                     this.errors.addr.validOrNull(this.state.addr);
-                    this.loadInfos();
+                    this.loadInfo();
                     this.forceUpdate();
                 }
             );
@@ -321,7 +321,7 @@ export default class DaoComponent extends Component {
         );
     }
 
-    loadInfos() {
+    loadInfo() {
         const { addr: addrError, noContract, noDao } = this.errors;
         const { addr } = this.state;
 
@@ -382,7 +382,7 @@ export default class DaoComponent extends Component {
                         newState = {
                             dao: newDAO,
                             rowContent: rows,
-                            infos: {
+                            info: {
                                 admins: admins,
                                 tokens: tokens,
                                 jobs: jobs,
@@ -460,7 +460,7 @@ export default class DaoComponent extends Component {
 
     getContent() {
         const { selector: walletSelector } = this.context;
-        const { infos, loading, rowContent } = this.state;
+        const { info, loading, rowContent } = this.state;
 
         // if user not logged in, remind him to sign in.
         // TODO: only require signIn when DAO has no multicall instance (to know if user can propose or vote on existing proposal to create multicall)
@@ -494,12 +494,12 @@ export default class DaoComponent extends Component {
         if (loading) return <div className="info-container loader"></div>;
 
         // everything should be loaded
-        if (!infos.admins || !infos.tokens || !infos.bond) {
-            console.error("infos incomplete", infos);
+        if (!info.admins || !info.tokens || !info.bond) {
+            console.error("info incomplete", info);
             return <div className="info-container error">Unexpected error! Multicall might be outdated.</div>;
         }
 
-        // infos found
+        // info found
         return (
             <PageTabs
                 contents={[
@@ -508,20 +508,20 @@ export default class DaoComponent extends Component {
                             <AddOutlined />
                             <h1 className="title">Admins</h1>
                             <ul className="list">
-                                {infos.admins.map((a) => (
-                                    <li key={infos.admins.id}>{this.toLink(a)}</li>
+                                {info.admins.map((admin) => (
+                                    <li key={admin}>{this.toLink(admin)}</li>
                                 ))}
                             </ul>
                         </div>
                         <div className="info-card jobs">
                             <AddOutlined />
                             <h1 className="title">Jobs</h1>
-                            <div className="scroll-wrapper">{infos.jobs.map((j) => this.job(j))}</div>
+                            <div className="scroll-wrapper">{info.jobs.map((j) => this.job(j))}</div>
                         </div>
                         <div className="info-card bond">
                             <h1 className="title">
                                 Job Bond
-                                <span>{`${infos.bond !== "..." ? toNEAR(infos.bond) : "..."} Ⓝ`}</span>
+                                <span>{`${info.bond !== "..." ? toNEAR(info.bond) : "..."} Ⓝ`}</span>
                             </h1>
                         </div>
                     </div>,
@@ -537,8 +537,8 @@ export default class DaoComponent extends Component {
                         <div className="info-card wtokens">
                             <h1 className="title">Whitelisted Tokens</h1>
                             <ul className="list">
-                                {infos.tokens.map((t) => (
-                                    <li key={infos.tokens.id}>{this.toLink(t)}</li>
+                                {info.tokens.map((token) => (
+                                    <li key={token}>{this.toLink(token)}</li>
                                 ))}
                             </ul>
                         </div>
@@ -550,6 +550,8 @@ export default class DaoComponent extends Component {
 
     render() {
         const { addr } = this.state;
+
+        console.log(this.state);
 
         return (
             <div className="dao-container">
