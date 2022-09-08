@@ -1,3 +1,5 @@
+// TODO: use Multical helper class to fetch & store infos, like admins, tokens etc...
+
 import React, { Component } from "react";
 import { view } from "../../utils/wallet";
 import { STORAGE } from "../../utils/persistent";

@@ -112,6 +112,14 @@ class Multicall {
     }
 
     /**
+     * Multicall's factory has an admin-controlled fee to be
+     * paid upon creating a new multicall instance contract
+     */
+    static async getFactoryFee(): Promise<string> {
+        return view(this.FACTORY_ADDRESS, "get_fee", {});
+    }
+
+    /**
      * get list of admins
      */
     async getAdmins(): Promise<string[]> {
