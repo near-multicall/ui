@@ -5,6 +5,7 @@ import debounce from "lodash.debounce";
 import * as nearAPI from "near-api-js";
 import React, { Component } from "react";
 
+import { TokenLabel } from "../token/token";
 import { ArgsAccount, ArgsError } from "../../utils/args";
 import { STORAGE } from "../../utils/persistent";
 import { toNEAR, toYocto, Big, formatTokenAmount } from "../../utils/converter";
@@ -15,7 +16,7 @@ import { TextInput } from "../editor/elements";
 import { FungibleToken } from "../../utils/standards/fungibleToken";
 import { Table } from "../../shared/ui/components/table";
 import { PageTabs } from "../../shared/ui/components/tabs";
-import { NearProtocolFilled } from "../../shared/ui/components/icons";
+import { NearIconFilled } from "../../shared/ui/components/icons";
 import "./dao.scss";
 
 // minimum balance a multicall instance needs for storage + state.
@@ -338,6 +339,24 @@ export default class DaoComponent extends Component {
         );
     }
 
+    async nearInfo() {
+        const { addr, dao } = this.state;
+        const multicall = `${addr.value}.${window.nearConfig.MULTICALL_FACTORY_ADDRESS}`;
+        const nearBalanceMulticall = (await viewAccount(multicall)).amount;
+        const nearBalanceDao = (await viewAccount(dao.address)).amount;
+
+        return [
+            <TokenLabel
+                icon={<NearIconFilled />}
+                symbol="NEAR"
+            />,
+
+            formatTokenAmount(nearBalanceMulticall, 24, 2),
+            formatTokenAmount(nearBalanceDao, 24, 2),
+            formatTokenAmount(Big(nearBalanceDao).add(nearBalanceMulticall).toFixed(), 24, 2),
+        ];
+    }
+
     async tokenInfo(multicall, dao) {
         const tokenAddrList = await FungibleToken.getLikelyTokenContracts(multicall);
         const likelyTokenList = await Promise.all(tokenAddrList.map((address) => FungibleToken.init(address)));
@@ -365,39 +384,12 @@ export default class DaoComponent extends Component {
     balancesToRows(multicall, dao) {
         return this.tokenInfo(multicall, dao).then((res) =>
             res.map(({ token, multicallBalance, daoBalance, total }) => [
-                <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                    <img
-                        loading="lazy"
-                        style={{ width: "32px", height: "32px" }}
-                        src={token.metadata.icon}
-                    />
-
-                    <span>{token.metadata.symbol}</span>
-                </span>,
-
+                <TokenLabel {...token.metadata} />,
                 formatTokenAmount(multicallBalance, token.metadata.decimals, 2),
                 formatTokenAmount(daoBalance, token.metadata.decimals, 2),
                 formatTokenAmount(total, token.metadata.decimals, 2),
             ])
         );
-    }
-
-    async nearInfo() {
-        const { addr, dao } = this.state;
-        const multicall = `${addr.value}.${window.nearConfig.MULTICALL_FACTORY_ADDRESS}`;
-        const nearBalanceMulticall = (await viewAccount(multicall)).amount;
-        const nearBalanceDao = (await viewAccount(dao.address)).amount;
-
-        return [
-            <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <NearProtocolFilled style={{ width: "32px", height: "32px" }} />
-                <span>NEAR</span>
-            </span>,
-
-            formatTokenAmount(nearBalanceMulticall, 24, 2),
-            formatTokenAmount(nearBalanceDao, 24, 2),
-            formatTokenAmount(Big(nearBalanceDao).add(nearBalanceMulticall).toFixed(), 24, 2),
-        ];
     }
 
     displayToken() {
@@ -544,6 +536,15 @@ export default class DaoComponent extends Component {
                             </ul>
                         </div>
 
+                        <div className="info-card wtokens">
+                            <h1 className="title">Whitelisted Tokens</h1>
+                            <ul className="list">
+                                {info.tokens.map((token) => (
+                                    <li key={token}>{this.toLink(token)}</li>
+                                ))}
+                            </ul>
+                        </div>
+
                         <div className="info-card jobs">
                             <AddOutlined />
                             <h1 className="title">Jobs</h1>
@@ -566,15 +567,6 @@ export default class DaoComponent extends Component {
                                 header={TableHeader}
                                 rows={rowContent}
                             />
-                        </div>
-
-                        <div className="info-card wtokens">
-                            <h1 className="title">Whitelisted Tokens</h1>
-                            <ul className="list">
-                                {info.tokens.map((token) => (
-                                    <li key={token}>{this.toLink(token)}</li>
-                                ))}
-                            </ul>
                         </div>
                     </div>,
                 ]}
