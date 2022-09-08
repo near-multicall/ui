@@ -16,6 +16,7 @@ import Twitter from "../../assets/twitter.svg";
 import { Wallet } from "../wallet/wallet.jsx";
 import { STORAGE } from "../../utils/persistent";
 import { PopupMenu } from "../popup-menu/popup-menu.jsx";
+import { Tooltip } from "../tooltip/tooltip";
 
 import {
     DappLoginDialog,
@@ -180,16 +181,17 @@ export class Sidebar extends Component {
                                 triggerClassName="sidebar-button"
                             />
 
-                            <PopupMenu
-                                icon={<DeleteForeverOutlined onClick={() => this.openDialog("clearAll")} />}
-                                items={[
-                                    {
-                                        onClick: () => this.openDialog("clearAll"),
-                                        title: "Clear All",
-                                    },
-                                ]}
-                                triggerClassName="sidebar-button"
-                            />
+                            <div className="sidebar-button">
+                                <Tooltip
+                                    placement="right"
+                                    title="Clear All"
+                                >
+                                    <DeleteForeverOutlined
+                                        className="icon"
+                                        onClick={() => this.openDialog("clearAll")}
+                                    />
+                                </Tooltip>
+                            </div>
 
                             <hr />
                         </>
