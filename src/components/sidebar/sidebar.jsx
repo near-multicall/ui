@@ -6,7 +6,7 @@ import {
     ScienceOutlined,
 } from "@mui/icons-material";
 
-import { Icon, IconButton } from "@mui/material";
+import { Icon } from "@mui/material";
 import React, { Component } from "react";
 import { NavLink } from "react-router-dom";
 
@@ -15,8 +15,7 @@ import Github from "../../assets/github.svg";
 import Twitter from "../../assets/twitter.svg";
 import { Wallet } from "../wallet/wallet.jsx";
 import { STORAGE } from "../../utils/persistent";
-import { PopupMenu } from "../popup-menu/index.jsx";
-import { Tooltip } from "../tooltip/index.jsx";
+import { PopupMenu } from "../popup-menu/popup-menu.jsx";
 
 import {
     DappLoginDialog,
@@ -181,20 +180,17 @@ export class Sidebar extends Component {
                                 triggerClassName="sidebar-button"
                             />
 
-                            <div className="sidebar-button">
-                                <Tooltip
-                                    title="Clear All"
-                                    placement="right"
-                                >
-                                    <IconButton
-                                        disableRipple
-                                        className="sidebar-button"
-                                        onClick={() => this.openDialog("clearAll")}
-                                    >
-                                        <DeleteForeverOutlined />
-                                    </IconButton>
-                                </Tooltip>
-                            </div>
+                            <PopupMenu
+                                icon={<DeleteForeverOutlined onClick={() => this.openDialog("clearAll")} />}
+                                items={[
+                                    {
+                                        onClick: () => this.openDialog("clearAll"),
+                                        title: "Clear All",
+                                    },
+                                ]}
+                                triggerClassName="sidebar-button"
+                            />
+
                             <hr />
                         </>
                     ) : null}

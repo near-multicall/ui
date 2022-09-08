@@ -1,7 +1,7 @@
 import { Chip } from "@mui/material";
 import clsx from "clsx";
 
-import "./index.scss";
+import "./popup-menu.scss";
 
 export const PopupMenu = ({ icon, items, triggerClassName }) => (
     <div className={clsx("popup-menu", triggerClassName)}>
