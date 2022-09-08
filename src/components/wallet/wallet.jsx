@@ -5,6 +5,7 @@ import { tx, view } from "../../utils/wallet";
 import { STORAGE } from "../../utils/persistent";
 import { useWalletSelector } from "../../contexts/walletSelectorContext";
 import { SputnikDAO, ProposalKind, ProposalAction } from "../../utils/contracts/sputnik-dao";
+import { errorMsg } from "../../utils/errors";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
 import { Icon } from "@mui/material";
@@ -16,9 +17,9 @@ export class Wallet extends Component {
     static contextType = useWalletSelector();
 
     errors = {
-        noDao: new ArgsError(`No sputnik dao found at address`, (value) => this.errors.noDao.isBad),
-        noRights: new ArgsError("No permission to create a proposal on this dao", (value) => this.errors.noRights),
-        noContract: new ArgsError("Dao does not have a multicall instance", (value) => this.errors.noContract.isBad),
+        noDao: new ArgsError(errorMsg.ERR_NO_DAO_ON_ADDR, (value) => this.errors.noDao.isBad),
+        noRights: new ArgsError(errorMsg.ERR_CANNOT_PROPOSE_TO_DAO, (value) => this.errors.noRights),
+        noContract: new ArgsError(errorMsg.ERR_DAO_HAS_NO_MTCL, (value) => this.errors.noContract.isBad),
     };
 
     daoList = [];
