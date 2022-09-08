@@ -289,7 +289,7 @@
             color: color.$light-text;
             font-size: 1em;
         }
-        font-size: 1.8rem;
+        font-size: size.$text;
     }
     & > .MuiTextField-root {
         &:first-of-type {

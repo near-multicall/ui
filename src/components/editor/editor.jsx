@@ -3,7 +3,7 @@ import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import AutoAwesomeOutlinedIcon from "@mui/icons-material/AutoAwesomeOutlined";
 import "./editor.scss";
 
-export default class Editor extends Component {
+export class Editor extends Component {
     constructor(props) {
         super(props);
 

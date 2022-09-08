@@ -15,7 +15,7 @@ import { TextInput, TextInputWithUnits } from "../editor/elements";
 import debounce from "lodash.debounce";
 import "./export.scss";
 
-export default class Export extends Component {
+export class Export extends Component {
     static contextType = useWalletSelector();
 
     errors = {

@@ -1,12 +1,13 @@
 import React, { Component } from "react";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
-import { Column, Menu } from "../../components.js";
+import { Column } from "../column/column.jsx";
+import { Menu } from "../menu/menu.jsx";
 import { initialData } from "../../initial-data.js";
 import { Base64 } from "js-base64";
 import { STORAGE } from "../../utils/persistent";
 import "./layout.scss";
 
-export default class Layout extends Component {
+export class Layout extends Component {
     taskID = 0;
     columnID = 1;
 

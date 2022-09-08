@@ -1,7 +1,7 @@
 import React from "react";
 import { Layout, Sidebar } from "../components.js";
 
-export default function AppPage() {
+export const AppPage = () => {
     window.PAGE = "app";
 
     return (
@@ -10,4 +10,4 @@ export default function AppPage() {
             <Layout />
         </>
     );
-}
+};

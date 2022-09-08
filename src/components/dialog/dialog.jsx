@@ -1,13 +1,15 @@
-import React, { Component } from "react";
 import {
     Dialog as MUIDialog,
     DialogTitle as MUIDialogTitle,
     DialogContent as MUIDialogContent,
     DialogActions as MUIDialogAction,
 } from "@mui/material";
+import { clsx } from "clsx";
+import React, { Component } from "react";
+
 import "./dialog.scss";
 
-export default class Dialog extends Component {
+export class Dialog extends Component {
     constructor(props) {
         super(props);
 
@@ -24,13 +26,13 @@ export default class Dialog extends Component {
 
     render() {
         const { title, open } = this.state;
-        const { onClose, onDone, doneRename, onCancel, cancelRename, disable, children } = this.props;
+        const { className, onClose, onDone, doneRename, onCancel, cancelRename, disable, children } = this.props;
 
         return (
             <MUIDialog
                 onClose={() => onClose()}
                 open={open}
-                className="dialog"
+                className={clsx("dialog", className)}
             >
                 <MUIDialogTitle className="title">{title}</MUIDialogTitle>
                 <MUIDialogContent className="content">{children}</MUIDialogContent>

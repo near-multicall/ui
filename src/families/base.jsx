@@ -1,5 +1,5 @@
 import { DeleteOutline, MoveDown, EditOutlined } from "@mui/icons-material";
-import { Tooltip } from "@mui/material";
+import { Tooltip } from "../components/tooltip/tooltip";
 import React, { Component } from "react";
 import { TextInput, TextInputWithUnits } from "../components/editor/elements";
 import { ArgsAccount, ArgsBig, ArgsError, ArgsJSON, ArgsString } from "../utils/args";
@@ -210,7 +210,7 @@ export class BaseTask extends Component {
             >
                 <div className="name">
                     <Tooltip
-                        title={<h1 style={{ fontSize: "12px" }}>Edit</h1>}
+                        title="Edit"
                         disableInteractive
                     >
                         <EditOutlined
@@ -223,7 +223,7 @@ export class BaseTask extends Component {
                     </Tooltip>
                     <div className="edit-pseudo"></div>
                     <Tooltip
-                        title={<h1 style={{ fontSize: "12px" }}>Clone card</h1>}
+                        title={"Clone card"}
                         disableInteractive
                     >
                         <MoveDown
@@ -236,7 +236,7 @@ export class BaseTask extends Component {
                     <div className="duplicate-pseudo"></div>
                     <h3>{name.toString()}</h3>
                     <Tooltip
-                        title={<h1 style={{ fontSize: "12px" }}>Delete</h1>}
+                        title={"Delete"}
                         disableInteractive
                     >
                         <DeleteOutline

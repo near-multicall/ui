@@ -1,9 +1,9 @@
 import React, { Component } from "react";
 import { Droppable } from "react-beautiful-dnd";
-import { Column } from "../../components.js";
+import { Column } from "../column/column.jsx";
 import "./builder.scss";
 
-export default class Builder extends Component {
+export class Builder extends Component {
     render() {
         const LAYOUT = this.props.layout; // ususally global parameter
 
