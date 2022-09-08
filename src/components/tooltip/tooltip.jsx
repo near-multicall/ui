@@ -1,6 +1,6 @@
 import { Tooltip as MuiTooltip } from "@mui/material";
 
-import "./index.scss";
+import "./tooltip.scss";
 
 export const Tooltip = ({ children, title, ...props }) => (
     <MuiTooltip

@@ -9,7 +9,7 @@ import { readFile, saveFile } from "../../utils/loader";
 import { STORAGE } from "../../utils/persistent";
 import { Dialog } from "../dialog/dialog";
 import { TextInput } from "../editor/elements";
-import { Tooltip } from "../tooltip/index.jsx";
+import { Tooltip } from "../tooltip/tooltip.jsx";
 import "./dialogs.scss";
 
 const DAPP_LOGIN_INSTRUCTIONS = [
