@@ -68,10 +68,7 @@ export const DappLoginDialog = ({ actorType, onClose, open, title }) => {
                                     placement="right"
                                     title={hint}
                                 >
-                                    <InfoOutlined
-                                        className="dapp-login-step-tooltip-icon"
-                                        fontSize="large"
-                                    />
+                                    <InfoOutlined className="icon" />
                                 </Tooltip>
                             )}
                         </span>

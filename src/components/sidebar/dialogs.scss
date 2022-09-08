@@ -1,29 +1,32 @@
 @use "sass/size";
+@use "sass/mixin";
 
 .modal-dialog {
     .MuiDialogContent-root {
         display: flex;
         flex-direction: column;
-        gap: size.$gap;
+        gap: 0.5 * size.$gap;
     }
 }
 
 .dapp-login-steps {
     display: flex;
     flex-direction: column;
-    gap: calc(size.$medium-text / 2);
-    padding: 0 20px;
+    padding: 0 size.$gap;
     list-style-type: decimal;
-    font-size: size.$medium-text;
+    font-size: size.$text;
 
     .item {
         .content {
-            display: flex;
-            align-items: center;
+            @include mixin.center-items(flex-start, center);
+            padding-left: 0.25 * size.$gap;
+            .icon {
+                padding-left: 0.5ch;
+                @include mixin.light-icon;
+            }
+        }
+        &::marker {
+            font-weight: 800;
         }
     }
-}
-
-.dapp-login-step-tooltip-icon {
-    padding-left: 8px;
 }
