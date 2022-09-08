@@ -122,6 +122,7 @@ export const LoadFromJsonDialog = ({ onClose, open }) => {
             onCancel={() => {}}
             onDone={() => readFile(uploadedFile, (json) => LAYOUT.fromBase64(json))}
             doneRename="Load"
+            disable={() => uploadedFile === null}
             {...{ onClose, open }}
         >
             <input
