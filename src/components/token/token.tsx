@@ -1,6 +1,6 @@
 import React from "react";
 
-import { NearGenericTokenIconFilled } from "../../shared/ui/components/icons/near";
+import { NearGenericTokenIconFilled } from "../../shared/ui/components/icons";
 import "./token.scss";
 
 export const TokenLabel = ({
