@@ -12,15 +12,16 @@ import { view, viewAccount } from "../../utils/wallet";
 import { useWalletSelector } from "../../contexts/walletSelectorContext";
 import { SputnikDAO, SputnikUI, ProposalKind, ProposalAction } from "../../utils/contracts/sputnik-dao";
 import { TextInput } from "../editor/elements";
+import { FungibleToken } from "../../utils/standards/fungibleToken";
 import { Table } from "../../shared/ui/components/table";
 import { PageTabs } from "../../shared/ui/components/tabs";
-import { FungibleToken } from "../../utils/standards/fungibleToken";
+import { NearProtocolFilled } from "../../shared/ui/components/icons";
 import "./dao.scss";
 
 // minimum balance a multicall instance needs for storage + state.
 const MIN_INSTANCE_BALANCE = toYocto(1); // 1 NEAR
 
-const TableHeader = ["Token", "", "Multicall", "DAO", "Total"];
+const TableHeader = ["Token", "Multicall", "DAO", "Total"];
 
 export default class DaoComponent extends Component {
     static contextType = useWalletSelector();
@@ -48,7 +49,7 @@ export default class DaoComponent extends Component {
             loading: false,
             proposed: -1,
             proposedInfo: {},
-            rowContent: null,
+            rowContent: [["...", "...", "...", "..."]],
             info: {
                 admins: [],
                 tokens: [],
@@ -141,28 +142,34 @@ export default class DaoComponent extends Component {
 
     createMulticall() {
         const { accountId } = this.context;
-
-        if (this.fee === undefined) return;
-
         const { loading, addr, dao, proposed, proposedInfo } = this.state;
         const { noContract, noDao } = this.errors;
 
-        // happens if wallet not logged in or DAO object not initialized yet
-        if (dao?.ready !== true) return <></>;
+        if (
+            this.fee === undefined ||
+            // wallet not logged in or DAO object not initialized yet
+            dao?.ready !== true
+        ) {
+            return null;
+        }
 
         const multicall = `${addr.value}.${window.nearConfig.MULTICALL_FACTORY_ADDRESS}`;
         const depo = Big(this.fee).plus(MIN_INSTANCE_BALANCE);
+
         // can user propose a FunctionCall to DAO?
         const canPropose = dao.checkUserPermission(accountId, ProposalAction.AddProposal, ProposalKind.FunctionCall);
+
         // can user vote approve a FunctionCall on the DAO?
         const canApprove = dao.checkUserPermission(accountId, ProposalAction.VoteApprove, ProposalKind.FunctionCall);
 
         const args = {
             proposal: {
                 description: `create multicall instance for this DAO at ${multicall}`,
+
                 kind: {
                     FunctionCall: {
                         receiver_id: window.nearConfig.MULTICALL_FACTORY_ADDRESS,
+
                         actions: [
                             {
                                 method_name: "create",
@@ -173,9 +180,11 @@ export default class DaoComponent extends Component {
                                             croncat_manager: window.nearConfig.CRONCAT_MANAGER_ADDRESS,
                                             job_bond: dao.policy.proposal_bond,
                                         },
+
                                         public_key: "HdJuXFRBKMEXuzEsXVscdd3aoBvEGGXDKQ3JoNhqJ4uU",
                                     })
                                 ),
+
                                 deposit: depo.toFixed(),
                                 gas: "150000000000000",
                             },
@@ -187,14 +196,18 @@ export default class DaoComponent extends Component {
 
         if (
             noContract.isBad &&
-            !noDao.isBad && // base.sputnik-dao.near does not exist
+            // base.sputnik-dao.near does not exist
+            !noDao.isBad &&
             !loading &&
-            this.lastAddr === document.querySelector(".address-container input")._valueTracker.getValue() // disappear while debouncing
+            // disappear while debouncing
+            this.lastAddr === document.querySelector(".address-container input")._valueTracker.getValue()
         ) {
-            // no create multicall proposal exists
             if (proposed === -1) {
-                // ... and user can propose FunctionCall
+                // no create multicall proposal exists
+
                 if (canPropose) {
+                    // ... and user can propose FunctionCall
+
                     return (
                         <>
                             <div className="info-text">
@@ -209,6 +222,7 @@ export default class DaoComponent extends Component {
                                 </a>
                                 {` by making a proposal.`}
                             </div>
+
                             <button
                                 className="create-multicall"
                                 onClick={() => {
@@ -219,9 +233,9 @@ export default class DaoComponent extends Component {
                             </button>
                         </>
                     );
-                }
-                // ... and user cannot propose FunctionCall
-                else {
+                } else {
+                    // ... and user cannot propose FunctionCall
+
                     return (
                         <div className="info-text">
                             {/* hint: you can use "ref-community-board-testnet" as DAO to get to this message */}
@@ -229,11 +243,12 @@ export default class DaoComponent extends Component {
                         </div>
                     );
                 }
-            }
-            // create multicall proposal exists
-            else if (proposed !== -1) {
-                // user does not have rights to VoteApprove
+            } else if (proposed !== -1) {
+                // create multicall proposal exists
+
                 if (!canApprove) {
+                    // user does not have rights to VoteApprove
+
                     return (
                         <div className="info-text">
                             {`Proposal to create a multicall exists (#${proposed}), but you have no voting permissions on this DAO.`}
@@ -247,9 +262,9 @@ export default class DaoComponent extends Component {
                             </a>
                         </div>
                     );
-                }
-                // user can VoteApprove and already voted
-                else if (proposedInfo.votes[accountId]) {
+                } else if (proposedInfo.votes[accountId]) {
+                    // user can VoteApprove and already voted
+
                     return (
                         <div className="info-text">
                             {`You have voted on creating a multicall instance for this DAO. It will be created as soon as the proposal passes voting.`}
@@ -263,9 +278,9 @@ export default class DaoComponent extends Component {
                             </a>
                         </div>
                     );
-                }
-                // user can VoteApprove and did NOT vote yet.
-                else {
+                } else {
+                    // user can VoteApprove and did NOT vote yet.
+
                     return (
                         <>
                             <div className="info-text">
@@ -279,6 +294,7 @@ export default class DaoComponent extends Component {
                                     Open on AstroDAO
                                 </a>
                             </div>
+
                             <button
                                 className="create-multicall proposal-exists"
                                 onClick={() => {
@@ -322,6 +338,72 @@ export default class DaoComponent extends Component {
         );
     }
 
+    async tokenInfo(multicall, dao) {
+        const tokenAddrList = await FungibleToken.getLikelyTokenContracts(multicall);
+        const likelyTokenList = await Promise.all(tokenAddrList.map((address) => FungibleToken.init(address)));
+        const tokenList = likelyTokenList.filter((token) => token.ready === true);
+
+        const balances = await Promise.all(
+            tokenList.map(async (token) => {
+                const [multicallBalance, daoBalance] = await Promise.all([
+                    token.ftBalanceOf(multicall),
+                    token.ftBalanceOf(dao.address),
+                ]);
+
+                return {
+                    token,
+                    multicallBalance: multicallBalance,
+                    daoBalance: daoBalance,
+                    total: Big(multicallBalance).add(daoBalance).toFixed(),
+                };
+            })
+        );
+
+        return balances.filter((el) => Big(el.total).gt("0"));
+    }
+
+    balancesToRows(multicall, dao) {
+        return this.tokenInfo(multicall, dao).then((res) =>
+            res.map(({ token, multicallBalance, daoBalance, total }) => [
+                <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <img
+                        loading="lazy"
+                        style={{ width: "32px", height: "32px" }}
+                        src={token.metadata.icon}
+                    />
+
+                    <span>{token.metadata.symbol}</span>
+                </span>,
+
+                formatTokenAmount(multicallBalance, token.metadata.decimals, 2),
+                formatTokenAmount(daoBalance, token.metadata.decimals, 2),
+                formatTokenAmount(total, token.metadata.decimals, 2),
+            ])
+        );
+    }
+
+    async nearInfo() {
+        const { addr, dao } = this.state;
+        const multicall = `${addr.value}.${window.nearConfig.MULTICALL_FACTORY_ADDRESS}`;
+        const nearBalanceMulticall = (await viewAccount(multicall)).amount;
+        const nearBalanceDao = (await viewAccount(dao.address)).amount;
+
+        return [
+            <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <NearProtocolFilled style={{ width: "32px", height: "32px" }} />
+                <span>NEAR</span>
+            </span>,
+
+            formatTokenAmount(nearBalanceMulticall, 24, 2),
+            formatTokenAmount(nearBalanceDao, 24, 2),
+            formatTokenAmount(Big(nearBalanceDao).add(nearBalanceMulticall).toFixed(), 24, 2),
+        ];
+    }
+
+    displayToken() {
+        // format to show small balances
+    }
+
     loadInfo() {
         const { addr: addrError, noContract, noDao } = this.errors;
         const { addr } = this.state;
@@ -345,127 +427,73 @@ export default class DaoComponent extends Component {
 
         this.setState({ loading: true });
 
-        let newState = {};
-
         // initialize DAO object
         SputnikDAO.init(daoAddress)
             .catch((e) => {})
-            .then((newDAO) => {
-                // DAO not ready => either no SputnikDAO contract on the chosen address
-                // or some error happened during DAO object init.
-                if (!newDAO.ready) {
+            .then((dao) => {
+                if (!dao.ready) {
+                    // DAO not ready => either no SputnikDAO contract on the chosen address
+                    // or some error happened during DAO object init.
+
                     noContract.isBad = true;
                     noDao.isBad = true;
-                    this.setState({
-                        dao: newDAO,
-                        loading: false,
-                    });
+                    this.setState({ dao, loading: false });
                     return;
-                }
-                // DAO correctly initialized, try to fetch multicall info
-                else {
+                } else {
+                    // DAO correctly initialized, try to fetch multicall info
+
                     Promise.all([
                         view(multicall, "get_admins", {}).catch((e) => {
                             if (e.type === "AccountDoesNotExist" && e.toString().includes(` ${multicall} `)) {
                                 noContract.isBad = true;
                             }
                         }),
+
                         view(multicall, "get_tokens", {}).catch((e) => {}),
                         view(multicall, "get_jobs", {}).catch((e) => {}),
                         view(multicall, "get_job_bond", {}).catch((e) => {}),
-                        this.proposalAlreadyExists(newDAO).catch((e) => {}),
-                        this.balancesToRows(multicall, newDAO).catch((e) => {}),
-                        this.nearInfo(multicall, newDAO).catch((e) => {}),
-                    ]).then(([admins, tokens, jobs, bond, createMulticallProposalInfo, rows, nearBalance]) => {
-                        const { proposal_id, proposal_info } = createMulticallProposalInfo;
-                        rows.unshift(nearBalance);
+                        this.proposalAlreadyExists(dao).catch((e) => {}),
+                        this.nearInfo(multicall, dao).catch((e) => {}),
+                        this.balancesToRows(multicall, dao).catch((e) => {}),
+                    ]).then(
+                        ([
+                            admins,
+                            tokens,
+                            jobs,
+                            bond,
+                            { proposal_id, proposal_info },
+                            nearBalances,
+                            fungibleTokenBalances,
+                        ]) =>
+                            this.setState({
+                                dao,
+                                rowContent: [nearBalances, ...fungibleTokenBalances],
 
-                        newState = {
-                            dao: newDAO,
-                            rowContent: rows,
-                            info: {
-                                admins: admins,
-                                tokens: tokens,
-                                jobs: jobs,
-                                bond: bond,
-                            },
-                            loading: false,
-                            proposed: proposal_id,
-                            proposedInfo: proposal_info,
-                        };
+                                info: {
+                                    admins: admins,
+                                    tokens: tokens,
+                                    jobs: jobs,
+                                    bond: bond,
+                                },
 
-                        // update visuals
-                        this.setState(newState);
-                    });
+                                loading: false,
+                                proposed: proposal_id,
+                                proposedInfo: proposal_info,
+                            })
+                    );
                 }
             });
-    }
-
-    async tokenInfo(multicall, dao) {
-        const tokenAddrList = await FungibleToken.getLikelyTokenContracts(multicall);
-
-        const likelyTokenList = await Promise.all(tokenAddrList.map((address) => FungibleToken.init(address)));
-
-        const tokenList = likelyTokenList.filter((tkn) => tkn.ready === true);
-
-        const balances = await Promise.all(
-            tokenList.map(async (tkn) => {
-                const [multicallBalance, daoBalance] = await Promise.all([
-                    tkn.ftBalanceOf(multicall),
-                    tkn.ftBalanceOf(dao.address),
-                ]);
-                return {
-                    token: tkn,
-                    multicallBalance: multicallBalance,
-                    daoBalance: daoBalance,
-                    total: Big(multicallBalance).add(daoBalance).toFixed(),
-                };
-            })
-        );
-
-        return balances.filter((el) => Big(el.total).gt("0"));
-    }
-
-    balancesToRows(multicall, dao) {
-        return this.tokenInfo(multicall, dao).then((res) =>
-            res.map((row) => [
-                row.token.metadata.symbol,
-                row.token.metadata.icon,
-                formatTokenAmount(row.multicallBalance, row.token.metadata.decimals, 2),
-                formatTokenAmount(row.daoBalance, row.token.metadata.decimals, 2),
-                formatTokenAmount(row.total, row.token.metadata.decimals, 2),
-            ])
-        );
-    }
-
-    async nearInfo() {
-        const { addr, dao } = this.state;
-
-        const multicall = `${addr.value}.${window.nearConfig.MULTICALL_FACTORY_ADDRESS}`;
-
-        const nearBalanceMulticall = (await viewAccount(multicall)).amount;
-        const nearBalanceDao = (await viewAccount(dao.address)).amount;
-
-        return [
-            "NEAR",
-            "https://s2.coinmarketcap.com/static/img/coins/64x64/6535.png",
-            formatTokenAmount(nearBalanceMulticall, 24, 2),
-            formatTokenAmount(nearBalanceDao, 24, 2),
-            formatTokenAmount(Big(nearBalanceDao).add(nearBalanceMulticall).toFixed(), 24, 2),
-        ];
-    }
-
-    displayToken() {
-        // format to show small balances
     }
 
     getContent() {
         const { selector: walletSelector } = this.context;
         const { info, loading, rowContent } = this.state;
 
-        // if user not logged in, remind him to sign in.
         // TODO: only require signIn when DAO has no multicall instance (to know if user can propose or vote on existing proposal to create multicall)
-        if (!walletSelector.isSignedIn()) return <div className="info-container error">Please sign in to continue</div>;
+        if (!walletSelector.isSignedIn()) {
+            // if user not logged in, remind him to sign in.
+            return <div className="info-container error">Please sign in to continue</div>;
+        }
 
         // errors to display
         const displayErrorsList = ["addr", "noDao", "noContract"];
@@ -508,17 +536,20 @@ export default class DaoComponent extends Component {
                         <div className="info-card admins">
                             <AddOutlined />
                             <h1 className="title">Admins</h1>
+
                             <ul className="list">
                                 {info.admins.map((admin) => (
                                     <li key={admin}>{this.toLink(admin)}</li>
                                 ))}
                             </ul>
                         </div>
+
                         <div className="info-card jobs">
                             <AddOutlined />
                             <h1 className="title">Jobs</h1>
                             <div className="scroll-wrapper">{info.jobs.map((j) => this.job(j))}</div>
                         </div>
+
                         <div className="info-card bond">
                             <h1 className="title">
                                 Job Bond
@@ -526,15 +557,17 @@ export default class DaoComponent extends Component {
                             </h1>
                         </div>
                     </div>,
+
                     <div className="info-container">
                         <div className="info-card tokens">
                             <h1 className="title">Token Balances</h1>
 
                             <Table
                                 header={TableHeader}
-                                rows={rowContent ?? [["...", "", "...", "...", "..."]]}
+                                rows={rowContent}
                             />
                         </div>
+
                         <div className="info-card wtokens">
                             <h1 className="title">Whitelisted Tokens</h1>
                             <ul className="list">
@@ -572,6 +605,7 @@ export default class DaoComponent extends Component {
                         }}
                     />
                 </div>
+
                 {this.getContent()}
             </div>
         );
