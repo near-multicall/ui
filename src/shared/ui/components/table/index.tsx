@@ -17,7 +17,7 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import React, { useState } from "react";
 
-import useBreakpoint from "../../hooks/useBreakpoint";
+import { useBreakpoint } from "../../lib/breakpoints";
 
 const StyledTableContainer = styled(TableContainer)({
     display: "table",

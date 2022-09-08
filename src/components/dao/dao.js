@@ -12,8 +12,8 @@ import { view, viewAccount } from "../../utils/wallet";
 import { useWalletSelector } from "../../contexts/walletSelectorContext";
 import { SputnikDAO, SputnikUI, ProposalKind, ProposalAction } from "../../utils/contracts/sputnik-dao";
 import { TextInput } from "../editor/elements";
-import { Table } from "../../func-components/Table";
-import { PageTabs } from "../../func-components/Tabs/PageTabs";
+import { Table } from "../../shared/ui/components/table";
+import { PageTabs } from "../../shared/ui/components/tabs";
 import { FungibleToken } from "../../utils/standards/fungibleToken";
 import "./dao.scss";
 
