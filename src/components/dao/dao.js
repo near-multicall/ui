@@ -328,7 +328,7 @@ export default class DaoComponent extends Component {
         noDao.isBad = false;
 
         // chosen address violates NEAR AccountId rules.
-        if (args.string().address().isValid(addr)) {
+        if (args.string().address().isValidSync(addr)) {
             noMulticall.isBad = true;
             noDao.isBad = true;
             this.setState({ proposed: -1, proposedInfo: {} });
@@ -342,9 +342,9 @@ export default class DaoComponent extends Component {
         // initialize DAO object
         Promise.all([
             SputnikDAO.init(daoAddress).catch((e) => {}),
-            noMulticall.check(multicallAddress),
-            noDao.check(daoAddress),
-        ]).then(([newDAO, noMulticallIsBad, noDaoIsBad]) => {
+            noMulticall.checkAsync(multicallAddress),
+            noDao.checkAsync(daoAddress),
+        ]).then(([newDAO, _noMulticallIsBad, _noDaoIsBad]) => {
             // DAO not ready => either no SputnikDAO contract on the chosen address
             // or some error happened during DAO object init.
             if (!newDAO.ready) {
@@ -475,7 +475,7 @@ export default class DaoComponent extends Component {
                         value={addr}
                         error={this.errors.addr}
                         update={() => {
-                            if (this.state.addr.isValid) {
+                            if (args.string().address().isValidSync(addr)) {
                                 this.loadInfoDebounced();
                             }
                             this.forceUpdate();

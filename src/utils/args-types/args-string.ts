@@ -1,4 +1,4 @@
-import { addMethod, StringSchema } from "yup";
+import { addMethod, StringSchema as _StringSchema } from "yup";
 import { hasContract } from "../contracts/generic";
 import Multicall from "../contracts/multicall";
 import { SputnikDAO } from "../contracts/sputnik-dao";
@@ -20,7 +20,7 @@ const rAddress: RegExp = /^(?=.{2,64}$)(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_]
 
 // TODO maybe yup.object().json() already does this?
 // ensure string is json interpretable
-addMethod(StringSchema, "json", function json(message = locale.string.json) {
+addMethod(_StringSchema, "json", function json(message = locale.string.json) {
     return this.test({
         name: "json",
         message,
@@ -35,7 +35,7 @@ addMethod(StringSchema, "json", function json(message = locale.string.json) {
 });
 
 // ensure string is a valid NEAR address
-addMethod(StringSchema, "address", function address(message = locale.string.address) {
+addMethod(_StringSchema, "address", function address(message = locale.string.address) {
     return this.matches(rAddress, {
         name: "address",
         message,
@@ -44,7 +44,7 @@ addMethod(StringSchema, "address", function address(message = locale.string.addr
 });
 
 // ensure string is a valid NEAR address with a contract
-addMethod(StringSchema, "contract", function contract(message = locale.string.contract) {
+addMethod(_StringSchema, "contract", function contract(message = locale.string.contract) {
     return this.address().test({
         name: "contract",
         message,
@@ -53,7 +53,7 @@ addMethod(StringSchema, "contract", function contract(message = locale.string.co
 });
 
 // ensure string is a valid NEAR address with a SputnikDAO contract
-addMethod(StringSchema, "sputnikDao", function sputnikDao(message = locale.string.sputnikDao) {
+addMethod(_StringSchema, "sputnikDao", function sputnikDao(message = locale.string.sputnikDao) {
     return this.contract().test({
         name: "sputnikDao",
         message,
@@ -62,7 +62,7 @@ addMethod(StringSchema, "sputnikDao", function sputnikDao(message = locale.strin
 });
 
 // ensure string is a valid NEAR address with a multicall contract
-addMethod(StringSchema, "multicall", function multicall(message = locale.string.multicall) {
+addMethod(_StringSchema, "multicall", function multicall(message = locale.string.multicall) {
     return this.contract().test({
         name: "multicall",
         message,
@@ -71,8 +71,8 @@ addMethod(StringSchema, "multicall", function multicall(message = locale.string.
 });
 
 // transfrom address into URL
-addMethod(StringSchema, "intoUrl", function intoUrl() {
+addMethod(_StringSchema, "intoUrl", function intoUrl() {
     return this.address().transform((value) => `https://explorer.${window.NEAR_ENV}.near.org/accounts/${value}`);
 });
 
-export { StringSchema };
+export { _StringSchema as StringSchema };

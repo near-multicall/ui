@@ -1,4 +1,4 @@
-import { addMethod, array, BaseSchema, object, ObjectSchema } from "yup";
+import { addMethod, array, BaseSchema, object, ObjectSchema as _ObjectSchema } from "yup";
 import { StringSchema } from "./args-string";
 import { BigSchema } from "./args-big";
 import { Base64 } from "js-base64";
@@ -13,7 +13,7 @@ declare module "yup" {
 }
 
 // ensure input value is valid call
-addMethod(ObjectSchema, "call", function call() {
+addMethod(_ObjectSchema, "call", function call() {
     const args = {
         string: () => new StringSchema(),
         big: () => new BigSchema(),
@@ -34,17 +34,17 @@ addMethod(ObjectSchema, "call", function call() {
 });
 
 // make json string from input value
-addMethod(ObjectSchema, "intoJsonString", function intoJsonString() {
+addMethod(_ObjectSchema, "intoJsonString", function intoJsonString() {
     return this.transform((value) => JSON.stringify(value));
 });
 
 // base64 encode input value
-addMethod(ObjectSchema, "intoBase64String", function intoBase64String() {
+addMethod(_ObjectSchema, "intoBase64String", function intoBase64String() {
     return this.transform((value) => Base64.encode(JSON.stringify(value)));
 });
 
 // base64 encode input value
-addMethod(ObjectSchema, "intoCallString", function intoCallString() {
+addMethod(_ObjectSchema, "intoCallString", function intoCallString() {
     return this.call().transform((value) => {
         const _value = value;
         _value.actions.forEach((a: { args: object | string }) => (a.args = Base64.encode(JSON.stringify(a.args))));
@@ -52,4 +52,4 @@ addMethod(ObjectSchema, "intoCallString", function intoCallString() {
     });
 });
 
-export { ObjectSchema };
+export { _ObjectSchema as ObjectSchema };

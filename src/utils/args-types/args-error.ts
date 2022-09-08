@@ -22,19 +22,40 @@ class ArgsError {
     error: ValidationError | null = null;
     customMessage: string | null = null;
     message: string = "";
-    check: (value: any, validateOptions: ValidateOptions) => Promise<boolean>;
+    checkAsync: (value: any, validateOptions: ValidateOptions) => Promise<boolean>;
+    check: (value: any, validateOptions: ValidateOptions) => boolean;
 
     constructor(schema: AnySchema | null, options?: ArgsErrorOptions) {
         if (options && options.customMessage) this.customMessage = options.customMessage;
         if (options && options.initial) this.isBad = options.initial;
-        if (options && options.dummy)
-            this.check = () => {
+        if (options && options.dummy) {
+            this.check = (_value: any, _validateOptions: ValidateOptions) => {
+                this.error = new ValidationError("dummy");
+                this.message = this.customMessage ?? this.error.message;
+                return this.isBad;
+            };
+            this.checkAsync = (_value: any, _validateOptions: ValidateOptions) => {
                 this.error = new ValidationError("dummy");
                 this.message = this.customMessage ?? this.error.message;
                 return Promise.resolve(this.isBad);
             };
-        else
-            this.check = async (value: any, validateOptions: ValidateOptions) => {
+        } else {
+            this.check = (value: any, validateOptions: ValidateOptions) => {
+                try {
+                    schema!.validateSync(value, validateOptions);
+                    this.error = null;
+                    this.isBad = false;
+                    this.message = "";
+                } catch (e: any) {
+                    if (e instanceof ValidationError) {
+                        this.error = e;
+                        this.isBad = true;
+                        this.message = this.customMessage ?? this.error.message;
+                    }
+                }
+                return this.isBad;
+            };
+            this.checkAsync = async (value: any, validateOptions: ValidateOptions) => {
                 try {
                     await schema!.validate(value, validateOptions);
                     this.error = null;
@@ -49,6 +70,7 @@ class ArgsError {
                 }
                 return this.isBad;
             };
+        }
     }
 }
 
