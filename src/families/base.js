@@ -10,7 +10,7 @@ import { hasContract } from "../utils/contracts/generic";
 import debounce from "lodash.debounce";
 import "./base.scss";
 
-export default class BaseTask extends Component {
+export class BaseTask extends Component {
     uniqueClassName = "base-task";
     call;
     loadErrors;
