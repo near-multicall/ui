@@ -1,9 +1,9 @@
 import React, { Component } from "react";
 import { Draggable } from "react-beautiful-dnd";
-import { Family } from "../../components";
+import { Family } from "../../families/index.js";
 import "./task.scss";
 
-export default class Task extends Component {
+export class Task extends Component {
     id;
 
     constructor(props) {

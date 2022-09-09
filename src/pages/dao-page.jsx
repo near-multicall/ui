@@ -1,7 +1,7 @@
 import React from "react";
 import { Dao, Sidebar } from "../components.js";
 
-export default function DaoPage() {
+export const DaoPage = () => {
     window.PAGE = "dao";
 
     // TODO: remove "full" prop
@@ -11,4 +11,4 @@ export default function DaoPage() {
             <Dao />
         </>
     );
-}
+};

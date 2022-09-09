@@ -24,7 +24,7 @@ const MIN_INSTANCE_BALANCE = toYocto(1); // 1 NEAR
 
 const TableHeader = ["Token", "Multicall", "DAO", "Total"];
 
-export default class DaoComponent extends Component {
+export class Dao extends Component {
     static contextType = useWalletSelector();
 
     errors = {

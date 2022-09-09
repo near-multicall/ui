@@ -1,10 +1,15 @@
 @use "sass/size";
 @use "sass/color";
 @use "sass/font";
+@use "sass/mixin";
 
 .dialog {
     .title {
         font-size: size.$large-text;
+        font-weight: 800;
+        font-family: font.$text;
+        padding: size.$gap;
+        padding-bottom: 0.5 * size.$gap;
     }
     .MuiPaper-root {
         background-color: color.$black;
@@ -13,6 +18,9 @@
         font-size: size.$text;
     }
     .content {
+        display: flex;
+        flex-flow: column nowrap;
+        gap: 0.5 * size.$gap;
         .MuiTextField-root {
             width: 100%;
         }
@@ -27,6 +35,10 @@
         }
     }
     .action {
+        @include mixin.center-items(space-between, center);
+        flex-flow: row nowrap;
+        padding: size.$gap;
+        padding-top: 0;
         button {
             font-size: size.$text;
             border-radius: size.$task-radius;

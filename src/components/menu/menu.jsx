@@ -1,9 +1,11 @@
 import React, { Component } from "react";
 import Icon from "@mui/material/Icon";
-import { Builder, Editor, Export } from "../../components";
+import { Builder } from "../builder/builder.jsx";
+import { Editor } from "../editor/editor.jsx";
+import { Export } from "../export/export.jsx";
 import "./menu.scss";
 
-export default class Menu extends Component {
+export class Menu extends Component {
     constructor(props) {
         super(props);
 

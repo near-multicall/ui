@@ -1,14 +1,12 @@
-import Layout from "./components/layout/layout.js";
-import Column from "./components/column/column.js";
-import Task from "./components/task/task.js";
-import Menu from "./components/menu/menu.js";
-import Builder from "./components/builder/builder.js";
-import Editor from "./components/editor/editor.js";
-import Export from "./components/export/export.js";
-import Wallet from "./components/wallet/wallet.js";
-import Sidebar from "./components/sidebar/sidebar.js";
-import Dao from "./components/dao/dao.js";
-
-import * as Family from "./families/families.js";
-
-export { Layout, Column, Task, Menu, Builder, Editor, Export, Wallet, Sidebar, Dao, Family };
+export { Layout } from "./components/layout/layout.jsx";
+export { Column } from "./components/column/column.jsx";
+export { Task } from "./components/task/task.jsx";
+export { Menu } from "./components/menu/menu.jsx";
+export { Builder } from "./components/builder/builder.jsx";
+export { Editor } from "./components/editor/editor.jsx";
+export { Export } from "./components/export/export.jsx";
+export { Wallet } from "./components/wallet/wallet.jsx";
+export { Sidebar } from "./components/sidebar/sidebar.jsx";
+export { Dao } from "./components/dao/dao.jsx";
+export { Tooltip } from "./components/tooltip/tooltip.jsx";
+export { PopupMenu } from "./components/popup-menu/popup-menu.jsx";
