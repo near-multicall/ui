@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { Multicall } from "../utils/contracts/multicall";
 import { map, distinctUntilChanged } from "rxjs";
 import { setupWalletSelector } from "@near-wallet-selector/core";
 import type { WalletSelector, AccountState } from "@near-wallet-selector/core";
@@ -59,7 +60,7 @@ export const WalletSelectorContextProvider: React.FC<any> = ({ children }) => {
             ],
         });
         const _modal = setupModal(_selector, {
-            contractId: window.nearConfig.MULTICALL_FACTORY_ADDRESS,
+            contractId: Multicall.FACTORY_ADDRESS,
             theme: "dark",
         });
         const state = _selector.store.getState();

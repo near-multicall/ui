@@ -26,7 +26,7 @@ type JobSchema = {
     start_at: string; // string encoded number (u64)
     run_count: number;
     is_active: boolean;
-    multicalls: object[]; // object schema here is MulticallArgs (TODO: add MulticallArgs schema)
+    multicalls: MulticallArgs[];
 };
 
 type FunctionCall = {

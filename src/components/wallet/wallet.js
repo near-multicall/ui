@@ -5,6 +5,7 @@ import { view } from "../../utils/wallet";
 import { STORAGE } from "../../utils/persistent";
 import { useWalletSelector } from "../../contexts/walletSelectorContext";
 import { SputnikDAO, ProposalKind, ProposalAction } from "../../utils/contracts/sputnik-dao";
+import { Multicall } from "../../utils/contracts/multicall";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
 import { Icon } from "@mui/material";
@@ -72,7 +73,7 @@ export default class Wallet extends Component {
         });
     }
 
-    connectDao(dao) {
+    connectDao(daoAddress) {
         const { accountId } = this.context;
 
         const { noDao, noRights, noContract } = this.errors;
@@ -81,35 +82,27 @@ export default class Wallet extends Component {
         noDao.isBad = false;
         noContract.isBad = false;
 
-        const multicall = dao.replace(SputnikDAO.FACTORY_ADDRESS, window.nearConfig.MULTICALL_FACTORY_ADDRESS);
+        const multicallAddress = daoAddress.replace(SputnikDAO.FACTORY_ADDRESS, Multicall.FACTORY_ADDRESS);
 
         Promise.all([
-            SputnikDAO.init(dao).catch((e) => {}),
-            view(multicall, "get_admins", {}).catch((e) => {
-                if (
-                    (e.type === "AccountDoesNotExist" && e.toString().includes(` ${multicall} `)) ||
-                    (e.type === "CodeDoesNotExist" && e.toString().includes(`${multicall}`)) ||
-                    e.toString().includes("MethodNotFound")
-                )
-                    noContract.isBad = true;
-                else console.error(e, { ...e });
-
-                window.MENU?.forceUpdate();
-            }),
+            // on failure return non-initialized DAO instance (per default: ready = false)
+            SputnikDAO.init(daoAddress).catch((e) => new SputnikDAO(daoAddress)),
+            Multicall.isMulticall(multicallAddress).catch((e) => false),
         ])
-            .then(([initializedDAO, admins]) => {
-                if (!initializedDAO.ready) {
-                    noDao.isBad = true;
+            .then(([newDAO, hasMulticall]) => {
+                if (!newDAO.ready || !hasMulticall) {
+                    noDao.isBad = !newDAO.ready;
+                    noContract.isBad = !hasMulticall;
                     MENU.forceUpdate();
                     return;
                 }
 
                 this.setState({
-                    currentDAO: initializedDAO,
+                    currentDAO: newDAO,
                 });
 
                 // can user propose FunctionCall to DAO?
-                const canPropose = initializedDAO.checkUserPermission(
+                const canPropose = newDAO.checkUserPermission(
                     accountId,
                     ProposalAction.AddProposal,
                     ProposalKind.FunctionCall
@@ -122,7 +115,7 @@ export default class Wallet extends Component {
             .finally(() => {
                 let color = "red";
 
-                if (ArgsAccount.isValid(dao) && !noDao.isBad) color = "yellow";
+                if (ArgsAccount.isValid(daoAddress) && !noDao.isBad) color = "yellow";
 
                 if (!noContract.isBad) color = "";
 
@@ -224,7 +217,7 @@ export default class Wallet extends Component {
                                 STORAGE.addresses.dao = newValue ?? "";
                                 STORAGE.addresses.multicall = newValue?.replace(
                                     SputnikDAO.FACTORY_ADDRESS,
-                                    window.nearConfig.MULTICALL_FACTORY_ADDRESS
+                                    Multicall.FACTORY_ADDRESS
                                 );
                                 this.daoSearchDebounced(newValue);
                             }}
