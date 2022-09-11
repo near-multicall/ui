@@ -52,7 +52,7 @@ export class Dao extends Component {
             loading: false,
             proposed: -1,
             proposedInfo: {},
-            rowContent: [["...", "...", "...", "..."]],
+            fungibleTokenBalances: [["...", "...", "...", "..."]],
             info: {
                 admins: [],
                 tokens: [],
@@ -456,12 +456,12 @@ export class Dao extends Component {
                             jobs,
                             bond,
                             { proposal_id, proposal_info },
-                            nearBalances,
-                            fungibleTokenBalances,
+                            nearTokenBalances,
+                            customTokensBalances,
                         ]) =>
                             this.setState({
                                 dao,
-                                rowContent: [nearBalances, ...fungibleTokenBalances],
+                                fungibleTokenBalances: [nearTokenBalances, ...customTokensBalances],
 
                                 info: {
                                     admins: admins,
@@ -481,7 +481,7 @@ export class Dao extends Component {
 
     getContent() {
         const { selector: walletSelector } = this.context;
-        const { info, loading, rowContent } = this.state;
+        const { info, loading, fungibleTokenBalances } = this.state;
 
         // TODO: only require signIn when DAO has no multicall instance (to know if user can propose or vote on existing proposal to create multicall)
         if (!walletSelector.isSignedIn()) {
@@ -569,7 +569,7 @@ export class Dao extends Component {
 
                                 <Table
                                     header={TableHeader}
-                                    rows={rowContent}
+                                    rows={fungibleTokenBalances}
                                 />
                             </div>
                         </div>
