@@ -1,118 +1,68 @@
-import { Tabs as MuiTabs, Tab, Box, TabProps } from "@mui/material";
-import React, { useCallback } from "react";
+import { Tabs as MuiTabs, Tab, Box } from "@mui/material";
+import clsx from "clsx";
+import React, { Fragment, useCallback } from "react";
 
 interface Props {
     titles: string[] | JSX.Element[];
-    contents: React.ReactNode[];
-    customCurrentTab?: number;
-    customOnChange?: (val: number) => void;
-    CustomTab?: React.FC<TabProps & { selected?: boolean }>;
-    tabPadding?: string;
+    content: React.ReactNode[];
     fontWeight?: number;
 }
 
-const TabPanel = ({ children, value, index }: { children: React.ReactNode; value: number; index: number }) => (
-    <div hidden={value !== index}>{value === index && children}</div>
-);
-
-const CustomTab = (props: TabProps) => (
-    <Tab
-        {...props}
-        sx={{
-            width: 116,
-            height: 44,
-            ml: "19px",
-            mb: "35px",
-            mt: "20px",
-            fontFamily: "Titillium Web",
-            fontWeight: "bold",
-            textTransform: "none",
-            borderRadius: 1,
-            background: "transparent",
-            color: "#e0e0e0",
-            fontSize: "16px",
-            border: "1px solid #e0e0e0 ",
-            opacity: 1,
-
-            "&.Mui-selected": {
-                background: "#A4BAB8",
-                color: "#2a2a2a",
-                borderColor: "#000000",
-            },
-        }}
-    />
-);
-
-export const Tabs = ({ titles, contents, customCurrentTab, customOnChange, tabPadding, CustomTab }: Props) => {
-    const [value, setValue] = React.useState(0);
+export const Tabs = ({ titles, content }: Props) => {
+    const [activeТаbIndex, activeTabSwitch] = React.useState(0);
 
     const onChange = useCallback(
-        (e: React.ChangeEvent<any>, value: any) => {
-            customOnChange ? customOnChange(value) : setValue(value);
-        },
-        [customOnChange]
+        (_event: React.ChangeEvent<any>, value: any) => activeTabSwitch(value),
+        [activeTabSwitch]
     );
 
     return (
         <Box sx={{ width: "100%" }}>
-            <Box sx={CustomTab ? undefined : { borderBottom: 1, borderColor: "divider" }}>
+            <Box>
                 <MuiTabs
                     allowScrollButtonsMobile
                     scrollButtons="auto"
-                    value={customCurrentTab !== undefined ? customCurrentTab : value}
-                    onChange={onChange}
                     sx={{ mb: -1, marginRight: 0 }}
-                    TabIndicatorProps={CustomTab ? { style: { display: "none" } } : undefined}
+                    TabIndicatorProps={{ style: { display: "none" } }}
+                    value={activeТаbIndex}
+                    {...{ onChange }}
                 >
-                    {CustomTab
-                        ? titles.map((tab, idx) => (
-                              <CustomTab
-                                  key={idx}
-                                  label={tab}
-                              />
-                          ))
-                        : titles.map((tab, idx) => (
-                              <Tab
-                                  disableRipple
-                                  key={idx}
-                                  label={tab}
-                                  sx={{
-                                      minWidth: "fit-content",
-                                      fontSize: { xs: 16 },
-                                      fontFamily: "Titillium Web",
-                                      fontWeight: "bold",
-                                      padding: tabPadding,
-                                      mr: { xs: 23, md: 28 },
-                                      textTransform: "none",
-                                      color: (theme) => theme.palette.text.primary,
-                                      opacity: 0.4,
-                                      "&.Mui-selected": {
-                                          color: (theme) => theme.palette.text.primary,
-                                          opacity: 1,
-                                      },
-                                  }}
-                              />
-                          ))}
+                    {titles.map((title, index) => (
+                        <Tab
+                            disableRipple
+                            key={index}
+                            label={title}
+                            sx={{
+                                width: 116,
+                                height: 44,
+                                ml: "19px",
+                                mb: "35px",
+                                mt: "20px",
+                                fontFamily: "Titillium Web",
+                                fontWeight: "bold",
+                                textTransform: "none",
+                                borderRadius: 1,
+                                background: "transparent",
+                                color: "#e0e0e0",
+                                fontSize: "16px",
+                                border: "1px solid #e0e0e0 ",
+                                opacity: 1,
+
+                                "&.Mui-selected": {
+                                    background: "#A4BAB8",
+                                    color: "#2a2a2a",
+                                    borderColor: "#000000",
+                                },
+                            }}
+                        />
+                    ))}
                 </MuiTabs>
             </Box>
 
-            {contents.map((content, idx) => (
-                <TabPanel
-                    value={customCurrentTab !== undefined ? customCurrentTab : value}
-                    index={idx}
-                    key={idx}
-                >
-                    {content}
-                </TabPanel>
-            ))}
+            {content.map(
+                (tabPanelContent, tabIndex) =>
+                    activeТаbIndex === tabIndex && <Fragment key={tabIndex}>{tabPanelContent}</Fragment>
+            )}
         </Box>
     );
 };
-
-export const PageTabs = ({ contents }: { contents: JSX.Element[] }) => (
-    <Tabs
-        titles={["Multicall", "DAO"]}
-        contents={contents}
-        CustomTab={CustomTab}
-    />
-);
