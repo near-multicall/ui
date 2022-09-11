@@ -43,9 +43,9 @@ export const Tabs = ({ titles, content }: Props) => {
                                 textTransform: "none",
                                 borderRadius: 1,
                                 background: "transparent",
-                                color: "#e0e0e0",
+                                color: "#2a2a2a",
                                 fontSize: "16px",
-                                border: "1px solid #e0e0e0 ",
+                                border: "1px solid #A4BAB8",
                                 opacity: 1,
 
                                 "&.Mui-selected": {
