@@ -36,14 +36,18 @@ export const DappLoginDialog = ({ actorType, onClose, open, title }) => {
     const dAppURL = useMemo(() => new ArgsString(""), []);
     const dAppURLError = useMemo(() => new ArgsError("Invalid URL", ({ value }) => new URL(value), true), []);
 
-    const requestParams =
-        `account_id=${STORAGE.addresses[actorType]}` +
-        `&public_key=ed25519%3ADEaoD65LomNHAMzhNZva15LC85ntwBHdcTbCnZRXciZH` +
-        `&all_keys=ed25519%3A9jeqkc8ybv7aYSA7uLNFUEn8cgKo759yue4771bBWsSr`;
+    const accountIdParam = STORAGE.addresses[actorType];
 
-    const [requestURL, requestURLUpdate] = useReducer((currentValue, event) =>
-        dAppURLError.isBad ? currentValue : new URL(event.target.value).origin + "/?" + requestParams
-    );
+    const [requestURL, requestURLUpdate] = useReducer((currentValue, event) => {
+        if (dAppURLError.isBad) return currentValue;
+        else {
+            const url = new URL(event.target.value);
+            url.searchParams.set("account_id", accountIdParam);
+            url.searchParams.set("public_key", "ed25519%3ADEaoD65LomNHAMzhNZva15LC85ntwBHdcTbCnZRXciZH");
+            url.searchParams.set("all_keys", "ed25519%3A9jeqkc8ybv7aYSA7uLNFUEn8cgKo759yue4771bBWsSr");
+            return url.toString();
+        }
+    });
 
     return (
         <Dialog
