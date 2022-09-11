@@ -355,14 +355,15 @@ const Row = ({
                         : undefined
                 }
             >
-                {row.map((content, index) => (
-                    <TableCell
-                        sx={{ fontFamily: "Titillium Web" }}
-                        key={index}
-                    >
-                        {content}
-                    </TableCell>
-                ))}
+                {row &&
+                    row.map((content, index) => (
+                        <TableCell
+                            sx={{ fontFamily: "Titillium Web" }}
+                            key={index}
+                        >
+                            {content}
+                        </TableCell>
+                    ))}
 
                 {collapsible && (
                     <TableCell>
@@ -382,7 +383,7 @@ const Row = ({
                 <TableRow>
                     <TableCell
                         style={{ padding: 0 }}
-                        colSpan={row.length + 5}
+                        colSpan={(row ? row.length : 0) + 5}
                     >
                         <Collapse
                             in={isOpen}
