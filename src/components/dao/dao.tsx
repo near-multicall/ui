@@ -1,4 +1,4 @@
-import { InputAdornment } from "@mui/material";
+import { InputAdornment, Tab, TabProps } from "@mui/material";
 import { DeleteOutline, EditOutlined, AddOutlined, PauseOutlined, PlayArrowOutlined } from "@mui/icons-material";
 import { Base64 } from "js-base64";
 import debounce from "lodash.debounce";
@@ -15,9 +15,11 @@ import { SputnikDAO, SputnikUI, ProposalKind, ProposalAction } from "../../utils
 import { TextInput } from "../editor/elements";
 import { FungibleToken } from "../../utils/standards/fungibleToken";
 import { Table } from "../../shared/ui/components/table";
-import { PageTabs } from "../../shared/ui/components/tabs";
+import { Tabs } from "../../shared/ui/components/tabs";
 import { NearIconFilled } from "../../shared/ui/components/icons";
 import "./dao.scss";
+import "./funds.scss";
+import "./multicall.scss";
 
 // minimum balance a multicall instance needs for storage + state.
 const MIN_INSTANCE_BALANCE = toYocto(1); // 1 NEAR
@@ -445,7 +447,7 @@ export class Dao extends Component {
                         view(multicall, "get_jobs", {}).catch((e) => {}),
                         view(multicall, "get_job_bond", {}).catch((e) => {}),
                         this.proposalAlreadyExists(dao).catch((e) => {}),
-                        this.nearInfo(multicall, dao).catch((e) => {}),
+                        this.nearInfo().catch((e) => {}),
                         this.balancesToRows(multicall, dao).catch((e) => {}),
                     ]).then(
                         ([
@@ -483,12 +485,11 @@ export class Dao extends Component {
 
         // TODO: only require signIn when DAO has no multicall instance (to know if user can propose or vote on existing proposal to create multicall)
         if (!walletSelector.isSignedIn()) {
-            // if user not logged in, remind him to sign in.
             return <div className="info-container error">Please sign in to continue</div>;
         }
 
-        // errors to display
         const displayErrorsList = ["addr", "noDao", "noContract"];
+
         const displayErrors = Object.keys(this.errors)
             .filter((e) => this.errors[e].isBad && displayErrorsList.includes(e))
             .map((e) => (
@@ -511,7 +512,6 @@ export class Dao extends Component {
                 </>
             );
 
-        // loading ...
         if (loading) return <div className="info-container loader"></div>;
 
         // everything should be loaded
@@ -520,55 +520,60 @@ export class Dao extends Component {
             return <div className="info-container error">Unexpected error! Multicall might be outdated.</div>;
         }
 
-        // info found
         return (
-            <PageTabs
-                contents={[
-                    <div className="info-container">
-                        <div className="info-card admins">
-                            <AddOutlined />
-                            <h1 className="title">Admins</h1>
+            <Tabs
+                titles={["Multicall", "Funds"]}
+                content={[
+                    <section className="multicall-tab content">
+                        <div className="info-container">
+                            <div className="info-card admins">
+                                <AddOutlined />
+                                <h1 className="title">Admins</h1>
 
-                            <ul className="list">
-                                {info.admins.map((admin) => (
-                                    <li key={admin}>{this.toLink(admin)}</li>
-                                ))}
-                            </ul>
+                                <ul className="list">
+                                    {info.admins.map((admin) => (
+                                        <li key={admin}>{this.toLink(admin)}</li>
+                                    ))}
+                                </ul>
+                            </div>
+
+                            <div className="info-card token-whitelist">
+                                <h1 className="title">Whitelisted Tokens</h1>
+
+                                <ul className="list">
+                                    {info.tokens.map((token) => (
+                                        <li key={token}>{this.toLink(token)}</li>
+                                    ))}
+                                </ul>
+                            </div>
+
+                            <div className="info-card jobs">
+                                <AddOutlined />
+                                <h1 className="title">Jobs</h1>
+                                <div className="scroll-wrapper">{info.jobs.map((j) => this.job(j))}</div>
+                            </div>
+
+                            <div className="info-card job-bond">
+                                <h1 className="title">
+                                    Job Bond
+                                    <span>{`${info.bond !== "..." ? toNEAR(info.bond) : "..."} Ⓝ`}</span>
+                                </h1>
+                            </div>
                         </div>
+                    </section>,
 
-                        <div className="info-card wtokens">
-                            <h1 className="title">Whitelisted Tokens</h1>
-                            <ul className="list">
-                                {info.tokens.map((token) => (
-                                    <li key={token}>{this.toLink(token)}</li>
-                                ))}
-                            </ul>
+                    <section className="funds-tab content">
+                        <div className="info-container">
+                            <div className="info-card tokens">
+                                <h1 className="title">Fungible Token Balances</h1>
+
+                                <Table
+                                    header={TableHeader}
+                                    rows={rowContent}
+                                />
+                            </div>
                         </div>
-
-                        <div className="info-card jobs">
-                            <AddOutlined />
-                            <h1 className="title">Jobs</h1>
-                            <div className="scroll-wrapper">{info.jobs.map((j) => this.job(j))}</div>
-                        </div>
-
-                        <div className="info-card bond">
-                            <h1 className="title">
-                                Job Bond
-                                <span>{`${info.bond !== "..." ? toNEAR(info.bond) : "..."} Ⓝ`}</span>
-                            </h1>
-                        </div>
-                    </div>,
-
-                    <div className="info-container">
-                        <div className="info-card tokens">
-                            <h1 className="title">Token Balances</h1>
-
-                            <Table
-                                header={TableHeader}
-                                rows={rowContent}
-                            />
-                        </div>
-                    </div>,
+                    </section>,
                 ]}
             />
         );

@@ -1,0 +1,19 @@
+@use "sass/color";
+@use "sass/font";
+@use "sass/mixin";
+@use "sass/size";
+
+.funds-tab {
+    &.content {
+        @include mixin.center-items(center, initial);
+
+        .info-container {
+            grid-template: "balances" 1fr / 1fr;
+        }
+
+        .balances {
+            grid-area: balances;
+            padding-bottom: size.$gap;
+        }
+    }
+}

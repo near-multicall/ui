@@ -7,6 +7,6 @@ export { Editor } from "./components/editor/editor.jsx";
 export { Export } from "./components/export/export.jsx";
 export { Wallet } from "./components/wallet/wallet.jsx";
 export { Sidebar } from "./components/sidebar/sidebar.jsx";
-export { Dao } from "./components/dao/dao.jsx";
+export { Dao } from "./components/dao/dao.tsx";
 export { Tooltip } from "./components/tooltip/tooltip.jsx";
 export { PopupMenu } from "./components/popup-menu/popup-menu.jsx";
