@@ -45,7 +45,7 @@ export default abstract class Args {
 
     static equals = (oneInstance: Args, anotherInstance: Args) => oneInstance.value === anotherInstance.value;
 
-    equals = (anotherInstance: Args) => Args.equals(this.value, anotherInstance.value);
+    equals = (anotherInstance: Args) => Args.equals(this, anotherInstance);
 
     toString = () => this.value.toString();
 
