@@ -5,7 +5,7 @@ import debounce from "lodash.debounce";
 import * as nearAPI from "near-api-js";
 import React, { Component } from "react";
 
-import { TokenLabel } from "../token/token";
+import { TokenLabel } from "../../shared/ui/components/token-label/token-label";
 import { ArgsAccount, ArgsError } from "../../utils/args";
 import { STORAGE } from "../../utils/persistent";
 import { toNEAR, toYocto, Big, formatTokenAmount } from "../../utils/converter";
@@ -16,7 +16,6 @@ import { TextInput } from "../editor/elements";
 import { FungibleToken } from "../../utils/standards/fungibleToken";
 import { Table } from "../../shared/ui/components/table";
 import { Tabs } from "../../shared/ui/components/tabs";
-import { NearIconFilled } from "../../shared/ui/components/icons";
 import "./dao.scss";
 import "./funds.scss";
 import "./multicall.scss";
@@ -348,11 +347,7 @@ export class Dao extends Component {
         const nearBalanceDao = (await viewAccount(dao.address)).amount;
 
         return [
-            <TokenLabel
-                icon={<NearIconFilled />}
-                symbol="NEAR"
-            />,
-
+            <TokenLabel native />,
             formatTokenAmount(nearBalanceMulticall, 24, 2),
             formatTokenAmount(nearBalanceDao, 24, 2),
             formatTokenAmount(Big(nearBalanceDao).add(nearBalanceMulticall).toFixed(), 24, 2),
@@ -384,8 +379,8 @@ export class Dao extends Component {
     }
 
     balancesToRows(multicall, dao) {
-        return this.tokenInfo(multicall, dao).then((res) =>
-            res.map(({ token, multicallBalance, daoBalance, total }) => [
+        return this.tokenInfo(multicall, dao).then((response) =>
+            response.map(({ token, multicallBalance, daoBalance, total }) => [
                 <TokenLabel {...token.metadata} />,
                 formatTokenAmount(multicallBalance, token.metadata.decimals, 2),
                 formatTokenAmount(daoBalance, token.metadata.decimals, 2),
