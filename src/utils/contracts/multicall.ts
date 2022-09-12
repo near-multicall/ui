@@ -19,10 +19,10 @@ export default class Multicall {
     static FACTORY_ADDRESS: string = FACTORY_ADDRESS_SELECTOR[window.NEAR_ENV];
     static CONTRACT_CODE_HASHES: string[] = CONTRACT_CODE_HASHES_SELECTOR[window.NEAR_ENV];
 
-    MULTICALL_ADDRESS: string;
+    address: string;
 
     constructor(multicall_address: string) {
-        this.MULTICALL_ADDRESS = multicall_address;
+        this.address = multicall_address;
     }
 
     /**
