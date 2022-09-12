@@ -1,1 +1,1 @@
-export { FungibleTokenBalances } from "./fungible";
+export { FungibleTokenBalances } from "./ui/fungible";
