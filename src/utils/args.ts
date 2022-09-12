@@ -1,5 +1,6 @@
 import { unitToDecimals, SIMPLE_NUM_REGEX, convert, Big } from "./converter";
 import { BigSource } from "big.js";
+import { SputnikDAO } from "./contracts/sputnik-dao";
 
 export default abstract class Args {
     private types = {
@@ -42,6 +43,10 @@ export default abstract class Args {
         this.decimals = decimals;
     }
 
+    static equals = (oneInstance: Args, anotherInstance: Args) => oneInstance.value === anotherInstance.value;
+
+    equals = (anotherInstance: Args) => Args.equals(this.value, anotherInstance.value);
+
     toString = () => this.value.toString();
 
     getUnit = (): {} => ({
@@ -63,6 +68,20 @@ class ArgsAccount extends Args {
     constructor(value: string) {
         super("string", value);
     }
+
+    static getSubAccountAddress = (address: string) => {
+        let result;
+
+        if (address.endsWith("." + SputnikDAO.FACTORY_ADDRESS))
+            result = address.split("." + SputnikDAO.FACTORY_ADDRESS)[0];
+        else if (address.endsWith("." + window.nearConfig.MULTICALL_FACTORY_ADDRESS))
+            result = address.split("." + window.nearConfig.MULTICALL_FACTORY_ADDRESS)[0];
+        else result = address;
+
+        return new ArgsAccount(result);
+    };
+
+    getSubAccountAddress = () => ArgsAccount.getSubAccountAddress(this.value);
 
     static isValid = (value: ArgsAccount | string): boolean => {
         if (typeof value === "string") {
