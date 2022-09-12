@@ -15,7 +15,7 @@ const CONTRACT_CODE_HASHES_SELECTOR: Record<string, string[]> = {
     ],
 };
 
-export default class Multicall {
+export class Multicall {
     static FACTORY_ADDRESS: string = FACTORY_ADDRESS_SELECTOR[window.NEAR_ENV];
     static CONTRACT_CODE_HASHES: string[] = CONTRACT_CODE_HASHES_SELECTOR[window.NEAR_ENV];
 
