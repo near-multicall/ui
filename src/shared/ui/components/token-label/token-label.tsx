@@ -4,7 +4,7 @@ import { NearGenericTokenIconFilled, NearIconFilled } from "../icons";
 import "./token-label.scss";
 
 export const TokenLabel = ({
-    icon = <NearGenericTokenIconFilled />,
+    icon,
     native,
     symbol,
 }: {
@@ -20,7 +20,7 @@ export const TokenLabel = ({
                 src={icon}
             />
         ) : (
-            <span className="icon">{native ? <NearIconFilled /> : icon}</span>
+            <span className="icon">{native ? <NearIconFilled /> : icon || <NearGenericTokenIconFilled />}</span>
         )}
 
         <span className="symbol">{native ? "NEAR" : symbol}</span>
