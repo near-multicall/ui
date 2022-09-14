@@ -187,7 +187,7 @@ export const Table = ({
 }: {
     sortHeaders?: string[];
     header: string[];
-    rows: (string | number | JSX.Element)[][];
+    rows: ((string | number | JSX.Element)[] | null)[];
     variant?: "outlined" | "grey";
     collapsible?: boolean;
     hiddenParts?: JSX.Element[];
@@ -226,7 +226,7 @@ export const Table = ({
                                             sx={{ color: (theme) => theme.palette.text.secondary }}
                                             component="div"
                                         >
-                                            {data[index] ?? null}
+                                            {data && data[index]}
                                         </Typography>
 
                                         {collapsible && index + 1 === header.length && (
