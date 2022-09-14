@@ -71,16 +71,18 @@
 }
 
 .loader {
-    display: inline-block;
-    width: 80px;
-    height: 80px;
+    display: flex;
+    align-self: center;
+    align-items: center;
+    justify-content: center;
+    width: 100px;
+    height: 100px;
     &::after {
         content: " ";
         display: block;
         width: 64px;
         height: 64px;
-        margin: 8px;
-        border-radius: 50%;
+        border-radius: 100%;
         border: 6px solid color.$lightish;
         border-color: color.$lightish transparent color.$lightish transparent;
         animation: lds-dual-ring 1.2s linear infinite;

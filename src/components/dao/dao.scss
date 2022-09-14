@@ -73,8 +73,7 @@
         padding: size.$gap;
         max-width: 1024px;
 
-        &.error,
-        &.loader {
+        &.error {
             display: flex;
             flex-flow: column;
             align-self: center;
