@@ -15,6 +15,7 @@ import Github from "../../assets/github.svg";
 import Twitter from "../../assets/twitter.svg";
 import { Wallet } from "../wallet/wallet.jsx";
 import { STORAGE } from "../../utils/persistent";
+import { viewAccount } from "../../utils/wallet";
 import { PopupMenu } from "../popup-menu/popup-menu.jsx";
 import { Tooltip } from "../tooltip/tooltip";
 
@@ -38,6 +39,11 @@ export class Sidebar extends Component {
         super(props);
 
         this.state = {
+            featureFlags: {
+                daoDappLogin: true,
+                multicallDappLogin: false,
+            },
+
             dialogs: {
                 saveAsJSON: false,
                 loadFromJSON: false,
@@ -51,6 +57,10 @@ export class Sidebar extends Component {
 
     componentDidMount() {
         window.SIDEBAR = this;
+
+        viewAccount(STORAGE.addresses.multicall)
+            .then(() => this.setState({ featureFlags: { ...this.state.featureFlags, multicallDappLogin: true } }))
+            .catch(() => this.setState({ featureFlags: { ...this.state.featureFlags, multicallDappLogin: false } }));
     }
 
     openDialog(name) {
@@ -136,6 +146,7 @@ export class Sidebar extends Component {
                     <PopupMenu
                         icon={<PreviewOutlined />}
                         items={Object.values(DAPP_LOGIN_METHODS).map(({ key, title }) => ({
+                            disabled: !this.state.featureFlags[key],
                             onClick: () => this.openDialog(key),
                             title,
                         }))}

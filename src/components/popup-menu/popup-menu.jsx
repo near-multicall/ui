@@ -9,10 +9,11 @@ export const PopupMenu = ({ icon, items, triggerClassName }) => (
 
         <div className="popup-menu-content">
             <ul>
-                {items.map(({ label, onClick, title }) => (
+                {items.map(({ disabled = false, label, onClick, title }) => (
                     <li
+                        className={clsx({ disabled })}
                         key={title}
-                        {...{ onClick }}
+                        onClick={disabled ? null : onClick}
                     >
                         {title}
                         {label && <Chip {...{ label }} />}
