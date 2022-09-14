@@ -7,6 +7,7 @@ import { ArgsError, ArgsString } from "../../utils/args";
 import { SputnikDAO } from "../../utils/contracts/sputnik-dao";
 import { readFile, saveFile } from "../../utils/loader";
 import { STORAGE } from "../../utils/persistent";
+import { Validation } from "../../utils/validation";
 import { Dialog } from "../dialog/dialog";
 import { TextInput } from "../editor/elements";
 import { Tooltip } from "../tooltip/tooltip.jsx";
@@ -33,16 +34,15 @@ const DAPP_LOGIN_INSTRUCTIONS = [
 ];
 
 export const DappLoginDialog = ({ actorType, onClose, open, title }) => {
-    const dAppURL = useMemo(() => new ArgsString(""), []);
-    const dAppURLError = useMemo(() => new ArgsError("Invalid URL", ({ value }) => new URL(value), true), []);
-
-    const accountIdParam = STORAGE.addresses[actorType];
+    const dAppURL = useMemo(() => new ArgsString(""), []),
+        dAppURLError = useMemo(() => new ArgsError("Invalid URL", ({ value }) => Validation.isUrl(value), true), []);
 
     const [requestURL, requestURLUpdate] = useReducer((currentValue, event) => {
-        if (dAppURLError.isBad) return currentValue;
-        else {
+        if (dAppURLError.isBad) {
+            return currentValue;
+        } else {
             const url = new URL(event.target.value);
-            url.searchParams.set("account_id", accountIdParam);
+            url.searchParams.set("account_id", STORAGE.addresses[actorType]);
             url.searchParams.set("public_key", "ed25519%3ADEaoD65LomNHAMzhNZva15LC85ntwBHdcTbCnZRXciZH");
             url.searchParams.set("all_keys", "ed25519%3A9jeqkc8ybv7aYSA7uLNFUEn8cgKo759yue4771bBWsSr");
             return url.toString();
@@ -141,17 +141,17 @@ export const LoadFromJsonDialog = ({ onClose, open }) => {
 };
 
 export const LoadFromProposalDialog = ({ onClose, open }) => {
-    const [argsFromProposal, argsFromProposalUpdate] = useState(null);
-    const proposalURL = useMemo(() => new ArgsString(""), []);
+    const [argsFromProposal, argsFromProposalUpdate] = useState(null),
+        proposalURL = useMemo(() => new ArgsString(""), []);
 
     const proposalURLInvalid = useMemo(
         () => new ArgsError("Invalid URL", (urlInput) => !!SputnikDAO.getInfoFromProposalUrl(urlInput.value), true),
         []
     );
 
-    const proposalNonExistent = new ArgsError(
-        "The specified URL does not link to a proposal",
-        (urlInput) => proposalNonExistent.isBad
+    const proposalNonExistent = useMemo(
+        () => new ArgsError("The specified URL does not link to a proposal", (urlInput) => proposalNonExistent.isBad),
+        []
     );
 
     const onProposalURLUpdate = (_event, textInputComponent) => {
