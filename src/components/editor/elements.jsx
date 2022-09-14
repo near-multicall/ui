@@ -14,15 +14,15 @@ class TextInput extends Component {
                 value={value.value}
                 margin="dense"
                 size="small"
-                onChange={(e) => {
-                    value.value = e.target.value;
-                    errors.forEach((e) => e?.validOrNull(value));
-                    update?.(e, this);
+                onChange={(event) => {
+                    value.value = event.target.value;
+                    errors.forEach((error) => error?.validOrNull(value));
+                    update?.(event, this);
                     this.forceUpdate();
                 }}
-                error={errors.some((e) => e?.isBad)}
-                helperText={errors.map((e) => {
-                    if (e?.isBad) return e?.message;
+                error={errors.some((error) => error?.isBad)}
+                helperText={errors.map((error) => {
+                    if (error?.isBad) return error?.message;
                 })}
                 InputLabelProps={{ shrink: true }}
                 {...props}
