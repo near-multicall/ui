@@ -49,10 +49,6 @@
             &.done {
                 background-color: color.$green;
             }
-            &.disabled {
-                background-color: color.$darkish;
-                cursor: not-allowed;
-            }
         }
     }
 }

@@ -46,6 +46,12 @@ button {
     cursor: pointer;
 }
 
+.disabled {
+    background-color: color.$darkest !important;
+    color: rgba(232, 230, 227, 0.3);
+    cursor: not-allowed !important;
+}
+
 .warn {
     color: color.$yellow;
 }
