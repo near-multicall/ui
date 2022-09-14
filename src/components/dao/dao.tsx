@@ -421,7 +421,7 @@ export class Dao extends Component<Props, State> {
                 </>
             );
 
-        if (loading) return <div className="info-container loader"></div>;
+        if (loading) return <div className="info-container loader" />;
 
         // everything should be loaded
         if (!info.admins || !info.tokens || !info.jobBond) {
