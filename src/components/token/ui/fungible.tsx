@@ -1,7 +1,6 @@
 import React from "react";
 
 import { TokenLabel } from "../../../shared/ui/components/token-label/token-label";
-import { Big, formatTokenAmount } from "../../../utils/converter";
 import { Table } from "../../../shared/ui/components/table";
 import { ContractsData } from "../types";
 import { BalancesModel } from "../model/balances";
@@ -16,20 +15,15 @@ export const FungibleTokenBalances = ({ className, dao, multicall }: Props) => {
 
     const tableContent = [
         !nativeToken.loading && nativeToken.data
-            ? [
-                  <TokenLabel native />,
-                  formatTokenAmount(nativeToken.data.multicall, 24, 2),
-                  formatTokenAmount(nativeToken.data.dao, 24, 2),
-                  formatTokenAmount(Big(nativeToken.data.dao).add(nativeToken.data.multicall).toFixed(), 24, 2),
-              ]
+            ? [<TokenLabel native />, nativeToken.data.multicall, nativeToken.data.dao, nativeToken.data.total]
             : [],
 
         ...(!customTokens.loading && customTokens.data
-            ? customTokens.data.map(({ token: { metadata }, ...customToken }) => [
-                  <TokenLabel {...metadata} />,
-                  formatTokenAmount(customToken.multicall, metadata.decimals, 2),
-                  formatTokenAmount(customToken.dao, metadata.decimals, 2),
-                  formatTokenAmount(customToken.total, metadata.decimals, 2),
+            ? customTokens.data.map((customToken) => [
+                  <TokenLabel {...customToken.metadata} />,
+                  customToken.multicall,
+                  customToken.dao,
+                  customToken.total,
               ])
             : []),
     ];
