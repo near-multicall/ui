@@ -1,6 +1,8 @@
-import { unitToDecimals, SIMPLE_NUM_REGEX, convert, Big } from "./converter";
+import { useMemo, useState } from "react";
 import { BigSource } from "big.js";
+
 import { SputnikDAO } from "./contracts/sputnik-dao";
+import { unitToDecimals, SIMPLE_NUM_REGEX, convert, Big } from "./converter";
 
 export default abstract class Args {
     private types = {
@@ -261,6 +263,28 @@ class ArgsError {
         this.isBad = !valid;
 
         return valid ? value : null;
+    }
+
+    static useReactive(message: string, validator: (value: unknown) => boolean, isBad: boolean = false) {
+        const [invalid, invalidIf] = useState(true);
+
+        return {
+            invalid,
+
+            error: useMemo(
+                () =>
+                    new ArgsError(
+                        message,
+                        ({ value }) => {
+                            const valid = validator(value);
+                            invalidIf(!valid);
+                            return valid;
+                        },
+                        isBad
+                    ),
+                []
+            ),
+        };
     }
 }
 
