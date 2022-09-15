@@ -5,18 +5,18 @@ import {
     DialogActions as MUIDialogAction,
 } from "@mui/material";
 import { clsx } from "clsx";
-import React, { Component } from "react";
+import React, { Component, useEffect, useState } from "react";
 
 import "./dialog.scss";
 
 interface DialogProps extends React.PropsWithChildren {
-    cancelRename: string;
-    disable: () => boolean;
-    doneRename: string;
-    className: string;
-    onClose: VoidFunction;
-    onDone: VoidFunction;
-    onCancel: VoidFunction;
+    cancelRename?: string;
+    className?: string;
+    doneRename?: string;
+    noSubmit?: boolean;
+    onCancel?: VoidFunction;
+    onClose?: VoidFunction;
+    onDone?: VoidFunction;
     open: boolean;
     title: string;
 }
@@ -24,17 +24,17 @@ interface DialogProps extends React.PropsWithChildren {
 export const Dialog = ({
     cancelRename,
     children,
-    disable,
-    doneRename,
     className,
+    doneRename,
+    noSubmit,
+    onCancel,
     onClose,
     onDone,
-    onCancel,
     open,
     title,
 }: DialogProps) => (
     <MUIDialog
-        onClose={() => onClose()}
+        onClose={() => onClose?.()}
         open={open}
         className={clsx("dialog", className)}
     >
@@ -47,7 +47,7 @@ export const Dialog = ({
                     className="cancel"
                     onClick={() => {
                         onCancel();
-                        onClose();
+                        onClose?.();
                     }}
                 >
                     {cancelRename ?? "Cancel"}
@@ -56,11 +56,11 @@ export const Dialog = ({
 
             {onDone !== undefined ? (
                 <button
-                    className={clsx("done", { disabled: disable?.() })}
+                    className={clsx("done", { disabled: noSubmit })}
+                    disabled={noSubmit}
                     onClick={() => {
-                        if (disable?.()) return;
                         onDone();
-                        onClose();
+                        onClose?.();
                     }}
                 >
                     {doneRename ?? "Done"}
