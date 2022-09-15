@@ -34,11 +34,16 @@ const DAPP_LOGIN_INSTRUCTIONS = [
 ];
 
 export const DappLoginDialog = ({ actorType, onClose, open, title }) => {
-    const dAppURL = useMemo(() => new ArgsString(""), []),
-        dAppURLError = useMemo(() => new ArgsError("Invalid URL", ({ value }) => Validation.isUrl(value), true), []);
+    const dAppURL = useMemo(() => new ArgsString(""), []);
+
+    const { invalid: dAppURLInvalid, error: dAppURLError } = ArgsError.useReactive(
+        "Invalid URL",
+        Validation.isUrl,
+        true
+    );
 
     const [requestURL, requestURLUpdate] = useReducer((currentValue, event) => {
-        if (dAppURLError.isBad) {
+        if (dAppURLInvalid) {
             return currentValue;
         } else {
             const url = new URL(event.target.value);
@@ -52,10 +57,10 @@ export const DappLoginDialog = ({ actorType, onClose, open, title }) => {
     return (
         <Dialog
             className="modal-dialog"
+            doneRename="Proceed"
+            noSubmit={dAppURLInvalid}
             onCancel={() => {}}
             onDone={() => window.open(requestURL, "_blank")}
-            doneRename="Proceed"
-            disable={() => dAppURLError.isBad}
             {...{ onClose, open, title }}
         >
             <ul className="dapp-login-steps">
