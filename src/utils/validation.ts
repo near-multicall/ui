@@ -1,3 +1,4 @@
+/*
 const isUrl = (urlString: string) =>
     Boolean(
         new RegExp(
@@ -16,5 +17,14 @@ const isUrl = (urlString: string) =>
             "i"
         ).test(urlString)
     );
+		*/
+
+const isUrl = (urlString: string) => {
+    try {
+        return Boolean(new URL(urlString));
+    } catch {
+        return false;
+    }
+};
 
 export const Validation = { isUrl };
