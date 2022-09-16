@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useReducer } from "react";
 import { BigSource } from "big.js";
 
 import { SputnikDAO } from "./contracts/sputnik-dao";
@@ -243,16 +243,21 @@ class ArgsError {
     isBad: boolean;
     intermediate: any;
     message: string;
-    validator: (value: any) => boolean;
+    validator: (value: Args) => boolean;
 
-    constructor(message: string, validator: (value: any) => boolean, isBad: boolean = false, intermediate: any = null) {
+    constructor(
+        message: string,
+        validator: (value: Args) => boolean,
+        isBad: boolean = false,
+        intermediate: any = null
+    ) {
         this.isBad = isBad;
         this.intermediate = intermediate;
         this.message = message;
         this.validator = validator;
     }
 
-    validOrNull(value: any) {
+    validOrNull(value: Args) {
         let valid = false;
         try {
             if (this.validator(value)) valid = true;
@@ -265,27 +270,32 @@ class ArgsError {
         return valid ? value : null;
     }
 
-    static useReactive(message: string, validator: (value: unknown) => boolean, isBad: boolean = false) {
-        const [invalid, invalidIf] = useState(true);
+    static useInstance = (message: string, validator?: (value: unknown) => boolean, isBad: boolean = true) => {
+        const [$detected, detected] = useReducer(
+            (_currentValue: boolean, value: Error | boolean): boolean => Boolean(value),
+            isBad
+        );
 
-        return {
-            invalid,
+        const instance: ArgsError = useMemo(
+            () =>
+                new ArgsError(
+                    message,
+                    ({ value }) => {
+                        const valid = validator ? Boolean(validator(value)) : !instance.isBad;
+                        detected(!valid);
+                        return valid;
+                    },
+                    isBad
+                ),
+            []
+        );
 
-            error: useMemo(
-                () =>
-                    new ArgsError(
-                        message,
-                        ({ value }) => {
-                            const valid = validator(value);
-                            invalidIf(!valid);
-                            return valid;
-                        },
-                        isBad
-                    ),
-                []
-            ),
-        };
-    }
+        useEffect(() => {
+            instance.isBad = $detected;
+        }, [$detected]);
+
+        return { $detected, detected, instance };
+    };
 }
 
 export { Args, ArgsString, ArgsAccount, ArgsNumber, ArgsBig, ArgsObject, ArgsArray, ArgsJSON, ArgsError };
