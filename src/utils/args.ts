@@ -281,7 +281,7 @@ class ArgsError {
                 new ArgsError(
                     message,
                     ({ value }) => {
-                        const valid = validator ? Boolean(validator(value)) : !instance.isBad;
+                        const valid = validator ? validator(value) : !$detected;
                         detected(!valid);
                         return valid;
                     },
