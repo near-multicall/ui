@@ -297,7 +297,7 @@ class SputnikDAO {
         }
     }
 
-    static isProposalExistent = (urlString: string) => Boolean(SputnikDAO.getInfoFromProposalUrl(urlString));
+    static isProposalURLValid = (urlString: string) => Boolean(SputnikDAO.getInfoFromProposalUrl(urlString));
 
     // check if user can perform some action on some proposal kind
     checkUserPermission(userAddr: string, givenAction: ProposalAction, givenProposalKind: ProposalKind): boolean {

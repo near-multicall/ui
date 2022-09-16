@@ -36,10 +36,10 @@ const DAPP_LOGIN_INSTRUCTIONS = [
 export const DappLoginDialog = ({ actorType, onClose, open, title }) => {
     const dAppURL = useMemo(() => new ArgsString(""), []);
 
-    const URLError = ArgsError.useInstance("Invalid URL", Validation.isUrl, true);
+    const URLInvalid = ArgsError.useInstance("Invalid URL", Validation.isUrl, true);
 
     const [requestURL, requestURLUpdate] = useReducer((currentValue, value) => {
-        if (URLError.$detected) {
+        if (URLInvalid.$detected) {
             return currentValue;
         } else {
             const url = new URL(value);
@@ -54,7 +54,7 @@ export const DappLoginDialog = ({ actorType, onClose, open, title }) => {
         <Dialog
             className="modal-dialog"
             doneRename="Proceed"
-            noSubmit={URLError.$detected}
+            noSubmit={URLInvalid.$detected}
             onSubmit={() => window.open(requestURL, "_blank")}
             {...{ onClose, open, title }}
         >
@@ -82,7 +82,7 @@ export const DappLoginDialog = ({ actorType, onClose, open, title }) => {
 
             <TextInput
                 className="light-textfield"
-                error={URLError.instance}
+                error={URLInvalid.instance}
                 label="dApp URL"
                 update={({ target }) => requestURLUpdate(target.value)}
                 value={dAppURL}
@@ -147,12 +147,12 @@ export const LoadFromProposalDialog = ({ onClose, open }) => {
     const [argsFromProposal, argsFromProposalUpdate] = useState(null),
         proposalURL = useMemo(() => new ArgsString(""), []);
 
-    const proposalURLInvalid = ArgsError.useInstance("Invalid URL", Validation.isUrl),
-        proposalNonExistent = ArgsError.useInstance("URL does not link to proposal", SputnikDAO.isProposalExistent),
+    const URLInvalid = ArgsError.useInstance("Invalid URL", Validation.isUrl),
+        proposalURLInvalid = ArgsError.useInstance("URL does not link to proposal", SputnikDAO.isProposalURLValid),
         proposalNonCompatible = ArgsError.useInstance("Proposal is not compatible with multicall");
 
     const onProposalURLUpdate = (_event, textInputComponent) => {
-        if (!(proposalURLInvalid.$detected || proposalNonExistent.$detected)) {
+        if (!(URLInvalid.$detected || proposalURLInvalid.$detected)) {
             const { dao: daoAddress, proposalId } = SputnikDAO.getInfoFromProposalUrl(proposalURL.value);
 
             /*
@@ -162,7 +162,7 @@ export const LoadFromProposalDialog = ({ onClose, open }) => {
             const dao = new SputnikDAO(daoAddress);
 
             dao.getProposal(proposalId)
-                .catch(proposalNonExistent.detected)
+                .catch(proposalURLInvalid.detected)
                 .then((proposal) => {
                     if (Boolean(proposal)) {
                         const multicallAction = proposal.kind?.FunctionCall?.actions.find((action) => {
@@ -185,6 +185,8 @@ export const LoadFromProposalDialog = ({ onClose, open }) => {
                             }
                         });
 
+                        console.log(multicallAction);
+
                         proposalNonCompatible.detected(!Boolean(multicallAction));
                         textInputComponent.forceUpdate();
                     }
@@ -197,7 +199,7 @@ export const LoadFromProposalDialog = ({ onClose, open }) => {
             className="modal-dialog"
             doneRename="Load"
             onSubmit={() => window.LAYOUT.fromBase64(argsFromProposal)}
-            noSubmit={proposalURLInvalid.$detected || proposalNonExistent.$detected || proposalNonCompatible.$detected}
+            noSubmit={URLInvalid.$detected || proposalURLInvalid.$detected || proposalNonCompatible.$detected}
             title="Load from Proposal"
             {...{ onClose, open }}
         >
@@ -205,7 +207,7 @@ export const LoadFromProposalDialog = ({ onClose, open }) => {
 
             <TextInput
                 className="light-textfield"
-                error={[proposalURLInvalid.instance, proposalNonExistent.instance, proposalNonCompatible.instance]}
+                error={[URLInvalid.instance, proposalURLInvalid.instance, proposalNonCompatible.instance]}
                 label="Proposal URL"
                 update={onProposalURLUpdate}
                 value={proposalURL}
