@@ -1,7 +1,7 @@
 import { InfoOutlined } from "@mui/icons-material";
 import { TextField } from "@mui/material";
 import { Base64 } from "js-base64";
-import React, { useMemo, useReducer, useState } from "react";
+import React, { useEffect, useMemo, useReducer, useState } from "react";
 
 import { ArgsError, ArgsString } from "../../utils/args";
 import { SputnikDAO } from "../../utils/contracts/sputnik-dao";
@@ -36,17 +36,13 @@ const DAPP_LOGIN_INSTRUCTIONS = [
 export const DappLoginDialog = ({ actorType, onClose, open, title }) => {
     const dAppURL = useMemo(() => new ArgsString(""), []);
 
-    const { invalid: dAppURLInvalid, error: dAppURLError } = ArgsError.useReactive(
-        "Invalid URL",
-        Validation.isUrl,
-        true
-    );
+    const URLError = ArgsError.useInstance("Invalid URL", Validation.isUrl, true);
 
-    const [requestURL, requestURLUpdate] = useReducer((currentValue, event) => {
-        if (dAppURLInvalid) {
+    const [requestURL, requestURLUpdate] = useReducer((currentValue, value) => {
+        if (URLError.$detected) {
             return currentValue;
         } else {
-            const url = new URL(event.target.value);
+            const url = new URL(value);
             url.searchParams.set("account_id", STORAGE.addresses[actorType]);
             url.searchParams.set("public_key", "ed25519%3ADEaoD65LomNHAMzhNZva15LC85ntwBHdcTbCnZRXciZH");
             url.searchParams.set("all_keys", "ed25519%3A9jeqkc8ybv7aYSA7uLNFUEn8cgKo759yue4771bBWsSr");
@@ -58,9 +54,8 @@ export const DappLoginDialog = ({ actorType, onClose, open, title }) => {
         <Dialog
             className="modal-dialog"
             doneRename="Proceed"
-            noSubmit={dAppURLInvalid}
-            onCancel={() => {}}
-            onDone={() => window.open(requestURL, "_blank")}
+            noSubmit={URLError.$detected}
+            onSubmit={() => window.open(requestURL, "_blank")}
             {...{ onClose, open, title }}
         >
             <ul className="dapp-login-steps">
@@ -87,9 +82,9 @@ export const DappLoginDialog = ({ actorType, onClose, open, title }) => {
 
             <TextInput
                 className="light-textfield"
-                error={dAppURLError}
+                error={URLError.instance}
                 label="dApp URL"
-                update={requestURLUpdate}
+                update={({ target }) => requestURLUpdate(target.value)}
                 value={dAppURL}
                 variant="filled"
             />
@@ -104,8 +99,7 @@ export const SaveAsJsonDialog = ({ onClose, open }) => {
         <Dialog
             className="modal-dialog"
             doneRename="Download"
-            onCancel={() => {}}
-            onDone={() => saveFile(`${fileName}.json`, [JSON.stringify(LAYOUT.toBase64(), null, 2)])}
+            onSubmit={() => saveFile(`${fileName}.json`, [JSON.stringify(LAYOUT.toBase64(), null, 2)])}
             title="Save As JSON"
             {...{ onClose, open }}
         >
@@ -121,16 +115,20 @@ export const SaveAsJsonDialog = ({ onClose, open }) => {
     );
 };
 
-export const LoadFromJsonDialog = ({ onClose, open }) => {
+export const LoadFromJsonDialog = ({ open, ...props }) => {
     const [uploadedFile, uploadedFileUpdate] = useState(null);
+
+    const onClose = () => {
+        props.onClose();
+        uploadedFileUpdate(null);
+    };
 
     return (
         <Dialog
             className="modal-dialog"
             doneRename="Load"
             noSubmit={uploadedFile === null}
-            onCancel={() => {}}
-            onDone={() => readFile(uploadedFile, (json) => LAYOUT.fromBase64(json))}
+            onSubmit={() => readFile(uploadedFile, (json) => LAYOUT.fromBase64(json))}
             title="Load From JSON"
             {...{ onClose, open }}
         >
@@ -149,76 +147,65 @@ export const LoadFromProposalDialog = ({ onClose, open }) => {
     const [argsFromProposal, argsFromProposalUpdate] = useState(null),
         proposalURL = useMemo(() => new ArgsString(""), []);
 
-    const { invalid: proposalURLIsInvalid, error: proposalURLError } = ArgsError.useReactive(
-        "Invalid URL",
-        (urlInput) => !!SputnikDAO.getInfoFromProposalUrl(urlInput.value),
-        true
-    );
-
-    const { invalid: proposalDoesNotExist, error: proposalExistenceError } = ArgsError.useReactive(
-        "The specified URL does not link to a proposal",
-        (_urlInput) => proposalExistenceError.isBad
-    );
+    const proposalURLInvalid = ArgsError.useInstance("Invalid URL", Validation.isUrl),
+        proposalNonExistent = ArgsError.useInstance("URL does not link to proposal", SputnikDAO.isProposalExistent),
+        proposalNonCompatible = ArgsError.useInstance("Proposal is not compatible with multicall");
 
     const onProposalURLUpdate = (_event, textInputComponent) => {
-        // don't fetch proposal info from bad URL.
-        if (proposalURLError.isBad) {
-            proposalExistenceError.isBad = false;
-            return;
-        }
+        if (proposalURLInvalid.$detected || proposalNonExistent.$detected) {
+            // don't fetch proposal info from bad URL.
+            proposalNonCompatible.detected(true);
+        } else {
+            const { dao: daoAddress, proposalId } = SputnikDAO.getInfoFromProposalUrl(proposalURL.value);
 
-        const { dao, proposalId } = SputnikDAO.getInfoFromProposalUrl(proposalURL.value);
+            // !!! creating SputnikDAO instance must be done using init() to make sure DAO exists
+            // on that address. We use constructor here because of previous logic checks.
+            const dao = new SputnikDAO(daoAddress);
 
-        // !!! creating SputnikDAO instance must be done using init() to make sure DAO exists
-        // on that address. We use constructor here because of previous logic checks.
-        const daoObj = new SputnikDAO(dao);
+            // fetch proposal info from DAO contract
+            dao.getProposal(proposalId)
+                .catch(proposalNonExistent.detected)
+                .then((propOrUndefined) => {
+                    if (Boolean(propOrUndefined)) {
+                        let multicallArgs;
+                        const currProposal = propOrUndefined.kind?.FunctionCall;
 
-        // fetch proposal info from DAO contract
-        daoObj
-            .getProposal(proposalId)
-            .catch((e) => {
-                proposalExistenceError.isBad = true;
-                return;
-            })
-            .then((propOrUndefined) => {
-                if (!!propOrUndefined) {
-                    let multicallArgs;
-                    const currProposal = propOrUndefined.kind?.FunctionCall;
-
-                    const multicallAction = currProposal?.actions.find((action) => {
-                        // is it normal multicall?
-                        if (action.method_name === "multicall") {
-                            multicallArgs = JSON.parse(Base64.decode(action.args));
-                            return true;
-                        }
-                        // is it multicall with attached FT?
-                        else if (action.method_name === "ft_transfer_call") {
-                            const ftTransferArgs = JSON.parse(Base64.decode(action.args));
-                            const ftTransferMsg = JSON.parse(ftTransferArgs.msg);
-                            if (ftTransferMsg.function_id && ftTransferMsg.function_id === "multicall") {
-                                multicallArgs = JSON.parse(Base64.decode(ftTransferMsg.args));
+                        const multicallAction = currProposal?.actions.find((action) => {
+                            // is it normal multicall?
+                            if (action.method_name === "multicall") {
+                                multicallArgs = JSON.parse(Base64.decode(action.args));
                                 return true;
                             }
+                            // is it multicall with attached FT?
+                            else if (action.method_name === "ft_transfer_call") {
+                                const ftTransferArgs = JSON.parse(Base64.decode(action.args));
+                                const ftTransferMsg = JSON.parse(ftTransferArgs.msg);
+                                if (ftTransferMsg.function_id && ftTransferMsg.function_id === "multicall") {
+                                    multicallArgs = JSON.parse(Base64.decode(ftTransferMsg.args));
+                                    return true;
+                                }
+                            }
+                        });
+
+                        if (multicallAction) {
+                            proposalNonCompatible.detected(false);
+                            argsFromProposalUpdate(multicallArgs.calls);
+                        } else {
+                            proposalNonCompatible.detected(true);
                         }
-                    });
-
-                    if (multicallAction) {
-                        proposalExistenceError.isBad = false;
-                        argsFromProposalUpdate(multicallArgs.calls);
                     }
-                }
 
-                textInputComponent.forceUpdate();
-            });
+                    textInputComponent.forceUpdate();
+                });
+        }
     };
 
     return (
         <Dialog
             className="modal-dialog"
             doneRename="Load"
-            noSubmit={proposalURLIsInvalid || proposalDoesNotExist}
-            onCancel={() => {}}
-            onDone={() => window.LAYOUT.fromBase64(argsFromProposal)}
+            onSubmit={() => window.LAYOUT.fromBase64(argsFromProposal)}
+            noSubmit={proposalURLInvalid.$detected || proposalNonExistent.$detected || proposalNonCompatible.$detected}
             title="Load from Proposal"
             {...{ onClose, open }}
         >
@@ -226,7 +213,7 @@ export const LoadFromProposalDialog = ({ onClose, open }) => {
 
             <TextInput
                 className="light-textfield"
-                error={[proposalURLError, proposalExistenceError]}
+                error={[proposalURLInvalid.instance, proposalNonExistent.instance, proposalNonCompatible.instance]}
                 label="Proposal URL"
                 update={onProposalURLUpdate}
                 value={proposalURL}
@@ -242,13 +229,12 @@ export const ClearAllDialog = ({ onClose, open }) => (
     <Dialog
         className="modal-dialog"
         doneRename="Yes, clear all"
-        onCancel={() => {}}
-        onDone={() => LAYOUT.clear()}
+        onSubmit={() => LAYOUT.clear()}
         title="Clear All"
         {...{ onClose, open }}
     >
         <b className="warn">
-            Are you sure you want to clear your multicall?
+            Are you sure you want to clear your multicall layout?
             <br />
             You cannot undo this action!
         </b>
