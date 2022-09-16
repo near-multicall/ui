@@ -178,6 +178,9 @@ class SputnikDAO {
         return view(this.address, "get_proposals", args);
     }
 
+    /**
+     * Fetch proposal info from DAO contract
+     */
     async getProposal(proposal_id: number): Promise<object> {
         return view(this.address, "get_proposal", { id: proposal_id });
     }
