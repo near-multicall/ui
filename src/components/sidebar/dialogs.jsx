@@ -103,19 +103,19 @@ export const SaveAsJsonDialog = ({ onClose, open }) => {
     return (
         <Dialog
             className="modal-dialog"
-            title="Save As JSON"
+            doneRename="Download"
             onCancel={() => {}}
             onDone={() => saveFile(`${fileName}.json`, [JSON.stringify(LAYOUT.toBase64(), null, 2)])}
-            doneRename="Download"
+            title="Save As JSON"
             {...{ onClose, open }}
         >
             <TextField
-                label="Multicall title"
-                defaultValue="my-multicall"
-                variant="filled"
                 className="light-textfield"
+                defaultValue="my-multicall"
                 helperText="Please give a name to your multicall"
+                label="Multicall title"
                 onChange={(event) => fileNameUpdate(event.target.value)}
+                variant="filled"
             />
         </Dialog>
     );
@@ -127,17 +127,17 @@ export const LoadFromJsonDialog = ({ onClose, open }) => {
     return (
         <Dialog
             className="modal-dialog"
-            title="Load From JSON"
+            doneRename="Load"
+            noSubmit={uploadedFile === null}
             onCancel={() => {}}
             onDone={() => readFile(uploadedFile, (json) => LAYOUT.fromBase64(json))}
-            doneRename="Load"
-            disable={() => uploadedFile === null}
+            title="Load From JSON"
             {...{ onClose, open }}
         >
             <input
                 accept=".json,application/JSON"
-                type="file"
                 onChange={(event) => uploadedFileUpdate(event.target.files[0])}
+                type="file"
             />
 
             <b className="warn">Your current multicall will be replaced!</b>
@@ -149,20 +149,21 @@ export const LoadFromProposalDialog = ({ onClose, open }) => {
     const [argsFromProposal, argsFromProposalUpdate] = useState(null),
         proposalURL = useMemo(() => new ArgsString(""), []);
 
-    const proposalURLInvalid = useMemo(
-        () => new ArgsError("Invalid URL", (urlInput) => !!SputnikDAO.getInfoFromProposalUrl(urlInput.value), true),
-        []
+    const { invalid: proposalURLIsInvalid, error: proposalURLError } = ArgsError.useReactive(
+        "Invalid URL",
+        (urlInput) => !!SputnikDAO.getInfoFromProposalUrl(urlInput.value),
+        true
     );
 
-    const proposalNonExistent = useMemo(
-        () => new ArgsError("The specified URL does not link to a proposal", (urlInput) => proposalNonExistent.isBad),
-        []
+    const { invalid: proposalDoesNotExist, error: proposalExistenceError } = ArgsError.useReactive(
+        "The specified URL does not link to a proposal",
+        (_urlInput) => proposalExistenceError.isBad
     );
 
     const onProposalURLUpdate = (_event, textInputComponent) => {
         // don't fetch proposal info from bad URL.
-        if (proposalURLInvalid.isBad) {
-            proposalNonExistent.isBad = false;
+        if (proposalURLError.isBad) {
+            proposalExistenceError.isBad = false;
             return;
         }
 
@@ -176,7 +177,7 @@ export const LoadFromProposalDialog = ({ onClose, open }) => {
         daoObj
             .getProposal(proposalId)
             .catch((e) => {
-                proposalNonExistent.isBad = true;
+                proposalExistenceError.isBad = true;
                 return;
             })
             .then((propOrUndefined) => {
@@ -202,7 +203,7 @@ export const LoadFromProposalDialog = ({ onClose, open }) => {
                     });
 
                     if (multicallAction) {
-                        proposalNonExistent.isBad = false;
+                        proposalExistenceError.isBad = false;
                         argsFromProposalUpdate(multicallArgs.calls);
                     }
                 }
@@ -214,22 +215,22 @@ export const LoadFromProposalDialog = ({ onClose, open }) => {
     return (
         <Dialog
             className="modal-dialog"
-            title="Load from Proposal"
+            doneRename="Load"
+            noSubmit={proposalURLIsInvalid || proposalDoesNotExist}
             onCancel={() => {}}
             onDone={() => window.LAYOUT.fromBase64(argsFromProposal)}
-            doneRename="Load"
-            disable={() => proposalURLInvalid.isBad || proposalNonExistent.isBad}
+            title="Load from Proposal"
             {...{ onClose, open }}
         >
             <p>Enter proposal link from AstroDAO or base UI</p>
 
             <TextInput
-                label="Proposal URL"
-                value={proposalURL}
-                error={[proposalURLInvalid, proposalNonExistent]}
-                update={onProposalURLUpdate}
-                variant="filled"
                 className="light-textfield"
+                error={[proposalURLError, proposalExistenceError]}
+                label="Proposal URL"
+                update={onProposalURLUpdate}
+                value={proposalURL}
+                variant="filled"
             />
 
             <b className="warn">Your current multicall will be replaced!</b>
@@ -240,10 +241,10 @@ export const LoadFromProposalDialog = ({ onClose, open }) => {
 export const ClearAllDialog = ({ onClose, open }) => (
     <Dialog
         className="modal-dialog"
-        title="Clear All"
+        doneRename="Yes, clear all"
         onCancel={() => {}}
         onDone={() => LAYOUT.clear()}
-        doneRename="Yes, clear all"
+        title="Clear All"
         {...{ onClose, open }}
     >
         <b className="warn">
