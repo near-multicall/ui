@@ -152,50 +152,42 @@ export const LoadFromProposalDialog = ({ onClose, open }) => {
         proposalNonCompatible = ArgsError.useInstance("Proposal is not compatible with multicall");
 
     const onProposalURLUpdate = (_event, textInputComponent) => {
-        if (proposalURLInvalid.$detected || proposalNonExistent.$detected) {
-            // don't fetch proposal info from bad URL.
-            proposalNonCompatible.detected(true);
-        } else {
+        if (!(proposalURLInvalid.$detected || proposalNonExistent.$detected)) {
             const { dao: daoAddress, proposalId } = SputnikDAO.getInfoFromProposalUrl(proposalURL.value);
 
-            // !!! creating SputnikDAO instance must be done using init() to make sure DAO exists
-            // on that address. We use constructor here because of previous logic checks.
+            /*
+              ! SputnikDAO instance must be created using init() to make sure DAO exists
+              ! on that address. We use constructor here because of previous logic checks.
+            */
             const dao = new SputnikDAO(daoAddress);
 
-            // fetch proposal info from DAO contract
             dao.getProposal(proposalId)
                 .catch(proposalNonExistent.detected)
-                .then((propOrUndefined) => {
-                    if (Boolean(propOrUndefined)) {
-                        let multicallArgs;
-                        const currProposal = propOrUndefined.kind?.FunctionCall;
-
-                        const multicallAction = currProposal?.actions.find((action) => {
-                            // is it normal multicall?
-                            if (action.method_name === "multicall") {
-                                multicallArgs = JSON.parse(Base64.decode(action.args));
-                                return true;
-                            }
-                            // is it multicall with attached FT?
-                            else if (action.method_name === "ft_transfer_call") {
-                                const ftTransferArgs = JSON.parse(Base64.decode(action.args));
-                                const ftTransferMsg = JSON.parse(ftTransferArgs.msg);
-                                if (ftTransferMsg.function_id && ftTransferMsg.function_id === "multicall") {
-                                    multicallArgs = JSON.parse(Base64.decode(ftTransferMsg.args));
+                .then((proposal) => {
+                    if (Boolean(proposal)) {
+                        const multicallAction = proposal.kind?.FunctionCall?.actions.find((action) => {
+                            switch (action.method_name) {
+                                // Is it regular multicall?
+                                case "multicall": {
+                                    argsFromProposalUpdate(JSON.parse(Base64.decode(action.args)).calls);
                                     return true;
+                                }
+                                // Is it multicall with attached FT?
+                                case "ft_transfer_call": {
+                                    const ftTransferArgs = JSON.parse(Base64.decode(action.args)),
+                                        ftTransferMsg = JSON.parse(ftTransferArgs.msg);
+
+                                    if (ftTransferMsg.function_id && ftTransferMsg.function_id === "multicall") {
+                                        argsFromProposalUpdate(JSON.parse(Base64.decode(ftTransferMsg.args)).calls);
+                                        return true;
+                                    }
                                 }
                             }
                         });
 
-                        if (multicallAction) {
-                            proposalNonCompatible.detected(false);
-                            argsFromProposalUpdate(multicallArgs.calls);
-                        } else {
-                            proposalNonCompatible.detected(true);
-                        }
+                        proposalNonCompatible.detected(!Boolean(multicallAction));
+                        textInputComponent.forceUpdate();
                     }
-
-                    textInputComponent.forceUpdate();
                 });
         }
     };
