@@ -2,7 +2,7 @@ import {
     Dialog as MUIDialog,
     DialogTitle as MUIDialogTitle,
     DialogContent as MUIDialogContent,
-    DialogActions as MUIDialogAction,
+    DialogActions as MUIDialogActions,
 } from "@mui/material";
 import { clsx } from "clsx";
 import React, { Component, useEffect, useState } from "react";
@@ -13,10 +13,11 @@ interface DialogProps extends React.PropsWithChildren {
     cancelRename?: string;
     className?: string;
     doneRename?: string;
+    noCancel?: boolean;
     noSubmit?: boolean;
     onCancel?: VoidFunction;
     onClose?: VoidFunction;
-    onDone?: VoidFunction;
+    onSubmit?: VoidFunction;
     open: boolean;
     title: string;
 }
@@ -26,46 +27,44 @@ export const Dialog = ({
     children,
     className,
     doneRename,
+    noCancel = false,
     noSubmit,
     onCancel,
     onClose,
-    onDone,
+    onSubmit,
     open,
     title,
 }: DialogProps) => (
     <MUIDialog
-        onClose={() => onClose?.()}
-        open={open}
         className={clsx("dialog", className)}
+        {...{ onClose, open }}
     >
         <MUIDialogTitle className="title">{title}</MUIDialogTitle>
         <MUIDialogContent className="content">{children}</MUIDialogContent>
 
-        <MUIDialogAction className="action">
-            {onCancel !== undefined ? (
+        <MUIDialogActions className="action">
+            {!noCancel ? (
                 <button
                     className="cancel"
                     onClick={() => {
-                        onCancel();
+                        onCancel?.();
                         onClose?.();
                     }}
                 >
-                    {cancelRename ?? "Cancel"}
+                    {cancelRename || "Cancel"}
                 </button>
             ) : null}
 
-            {onDone !== undefined ? (
-                <button
-                    className={clsx("done", { disabled: noSubmit })}
-                    disabled={noSubmit}
-                    onClick={() => {
-                        onDone();
-                        onClose?.();
-                    }}
-                >
-                    {doneRename ?? "Done"}
-                </button>
-            ) : null}
-        </MUIDialogAction>
+            <button
+                className={clsx("done", { disabled: noSubmit })}
+                disabled={noSubmit}
+                onClick={() => {
+                    onSubmit?.();
+                    onClose?.();
+                }}
+            >
+                {doneRename || "Done"}
+            </button>
+        </MUIDialogActions>
     </MUIDialog>
 );
