@@ -148,8 +148,8 @@ export const LoadFromProposalDialog = ({ onClose, open }) => {
         proposalURL = useMemo(() => new ArgsString(""), []);
 
     const URLInvalid = ArgsError.useInstance("Invalid URL", Validation.isUrl),
-        proposalURLInvalid = ArgsError.useInstance("URL does not link to proposal", SputnikDAO.isProposalURLValid),
-        proposalNonCompatible = ArgsError.useInstance("Proposal is not compatible with multicall");
+        proposalURLInvalid = ArgsError.useInstance("URL doesn't link to proposal", SputnikDAO.isProposalURLValid),
+        proposalNonCompatible = ArgsError.useInstance("Proposal is incompatible with multicall or doesn't exist");
 
     const onProposalURLUpdate = (_event, textInputComponent) => {
         if (!(URLInvalid.$detected || proposalURLInvalid.$detected)) {
@@ -184,8 +184,6 @@ export const LoadFromProposalDialog = ({ onClose, open }) => {
                                 }
                             }
                         });
-
-                        console.log(multicallAction);
 
                         proposalNonCompatible.detected(!Boolean(multicallAction));
                         textInputComponent.forceUpdate();
