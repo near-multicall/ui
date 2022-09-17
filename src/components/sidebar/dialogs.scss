@@ -12,12 +12,22 @@
             flex-flow: row nowrap;
             gap: 0.5ch;
             padding-left: 0.25 * size.$gap;
+
             .icon {
                 @include mixin.light-icon;
             }
         }
+
         &::marker {
             font-weight: 800;
+        }
+    }
+}
+
+.proposal-multicall-import {
+    &.modal-dialog {
+        .MuiPaper-root {
+            min-width: 360px;
         }
     }
 }

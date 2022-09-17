@@ -152,7 +152,7 @@ export const LoadFromProposalDialog = ({ onClose, open }) => {
         proposalNonCompatible = ArgsError.useInstance("Proposal is incompatible with multicall or doesn't exist");
 
     const onProposalURLUpdate = (_event, textInputComponent) => {
-        if (!(URLInvalid.$detected || proposalURLInvalid.$detected)) {
+        if (!(URLInvalid.instance.isBad || proposalURLInvalid.instance.isBad)) {
             const { dao: daoAddress, proposalId } = SputnikDAO.getInfoFromProposalUrl(proposalURL.value);
 
             /*
@@ -194,7 +194,7 @@ export const LoadFromProposalDialog = ({ onClose, open }) => {
 
     return (
         <Dialog
-            className="modal-dialog"
+            className="proposal-multicall-import modal-dialog"
             doneRename="Load"
             onSubmit={() => window.LAYOUT.fromBase64(argsFromProposal)}
             noSubmit={URLInvalid.$detected || proposalURLInvalid.$detected || proposalNonCompatible.$detected}
