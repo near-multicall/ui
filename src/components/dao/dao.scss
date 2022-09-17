@@ -9,49 +9,81 @@
     display: flex;
     flex-flow: column nowrap;
 
-    .address-container {
-        @include mixin.center-items;
+    .header {
+        @include mixin.center-items(space-between);
         flex-flow: row nowrap;
-        width: auto;
+        max-width: 120rem;
+        margin: 0 auto;
+        .address-container {
+            @include mixin.center-items;
+            flex-flow: row nowrap;
+            width: auto;
 
-        .MuiTextField-root {
-            width: calc(100% - 2 * size.$gap);
-            max-width: 100ch;
-            text-align: left;
-            margin: calc(size.$gap - 0.5 * size.$large-text) size.$gap;
+            .MuiTextField-root {
+                width: calc(100% - 2 * size.$gap);
+                max-width: 100ch;
+                text-align: left;
+                margin: calc(size.$gap - 0.5 * size.$large-text) size.$gap;
 
-            .MuiInputBase-root {
-                font-size: size.$large-text;
-                color: color.$darkish;
+                .MuiInputBase-root {
+                    font-size: size.$large-text;
+                    color: color.$darkish;
 
-                input {
-                    padding: 0;
-                    padding-left: 0.5 * size.$gap;
+                    input {
+                        padding: 0;
+                        padding-left: 0.5 * size.$gap;
+                    }
+
+                    &.Mui-error {
+                        color: darken(color.$red, 10%);
+                    }
                 }
 
-                &.Mui-error {
-                    color: darken(color.$red, 10%);
+                fieldset {
+                    border: none;
+                    border-bottom: 2px solid currentColor;
+                    border-radius: 0;
+                }
+
+                p {
+                    display: none;
                 }
             }
 
-            fieldset {
-                border: none;
-                border-bottom: 2px solid currentColor;
-                border-radius: 0;
-            }
+            .MuiInputAdornment-root {
+                width: fit-content;
 
-            p {
-                display: none;
+                p {
+                    display: block !important;
+                    font-size: size.$large-text !important;
+                    color: color.$darkish;
+                }
             }
         }
-
-        .MuiInputAdornment-root {
-            width: fit-content;
-
-            p {
-                display: block !important;
-                font-size: size.$large-text !important;
-                color: color.$darkish;
+        .tab-list {
+            @include mixin.center-items;
+            box-shadow: inset 0px 0px 30px 0px rgba(color.$white, 0.1);
+            background-color: color.$lightest;
+            border-radius: size.$task-radius;
+            padding: 0;
+            height: size.$tab-list-height;
+            overflow: hidden;
+            z-index: 1;
+            button {
+                flex: 1;
+                padding: 0;
+                width: 30%;
+                height: 100%;
+                padding: 0 size.$gap;
+                font-size: size.$text;
+                background-color: transparent;
+                &:focus,
+                &:hover {
+                    background-color: rgba(color.$white, 0.1);
+                }
+                &.active-tab {
+                    background-color: color.$white;
+                }
             }
         }
     }
@@ -71,7 +103,17 @@
         display: grid;
         gap: size.$gap;
         padding: size.$gap;
-        max-width: 1024px;
+        max-width: 120rem;
+        max-height: calc(100% - (4.5 * size.$gap - 0.5 * (size.$gap - size.$large-text)));
+        &.hidden {
+            display: none;
+        }
+
+        &.active-panel {
+            width: 100%;
+            height: 100%;
+            margin: 0 auto;
+        }
 
         &.error {
             display: flex;

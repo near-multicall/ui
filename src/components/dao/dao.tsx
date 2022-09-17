@@ -13,7 +13,6 @@ import { SputnikDAO, SputnikUI, ProposalKind, ProposalAction } from "../../utils
 import { TextInput } from "../editor/elements";
 import { FungibleTokenBalances } from "../token";
 import { Multicall } from "../../utils/contracts/multicall";
-import { Tabs } from "../../shared/ui/components/tabs";
 import "./dao.scss";
 import "./funds.scss";
 import "./multicall.scss";
@@ -30,6 +29,7 @@ interface State {
     loading: boolean;
     proposed: number;
     proposedInfo: object;
+    tab: number;
 
     info: {
         admins: string[];
@@ -56,6 +56,7 @@ export class Dao extends Component<Props, State> {
             loading: false,
             proposed: -1,
             proposedInfo: {},
+            tab: 0,
 
             info: {
                 admins: [],
@@ -390,7 +391,7 @@ export class Dao extends Component<Props, State> {
 
     getContent() {
         const { selector: walletSelector } = this.context;
-        const { info, loading } = this.state;
+        const { info, loading, tab } = this.state;
 
         // TODO: only require signIn when DAO has no multicall instance (to know if user can propose or vote on existing proposal to create multicall)
         if (!walletSelector.isSignedIn()) {
@@ -430,58 +431,50 @@ export class Dao extends Component<Props, State> {
         }
 
         return (
-            <Tabs
-                titles={["Multicall", "Funds"]}
-                content={[
-                    <section className="multicall-tab content">
-                        <div className="info-container">
-                            <div className="info-card admins">
-                                <AddOutlined />
-                                <h1 className="title">Admins</h1>
+            <>
+                <div className={`${tab != 0 ? "hidden" : "active-panel"} multicall-tab info-container`}>
+                    <div className="info-card admins">
+                        <AddOutlined />
+                        <h1 className="title">Admins</h1>
 
-                                <ul className="list">
-                                    {info.admins.map((admin) => (
-                                        <li key={admin}>{this.toLink(admin)}</li>
-                                    ))}
-                                </ul>
-                            </div>
+                        <ul className="list">
+                            {info.admins.map((admin) => (
+                                <li key={admin}>{this.toLink(admin)}</li>
+                            ))}
+                        </ul>
+                    </div>
 
-                            <div className="info-card token-whitelist">
-                                <h1 className="title">Whitelisted Tokens</h1>
+                    <div className="info-card token-whitelist">
+                        <h1 className="title">Whitelisted Tokens</h1>
 
-                                <ul className="list">
-                                    {info.tokens.map((token) => (
-                                        <li key={token}>{this.toLink(token)}</li>
-                                    ))}
-                                </ul>
-                            </div>
+                        <ul className="list">
+                            {info.tokens.map((token) => (
+                                <li key={token}>{this.toLink(token)}</li>
+                            ))}
+                        </ul>
+                    </div>
 
-                            <div className="info-card jobs">
-                                <AddOutlined />
-                                <h1 className="title">Jobs</h1>
-                                <div className="scroll-wrapper">{info.jobs.map((j) => this.job(j))}</div>
-                            </div>
+                    <div className="info-card jobs">
+                        <AddOutlined />
+                        <h1 className="title">Jobs</h1>
+                        <div className="scroll-wrapper">{info.jobs.map((j) => this.job(j))}</div>
+                    </div>
 
-                            <div className="info-card job-bond">
-                                <h1 className="title">
-                                    Job Bond
-                                    <span>{`${info.jobBond !== "..." ? toNEAR(info.jobBond) : "..."} Ⓝ`}</span>
-                                </h1>
-                            </div>
-                        </div>
-                    </section>,
-
-                    <section className="funds-tab content">
-                        <div className="info-container">
-                            <FungibleTokenBalances
-                                className="info-card tokens"
-                                dao={this.state.dao}
-                                multicall={this.state.multicall}
-                            />
-                        </div>
-                    </section>,
-                ]}
-            />
+                    <div className="info-card job-bond">
+                        <h1 className="title">
+                            Job Bond
+                            <span>{`${info.jobBond !== "..." ? toNEAR(info.jobBond) : "..."} Ⓝ`}</span>
+                        </h1>
+                    </div>
+                </div>
+                <div className={`${tab != 1 ? "hidden" : "active-panel"} funds-tab info-container`}>
+                    <FungibleTokenBalances
+                        className="info-card tokens"
+                        dao={this.state.dao}
+                        multicall={this.state.multicall}
+                    />
+                </div>
+            </>
         );
     }
 
@@ -510,28 +503,46 @@ export class Dao extends Component<Props, State> {
         document.addEventListener("onaddressesupdated", () => this.onAddressesUpdated());
     }
 
+    changeTab = (newTab: number) => this.setState({ tab: newTab });
+
     render() {
+        const { tab } = this.state;
         return (
             <div className="dao-container">
-                <div className="address-container">
-                    <TextInput
-                        placeholder="Insert DAO name here"
-                        value={this.state.name}
-                        error={this.errors.name}
-                        update={() => {
-                            if (this.state.name.isValid()) {
-                                this.loadInfoDebounced();
-                            }
-                            this.forceUpdate();
-                        }}
-                        InputProps={{
-                            endAdornment: (
-                                <InputAdornment position="end">{`.${SputnikDAO.FACTORY_ADDRESS}`}</InputAdornment>
-                            ),
-                        }}
-                    />
+                <div className="header">
+                    <div className="tab-list">
+                        <button
+                            className={`tab ${tab === 0 ? "active-tab" : ""}`}
+                            onClick={() => this.changeTab(0)}
+                        >
+                            Config
+                        </button>
+                        <button
+                            className={`tab ${tab === 1 ? "active-tab" : ""}`}
+                            onClick={() => this.changeTab(1)}
+                        >
+                            Funds
+                        </button>
+                    </div>
+                    <div className="address-container">
+                        <TextInput
+                            placeholder="Insert DAO name here"
+                            value={this.state.name}
+                            error={this.errors.name}
+                            update={() => {
+                                if (this.state.name.isValid()) {
+                                    this.loadInfoDebounced();
+                                }
+                                this.forceUpdate();
+                            }}
+                            InputProps={{
+                                endAdornment: (
+                                    <InputAdornment position="end">{`.${SputnikDAO.FACTORY_ADDRESS}`}</InputAdornment>
+                                ),
+                            }}
+                        />
+                    </div>
                 </div>
-
                 {this.getContent()}
             </div>
         );
