@@ -42,6 +42,17 @@ const convert = (amount: string | number, unit: string, decimals?: number): numb
         : amount;
 };
 
+// JS Date to cron expression. Follows croncat format, see: https://github.com/CronCats/Schedule
+const dateToCron = (date: Date): string => {
+    const minutes = date.getUTCMinutes();
+    const hours = date.getUTCHours();
+    const days = date.getUTCDate();
+    const months = date.getUTCMonth() + 1;
+    const year = date.getUTCFullYear();
+
+    return `0 ${minutes} ${hours} ${days} ${months} * ${year}`;
+};
+
 export {
     unitToDecimals,
     SIMPLE_NUM_REGEX,
@@ -53,4 +64,5 @@ export {
     toYocto,
     convert,
     Big, // re-export Big.js to preserve library config
+    dateToCron,
 };

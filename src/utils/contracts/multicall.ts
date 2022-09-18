@@ -1,4 +1,5 @@
-import { rpcProvider, view } from "../wallet";
+import { rpcProvider, view, tx } from "../wallet";
+import { Big, toGas, dateToCron } from "../converter";
 
 const FACTORY_ADDRESS_SELECTOR: Record<string, string> = {
     mainnet: "v1.multicall.near",
@@ -145,6 +146,41 @@ class Multicall {
      */
     async getJobs(): Promise<{ id: number; job: JobSchema }[]> {
         return view(this.address, "get_jobs", {});
+    }
+
+    /**
+     * Register a new job. Has to pay job bond.
+     * TODO: Add logic for estimating totalBudget.
+     *
+     * @param multicalls Multicalls to execute. 1 multicall per tx.
+     * @param triggerDate Execution date, in user's local time.
+     * @param triggerGas Gas amount. Will be allocated for every tx in this job.
+     * @param totalBudget Total fee to be paid to Croncat agents.
+     * @returns
+     */
+    async addJob(
+        multicalls: MulticallArgs[],
+        triggerDate: Date, // Date of job execution
+        triggerGas: string,
+        totalBudget: string
+    ): Promise<void> {
+        // crontab in CronCat format. See: https://github.com/CronCats/Schedule
+        const cadence: string = dateToCron(triggerDate);
+        // timestamp as required by NEAR chain (UTC, in nanoseconds)
+        const startAt: string = Big(triggerDate.getTime()).times("1000000").toFixed();
+        return tx(
+            this.address,
+            "job_add",
+            {
+                job_multicalls: multicalls,
+                job_cadence: cadence,
+                job_trigger_gas: triggerGas,
+                job_total_budget: totalBudget,
+                job_start_at: startAt,
+            },
+            toGas("25"),
+            this.jobBond
+        );
     }
 }
 
