@@ -9,7 +9,7 @@ import { STORAGE } from "../../utils/persistent";
 import { toNEAR, toYocto, Big } from "../../utils/converter";
 import { view } from "../../utils/wallet";
 import { useWalletSelector } from "../../contexts/walletSelectorContext";
-import { SputnikDAO, SputnikUI, ProposalKind, ProposalAction } from "../../utils/contracts/sputnik-dao";
+import { SputnikDAO, SputnikUI, ProposalKind, ProposalAction, ProposalStatus } from "../../utils/contracts/sputnik-dao";
 import { TextInput } from "../editor/elements";
 import { FungibleTokenBalances } from "../token";
 import { Multicall } from "../../utils/contracts/multicall";
@@ -17,6 +17,8 @@ import "./dao.scss";
 import "./funds.scss";
 import "./multicall.scss";
 import clsx from "clsx";
+
+import type { ProposalOutput } from "../../utils/contracts/sputnik-dao";
 
 // minimum balance a multicall instance needs for storage + state.
 const MIN_INSTANCE_BALANCE = toYocto(1); // 1 NEAR
@@ -29,13 +31,13 @@ interface State {
     multicall: Multicall;
     loading: boolean;
     proposed: number;
-    proposedInfo: object;
+    proposedInfo: ProposalOutput;
     activeTab: number;
 
     info: {
         admins: string[];
         tokens: string[];
-        jobs: unknown[];
+        jobs: object[];
         jobBond: string;
     };
 }
@@ -87,7 +89,9 @@ export class Dao extends Component<Props, State> {
 
     loadInfoDebounced = debounce(() => this.loadInfo(), 400);
 
-    lastAddr;
+    lastAddr: string = "";
+    // Multicall factory fee.
+    fee: string = "";
 
     /**
      * check if DAO has a proposal to create multicall instance.
@@ -112,7 +116,7 @@ export class Dao extends Component<Props, State> {
                     if (
                         !(proposal.kind?.FunctionCall?.receiver_id === window.nearConfig.MULTICALL_FACTORY_ADDRESS) ||
                         !(proposal.kind?.FunctionCall?.actions?.[0]?.method_name === "create") ||
-                        !(proposal.status === "InProgress")
+                        !(proposal.status === ProposalStatus.InProgress)
                     ) {
                         return false;
                     }
@@ -139,7 +143,7 @@ export class Dao extends Component<Props, State> {
         const { noContract, noDao } = this.errors;
 
         if (
-            this.fee === undefined ||
+            this.fee === "" ||
             // wallet not logged in or DAO object not initialized yet
             dao?.ready !== true
         ) {
@@ -147,6 +151,7 @@ export class Dao extends Component<Props, State> {
         }
 
         const depo = Big(this.fee).plus(MIN_INSTANCE_BALANCE);
+        const daoSearchInput: HTMLInputElement = document.querySelector(".address-container input")!;
 
         // can user propose a FunctionCall to DAO?
         const canPropose = dao.checkUserPermission(accountId, ProposalAction.AddProposal, ProposalKind.FunctionCall);
@@ -192,7 +197,7 @@ export class Dao extends Component<Props, State> {
             !noDao.isBad &&
             !loading &&
             // disappear while debouncing
-            this.lastAddr === document.querySelector(".address-container input")._valueTracker.getValue()
+            this.lastAddr === daoSearchInput.value
         ) {
             if (proposed === -1) {
                 // no create multicall proposal exists
@@ -305,7 +310,7 @@ export class Dao extends Component<Props, State> {
         }
     }
 
-    toLink(address, deleteIcon = false) {
+    toLink(address: string, deleteIcon: boolean = false) {
         const name = new ArgsAccount(address);
 
         return (
@@ -322,7 +327,7 @@ export class Dao extends Component<Props, State> {
         );
     }
 
-    job(job) {
+    job(job: object) {
         return (
             <div className="job">
                 <EditOutlined />
@@ -358,9 +363,10 @@ export class Dao extends Component<Props, State> {
 
         // initialize DAO object
         SputnikDAO.init(daoAddress)
-            .catch((e) => {})
+            // on error, return non-initialized DAO object, as ready = false per default
+            .catch((e) => new SputnikDAO(daoAddress))
             .then((dao) => {
-                if (!dao?.ready) {
+                if (!dao.ready) {
                     // DAO not ready => either no SputnikDAO contract on the chosen address
                     // or some error happened during DAO object init.
                     noContract.isBad = true;

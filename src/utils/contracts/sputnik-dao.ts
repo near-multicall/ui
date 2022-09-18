@@ -51,6 +51,29 @@ type Policy = {
     bounty_forgiveness_period: string;
 };
 
+// structure returned by contract when fetching proposals.
+type ProposalOutput = { id: number } & Proposal;
+
+type Vote = "Approve" | "Reject" | "Remove";
+
+// Define structure of a proposal
+type Proposal = {
+    // Original proposer.
+    proposer: string;
+    // Description of this proposal.
+    description: string;
+    // Kind of proposal with relevant information.
+    kind: ProposalKind;
+    // Current status of the proposal.
+    status: ProposalStatus;
+    // Count of votes per role per decision: yes / no / spam.
+    vote_counts: Record<string, [number, number, number]>;
+    // Map of who voted and how.
+    votes: Record<string, Vote>;
+    // Submission time (for voting period). (u64 as a string)
+    submission_time: string;
+};
+
 enum ProposalKind {
     ChangeConfig = "config",
     ChangePolicy = "policy",
@@ -87,6 +110,24 @@ enum ProposalAction {
     Finalize = "Finalize",
     /// Move a proposal to the hub to shift into another DAO.
     MoveToHub = "MoveToHub",
+}
+
+// Status of a proposal.
+enum ProposalStatus {
+    InProgress = "InProgress",
+    // If quorum voted yes, this proposal is successfully approved.
+    Approved = "Approved",
+    // If quorum voted no, this proposal is rejected. Bond is returned.
+    Rejected = "Rejected",
+    // If quorum voted to remove (e.g. spam), this proposal is rejected and bond is not returned.
+    // Interfaces shouldn't show removed proposals.
+    Removed = "Removed",
+    // Expired after period of time.
+    Expired = "Expired",
+    // If proposal was moved to Hub or somewhere else.
+    Moved = "Moved",
+    // If proposal has failed when finalizing. Allowed to re-finalize again to either expire or approved.
+    Failed = "Failed",
 }
 
 class SputnikDAO {
@@ -174,14 +215,14 @@ class SputnikDAO {
         );
     }
 
-    async getProposals(args: { from_index: number; limit: number }): Promise<object[]> {
+    async getProposals(args: { from_index: number; limit: number }): Promise<ProposalOutput[]> {
         return view(this.address, "get_proposals", args);
     }
 
     /**
      * Fetch proposal info from DAO contract
      */
-    async getProposal(proposal_id: number): Promise<object> {
+    async getProposal(proposal_id: number): Promise<ProposalOutput> {
         return view(this.address, "get_proposal", { id: proposal_id });
     }
 
@@ -235,7 +276,7 @@ class SputnikDAO {
     }
 
     // get proposal page URL on UI of choice
-    getProposalUrl(ui: SputnikUI, proposal_id: string): string {
+    getProposalUrl(ui: SputnikUI, proposal_id: number): string {
         // exit if UI not supported
         if (!(ui in SputnikUI)) return "";
         // we have a supported UI
@@ -321,4 +362,5 @@ class SputnikDAO {
     }
 }
 
-export { SputnikDAO, SputnikUI, ProposalKind, ProposalAction };
+export { SputnikDAO, SputnikUI, ProposalKind, ProposalAction, ProposalStatus };
+export type { ProposalOutput };

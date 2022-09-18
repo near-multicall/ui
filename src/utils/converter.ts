@@ -1,4 +1,5 @@
 import { Big, BigSource } from "big.js";
+import { Validation } from "./validation";
 
 // config for Big.js behavior. see: https://mikemcl.github.io/big.js/
 Big.RM = Big.roundDown;
@@ -12,9 +13,6 @@ const unitToDecimals: Record<string, number> = {
     Tgas: 12,
     gas: 0,
 };
-
-// only match basic integers & flaots. Reject exponentials, scientific notations ...
-const SIMPLE_NUM_REGEX: RegExp = /^\d+(\.\d+)?$/;
 
 const removeTrailingZeros = (amount: string): string => amount.replace(/\.?0*$/, "");
 // token amount -> indivisible units
@@ -37,14 +35,13 @@ const toYocto = (amount: string | number): string => parseTokenAmount(amount.toS
 const convert = (amount: string | number, unit: string, decimals?: number): number | string => {
     decimals = decimals ?? unitToDecimals[unit];
 
-    return decimals !== undefined && SIMPLE_NUM_REGEX.test(amount.toString())
+    return decimals !== undefined && Validation.isSimpleNumberStr(amount.toString())
         ? parseTokenAmount((amount === "" ? "0" : amount).toString(), decimals)
         : amount;
 };
 
 export {
     unitToDecimals,
-    SIMPLE_NUM_REGEX,
     parseTokenAmount,
     formatTokenAmount,
     toTGas,

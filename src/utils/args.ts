@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useReducer } from "react";
 import { BigSource } from "big.js";
+import { Validation } from "./validation";
 
 import { SputnikDAO } from "./contracts/sputnik-dao";
-import { unitToDecimals, SIMPLE_NUM_REGEX, convert, Big } from "./converter";
+import { unitToDecimals, convert, Big } from "./converter";
 
 export default abstract class Args {
     private types = {
@@ -64,9 +65,6 @@ class ArgsString extends Args {
 }
 
 class ArgsAccount extends Args {
-    // Regexp for NEAR account IDs. See: https://github.com/near/nearcore/blob/180e5dda991ad7bdbb389a931e84d24e31fb0674/core/account-id/src/lib.rs#L240
-    static ACCOUNT_ID_REGEX: RegExp = /^(?=.{2,64}$)(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_])*[a-z\d]+$/;
-
     constructor(value: string) {
         super("string", value);
     }
@@ -90,7 +88,7 @@ class ArgsAccount extends Args {
             value = new ArgsAccount(value);
         }
 
-        return this.ACCOUNT_ID_REGEX.test(value.value);
+        return Validation.isNearAccountId(value.value);
     };
 
     isValid = (): boolean => ArgsAccount.isValid(this);
@@ -111,7 +109,7 @@ class ArgsNumber extends Args {
 
     static isValid = (value: ArgsNumber): boolean => {
         // test if number
-        if (!SIMPLE_NUM_REGEX.test(value.value.toString())) {
+        if (!Validation.isSimpleNumberStr(value.value.toString())) {
             return false;
         }
 
@@ -154,7 +152,7 @@ class ArgsBig extends Args {
 
     static isValid = (value: ArgsBig): boolean => {
         // test if number
-        if (!SIMPLE_NUM_REGEX.test(value.value.toString())) {
+        if (!Validation.isSimpleNumberStr(value.value.toString())) {
             return false;
         }
 
