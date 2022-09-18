@@ -4,6 +4,7 @@ import { Builder } from "../builder/builder.jsx";
 import { Editor } from "../editor/editor.jsx";
 import { Export } from "../export/export.jsx";
 import "./menu.scss";
+import clsx from "clsx";
 
 export class Menu extends Component {
     constructor(props) {
@@ -11,7 +12,7 @@ export class Menu extends Component {
 
         this.state = {
             expanded: false,
-            tab: 0,
+            activeTab: 0,
         };
 
         document.addEventListener("onaddressesupdated", () => this.forceUpdate());
@@ -21,10 +22,10 @@ export class Menu extends Component {
         window.MENU = this;
     }
 
-    changeTab = (newTab) => this.setState({ tab: newTab });
+    changeTab = (newTab) => this.setState({ activeTab: newTab });
 
     render() {
-        const { expanded, tab } = this.state;
+        const { expanded, activeTab } = this.state;
 
         const LAYOUT = this.props.layout; // ususally global parameter
 
@@ -33,37 +34,43 @@ export class Menu extends Component {
                 <div className="tabs">
                     <div className="tab-list">
                         <button
-                            className={`tab ${tab === 0 ? "active-tab" : ""}`}
+                            className={clsx("tab", { "active-tab": activeTab === 0 })}
                             onClick={() => this.changeTab(0)}
                         >
                             Build
                         </button>
+
                         <button
-                            className={`tab ${tab === 1 ? "active-tab" : ""}`}
+                            className={clsx("tab", { "active-tab": activeTab === 1 })}
                             onClick={() => this.changeTab(1)}
                         >
                             Edit
                         </button>
+
                         <button
-                            className={`tab ${tab === 2 ? "active-tab" : ""}`}
+                            className={clsx("tab", { "active-tab": activeTab === 2 })}
                             onClick={() => this.changeTab(2)}
                         >
                             Export
                         </button>
                     </div>
-                    <div className={`${tab != 0 ? "hidden" : "active-panel"}`}>
+
+                    <div className={clsx({ hidden: activeTab !== 0, "active-tab-panel": activeTab === 0 })}>
                         <Builder
                             layout={LAYOUT}
                             menu={this}
                         />
                     </div>
-                    <div className={`${tab != 1 ? "hidden" : "active-panel"}`}>
+
+                    <div className={clsx({ hidden: activeTab !== 1, "active-tab-panel": activeTab === 1 })}>
                         <Editor />
                     </div>
-                    <div className={`${tab != 2 ? "hidden" : "active-panel"}`}>
+
+                    <div className={clsx({ hidden: activeTab !== 2, "active-tab-panel": activeTab === 2 })}>
                         <Export layout={LAYOUT} />
                     </div>
-                    <div className={`toggle-size ${expanded ? "collapse" : "expand"}`}>
+
+                    <div className={clsx("toggle-size", { collapse: expanded, expand: !expanded })}>
                         <Icon
                             className="icon"
                             onClick={() => {

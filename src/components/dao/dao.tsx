@@ -16,6 +16,7 @@ import { Multicall } from "../../utils/contracts/multicall";
 import "./dao.scss";
 import "./funds.scss";
 import "./multicall.scss";
+import clsx from "clsx";
 
 // minimum balance a multicall instance needs for storage + state.
 const MIN_INSTANCE_BALANCE = toYocto(1); // 1 NEAR
@@ -29,7 +30,7 @@ interface State {
     loading: boolean;
     proposed: number;
     proposedInfo: object;
-    tab: number;
+    activeTab: number;
 
     info: {
         admins: string[];
@@ -56,7 +57,7 @@ export class Dao extends Component<Props, State> {
             loading: false,
             proposed: -1,
             proposedInfo: {},
-            tab: 0,
+            activeTab: 0,
 
             info: {
                 admins: [],
@@ -204,6 +205,7 @@ export class Dao extends Component<Props, State> {
                             <div className="info-text">
                                 {/* hint: you can use "genesis" or "test" as DAO to get to this message */}
                                 {`A multicall instance can only be created for `}
+
                                 <a
                                     href={dao.getDaoUrl(SputnikUI.ASTRO_UI)}
                                     target="_blank"
@@ -211,6 +213,7 @@ export class Dao extends Component<Props, State> {
                                 >
                                     {dao.address}
                                 </a>
+
                                 {` by making a proposal.`}
                             </div>
 
@@ -277,6 +280,7 @@ export class Dao extends Component<Props, State> {
                             <div className="info-text">
                                 {/* hint: you can use "genesis" or "test" as DAO to get to this message */}
                                 {`There exists a proposal (#${proposed}) to create a multicall instance for this DAO. `}
+
                                 <a
                                     href={dao.getProposalUrl(SputnikUI.ASTRO_UI, proposed)}
                                     target="_blank"
@@ -335,10 +339,10 @@ export class Dao extends Component<Props, State> {
 
         const multicallAddress = `${name.value}.${window.nearConfig.MULTICALL_FACTORY_ADDRESS}`;
         const daoAddress = `${name.value}.${SputnikDAO.FACTORY_ADDRESS}`;
+
         if (this.lastAddr === name.value) return;
 
         this.lastAddr = name.value;
-
         noContract.isBad = false;
         noDao.isBad = false;
 
@@ -391,7 +395,7 @@ export class Dao extends Component<Props, State> {
 
     getContent() {
         const { selector: walletSelector } = this.context;
-        const { info, loading, tab } = this.state;
+        const { info, loading, activeTab } = this.state;
 
         // TODO: only require signIn when DAO has no multicall instance (to know if user can propose or vote on existing proposal to create multicall)
         if (!walletSelector.isSignedIn()) {
@@ -432,7 +436,13 @@ export class Dao extends Component<Props, State> {
 
         return (
             <>
-                <div className={`${tab != 0 ? "hidden" : "active-panel"} multicall-tab info-container`}>
+                <div
+                    className={clsx(
+                        { hidden: activeTab !== 0, "active-tab-panel": activeTab === 0 },
+                        "multicall-tab",
+                        "info-container"
+                    )}
+                >
                     <div className="info-card admins">
                         <AddOutlined />
                         <h1 className="title">Admins</h1>
@@ -467,7 +477,14 @@ export class Dao extends Component<Props, State> {
                         </h1>
                     </div>
                 </div>
-                <div className={`${tab != 1 ? "hidden" : "active-panel"} funds-tab info-container`}>
+
+                <div
+                    className={clsx(
+                        { hidden: activeTab !== 1, "active-tab-panel": activeTab === 1 },
+                        "funds-tab",
+                        "info-container"
+                    )}
+                >
                     <FungibleTokenBalances
                         className="info-card tokens"
                         dao={this.state.dao}
@@ -490,6 +507,7 @@ export class Dao extends Component<Props, State> {
                         }`
                     ),
                 },
+
                 () => {
                     this.errors.name.validOrNull(this.state.name);
                     this.loadInfo();
@@ -503,27 +521,29 @@ export class Dao extends Component<Props, State> {
         document.addEventListener("onaddressesupdated", () => this.onAddressesUpdated());
     }
 
-    changeTab = (newTab: number) => this.setState({ tab: newTab });
+    changeTab = (newTab: number) => this.setState({ activeTab: newTab });
 
     render() {
-        const { tab } = this.state;
+        const { activeTab } = this.state;
         return (
             <div className="dao-container">
                 <div className="header">
                     <div className="tab-list">
                         <button
-                            className={`tab ${tab === 0 ? "active-tab" : ""}`}
+                            className={clsx("tab", { "active-tab": activeTab === 0 })}
                             onClick={() => this.changeTab(0)}
                         >
                             Config
                         </button>
+
                         <button
-                            className={`tab ${tab === 1 ? "active-tab" : ""}`}
+                            className={clsx("tab", { "active-tab": activeTab === 1 })}
                             onClick={() => this.changeTab(1)}
                         >
                             Funds
                         </button>
                     </div>
+
                     <div className="address-container">
                         <TextInput
                             placeholder="Insert DAO name here"
@@ -543,6 +563,7 @@ export class Dao extends Component<Props, State> {
                         />
                     </div>
                 </div>
+
                 {this.getContent()}
             </div>
         );
