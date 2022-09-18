@@ -58,6 +58,10 @@ export class Sidebar extends Component {
     componentDidMount() {
         window.SIDEBAR = this;
 
+        document.addEventListener("onaddressesupdated", () => this.forceUpdate());
+    }
+
+    componentDidUpdate() {
         viewAccount(STORAGE.addresses.multicall)
             .then(() => this.setState({ featureFlags: { ...this.state.featureFlags, multicallDappLogin: true } }))
             .catch(() => this.setState({ featureFlags: { ...this.state.featureFlags, multicallDappLogin: false } }));
@@ -147,6 +151,7 @@ export class Sidebar extends Component {
                         icon={<PreviewOutlined />}
                         items={Object.values(DAPP_LOGIN_METHODS).map(({ key, title }) => ({
                             disabled: !this.state.featureFlags[key],
+                            key,
                             onClick: () => this.openDialog(key),
                             title,
                         }))}
