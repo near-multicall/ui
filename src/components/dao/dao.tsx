@@ -436,13 +436,7 @@ export class Dao extends Component<Props, State> {
 
         return (
             <>
-                <div
-                    className={clsx(
-                        { hidden: activeTab !== 0, "active-tab-panel": activeTab === 0 },
-                        "multicall-tab",
-                        "info-container"
-                    )}
-                >
+                <div className={clsx("multicall-tab", "tab-panel", "info-container", { active: activeTab === 0 })}>
                     <div className="info-card admins">
                         <AddOutlined />
                         <h1 className="title">Admins</h1>
@@ -478,13 +472,7 @@ export class Dao extends Component<Props, State> {
                     </div>
                 </div>
 
-                <div
-                    className={clsx(
-                        { hidden: activeTab !== 1, "active-tab-panel": activeTab === 1 },
-                        "funds-tab",
-                        "info-container"
-                    )}
-                >
+                <div className={clsx("funds-tab", "tab-panel", "info-container", { active: activeTab === 1 })}>
                     <FungibleTokenBalances
                         className="info-card tokens"
                         dao={this.state.dao}

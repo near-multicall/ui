@@ -57,16 +57,20 @@
 }
 
 .tab-panel {
-    height: calc(100% - size.$tab-list-height - 2 * size.$gap);
-    @include mixin.center-items;
-    flex-flow: column;
-    gap: size.$gap;
-    & > div {
-        display: flex;
-        flex-flow: column nowrap;
-        height: calc(100% - size.$gap);
-        width: calc(100% - (2 * size.$gap));
-        padding: 0 size.$gap size.$gap size.$gap;
+    display: none;
+
+    &.active {
+        @include mixin.center-items;
+        height: calc(100% - size.$tab-list-height - 2 * size.$gap);
+        flex-flow: column;
+        gap: size.$gap;
+        & > div {
+            display: flex;
+            flex-flow: column nowrap;
+            height: calc(100% - size.$gap);
+            width: calc(100% - (2 * size.$gap));
+            padding: 0 size.$gap size.$gap size.$gap;
+        }
     }
 }
 

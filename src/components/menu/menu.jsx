@@ -55,18 +55,18 @@ export class Menu extends Component {
                         </button>
                     </div>
 
-                    <div className={clsx({ hidden: activeTab !== 0, "active-tab-panel": activeTab === 0 })}>
+                    <div className={clsx("tab-panel", { active: activeTab === 0 })}>
                         <Builder
                             layout={LAYOUT}
                             menu={this}
                         />
                     </div>
 
-                    <div className={clsx({ hidden: activeTab !== 1, "active-tab-panel": activeTab === 1 })}>
+                    <div className={clsx("tab-panel", { active: activeTab === 1 })}>
                         <Editor />
                     </div>
 
-                    <div className={clsx({ hidden: activeTab !== 2, "active-tab-panel": activeTab === 2 })}>
+                    <div className={clsx("tab-panel", { active: activeTab === 2 })}>
                         <Export layout={LAYOUT} />
                     </div>
 
