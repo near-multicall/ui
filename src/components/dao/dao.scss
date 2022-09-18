@@ -105,9 +105,6 @@
         padding: size.$gap;
         max-width: 120rem;
         max-height: calc(100% - (4.5 * size.$gap - 0.5 * (size.$gap - size.$large-text)));
-        &.hidden {
-            display: none;
-        }
 
         &.active-tab-panel {
             width: 100%;

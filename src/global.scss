@@ -46,6 +46,10 @@ button {
     cursor: pointer;
 }
 
+.hidden {
+    display: none;
+}
+
 .warn {
     color: color.$yellow;
 }
