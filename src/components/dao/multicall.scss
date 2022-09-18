@@ -4,60 +4,54 @@
 @use "sass/size";
 
 .multicall-tab {
-    &.content {
-        @include mixin.center-items(center, initial);
+    grid-template:
+        "admins jobs" 6fr
+        "token-whitelist jobs" 5fr
+        "token-whitelist job-bond" 1fr / 1fr 1fr;
 
-        .info-container {
-            grid-template:
-                "admins jobs" 6fr
-                "token-whitelist jobs" 5fr
-                "token-whitelist job-bond" 1fr / 1fr 1fr;
-        }
+    .admins {
+        grid-area: admins;
+    }
 
-        .admins {
-            grid-area: admins;
-        }
+    .token-whitelist {
+        grid-area: token-whitelist;
+    }
 
-        .token-whitelist {
-            grid-area: token-whitelist;
-        }
+    .jobs {
+        grid-area: jobs;
+        position: relative;
 
-        .jobs {
-            grid-area: jobs;
-            position: relative;
+        .scroll-wrapper {
+            @include mixin.no-scrollbar;
+            overflow-y: scroll;
+            position: absolute;
+            top: calc(size.$large-text + 1.5 * size.$gap);
+            bottom: 0;
+            left: 0;
+            right: 0;
 
-            .scroll-wrapper {
-                @include mixin.no-scrollbar;
-                overflow-y: scroll;
-                position: absolute;
-                top: calc(size.$large-text + 1.5 * size.$gap);
-                bottom: 0;
-                left: 0;
-                right: 0;
+            .job {
+                position: relative;
+                margin: size.$gap;
+                margin-top: 0;
+                border-radius: size.$task-radius;
+                background-color: color.$lightest;
 
-                .job {
-                    position: relative;
-                    margin: size.$gap;
-                    margin-top: 0;
-                    border-radius: size.$task-radius;
-                    background-color: color.$lightest;
-
-                    pre {
-                        padding: 0.5 * size.$gap;
-                        font-family: font.$code;
-                        font-size: size.$small-text;
-                    }
+                pre {
+                    padding: 0.5 * size.$gap;
+                    font-family: font.$code;
+                    font-size: size.$small-text;
                 }
             }
         }
+    }
 
-        .job-bond {
-            grid-area: job-bond;
+    .job-bond {
+        grid-area: job-bond;
 
-            .title {
-                @include mixin.center-items(space-between, center);
-                height: 100%;
-            }
+        .title {
+            @include mixin.center-items(space-between, center);
+            height: 100%;
         }
     }
 }
