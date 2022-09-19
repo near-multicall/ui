@@ -4,7 +4,7 @@ import { toGas, Big } from "../../utils/converter";
 import { tx, view } from "../../utils/wallet";
 import { STORAGE } from "../../utils/persistent";
 import { useWalletSelector } from "../../contexts/walletSelectorContext";
-import { SputnikDAO, ProposalKind, ProposalAction } from "../../utils/contracts/sputnik-dao";
+import { SputnikDAO } from "../../utils/contracts/sputnik-dao";
 import { errorMsg } from "../../utils/errors";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
@@ -179,7 +179,10 @@ export class Wallet extends Component {
         const multicall = dao.replace(SputnikDAO.FACTORY_ADDRESS, window.nearConfig.MULTICALL_FACTORY_ADDRESS);
 
         Promise.all([
-            SputnikDAO.init(dao).catch((e) => {}),
+            SputnikDAO.init(dao).catch(() => {
+                // return non-initialized DAO obj as ready = false per default.
+                new SputnikDAO(dao);
+            }),
             view(multicall, "get_admins", {}).catch((e) => {
                 if (
                     (e.type === "AccountDoesNotExist" && e.toString().includes(` ${multicall} `)) ||
@@ -204,11 +207,7 @@ export class Wallet extends Component {
                 });
 
                 // can user propose FunctionCall to DAO?
-                const canPropose = initializedDAO.checkUserPermission(
-                    accountId,
-                    ProposalAction.AddProposal,
-                    ProposalKind.FunctionCall
-                );
+                const canPropose = initializedDAO.checkUserPermission(accountId, "AddProposal", "FunctionCall");
 
                 if (!canPropose) noRights.isBad = true; // no add proposal rights
 

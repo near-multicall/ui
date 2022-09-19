@@ -53,8 +53,42 @@ type Policy = {
 
 // structure returned by contract when fetching proposals.
 type ProposalOutput = { id: number } & Proposal;
-
 type Vote = "Approve" | "Reject" | "Remove";
+type ProposalKind =
+    | "ChangeConfig"
+    | "ChangePolicy"
+    | "AddMemberToRole"
+    | "RemoveMemberFromRole"
+    | "FunctionCall"
+    | "UpgradeSelf"
+    | "UpgradeRemote"
+    | "Transfer"
+    | "SetStakingContract"
+    | "AddBounty"
+    | "BountyDone"
+    | "Vote"
+    | "FactoryInfoUpdate"
+    | "ChangePolicyAddOrUpdateRole"
+    | "ChangePolicyRemoveRole"
+    | "ChangePolicyUpdateDefaultVotePolicy"
+    | "ChangePolicyUpdateParameters";
+
+type ProposalAction =
+    // Action to add proposal. Used internally.
+    | "AddProposal"
+    // Action to remove given proposal. Used for immediate deletion in special cases.
+    | "RemoveProposal"
+    // Vote to approve given proposal or bounty.
+    | "VoteApprove"
+    // Vote to reject given proposal or bounty.
+    | "VoteReject"
+    // Vote to remove given proposal or bounty (because it's spam).
+    | "VoteRemove"
+    // Finalize proposal, called when it's expired to return the funds
+    // (or in the future can be used for early proposal closure).
+    | "Finalize"
+    // Move a proposal to the hub to shift into another DAO.
+    | "MoveToHub";
 
 // Define structure of a proposal
 type Proposal = {
@@ -63,7 +97,7 @@ type Proposal = {
     // Description of this proposal.
     description: string;
     // Kind of proposal with relevant information.
-    kind: ProposalKind;
+    kind: Record<ProposalKind, any>;
     // Current status of the proposal.
     status: ProposalStatus;
     // Count of votes per role per decision: yes / no / spam.
@@ -74,43 +108,25 @@ type Proposal = {
     submission_time: string;
 };
 
-enum ProposalKind {
-    ChangeConfig = "config",
-    ChangePolicy = "policy",
-    AddMemberToRole = "add_member_to_role",
-    RemoveMemberFromRole = "remove_member_from_role",
-    FunctionCall = "call",
-    UpgradeSelf = "upgrade_self",
-    UpgradeRemote = "upgrade_remote",
-    Transfer = "transfer",
-    SetStakingContract = "set_vote_token",
-    AddBounty = "add_bounty",
-    BountyDone = "bounty_done",
-    Vote = "vote",
-    FactoryInfoUpdate = "factory_info_update",
-    ChangePolicyAddOrUpdateRole = "policy_add_or_update_role",
-    ChangePolicyRemoveRole = "policy_remove_role",
-    ChangePolicyUpdateDefaultVotePolicy = "policy_update_default_vote_policy",
-    ChangePolicyUpdateParameters = "policy_update_parameters",
-}
-
-enum ProposalAction {
-    /// Action to add proposal. Used internally.
-    AddProposal = "AddProposal",
-    /// Action to remove given proposal. Used for immediate deletion in special cases.
-    RemoveProposal = "RemoveProposal",
-    /// Vote to approve given proposal or bounty.
-    VoteApprove = "VoteApprove",
-    /// Vote to reject given proposal or bounty.
-    VoteReject = "VoteReject",
-    /// Vote to remove given proposal or bounty (because it's spam).
-    VoteRemove = "VoteRemove",
-    /// Finalize proposal, called when it's expired to return the funds
-    /// (or in the future can be used for early proposal closure).
-    Finalize = "Finalize",
-    /// Move a proposal to the hub to shift into another DAO.
-    MoveToHub = "MoveToHub",
-}
+const ProposalKindPolicyLabel: Record<ProposalKind, string> = {
+    ChangeConfig: "config",
+    ChangePolicy: "policy",
+    AddMemberToRole: "add_member_to_role",
+    RemoveMemberFromRole: "remove_member_from_role",
+    FunctionCall: "call",
+    UpgradeSelf: "upgrade_self",
+    UpgradeRemote: "upgrade_remote",
+    Transfer: "transfer",
+    SetStakingContract: "set_vote_token",
+    AddBounty: "add_bounty",
+    BountyDone: "bounty_done",
+    Vote: "vote",
+    FactoryInfoUpdate: "factory_info_update",
+    ChangePolicyAddOrUpdateRole: "policy_add_or_update_role",
+    ChangePolicyRemoveRole: "policy_remove_role",
+    ChangePolicyUpdateDefaultVotePolicy: "policy_update_default_vote_policy",
+    ChangePolicyUpdateParameters: "policy_update_parameters",
+};
 
 // Status of a proposal.
 enum ProposalStatus {
@@ -351,7 +367,7 @@ class SputnikDAO {
             .flat()
             .filter((permission) => {
                 const [proposalKind, action] = permission.split(":");
-                return proposalKind === "*" || proposalKind === givenProposalKind;
+                return proposalKind === "*" || proposalKind === ProposalKindPolicyLabel[givenProposalKind];
             });
         const canDoAction: boolean = proposalKindPermissions?.some((permission) => {
             const [proposalKind, action] = permission.split(":");
@@ -362,5 +378,5 @@ class SputnikDAO {
     }
 }
 
-export { SputnikDAO, SputnikUI, ProposalKind, ProposalAction, ProposalStatus };
-export type { ProposalOutput };
+export { SputnikDAO, SputnikUI, ProposalKindPolicyLabel, ProposalStatus };
+export type { ProposalOutput, ProposalKind, ProposalAction };

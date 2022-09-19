@@ -69,19 +69,30 @@ class ArgsAccount extends Args {
         super("string", value);
     }
 
-    static getSubAccountAddress = (address: string) => {
-        let result;
+    /**
+     * Deconstructs given NEAR address into its parent address, and a name.
+     * Parent address for a Top Level Account (TLA) is "".
+     *
+     * Examples:
+     *   1- "potato.example.near" becomes: {name: "potato", parentAddress: "example.near"}
+     *   2- "near" becomes {name: "potato", parentAddress: ""}
+     *
+     * @param address address to get its NEAR parent account
+     * @returns
+     */
+    static deconstructAddress = (address: string): { name: string; parentAddress: string } => {
+        const deconstructedAddr = address.split(".");
+        const result = { name: deconstructedAddr[0], parentAddress: "" };
+        // address has a parent account (not TLA)
+        if (deconstructedAddr.length > 1) {
+            deconstructedAddr.splice(0, 1);
+            result.parentAddress = deconstructedAddr.join(".");
+        }
 
-        if (address.endsWith("." + SputnikDAO.FACTORY_ADDRESS))
-            result = address.split("." + SputnikDAO.FACTORY_ADDRESS)[0];
-        else if (address.endsWith("." + window.nearConfig.MULTICALL_FACTORY_ADDRESS))
-            result = address.split("." + window.nearConfig.MULTICALL_FACTORY_ADDRESS)[0];
-        else result = address;
-
-        return new ArgsAccount(result);
+        return result;
     };
 
-    getSubAccountAddress = () => ArgsAccount.getSubAccountAddress(this.value);
+    deconstructAddress = () => ArgsAccount.deconstructAddress(this.value);
 
     static isValid = (value: ArgsAccount | string): boolean => {
         if (typeof value === "string") {

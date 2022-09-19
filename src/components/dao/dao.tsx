@@ -9,7 +9,7 @@ import { STORAGE } from "../../utils/persistent";
 import { toNEAR, toYocto, Big } from "../../utils/converter";
 import { view } from "../../utils/wallet";
 import { useWalletSelector } from "../../contexts/walletSelectorContext";
-import { SputnikDAO, SputnikUI, ProposalKind, ProposalAction, ProposalStatus } from "../../utils/contracts/sputnik-dao";
+import { SputnikDAO, SputnikUI, ProposalStatus } from "../../utils/contracts/sputnik-dao";
 import { TextInput } from "../editor/elements";
 import { FungibleTokenBalances } from "../token";
 import { Multicall } from "../../utils/contracts/multicall";
@@ -37,7 +37,7 @@ interface State {
     info: {
         admins: string[];
         tokens: string[];
-        jobs: object[];
+        jobs: any[];
         jobBond: string;
     };
 }
@@ -46,16 +46,13 @@ export class Dao extends Component<Props, State> {
     constructor(props: Props) {
         super(props);
 
+        // split DAO address into parent address and rest (name).
+        const deconstructedDaoAddress = ArgsAccount.deconstructAddress(STORAGE.addresses.dao);
+
         this.state = {
-            name: ArgsAccount.getSubAccountAddress(STORAGE.addresses.dao),
+            name: new ArgsAccount(deconstructedDaoAddress.name),
             dao: new SputnikDAO(STORAGE.addresses.dao),
-
-            multicall: new Multicall(
-                `${ArgsAccount.getSubAccountAddress(STORAGE.addresses.dao).value}.${
-                    window.nearConfig.MULTICALL_FACTORY_ADDRESS
-                }`
-            ),
-
+            multicall: new Multicall(`${deconstructedDaoAddress.name}.${window.nearConfig.MULTICALL_FACTORY_ADDRESS}`),
             loading: false,
             proposed: -1,
             proposedInfo: {},
@@ -77,10 +74,10 @@ export class Dao extends Component<Props, State> {
 
     static contextType = useWalletSelector();
 
-    errors = {
+    errors: { [key: string]: ArgsError } = {
         name: new ArgsError(
             "Invalid NEAR address",
-            (value) => ArgsAccount.isValid(value),
+            (input) => ArgsAccount.isValid(`${input.value}.${SputnikDAO.FACTORY_ADDRESS}`),
             !ArgsAccount.isValid(STORAGE.addresses.dao)
         ),
         noDao: new ArgsError("Sputnik DAO not found on given address", (value) => this.errors.noDao.isBad),
@@ -139,7 +136,7 @@ export class Dao extends Component<Props, State> {
 
     createMulticall() {
         const { accountId } = this.context;
-        const { loading, name, dao, proposed, proposedInfo } = this.state;
+        const { loading, dao, proposed, proposedInfo } = this.state;
         const { noContract, noDao } = this.errors;
 
         if (
@@ -154,10 +151,10 @@ export class Dao extends Component<Props, State> {
         const daoSearchInput: HTMLInputElement = document.querySelector(".address-container input")!;
 
         // can user propose a FunctionCall to DAO?
-        const canPropose = dao.checkUserPermission(accountId, ProposalAction.AddProposal, ProposalKind.FunctionCall);
+        const canPropose = dao.checkUserPermission(accountId, "AddProposal", "FunctionCall");
 
         // can user vote approve a FunctionCall on the DAO?
-        const canApprove = dao.checkUserPermission(accountId, ProposalAction.VoteApprove, ProposalKind.FunctionCall);
+        const canApprove = dao.checkUserPermission(accountId, "VoteApprove", "FunctionCall");
 
         const args = {
             proposal: {
@@ -311,23 +308,23 @@ export class Dao extends Component<Props, State> {
     }
 
     toLink(address: string, deleteIcon: boolean = false) {
-        const name = new ArgsAccount(address);
+        const addr = new ArgsAccount(address);
 
         return (
             <span>
                 <a
-                    href={name.toUrl()}
+                    href={addr.toUrl()}
                     target="_blank"
                     rel="noopener noreferrer"
                 >
-                    {name.value}
+                    {addr.value}
                 </a>
                 {deleteIcon ? <DeleteOutline /> : null}
             </span>
         );
     }
 
-    job(job: object) {
+    job(job: any) {
         return (
             <div className="job">
                 <EditOutlined />
@@ -339,7 +336,7 @@ export class Dao extends Component<Props, State> {
     }
 
     loadInfo() {
-        const { name: addrError, noContract, noDao } = this.errors;
+        const { name: nameError, noContract, noDao } = this.errors;
         const { name } = this.state;
 
         const multicallAddress = `${name.value}.${window.nearConfig.MULTICALL_FACTORY_ADDRESS}`;
@@ -352,7 +349,7 @@ export class Dao extends Component<Props, State> {
         noDao.isBad = false;
 
         // chosen address violates NEAR AccountId rules.
-        if (addrError.isBad) {
+        if (nameError.isBad) {
             noContract.isBad = true;
             noDao.isBad = true;
             this.setState({ proposed: -1, proposedInfo: {} });
@@ -502,20 +499,20 @@ export class Dao extends Component<Props, State> {
     }
 
     onAddressesUpdated() {
-        if (!this.state.name.equals(ArgsAccount.getSubAccountAddress(STORAGE.addresses.dao))) {
+        const { name } = this.state;
+        const daoAccount = new ArgsAccount(STORAGE.addresses.dao);
+        if (!(name.value === daoAccount.deconstructAddress().name)) {
             this.setState(
                 {
-                    name: ArgsAccount.getSubAccountAddress(STORAGE.addresses.dao),
+                    name: new ArgsAccount(daoAccount.deconstructAddress().name),
 
                     multicall: new Multicall(
-                        `${ArgsAccount.getSubAccountAddress(STORAGE.addresses.dao).value}.${
-                            window.nearConfig.MULTICALL_FACTORY_ADDRESS
-                        }`
+                        `${daoAccount.deconstructAddress().name}.${window.nearConfig.MULTICALL_FACTORY_ADDRESS}`
                     ),
                 },
 
                 () => {
-                    this.errors.name.validOrNull(this.state.name);
+                    this.errors.name.validOrNull(daoAccount);
                     this.loadInfo();
                     this.forceUpdate();
                 }
@@ -530,7 +527,7 @@ export class Dao extends Component<Props, State> {
     changeTab = (newTab: number) => this.setState({ activeTab: newTab });
 
     render() {
-        const { activeTab } = this.state;
+        const { activeTab, name } = this.state;
         return (
             <div className="dao-container">
                 <div className="header">
@@ -553,10 +550,12 @@ export class Dao extends Component<Props, State> {
                     <div className="address-container">
                         <TextInput
                             placeholder="Insert DAO name here"
-                            value={this.state.name}
+                            value={name}
                             error={this.errors.name}
                             update={() => {
-                                if (this.state.name.isValid()) {
+                                const fullDaoAddr = `${name.value}.${SputnikDAO.FACTORY_ADDRESS}`;
+                                const daoAccount = new ArgsAccount(fullDaoAddr);
+                                if (daoAccount.isValid()) {
                                     this.loadInfoDebounced();
                                 }
                                 this.forceUpdate();
