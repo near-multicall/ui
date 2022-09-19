@@ -2,7 +2,8 @@ import { addMethod, array, BaseSchema, object, ObjectSchema as _ObjectSchema } f
 import { StringSchema } from "./args-string";
 import { BigSchema } from "./args-big";
 import { Base64 } from "js-base64";
-import { addErrorMethods } from "./args-error";
+import { addErrorMethods } from "../args-error";
+import { addFieldMethods } from "../args-form";
 
 declare module "yup" {
     interface ObjectSchema<TShape, TContext, TIn, TOut> extends BaseSchema<TIn, TContext, TOut> {
@@ -54,5 +55,6 @@ addMethod(_ObjectSchema, "intoCallString", function intoCallString() {
 });
 
 addErrorMethods(_ObjectSchema);
+addFieldMethods(_ObjectSchema);
 
 export { _ObjectSchema as ObjectSchema };

@@ -1,7 +1,8 @@
 import { BigSource } from "big.js";
 import { MixedSchema } from "yup";
-import { Big, formatTokenAmount, parseTokenAmount, toGas, unit, unitToDecimals } from "./../converter";
-import { addErrorMethods, locale } from "./args-error";
+import { Big, formatTokenAmount, parseTokenAmount, toGas, unit, unitToDecimals } from "../../converter";
+import { addErrorMethods, locale } from "../args-error";
+import { addFieldMethods } from "../args-form";
 
 class BigSchema extends MixedSchema<Big> {
     constructor() {
@@ -74,5 +75,6 @@ class BigSchema extends MixedSchema<Big> {
 }
 
 addErrorMethods(BigSchema);
+addFieldMethods(BigSchema);
 
 export { BigSchema };

@@ -16,4 +16,4 @@ export const args = {
     string: () => new StringSchema(),
 };
 
-console.log(args.string().address());
+console.log(args.object().call());

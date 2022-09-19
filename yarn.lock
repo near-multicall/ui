@@ -4038,6 +4038,16 @@ ee-first@1.1.1:
   resolved "https://registry.yarnpkg.com/ee-first/-/ee-first-1.1.1.tgz#590c61156b0ae2f4f0255732a158b266bc56b21d"
   integrity sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==
 
+effector-forms@^0.0.24:
+  version "0.0.24"
+  resolved "https://registry.yarnpkg.com/effector-forms/-/effector-forms-0.0.24.tgz#2ff2ee251b4aa059baa9f6883866da0758a896bb"
+  integrity sha512-bFExfHd2WKwAuDbCQ6kdGU/5ivx+C3N6cEcLBXcdTJefpnh5D0+Sp59ai8+xV+xUEVC1RTB1jA8WCeYbgG04fQ==
+
+effector@^22.3.0:
+  version "22.3.0"
+  resolved "https://registry.yarnpkg.com/effector/-/effector-22.3.0.tgz#c743dd7d934ec3f9a2efac76a563cd0281bc4201"
+  integrity sha512-Nh7IXn8U4emq8YtAZf2+y2Rs6n4W/gjPaNZpZLFOXOIAsRZSNBFjtK1vHTWNKxxmNFZOaZN6XUXdT8FDs0mAdQ==
+
 electron-to-chromium@^1.4.202:
   version "1.4.211"
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.211.tgz#afaa8b58313807501312d598d99b953568d60f91"

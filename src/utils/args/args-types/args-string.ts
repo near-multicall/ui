@@ -1,8 +1,9 @@
 import { addMethod, StringSchema as _StringSchema } from "yup";
-import { hasContract } from "../contracts/generic";
-import Multicall from "../contracts/multicall";
-import { SputnikDAO } from "../contracts/sputnik-dao";
-import { locale, addErrorMethods } from "./args-error";
+import { hasContract } from "../../contracts/generic";
+import Multicall from "../../contracts/multicall";
+import { SputnikDAO } from "../../contracts/sputnik-dao";
+import { locale, addErrorMethods } from "../args-error";
+import { addFieldMethods } from "../args-form";
 
 declare module "yup" {
     interface StringSchema {
@@ -76,5 +77,6 @@ addMethod(_StringSchema, "intoUrl", function intoUrl() {
 });
 
 addErrorMethods(_StringSchema);
+addFieldMethods(_StringSchema);
 
 export { _StringSchema as StringSchema };
