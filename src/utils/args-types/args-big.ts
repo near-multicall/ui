@@ -1,7 +1,7 @@
 import { BigSource } from "big.js";
 import { MixedSchema } from "yup";
 import { Big, formatTokenAmount, parseTokenAmount, toGas, unit, unitToDecimals } from "./../converter";
-import { locale } from "./args-error";
+import { addErrorMethods, locale } from "./args-error";
 
 class BigSchema extends MixedSchema<Big> {
     constructor() {
@@ -72,5 +72,7 @@ class BigSchema extends MixedSchema<Big> {
         return this.transform((value) => new Big(parseTokenAmount(value, decimals))).meta({ decimals });
     }
 }
+
+addErrorMethods(BigSchema);
 
 export { BigSchema };

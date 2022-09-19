@@ -2,7 +2,7 @@ import { addMethod, StringSchema as _StringSchema } from "yup";
 import { hasContract } from "../contracts/generic";
 import Multicall from "../contracts/multicall";
 import { SputnikDAO } from "../contracts/sputnik-dao";
-import { locale } from "./args-error";
+import { locale, addErrorMethods } from "./args-error";
 
 declare module "yup" {
     interface StringSchema {
@@ -74,5 +74,7 @@ addMethod(_StringSchema, "multicall", function multicall(message = locale.string
 addMethod(_StringSchema, "intoUrl", function intoUrl() {
     return this.address().transform((value) => `https://explorer.${window.NEAR_ENV}.near.org/accounts/${value}`);
 });
+
+addErrorMethods(_StringSchema);
 
 export { _StringSchema as StringSchema };

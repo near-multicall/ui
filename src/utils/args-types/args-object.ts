@@ -2,6 +2,7 @@ import { addMethod, array, BaseSchema, object, ObjectSchema as _ObjectSchema } f
 import { StringSchema } from "./args-string";
 import { BigSchema } from "./args-big";
 import { Base64 } from "js-base64";
+import { addErrorMethods } from "./args-error";
 
 declare module "yup" {
     interface ObjectSchema<TShape, TContext, TIn, TOut> extends BaseSchema<TIn, TContext, TOut> {
@@ -43,7 +44,7 @@ addMethod(_ObjectSchema, "intoBase64String", function intoBase64String() {
     return this.transform((value) => Base64.encode(JSON.stringify(value)));
 });
 
-// base64 encode input value
+// encode input value into json string, where args are encoded in base64
 addMethod(_ObjectSchema, "intoCallString", function intoCallString() {
     return this.call().transform((value) => {
         const _value = value;
@@ -51,5 +52,7 @@ addMethod(_ObjectSchema, "intoCallString", function intoCallString() {
         return JSON.stringify(_value);
     });
 });
+
+addErrorMethods(_ObjectSchema);
 
 export { _ObjectSchema as ObjectSchema };
