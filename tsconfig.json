@@ -1,7 +1,6 @@
 {
     "compilerOptions": {
-        "jsx": "react",
-        "target": "es5",
+        "target": "es6",
         "lib": ["dom", "dom.iterable", "esnext"],
         "allowJs": true,
         "jsx": "react",
@@ -18,7 +17,7 @@
         "noEmit": true,
         "noImplicitAny": true,
         "noImplicitThis": true,
-        "strictNullChecks": true,
+        "strictNullChecks": true
     },
     "include": ["src"]
 }
