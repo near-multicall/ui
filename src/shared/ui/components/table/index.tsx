@@ -1,23 +1,8 @@
-import {
-    TableContainer,
-    TableHead,
-    TableCell,
-    TableRow,
-    TableBody,
-    Box,
-    Typography,
-    styled,
-    IconButton,
-    Collapse,
-    TableSortLabel,
-} from "@mui/material";
-
-// import { visuallyHidden } from '@mui/utils'
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import React, { useState } from "react";
+import { TableContainer, TableHead, TableCell, TableRow as MuiTableRow, TableBody, styled } from "@mui/material";
+import React from "react";
 
 import { useBreakpoint } from "../../lib/breakpoints";
+import { TableRow, TableRowCard, TableRowDefault, TableRowProps } from "./row";
 
 const StyledTableContainer = styled(TableContainer)({
     display: "table",
@@ -67,135 +52,12 @@ const StyledTableHead = styled(TableHead)(({ theme }) => ({
     },
 }));
 
-const StyledTableRow = styled(TableRow, { shouldForwardProp: () => true })<{
-    variant: "outlined" | "grey";
-    fontSize?: string;
-}>(({ variant, theme, fontSize }) => ({
-    height: 80,
-    borderRadius: "16px",
-    overflow: "hidden",
-    position: "relative",
-    whiteSpace: "pre",
-    background: variant === "outlined" ? "transparent" : "#b4ccca",
-
-    "& + tr .MuiCollapse-root": {
-        background: variant === "outlined" ? "transparent" : theme.palette.background.default,
-    },
-
-    "& .MuiTableCell-root": {
-        fontSize: (fontSize ?? "16px") + "!important",
-        justifyContent: "flex-start",
-        paddingLeft: 0,
-        border: "1px solid",
-        borderColor: variant === "outlined" ? "#00000010" : "transparent",
-        borderRight: "none",
-        borderLeft: "none",
-
-        "& .MuiTypography-root": {
-            fontSize: (fontSize ?? "16px") + "!important",
-        },
-
-        "&:first-of-type": {
-            borderLeft: "1px solid",
-            borderColor: variant === "outlined" ? "#00000010" : "transparent",
-            paddingLeft: "20px",
-            borderTopLeftRadius: 16,
-            borderBottomLeftRadius: 16,
-        },
-
-        "&:last-child": {
-            borderRight: "1px solid",
-            borderColor: variant === "outlined" ? "#00000010" : "transparent",
-            paddingRight: "20px",
-            borderTopRightRadius: 16,
-            borderBottomRightRadius: 16,
-        },
-    },
-
-    "&:hover": {
-        "& + tr .MuiCollapse-root": {
-            backgroundColor: variant === "outlined" ? "#E2E7F020" : "#dcefea",
-        },
-
-        backgroundColor: variant === "outlined" ? "#E2E7F020" : "#dcefea",
-    },
-}));
-
-const Card = styled("div")({
-    backgroundColor: "rgba(255, 255, 255, 0.08)",
-    border: "1px solid rgba(0, 0, 0, 0.1)",
-    borderRadius: 16,
-    padding: 16,
-
-    "& > div": {
-        width: "100%",
-    },
-});
-
-const sortIcon = ({ className }: { className: string }) => (
-    <svg
-        width="6"
-        height="10"
-        viewBox="0 0 6 10"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        className={className}
-    >
-        <path
-            className="sort-down"
-            d="M1.0875 6.5791L3 8.48743L4.9125 6.5791L5.5 7.1666L3 9.6666L0.5 7.1666L1.0875 6.5791Z"
-            fill="#00000099"
-        />
-
-        <path
-            className="sort-up"
-            d="M1.0875 3.421L3 1.51266L4.9125 3.421L5.5 2.8335L3 0.333496L0.5 2.8335L1.0875 3.421Z"
-            fill="#00000099"
-        />
-    </svg>
-);
-
-const CardRow = styled("div")(`
-    display: flex;
-    justify-content: space-between;
-    grid-template-columns: auto 100%;
-
-    > div:first-of-type {
-      white-space: nowrap;
-    }
-
-    > div:last-child {
-      width: 100%;
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-    }
-  `);
-
 export const Table = ({
     header,
-    rows,
-    variant = "grey",
-    collapsible,
-    hiddenParts,
-    fontSize,
-    sortHeaders,
-    order,
-    orderBy,
-    createSortfunction,
-    icons,
+    rows = [["...", "...", "...", "..."]],
 }: {
-    sortHeaders?: string[];
-    header: string[];
-    rows: ((string | number | JSX.Element)[] | null)[];
-    variant?: "outlined" | "grey";
-    collapsible?: boolean;
-    hiddenParts?: JSX.Element[];
-    fontSize?: string;
-    order?: "asc" | "desc";
-    orderBy?: string;
-    createSortfunction?: (label: string) => () => void;
-    icons?: boolean;
+    header: TableRowProps["headerCells"];
+    rows?: TableRowProps["cells"][];
 }) => {
     const matches = useBreakpoint("md");
 
@@ -203,213 +65,35 @@ export const Table = ({
         <>
             {matches ? (
                 <>
-                    {rows.map((data, index) => (
-                        <Card key={index}>
-                            <Box
-                                display="flex"
-                                flexDirection="column"
-                                gap="16px"
-                            >
-                                {header.map((headerString, index) => (
-                                    <CardRow key={index}>
-                                        <Typography
-                                            variant="inherit"
-                                            component="div"
-                                            fontSize={12}
-                                            color="#000000"
-                                            sx={{ opacity: 0.5 }}
-                                        >
-                                            {headerString}
-                                        </Typography>
-
-                                        <Typography
-                                            sx={{ color: (theme) => theme.palette.text.secondary }}
-                                            component="div"
-                                        >
-                                            {data && data[index]}
-                                        </Typography>
-
-                                        {collapsible && index + 1 === header.length && (
-                                            <IconButton
-                                                aria-label="expand row"
-                                                size="small"
-                                                // onClick={() => setIsOpen(open => !open)}
-                                                sx={{ flexGrow: 0 }}
-                                            >
-                                                <KeyboardArrowUpIcon />
-                                                {/* {isOpen ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />} */}
-                                            </IconButton>
-                                        )}
-                                    </CardRow>
-                                ))}
-                            </Box>
-                        </Card>
+                    {rows.map((cells, index) => (
+                        <TableRowCard
+                            headerCells={header}
+                            key={index}
+                            {...{ cells }}
+                        />
                     ))}
                 </>
             ) : (
                 <StyledTableContainer>
                     <table>
                         <StyledTableHead>
-                            <TableRow>
-                                {header.map((string, index) => (
-                                    <TableCell key={index}>
-                                        {sortHeaders &&
-                                        sortHeaders.includes(string) &&
-                                        order &&
-                                        orderBy &&
-                                        createSortfunction ? (
-                                            <TableSortLabel
-                                                active={orderBy === string}
-                                                direction={orderBy === string ? order : "asc"}
-                                                onClick={createSortfunction(string)}
-                                                IconComponent={sortIcon}
-                                                sx={{
-                                                    "& .MuiTableSortLabel-icon": {
-                                                        transform: "none",
-                                                        opacity: 1,
-                                                    },
-
-                                                    "& .MuiTableSortLabel-iconDirectionDesc .sort-down": {
-                                                        fill: (theme) =>
-                                                            orderBy === string
-                                                                ? order === "desc"
-                                                                    ? theme.palette.primary.main
-                                                                    : "#00000099"
-                                                                : "#00000099",
-                                                    },
-
-                                                    "& .MuiTableSortLabel-iconDirectionAsc .sort-up": {
-                                                        fill: (theme) =>
-                                                            orderBy === string
-                                                                ? order === "asc"
-                                                                    ? theme.palette.primary.main
-                                                                    : "#00000099"
-                                                                : "#00000099",
-                                                    },
-                                                }}
-                                            >
-                                                {string}
-
-                                                {/* <Box component="span" sx={visuallyHidden}>
-                            {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                          </Box> */}
-                                            </TableSortLabel>
-                                        ) : (
-                                            string
-                                        )}
-                                    </TableCell>
+                            <MuiTableRow>
+                                {header.map((headerCell, index) => (
+                                    <TableCell key={index}>{headerCell}</TableCell>
                                 ))}
-                            </TableRow>
+                            </MuiTableRow>
                         </StyledTableHead>
 
                         <TableBody>
-                            {rows.map((row, index) => (
-                                <Row
-                                    fontSize={fontSize}
-                                    row={row}
-                                    collapsible={collapsible}
+                            {rows.map((cells, index) => (
+                                <TableRowDefault
                                     key={`row-${index}`}
-                                    variant={variant}
-                                    hiddenPart={hiddenParts && hiddenParts[index]}
+                                    {...{ cells }}
                                 />
                             ))}
                         </TableBody>
                     </table>
                 </StyledTableContainer>
-            )}
-        </>
-    );
-};
-
-const Row = ({
-    row,
-    variant,
-    collapsible,
-    hiddenPart,
-    fontSize,
-}: {
-    row: (string | number | JSX.Element)[];
-    variant: "outlined" | "grey";
-    collapsible?: boolean;
-    hiddenPart?: JSX.Element;
-    fontSize?: string;
-}) => {
-    const [isOpen, setIsOpen] = useState(false);
-
-    return (
-        <>
-            <StyledTableRow
-                fontSize={fontSize}
-                variant={variant}
-                sx={
-                    isOpen
-                        ? {
-                              borderBottomLeftRadius: 0,
-                              borderBottomRightRadius: 0,
-
-                              "& .MuiTableCell-root": {
-                                  "&:first-of-type": { borderBottomLeftRadius: 0 },
-                                  "&:last-child": { borderBottomRightRadius: 0 },
-                              },
-                          }
-                        : undefined
-                }
-            >
-                {row &&
-                    row.map((content, index) => (
-                        <TableCell
-                            sx={{ fontFamily: "Titillium Web" }}
-                            key={index}
-                        >
-                            {content}
-                        </TableCell>
-                    ))}
-
-                {collapsible && (
-                    <TableCell>
-                        <IconButton
-                            aria-label="expand row"
-                            size="small"
-                            onClick={() => setIsOpen((open) => !open)}
-                            sx={{ flexGrow: 0 }}
-                        >
-                            {isOpen ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-                        </IconButton>
-                    </TableCell>
-                )}
-            </StyledTableRow>
-
-            {collapsible && (
-                <TableRow>
-                    <TableCell
-                        style={{ padding: 0 }}
-                        colSpan={(row ? row.length : 0) + 5}
-                    >
-                        <Collapse
-                            in={isOpen}
-                            timeout="auto"
-                            sx={{
-                                borderBottomRightRadius: 16,
-                                borderBottomLeftRadius: 16,
-                                width: "100%",
-                                marginTop: -8,
-                            }}
-                        >
-                            <Box
-                                sx={{
-                                    padding: 28,
-                                    borderTop: "1px solid rgba(0, 0, 0, 0.1)",
-                                    transition: ".5s",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "space-between",
-                                }}
-                            >
-                                {hiddenPart}
-                            </Box>
-                        </Collapse>
-                    </TableCell>
-                </TableRow>
             )}
         </>
     );

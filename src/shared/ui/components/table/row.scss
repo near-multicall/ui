@@ -1,0 +1,71 @@
+.table-row-default {
+    height: 80px;
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+    white-space: pre;
+    background: #b4ccca;
+    font-family: "Titillium Web";
+
+    & .MuiTableCell-root {
+        font-size: 16px;
+        justify-content: flex-start;
+        padding-left: 0;
+        border: 1px solid;
+        border-color: transparent;
+        border-right: none;
+        border-left: none;
+
+        & .MuiTypography-root {
+            font-size: 16px;
+        }
+
+        &:first-of-type {
+            border-left: 1px solid;
+            border-color: transparent;
+            padding-left: 20px;
+            border-top-left-radius: 16px;
+            border-bottom-left-radius: 16px;
+        }
+
+        &:last-child {
+            border-right: 1px solid;
+            border-color: transparent;
+            padding-right: 20px;
+            border-top-right-radius: 16px;
+            border-bottom-right-radius: 16px;
+        }
+    }
+
+    &:hover {
+        background-color: #dcefea;
+    }
+}
+
+.table-row-card {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    border: "1px solid rgba(0, 0, 0, 0.1)";
+    border-radius: 16px;
+    padding: 16px;
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.08);
+
+    .content {
+        display: flex;
+        justify-content: space-between;
+        grid-template-columns: auto 100%;
+
+        > div:first-of-type {
+            white-space: nowrap;
+        }
+
+        > div:last-child {
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+    }
+}

@@ -5,11 +5,11 @@ import { Table } from "../../../shared/ui/components/table";
 import { ContractsData } from "../types";
 import { BalancesModel } from "../model/balances";
 
-interface Props extends ContractsData {
+interface FungibleTokenBalancesProps extends ContractsData {
     className?: string;
 }
 
-export const FungibleTokenBalances = ({ className, dao, multicall }: Props) => {
+export const FungibleTokenBalances = ({ className, dao, multicall }: FungibleTokenBalancesProps) => {
     const nativeToken = BalancesModel.useNativeTokenData({ dao, multicall }),
         customTokens = BalancesModel.useCustomTokensData({ dao, multicall }),
         loading = nativeToken.loading || customTokens.loading;
@@ -40,7 +40,7 @@ export const FungibleTokenBalances = ({ className, dao, multicall }: Props) => {
             ) : (
                 <Table
                     header={["Token", "Multicall", "DAO", "Total"]}
-                    rows={tableContent.length > 0 ? tableContent : [["...", "...", "...", "..."]]}
+                    rows={tableContent}
                 />
             )}
         </div>
