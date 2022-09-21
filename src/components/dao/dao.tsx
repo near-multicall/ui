@@ -20,6 +20,7 @@ import clsx from "clsx";
 
 // minimum balance a multicall instance needs for storage + state.
 const MIN_INSTANCE_BALANCE = toYocto(1); // 1 NEAR
+const Ctx = useWalletSelector();
 
 interface Props {}
 
@@ -73,7 +74,8 @@ export class Dao extends Component<Props, State> {
         });
     }
 
-    static contextType = useWalletSelector();
+    static contextType = Ctx;
+    declare context: React.ContextType<typeof Ctx>;
 
     errors = {
         name: new ArgsError(
@@ -134,7 +136,7 @@ export class Dao extends Component<Props, State> {
     }
 
     createMulticall() {
-        const { accountId } = this.context;
+        const { accountId } = this.context!;
         const { loading, name, dao, proposed, proposedInfo } = this.state;
         const { noContract, noDao } = this.errors;
 
@@ -149,10 +151,10 @@ export class Dao extends Component<Props, State> {
         const depo = Big(this.fee).plus(MIN_INSTANCE_BALANCE);
 
         // can user propose a FunctionCall to DAO?
-        const canPropose = dao.checkUserPermission(accountId, ProposalAction.AddProposal, ProposalKind.FunctionCall);
+        const canPropose = dao.checkUserPermission(accountId!, ProposalAction.AddProposal, ProposalKind.FunctionCall);
 
         // can user vote approve a FunctionCall on the DAO?
-        const canApprove = dao.checkUserPermission(accountId, ProposalAction.VoteApprove, ProposalKind.FunctionCall);
+        const canApprove = dao.checkUserPermission(accountId!, ProposalAction.VoteApprove, ProposalKind.FunctionCall);
 
         const args = {
             proposal: {
@@ -394,7 +396,7 @@ export class Dao extends Component<Props, State> {
     }
 
     getContent() {
-        const { selector: walletSelector } = this.context;
+        const { selector: walletSelector } = this.context!;
         const { info, loading, activeTab } = this.state;
 
         // TODO: only require signIn when DAO has no multicall instance (to know if user can propose or vote on existing proposal to create multicall)
