@@ -1,56 +1,16 @@
-import { TableContainer, TableHead, TableCell, TableRow as MuiTableRow, TableBody, styled } from "@mui/material";
+import {
+    TableContainer,
+    TableHead,
+    TableCell,
+    TableRow as MuiTableRow,
+    TableBody,
+    useMediaQuery,
+    useTheme,
+} from "@mui/material";
 import React from "react";
 
-import { useBreakpoint } from "../../lib/breakpoints";
-import { TableRow, TableRowCard, TableRowDefault, TableRowProps } from "./row";
-
-const StyledTableContainer = styled(TableContainer)({
-    display: "table",
-    borderRadius: "40px",
-    "& .MuiTableCell-root": {
-        borderBottom: "none",
-        fontWeight: 400,
-        padding: "14px 20px",
-        "&:first-of-type": {
-            paddingLeft: 20,
-        },
-        "&:last-child": {
-            paddingRight: 20,
-        },
-    },
-    "& table": {
-        width: "100%",
-        borderCollapse: "separate",
-        borderSpacing: "0 8px",
-    },
-});
-
-const StyledTableHead = styled(TableHead)(({ theme }) => ({
-    borderRadius: 8,
-    overflow: "hidden",
-    "& .MuiTableCell-root": {
-        fontSize: "12px",
-        whiteSpace: "pre",
-        lineHeight: "12px",
-        background: "rgba(255, 255, 255, 0.08)",
-        padding: "12px 20px 12px 0",
-        color: theme.palette.text.secondary,
-        borderBottom: "none",
-        "& .MuiTableSortLabel-root": {
-            fontWeight: 400,
-            fontSize: "12px!important",
-            color: theme.palette.text.secondary,
-        },
-        "&:first-of-type": {
-            paddingLeft: 20,
-            borderTopLeftRadius: 8,
-        },
-        "&:last-child": {
-            paddingRight: 20,
-            borderTopRightRadius: 8,
-        },
-    },
-}));
+import { TableRowCard, TableRowDefault, TableRowProps } from "./row";
+import "./index.scss";
 
 export const Table = ({
     header,
@@ -59,12 +19,12 @@ export const Table = ({
     header: TableRowProps["headerCells"];
     rows?: TableRowProps["cells"][];
 }) => {
-    const matches = useBreakpoint("md");
+    const matches = useMediaQuery(useTheme().breakpoints.down("md"));
 
     return (
         <>
             {matches ? (
-                <>
+                <div className="Table--column">
                     {rows.map((cells, index) => (
                         <TableRowCard
                             headerCells={header}
@@ -72,17 +32,17 @@ export const Table = ({
                             {...{ cells }}
                         />
                     ))}
-                </>
+                </div>
             ) : (
-                <StyledTableContainer>
+                <TableContainer className="table-container">
                     <table>
-                        <StyledTableHead>
+                        <TableHead className="table-head">
                             <MuiTableRow>
                                 {header.map((headerCell, index) => (
                                     <TableCell key={index}>{headerCell}</TableCell>
                                 ))}
                             </MuiTableRow>
-                        </StyledTableHead>
+                        </TableHead>
 
                         <TableBody>
                             {rows.map((cells, index) => (
@@ -93,7 +53,7 @@ export const Table = ({
                             ))}
                         </TableBody>
                     </table>
-                </StyledTableContainer>
+                </TableContainer>
             )}
         </>
     );

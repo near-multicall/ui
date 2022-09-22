@@ -1,0 +1,41 @@
+@use "sass/mixin";
+@use "sass/size";
+@use "sass/color";
+
+.TabsItem-button {
+    flex: 1;
+    padding: 0;
+    width: 30%;
+    height: 100%;
+    padding: 0 size.$gap;
+    font-size: size.$text;
+    background-color: transparent;
+
+    &:focus,
+    &:hover {
+        background-color: rgba(color.$white, 0.1);
+    }
+
+    &.is-active {
+        background-color: color.$white;
+    }
+}
+
+.TabsItem-panel {
+    display: none;
+    width: 100%;
+    height: 100%;
+    margin: 0 auto;
+
+    &.is-active {
+        @include mixin.center-items;
+        height: calc(100% - size.$Tab-buttons-height - 2 * size.$gap);
+        flex-flow: column;
+        gap: size.$gap;
+
+        & > div {
+            height: calc(100% - size.$gap);
+            width: calc(100% - (2 * size.$gap));
+        }
+    }
+}

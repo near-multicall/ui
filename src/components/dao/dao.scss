@@ -4,7 +4,7 @@
 @use "sass/font";
 @use "sass/animation";
 
-.dao-container {
+.DaoPage-root {
     @include mixin.page-wrapper;
     display: flex;
     flex-flow: column nowrap;
@@ -14,6 +14,7 @@
         flex-flow: row nowrap;
         max-width: 120rem;
         margin: 0 auto;
+
         .address-container {
             @include mixin.center-items;
             flex-flow: row nowrap;
@@ -60,32 +61,6 @@
                 }
             }
         }
-        .tab-list {
-            @include mixin.center-items;
-            box-shadow: inset 0px 0px 30px 0px rgba(color.$white, 0.1);
-            background-color: color.$lightest;
-            border-radius: size.$task-radius;
-            padding: 0;
-            height: size.$tab-list-height;
-            overflow: hidden;
-            z-index: 1;
-            button {
-                flex: 1;
-                padding: 0;
-                width: 30%;
-                height: 100%;
-                padding: 0 size.$gap;
-                font-size: size.$text;
-                background-color: transparent;
-                &:focus,
-                &:hover {
-                    background-color: rgba(color.$white, 0.1);
-                }
-                &.active-tab {
-                    background-color: color.$white;
-                }
-            }
-        }
     }
 
     &::before {
@@ -104,16 +79,6 @@
         padding: size.$gap;
         max-width: 120rem;
         max-height: calc(100% - (4.5 * size.$gap - 0.5 * (size.$gap - size.$large-text)));
-
-        &.tab-panel {
-            width: 100%;
-            height: 100%;
-            margin: 0 auto;
-
-            &.active {
-                display: grid;
-            }
-        }
 
         &.error {
             display: flex;
@@ -142,72 +107,6 @@
             }
         }
 
-        .info-card {
-            display: flex;
-            flex-flow: column nowrap;
-            position: relative;
-            background-color: rgba(color.$lightest, 0.25);
-            border-radius: size.$task-radius;
-            font-size: size.$small-text;
-            overflow: scroll;
-
-            .title {
-                padding: 0.5 * size.$gap size.$gap;
-                font-size: size.$large-text;
-
-                span {
-                    float: right;
-                }
-            }
-
-            @for $i from 0 to 3 {
-                .MuiSvgIcon-root:nth-of-type(#{$i + 1}) {
-                    position: absolute;
-                    font-size: size.$large-text;
-                    top: 0.5 * size.$gap;
-                    right: calc(0.5 * size.$gap + $i * (size.$large-text + 0.25 * size.$gap));
-                    cursor: pointer;
-                }
-            }
-
-            ul {
-                display: flex;
-                flex-flow: column nowrap;
-
-                li {
-                    margin-right: 0.5 * size.$gap;
-
-                    span {
-                        position: relative;
-                        display: block;
-                        width: 100%;
-
-                        a {
-                            color: darken(color.$blue, 20%) !important;
-                        }
-
-                        .MuiSvgIcon-root {
-                            visibility: hidden;
-                            position: absolute;
-                            font-size: size.$large-text;
-                            top: auto !important;
-                            bottom: auto !important;
-                            right: 0 !important;
-                            cursor: pointer;
-                        }
-                    }
-
-                    &:hover {
-                        background-color: color.$lightest;
-
-                        span > .MuiSvgIcon-root {
-                            visibility: visible;
-                        }
-                    }
-                }
-            }
-        }
-
         .create-multicall {
             width: fit-content;
             align-self: center;
@@ -220,5 +119,21 @@
                 background-color: color.$blue !important;
             }
         }
+    }
+}
+
+.DaoPageTabs-buttonsPanel {
+    position: absolute;
+    top: 1vmax;
+    left: 16vw;
+}
+
+.DaoPageTabs-contentSpace {
+    width: 100%;
+    height: 100%;
+    margin: 0 auto;
+
+    &.active {
+        display: grid;
     }
 }

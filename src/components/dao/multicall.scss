@@ -4,6 +4,8 @@
 @use "sass/size";
 
 .multicall-tab {
+    display: grid;
+
     grid-template:
         "admins jobs" 6fr
         "token-whitelist jobs" 5fr

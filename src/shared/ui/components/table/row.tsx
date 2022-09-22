@@ -29,14 +29,18 @@ export const TableRowCard = ({ cells, headerCells }: TableRowCardProps) => (
                 <Typography
                     variant="inherit"
                     component="div"
-                    fontSize={12}
+                    fontSize="2rem"
                     color="#000000"
-                    sx={{ opacity: 0.5 }}
                 >
                     {headerCell}
                 </Typography>
 
-                <Typography component="div">{cells && cells[headerCellIndex]}</Typography>
+                <Typography
+                    component="div"
+                    fontSize="2rem"
+                >
+                    {cells && cells[headerCellIndex]}
+                </Typography>
             </div>
         ))}
     </div>

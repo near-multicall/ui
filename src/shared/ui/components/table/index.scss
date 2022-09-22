@@ -1,0 +1,49 @@
+@use "sass/color";
+@use "sass/font";
+
+.table-container {
+    display: table;
+    border-radius: 40px;
+    font-family: font.$text;
+
+    & .MuiTableCell-root {
+        border-bottom: none;
+        padding: 14px 20px;
+        font-weight: 400;
+    }
+
+    & table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 1.6ch;
+    }
+}
+
+.table-head {
+    overflow: hidden;
+    background-color: color.$lightest;
+    color: color.$text;
+
+    & .MuiTableCell-root {
+        border-bottom: none;
+        padding: 12px 20px;
+        font-size: 12px;
+        line-height: 12px;
+        white-space: pre;
+
+        &:first-of-type {
+            border-top-left-radius: 12px;
+            border-bottom-left-radius: 12px;
+        }
+
+        &:last-of-type {
+            border-top-right-radius: 12px;
+            border-bottom-right-radius: 12px;
+        }
+    }
+}
+
+.Table--column {
+    display: grid;
+    gap: 1.6ch;
+}

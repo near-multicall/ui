@@ -1,0 +1,22 @@
+@use "sass/mixin";
+@use "sass/size";
+@use "sass/color";
+
+.TabsLayout-root {
+    height: 100%;
+}
+
+.TabsLayout-buttonsPanel {
+    @include mixin.center-items;
+    box-shadow: inset 0px 0px 30px 0px rgba(color.$white, 0.1);
+    background-color: color.$lightest;
+    border-radius: size.$task-radius;
+    padding: 0;
+    height: size.$Tab-buttons-height;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.TabsLayout-contentSpace {
+    height: 100%;
+}

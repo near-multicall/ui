@@ -31,42 +31,42 @@ export class Menu extends Component {
 
         return (
             <div className={`menu-container ${expanded ? "expanded-menu" : ""}`}>
-                <div className="tabs">
-                    <div className="tab-list">
+                <div className="EditorTabs-root">
+                    <div className="Tab-buttons">
                         <button
-                            className={clsx("tab", { "active-tab": activeTab === 0 })}
+                            className={clsx("tab", { "is-active": activeTab === 0 })}
                             onClick={() => this.changeTab(0)}
                         >
                             Build
                         </button>
 
                         <button
-                            className={clsx("tab", { "active-tab": activeTab === 1 })}
+                            className={clsx("tab", { "is-active": activeTab === 1 })}
                             onClick={() => this.changeTab(1)}
                         >
                             Edit
                         </button>
 
                         <button
-                            className={clsx("tab", { "active-tab": activeTab === 2 })}
+                            className={clsx("tab", { "is-active": activeTab === 2 })}
                             onClick={() => this.changeTab(2)}
                         >
                             Export
                         </button>
                     </div>
 
-                    <div className={clsx("tab-panel", { active: activeTab === 0 })}>
+                    <div className={clsx("Tab-panel", { active: activeTab === 0 })}>
                         <Builder
                             layout={LAYOUT}
                             menu={this}
                         />
                     </div>
 
-                    <div className={clsx("tab-panel", { active: activeTab === 1 })}>
+                    <div className={clsx("Tab-panel", { active: activeTab === 1 })}>
                         <Editor />
                     </div>
 
-                    <div className={clsx("tab-panel", { active: activeTab === 2 })}>
+                    <div className={clsx("Tab-panel", { active: activeTab === 2 })}>
                         <Export layout={LAYOUT} />
                     </div>
 

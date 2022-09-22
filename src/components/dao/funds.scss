@@ -4,6 +4,7 @@
 @use "sass/size";
 
 .funds-tab {
+    display: grid;
     grid-template: "balances" 1fr / 1fr;
 
     .balances {

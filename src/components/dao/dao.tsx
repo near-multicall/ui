@@ -1,5 +1,6 @@
 import { InputAdornment } from "@mui/material";
 import { DeleteOutline, EditOutlined, AddOutlined, PauseOutlined, PlayArrowOutlined } from "@mui/icons-material";
+import clsx from "clsx";
 import { Base64 } from "js-base64";
 import debounce from "lodash.debounce";
 import React, { Component } from "react";
@@ -10,13 +11,14 @@ import { toNEAR, toYocto, Big } from "../../utils/converter";
 import { view } from "../../utils/wallet";
 import { useWalletSelector } from "../../contexts/walletSelectorContext";
 import { SputnikDAO, SputnikUI, ProposalKind, ProposalAction } from "../../utils/contracts/sputnik-dao";
+import { Multicall } from "../../utils/contracts/multicall";
+import { Card } from "../../shared/ui/components/card";
+import { Tabs } from "../../shared/ui/components/tabs";
 import { TextInput } from "../editor/elements";
 import { FungibleTokenBalances } from "../token";
-import { Multicall } from "../../utils/contracts/multicall";
 import "./dao.scss";
 import "./funds.scss";
 import "./multicall.scss";
-import clsx from "clsx";
 
 // minimum balance a multicall instance needs for storage + state.
 const MIN_INSTANCE_BALANCE = toYocto(1); // 1 NEAR
@@ -58,7 +60,6 @@ export class Dao extends Component<Props, State> {
             loading: false,
             proposed: -1,
             proposedInfo: {},
-            activeTab: 0,
 
             info: {
                 admins: [],
@@ -437,51 +438,65 @@ export class Dao extends Component<Props, State> {
         }
 
         return (
-            <>
-                <div className={clsx("multicall-tab", "tab-panel", "info-container", { active: activeTab === 0 })}>
-                    <div className="info-card admins">
-                        <AddOutlined />
-                        <h1 className="title">Admins</h1>
+            <Tabs
+                classes={{ buttonsPanel: "DaoPageTabs-buttonsPanel" }}
+                items={[
+                    {
+                        title: "Config",
 
-                        <ul className="list">
-                            {info.admins.map((admin) => (
-                                <li key={admin}>{this.toLink(admin)}</li>
-                            ))}
-                        </ul>
-                    </div>
+                        content: (
+                            <div className={clsx("multicall-tab", "info-container")}>
+                                <Card className="admins">
+                                    <AddOutlined />
+                                    <h1 className="title">Admins</h1>
 
-                    <div className="info-card token-whitelist">
-                        <h1 className="title">Whitelisted Tokens</h1>
+                                    <ul className="list">
+                                        {info.admins.map((admin) => (
+                                            <li key={admin}>{this.toLink(admin)}</li>
+                                        ))}
+                                    </ul>
+                                </Card>
 
-                        <ul className="list">
-                            {info.tokens.map((token) => (
-                                <li key={token}>{this.toLink(token)}</li>
-                            ))}
-                        </ul>
-                    </div>
+                                <Card className="token-whitelist">
+                                    <h1 className="title">Whitelisted Tokens</h1>
 
-                    <div className="info-card jobs">
-                        <AddOutlined />
-                        <h1 className="title">Jobs</h1>
-                        <div className="scroll-wrapper">{info.jobs.map((j) => this.job(j))}</div>
-                    </div>
+                                    <ul className="list">
+                                        {info.tokens.map((token) => (
+                                            <li key={token}>{this.toLink(token)}</li>
+                                        ))}
+                                    </ul>
+                                </Card>
 
-                    <div className="info-card job-bond">
-                        <h1 className="title">
-                            Job Bond
-                            <span>{`${info.jobBond !== "..." ? toNEAR(info.jobBond) : "..."} Ⓝ`}</span>
-                        </h1>
-                    </div>
-                </div>
+                                <Card className="jobs">
+                                    <AddOutlined />
+                                    <h1 className="title">Jobs</h1>
+                                    <div className="scroll-wrapper">{info.jobs.map((j) => this.job(j))}</div>
+                                </Card>
 
-                <div className={clsx("funds-tab", "tab-panel", "info-container", { active: activeTab === 1 })}>
-                    <FungibleTokenBalances
-                        className="info-card tokens"
-                        dao={this.state.dao}
-                        multicall={this.state.multicall}
-                    />
-                </div>
-            </>
+                                <Card className="job-bond">
+                                    <h1 className="title">
+                                        Job Bond
+                                        <span>{`${info.jobBond !== "..." ? toNEAR(info.jobBond) : "..."} Ⓝ`}</span>
+                                    </h1>
+                                </Card>
+                            </div>
+                        ),
+                    },
+                    {
+                        title: "Funds",
+
+                        content: (
+                            <div className={clsx("funds-tab", "info-container")}>
+                                <FungibleTokenBalances
+                                    className="tokens"
+                                    dao={this.state.dao}
+                                    multicall={this.state.multicall}
+                                />
+                            </div>
+                        ),
+                    },
+                ]}
+            />
         );
     }
 
@@ -511,29 +526,12 @@ export class Dao extends Component<Props, State> {
         document.addEventListener("onaddressesupdated", () => this.onAddressesUpdated());
     }
 
-    changeTab = (newTab: number) => this.setState({ activeTab: newTab });
-
     render() {
         const { activeTab } = this.state;
+
         return (
-            <div className="dao-container">
+            <div className="DaoPage-root">
                 <div className="header">
-                    <div className="tab-list">
-                        <button
-                            className={clsx("tab", { "active-tab": activeTab === 0 })}
-                            onClick={() => this.changeTab(0)}
-                        >
-                            Config
-                        </button>
-
-                        <button
-                            className={clsx("tab", { "active-tab": activeTab === 1 })}
-                            onClick={() => this.changeTab(1)}
-                        >
-                            Funds
-                        </button>
-                    </div>
-
                     <div className="address-container">
                         <TextInput
                             placeholder="Insert DAO name here"

@@ -1,11 +1,13 @@
+@use "sass/color";
+@use "sass/size";
+
 .table-row-default {
     height: 80px;
     border-radius: 16px;
     overflow: hidden;
     position: relative;
     white-space: pre;
-    background: #b4ccca;
-    font-family: "Titillium Web";
+    background: color.$light;
 
     & .MuiTableCell-root {
         font-size: 16px;
@@ -21,36 +23,30 @@
         }
 
         &:first-of-type {
-            border-left: 1px solid;
             border-color: transparent;
-            padding-left: 20px;
             border-top-left-radius: 16px;
             border-bottom-left-radius: 16px;
         }
 
-        &:last-child {
-            border-right: 1px solid;
+        &:last-of-type {
             border-color: transparent;
-            padding-right: 20px;
             border-top-right-radius: 16px;
             border-bottom-right-radius: 16px;
         }
     }
 
     &:hover {
-        background-color: #dcefea;
+        background-color: color.$lightest;
     }
 }
 
 .table-row-card {
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    border: "1px solid rgba(0, 0, 0, 0.1)";
+    gap: size.$gap;
     border-radius: 16px;
     padding: 16px;
-    width: 100%;
-    background-color: rgba(255, 255, 255, 0.08);
+    background-color: color.$light;
 
     .content {
         display: flex;

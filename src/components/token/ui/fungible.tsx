@@ -1,9 +1,10 @@
 import React from "react";
 
-import { TokenLabel } from "../../../shared/ui/components/token-label/token-label";
+import { TokenLabel } from "../../../shared/ui/components/token-label";
 import { Table } from "../../../shared/ui/components/table";
-import { ContractsData } from "../types";
+import { Card } from "../../../shared/ui/components/card";
 import { BalancesModel } from "../model/balances";
+import { ContractsData } from "../types";
 
 interface FungibleTokenBalancesProps extends ContractsData {
     className?: string;
@@ -32,7 +33,7 @@ export const FungibleTokenBalances = ({ className, dao, multicall }: FungibleTok
     );
 
     return (
-        <div {...{ className }}>
+        <Card {...{ className }}>
             <h1 className="title">Fungible Token Balances</h1>
 
             {loading ? (
@@ -43,6 +44,6 @@ export const FungibleTokenBalances = ({ className, dao, multicall }: FungibleTok
                     rows={tableContent}
                 />
             )}
-        </div>
+        </Card>
     );
 };
