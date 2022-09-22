@@ -1,5 +1,8 @@
 import { rpcProvider, view, tx } from "../wallet";
 import { Big, toGas, dateToCron } from "../converter";
+import { Base64 } from "js-base64";
+
+import type { FunctionCallAction as daoFunctionCallAction } from "./sputnik-dao";
 
 const FACTORY_ADDRESS_SELECTOR: Record<string, string> = {
     mainnet: "v1.multicall.near",
@@ -45,6 +48,13 @@ type BatchCall = {
 type MulticallArgs = {
     calls: BatchCall[][];
 };
+
+class MulticallConfigChanges {
+    removeTokens: string[] = [];
+    addTokens: string[] = [];
+    jobBond: string = "";
+    croncatManager: string = "";
+}
 
 class Multicall {
     static FACTORY_ADDRESS: string = FACTORY_ADDRESS_SELECTOR[window.NEAR_ENV];
@@ -121,6 +131,73 @@ class Multicall {
     }
 
     /**
+     * Convert a series of config changes into an "actions" object that's compatible
+     * with SputnikDAO (V2 & V3) function call proposal params.
+     *
+     * @param configDiff changes to current config of some multicall instance.
+     * @returns actions that can be passed to JSON for DAO "add_proposal".
+     */
+    static configDiffToProposalActions(configDiff: MulticallConfigChanges): daoFunctionCallAction[] {
+        const { removeTokens, addTokens, jobBond, croncatManager } = configDiff;
+        const actions: daoFunctionCallAction[] = [];
+
+        // action: change croncat manager address
+        if (croncatManager !== "") {
+            actions.push({
+                method_name: "set_croncat_manager",
+                args: Base64.encode(
+                    JSON.stringify({
+                        address: croncatManager,
+                    })
+                ),
+                deposit: "1", // 1 yocto
+                gas: toGas("10"), // 10 Tgas
+            });
+        }
+        // action: change amount of job bond
+        if (jobBond !== "") {
+            actions.push({
+                method_name: "set_job_bond",
+                args: Base64.encode(
+                    JSON.stringify({
+                        amount: jobBond,
+                    })
+                ),
+                deposit: "1", // 1 yocto
+                gas: toGas("10"), // 10 Tgas
+            });
+        }
+        // action: remove tokens from whitelist
+        if (removeTokens.length > 0) {
+            actions.push({
+                method_name: "tokens_remove",
+                args: Base64.encode(
+                    JSON.stringify({
+                        addresses: removeTokens,
+                    })
+                ),
+                deposit: "1", // 1 yocto
+                gas: toGas("20"), // 20 Tgas
+            });
+        }
+        // action: add tokens to whitelist
+        if (addTokens.length > 0) {
+            actions.push({
+                method_name: "tokens_add",
+                args: Base64.encode(
+                    JSON.stringify({
+                        addresses: addTokens,
+                    })
+                ),
+                deposit: "1", // 1 yocto
+                gas: toGas("20"), // 20 Tgas
+            });
+        }
+
+        return actions;
+    }
+
+    /**
      * get list of admins
      */
     async getAdmins(): Promise<string[]> {
@@ -132,6 +209,13 @@ class Multicall {
      */
     async getWhitelistedTokens(): Promise<string[]> {
         return view(this.address, "get_tokens", {});
+    }
+
+    /**
+     * get croncat manager address that was regitered on the multicall instance.
+     */
+    async getCroncatManager(): Promise<string> {
+        return view(this.address, "get_croncat_manager", {});
     }
 
     /**

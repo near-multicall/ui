@@ -95,6 +95,19 @@ enum ProposalAction {
     MoveToHub = "MoveToHub",
 }
 
+// SputnikDAO FunctionCall structure
+type FunctionCall = {
+    receiver_id: string;
+    actions: FunctionCallAction[];
+};
+
+type FunctionCallAction = {
+    method_name: string;
+    args: string; // (base64 encoded JSON)
+    deposit: string; // (u128 as a string)
+    gas: string; // (u64 as a string)
+};
+
 class SputnikDAO {
     static FACTORY_ADDRESS: string = FACTORY_ADDRESS_SELECTOR[window.NEAR_ENV];
     static REFERENCE_UI_BASE_URL: string = REFERENCE_UI_URL_SELECTOR[window.NEAR_ENV];
@@ -325,6 +338,24 @@ class SputnikDAO {
         return canDoAction;
     }
 
+    // propose a generic function call to DAO.
+    async proposeFunctionCall(desc: string, pTarget: string, pActions: FunctionCall): Promise<void> {
+        const proposalArgs = {
+            proposal: {
+                description: desc,
+                kind: {
+                    FunctionCall: {
+                        receiver_id: pTarget,
+                        actions: pActions,
+                    },
+                },
+            },
+        };
+
+        // fire the add_proposal transaction
+        this.addProposal(proposalArgs);
+    }
+
     /**
      * propose a multicall using args from LAYOUT
      *
@@ -432,3 +463,4 @@ class SputnikDAO {
 }
 
 export { SputnikDAO, SputnikUI, ProposalKind, ProposalAction };
+export type { FunctionCall, FunctionCallAction };
