@@ -11,7 +11,7 @@ import Twitter from "../../assets/twitter.svg";
 import { Wallet } from "../../components";
 import { STORAGE } from "../../utils/persistent";
 import { SputnikDAO } from "../../utils/contracts/sputnik-dao";
-import { args } from "../../utils/args";
+import { args } from "../../utils/args/args";
 import { Base64 } from "js-base64";
 import { readFile, saveFile } from "../../utils/loader";
 import Dialog from "../dialog/dialog";
@@ -160,17 +160,15 @@ export default class Sidebar extends Component {
 
         // Load from Proposal
         const proposalURL = "";
-        const proposalURLInvalid = args.error(
-            args
-                .string()
-                .url("URL invalid")
-                .test({
-                    name: "proposalUrl",
-                    message: "URL does not belong to a proposal",
-                    test: (value) => value == null || !!SputnikDAO.getInfoFromProposalUrl(value),
-                }),
-            { initial: true }
-        );
+        const proposalURLInvalid = args
+            .string()
+            .url("URL invalid")
+            .test({
+                name: "proposalUrl",
+                message: "URL does not belong to a proposal",
+                test: (value) => value == null || !!SputnikDAO.getInfoFromProposalUrl(value),
+            })
+            .retain({ initial: true });
         let argsFromProposal;
 
         return [
@@ -228,7 +226,7 @@ export default class Sidebar extends Component {
                     window.LAYOUT.fromBase64(argsFromProposal);
                 }}
                 doneRename="Load"
-                disable={() => proposalURLInvalid.isBad || proposalNonExistent.isBad}
+                disable={() => proposalURLInvalid.isBad() /*|| proposalNonExistent.isBad*/}
                 ref={dialogComponent}
             >
                 {/* <TextInput

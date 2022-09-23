@@ -1,6 +1,6 @@
 import { tx, view, rpcProvider } from "../wallet";
 import { toGas } from "../converter";
-import { ArgsAccount } from "../args";
+import { ArgsAccount } from "../args-old";
 
 const FACTORY_ADDRESS_SELECTOR: Record<string, string> = {
     mainnet: "sputnik-dao.near",

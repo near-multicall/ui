@@ -4,7 +4,7 @@ import Icon from "@mui/material/Icon";
 import TextField from "@mui/material/TextField";
 import { Base64 } from "js-base64";
 import React, { Component } from "react";
-import { ArgsAccount, ArgsBig, ArgsError, ArgsString } from "../../utils/args";
+import { ArgsAccount, ArgsBig, ArgsError, ArgsString } from "../../utils/args-old";
 import { errorMsg } from "../../utils/errors";
 import { STORAGE } from "../../utils/persistent";
 import { convert, toGas, toNEAR } from "../../utils/converter";

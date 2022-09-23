@@ -1,7 +1,7 @@
 import { ConnectedField } from "effector-forms/dist-types";
 import React from "react";
 import { addMethods } from "./args-error";
-import { fieldType, NormalField } from "./args-types/fields";
+import { fieldType, FormInfo, NormalField } from "./fields";
 
 function intoRule(this: any, name: string) {
     return {
@@ -17,30 +17,40 @@ function intoRule(this: any, name: string) {
     };
 }
 
-function intoFieldModel(this: any, name: string) {
+function intoFieldConfig(this: any, fieldName: string) {
     return {
-        [name]: {
-            init: this.getDefault(),
-            rules: [this.intoRule(name)],
+        [fieldName]: {
+            init: this.getDefault() ?? "",
+            rules: [this.intoRule(fieldName)],
             validateOn: ["change"],
         },
     };
 }
 
-function intoFormModel(this: any, options?: object) {
-    const fields = Object.fromEntries(Object.entries(this.fields).map(([k, v]) => (v as any).intoFieldModel(k)));
+function intoFormConfig(this: any, options?: object) {
+    const fields = !!this.fields
+        ? Object.fromEntries(Object.entries(this.fields).map(([k, v]) => [k, (v as any).intoFieldConfig(k)]))
+        : { error: this.intoFieldConfig("error") };
     return {
         fields,
         ...options,
     };
 }
 
-function intoField(field: ConnectedField<string>, type: fieldType = fieldType.NORMAL) {
+function intoField(this: any, formInfo: FormInfo, fieldName: string, type: fieldType = fieldType.NORMAL) {
+    const field: ConnectedField<string> = formInfo.fields[fieldName];
     switch (type) {
         case fieldType.NORMAL:
             return React.createElement(
                 NormalField,
-                { value: field.value, onChange: (e) => field.onChange((e.target as HTMLInputElement).value) },
+                {
+                    value: field.value,
+                    onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
+                        field.onChange((e.target as HTMLInputElement).value),
+                    fieldName,
+                    formInfo,
+                    errorText: this.message(),
+                },
                 null
             );
     }
@@ -49,8 +59,8 @@ function intoField(field: ConnectedField<string>, type: fieldType = fieldType.NO
 function addFieldMethods(schema: any): void {
     addMethods(schema, {
         intoRule,
-        intoFieldModel,
-        intoFormModel,
+        intoFieldConfig,
+        intoFormConfig,
         intoField,
     });
 }

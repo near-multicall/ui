@@ -74,6 +74,7 @@
         "big.js": "^6.2.1",
         "effector": "^22.3.0",
         "effector-forms": "^0.0.24",
+        "effector-react": "^22.3.0",
         "js-base64": "^3.7.2",
         "lodash.debounce": "^4.0.8",
         "near-api-js": "^0.45.1",

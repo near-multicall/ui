@@ -1,4 +1,4 @@
-import { ArgsAccount, ArgsBig, ArgsJSON, ArgsString, ArgsError } from "../../utils/args";
+import { ArgsAccount, ArgsBig, ArgsJSON, ArgsString, ArgsError } from "../../utils/args-old";
 import Call from "../../utils/call";
 import { STORAGE } from "../../utils/persistent";
 import { toGas } from "../../utils/converter";

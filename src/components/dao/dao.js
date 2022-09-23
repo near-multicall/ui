@@ -4,13 +4,16 @@ import { Base64 } from "js-base64";
 import debounce from "lodash.debounce";
 import React, { Component } from "react";
 import { useWalletSelector } from "../../contexts/walletSelectorContext";
-import { args } from "../../utils/args";
+import { args } from "../../utils/args/args";
 import { ProposalAction, ProposalKind, SputnikDAO, SputnikUI } from "../../utils/contracts/sputnik-dao";
 import { Big, toNEAR, toYocto } from "../../utils/converter";
 import { STORAGE } from "../../utils/persistent";
 import { view } from "../../utils/wallet";
 import { TextInput } from "../editor/elements";
+import { ref } from "yup";
+import { useForm, createForm } from "effector-forms";
 import "./dao.scss";
+import { forward } from "effector";
 
 // minimum balance a multicall instance needs for storage + state.
 const MIN_INSTANCE_BALANCE = toYocto(1); // 1 NEAR
@@ -18,10 +21,15 @@ const MIN_INSTANCE_BALANCE = toYocto(1); // 1 NEAR
 export default class DaoComponent extends Component {
     static contextType = useWalletSelector();
 
-    errors = {
-        noDao: args.error(args.string().sputnikDao("Address is not a DAO")),
-        noMulticall: args.error(args.string().multicall("DAO does not have a multicall instance")),
-    };
+    errors = args.object().shape({
+        addr: args.string().address(),
+        noDao: args.string().sputnikDao().retain({ customMessage: "Address is not a DAO" }).checkOn(ref("addr")),
+        noMulticall: args
+            .string()
+            .multicall()
+            .retain({ customMessage: "DAO does not have a multicall instance" })
+            .checkOn(ref("addr")),
+    });
 
     loadInfoDebounced = debounce(() => this.loadInfos(), 400);
 
@@ -48,6 +56,16 @@ export default class DaoComponent extends Component {
             this.fee = createMulticallFee;
             this.loadInfos();
         });
+
+        const form = createForm(this.errors.intoFormConfig()),
+            fx = createEffect();
+
+        forward({
+            from: form.formValidated,
+            to: fx,
+        });
+
+        this.searchDao = { form, fx };
 
         document.addEventListener("onaddressesupdated", (e) => this.onAddressesUpdated(e));
     }
@@ -179,8 +197,8 @@ export default class DaoComponent extends Component {
         };
 
         if (
-            noMulticall.isBad &&
-            !noDao.isBad && // base.sputnik-dao.near does not exist
+            noMulticall.isBad() &&
+            !noDao.isBad() && // base.sputnik-dao.near does not exist
             !loading &&
             this.lastAddr === document.querySelector(".address-container input")._valueTracker.getValue() // disappear while debouncing
         ) {
@@ -315,7 +333,8 @@ export default class DaoComponent extends Component {
 
     // TODO use args.error().check() to check noMulticall & noDao
     loadInfos() {
-        const { noMulticall, noDao } = this.errors;
+        console.log(this.errors);
+        const { noMulticall, noDao } = this.errors.fields;
         const { addr } = this.state;
 
         const multicallAddress = `${addr}.${window.nearConfig.MULTICALL_FACTORY_ADDRESS}`;
@@ -324,13 +343,13 @@ export default class DaoComponent extends Component {
         if (this.lastAddr === addr) return;
         this.lastAddr = addr;
 
-        noMulticall.isBad = false;
-        noDao.isBad = false;
+        noMulticall.isBad(false);
+        noDao.isBad(false);
 
         // chosen address violates NEAR AccountId rules.
         if (args.string().address().isValidSync(addr)) {
-            noMulticall.isBad = true;
-            noDao.isBad = true;
+            noMulticall.isBad(true);
+            noDao.isBad(true);
             this.setState({ proposed: -1, proposedInfo: {} });
             return;
         }
@@ -348,8 +367,8 @@ export default class DaoComponent extends Component {
             // DAO not ready => either no SputnikDAO contract on the chosen address
             // or some error happened during DAO object init.
             if (!newDAO.ready) {
-                noMulticall.isBad = true;
-                noDao.isBad = true;
+                noMulticall.isBad(true);
+                noDao.isBad(true);
                 this.setState({
                     dao: newDAO,
                     loading: false,
@@ -396,16 +415,16 @@ export default class DaoComponent extends Component {
         if (!walletSelector.isSignedIn()) return <div className="info-container error">Please sign in to continue</div>;
 
         // errors to display
-        const displayErrorsList = ["addr", "noDao", "noMulticall"];
+        const displayErrorsList = ["noDao", "noMulticall"];
         const displayErrors = Object.keys(this.errors)
-            .filter((e) => this.errors[e].isBad && displayErrorsList.includes(e))
+            .filter((e) => this.errors[e].isBad() && displayErrorsList.includes(e))
             .map((e) => (
                 <p
                     key={`p-${e}`}
                     className={"red"}
                 >
-                    <span>{this.errors[e].isBad ? "\u2717" : "\u2714"} </span>
-                    {this.errors[e].message}
+                    <span>{this.errors[e].isBad() ? "\u2717" : "\u2714"} </span>
+                    {this.errors[e].message()}
                 </p>
             ));
 
@@ -463,6 +482,13 @@ export default class DaoComponent extends Component {
             </div>
         );
     }
+
+    searchDaoComponent = () => {
+        const formInfo = useForm(this.searchDao.form);
+        const pending = useStore(this.searchDao.fx.pending);
+        console.log(pending);
+        return <form>{this.errors.intoField(formInfo, "addr")}</form>;
+    };
 
     render() {
         const { addr } = this.state;

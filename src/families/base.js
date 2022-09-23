@@ -2,7 +2,7 @@ import { DeleteOutline, MoveDown, EditOutlined } from "@mui/icons-material";
 import { Tooltip } from "@mui/material";
 import React, { Component } from "react";
 import { TextInput, TextInputWithUnits } from "../components/editor/elements";
-import { ArgsAccount, ArgsBig, ArgsError, ArgsJSON, ArgsString } from "../utils/args";
+import { ArgsAccount, ArgsBig, ArgsError, ArgsJSON, ArgsString } from "../utils/args-old";
 import Call from "../utils/call";
 import { toGas, toYocto, formatTokenAmount, unitToDecimals } from "../utils/converter";
 import { errorMsg } from "../utils/errors";
