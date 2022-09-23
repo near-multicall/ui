@@ -12,6 +12,8 @@
     .header {
         @include mixin.center-items(space-between);
         flex-flow: row nowrap;
+        flex-basis: calc(2 * size.$gap + 0.5 * size.$large-text);
+        flex-shrink: 0;
         max-width: 120rem;
         margin: 0 auto;
 
@@ -19,12 +21,13 @@
             @include mixin.center-items;
             flex-flow: row nowrap;
             width: auto;
+            height: 100%;
 
             .MuiTextField-root {
                 width: calc(100% - 2 * size.$gap);
                 max-width: 100ch;
                 text-align: left;
-                margin: calc(size.$gap - 0.5 * size.$large-text) size.$gap;
+                margin: 0 size.$gap;
 
                 .MuiInputBase-root {
                     font-size: size.$large-text;
@@ -68,7 +71,7 @@
         position: fixed;
         top: 0;
         left: 0;
-        height: calc(2.5 * size.$gap - 0.5 * (size.$gap - size.$large-text));
+        height: calc(2 * size.$gap + 0.5 * size.$large-text);
         min-width: 100%;
         background-color: color.$light;
     }
@@ -78,7 +81,7 @@
         gap: size.$gap;
         padding: size.$gap;
         max-width: 120rem;
-        max-height: calc(100% - (4.5 * size.$gap - 0.5 * (size.$gap - size.$large-text)));
+        max-height: calc(100% - 2 * size.$gap);
 
         &.error {
             display: flex;
@@ -126,14 +129,4 @@
     position: absolute;
     top: 1vmax;
     left: 16vw;
-}
-
-.DaoPageTabs-contentSpace {
-    width: 100%;
-    height: 100%;
-    margin: 0 auto;
-
-    &.active {
-        display: grid;
-    }
 }

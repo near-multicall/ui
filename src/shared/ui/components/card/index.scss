@@ -5,11 +5,10 @@
     display: flex;
     flex-flow: column nowrap;
     position: relative;
-    padding: calc(size.$gap / 6);
+    padding: calc(0.25 * size.$gap);
     background-color: rgba(color.$lightest, 0.25);
     border-radius: size.$task-radius;
     font-size: size.$small-text;
-    overflow: scroll;
 
     .title {
         padding: 0.5 * size.$gap size.$gap;

@@ -5,7 +5,6 @@
 .TabsItem-button {
     flex: 1;
     padding: 0;
-    width: 30%;
     height: 100%;
     padding: 0 size.$gap;
     font-size: size.$text;
@@ -29,13 +28,17 @@
 
     &.is-active {
         @include mixin.center-items;
-        height: calc(100% - size.$Tab-buttons-height - 2 * size.$gap);
-        flex-flow: column;
-        gap: size.$gap;
 
-        & > div {
-            height: calc(100% - size.$gap);
-            width: calc(100% - (2 * size.$gap));
-        }
+        // Code below does not belong here, it's styling for the app menu,
+        // it should be applied to the tabs selector via a seperate css class
+
+        // height: calc(100% - size.$Tab-buttons-height - 2 * size.$gap);
+        // flex-flow: column;
+        // gap: size.$gap;
+
+        // & > div {
+        //     height: calc(100% - size.$gap);
+        //     width: calc(100% - (2 * size.$gap));
+        // }
     }
 }

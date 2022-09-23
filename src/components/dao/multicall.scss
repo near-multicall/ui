@@ -43,6 +43,7 @@
                     padding: 0.5 * size.$gap;
                     font-family: font.$code;
                     font-size: size.$small-text;
+                    overflow: hidden;
                 }
             }
         }
