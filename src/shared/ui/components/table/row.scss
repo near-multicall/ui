@@ -1,37 +1,27 @@
 @use "sass/color";
 @use "sass/size";
+@use "sass/font";
 
 .table-row-default {
-    height: 80px;
-    border-radius: 16px;
     overflow: hidden;
     position: relative;
     white-space: pre;
-    background: color.$light;
+    background: transparent;
 
     & .MuiTableCell-root {
-        font-size: 16px;
-        justify-content: flex-start;
-        padding-left: 0;
-        border: 1px solid;
-        border-color: transparent;
-        border-right: none;
-        border-left: none;
-
-        & .MuiTypography-root {
-            font-size: 16px;
-        }
+        font-size: size.$text;
+        font-family: font.$code;
+        border: none;
+        text-align: right;
 
         &:first-of-type {
-            border-color: transparent;
-            border-top-left-radius: 16px;
-            border-bottom-left-radius: 16px;
+            text-align: left;
+            font-family: font.$text;
+            padding-left: 1.25 * size.$gap;
         }
 
         &:last-of-type {
-            border-color: transparent;
-            border-top-right-radius: 16px;
-            border-bottom-right-radius: 16px;
+            padding-right: 1.25 * size.$gap;
         }
     }
 

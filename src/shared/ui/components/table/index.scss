@@ -1,44 +1,43 @@
 @use "sass/color";
 @use "sass/font";
+@use "sass/size";
 
 .table-container {
     display: table;
-    border-radius: 40px;
+    border-radius: size.$task-radius;
     font-family: font.$text;
+    margin-top: size.$gap;
 
     & .MuiTableCell-root {
         border-bottom: none;
-        padding: 14px 20px;
-        font-weight: 400;
+        padding: 0.5 * size.$gap;
     }
 
     & table {
         width: 100%;
         border-collapse: separate;
-        border-spacing: 0 1.6ch;
+        border-spacing: 0;
     }
 }
 
 .table-head {
     overflow: hidden;
-    background-color: color.$lightest;
-    color: color.$text;
+    font-family: font.$text;
 
     & .MuiTableCell-root {
         border-bottom: none;
-        padding: 12px 20px;
-        font-size: 12px;
-        line-height: 12px;
-        white-space: pre;
+        font-size: size.$text;
+        font-weight: 800;
+        color: color.$text;
+        text-align: right;
 
         &:first-of-type {
-            border-top-left-radius: 12px;
-            border-bottom-left-radius: 12px;
+            text-align: left;
+            padding-left: 1.25 * size.$gap;
         }
 
         &:last-of-type {
-            border-top-right-radius: 12px;
-            border-bottom-right-radius: 12px;
+            padding-right: 1.25 * size.$gap;
         }
     }
 }
