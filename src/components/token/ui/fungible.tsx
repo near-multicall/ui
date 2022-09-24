@@ -5,6 +5,7 @@ import { Table } from "../../../shared/ui/components/table";
 import { Card } from "../../../shared/ui/components/card";
 import { BalancesModel } from "../model/balances";
 import { ContractsData } from "../types";
+import "./fungible.scss";
 
 interface FungibleTokenBalancesProps extends ContractsData {
     className?: string;
@@ -39,10 +40,12 @@ export const FungibleTokenBalances = ({ className, dao, multicall }: FungibleTok
             {loading ? (
                 <div className="loader" />
             ) : (
-                <Table
-                    header={["Token", "Multicall", "DAO", "Total"]}
-                    rows={tableContent}
-                />
+                <div className="scroll-wrapper">
+                    <Table
+                        header={["Token", "Multicall", "DAO", "Total"]}
+                        rows={tableContent}
+                    />
+                </div>
             )}
         </Card>
     );

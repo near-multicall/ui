@@ -488,7 +488,7 @@ export class Dao extends Component<Props, State> {
                         content: (
                             <div className={clsx("funds-tab", "info-container")}>
                                 <FungibleTokenBalances
-                                    className="tokens"
+                                    className="balances"
                                     dao={this.state.dao}
                                     multicall={this.state.multicall}
                                 />

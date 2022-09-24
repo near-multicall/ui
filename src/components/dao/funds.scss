@@ -10,5 +10,7 @@
     .balances {
         grid-area: balances;
         padding-bottom: size.$gap;
+        position: relative;
+        overflow: hidden;
     }
 }
