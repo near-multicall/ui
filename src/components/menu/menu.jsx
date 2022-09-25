@@ -29,13 +29,16 @@ export class Menu extends Component {
     render() {
         const { expanded } = this.state;
 
-        const LAYOUT = this.props.layout; // ususally global parameter
+        const LAYOUT = this.props.layout; // usually global parameter
 
         return (
-            <div className={`menu-container ${expanded ? "expanded-menu" : ""}`}>
-                <div className="EditorTabs-root">
+            <div className={`Editor-root ${expanded ? "expanded-menu" : ""}`}>
+                <div className="Editor-tabs-root">
                     <Tabs
-                        classes={{ buttonsPanel: "Tab-buttons", contentSpace: "Tab-panel" }}
+                        classes={{
+                            buttonsPanel: "Editor-tabs-buttonsPanel",
+                            contentSpace: "Editor-tabs-contentSpace",
+                        }}
                         items={[
                             {
                                 title: "Build",

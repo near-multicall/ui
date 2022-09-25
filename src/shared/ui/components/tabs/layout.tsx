@@ -3,7 +3,7 @@ import React from "react";
 
 import "./layout.scss";
 
-const NAMESPACE = "TabsLayout";
+const NAMESPACE = "Tabs-layout";
 
 interface TabsLayoutButtonsPanelProps extends React.PropsWithChildren, React.HTMLAttributes<HTMLDivElement> {}
 

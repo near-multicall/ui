@@ -2,21 +2,31 @@
 @use "sass/size";
 @use "sass/color";
 
-.TabsLayout-root {
+.Tabs-layout-root {
     height: calc(100% - (2 * size.$gap + 0.5 * size.$large-text));
 }
 
-.TabsLayout-buttonsPanel {
+.Tabs-layout-buttonsPanel {
     @include mixin.center-items;
-    box-shadow: inset 0px 0px 30px 0px rgba(color.$white, 0.1);
-    background-color: color.$lightest;
-    border-radius: size.$task-radius;
-    padding: 0;
-    height: size.$Tab-buttons-height;
-    overflow: hidden;
     z-index: 1;
+    border-radius: size.$task-radius;
+    height: size.$Tabs-buttons-height;
+    padding: 0;
+    overflow: hidden;
+    background-color: transparent;
+    box-shadow: inset 0px 0px 30px 0px rgba(color.$white, 0.1);
+
+    & > .Tabs-item-button {
+        &:first-of-type {
+            border-radius: size.$task-radius 0 0 size.$task-radius;
+        }
+
+        &:last-of-type {
+            border-radius: 0 size.$task-radius size.$task-radius 0;
+        }
+    }
 }
 
-.TabsLayout-contentSpace {
+.Tabs-layout-contentSpace {
     height: 100%;
 }

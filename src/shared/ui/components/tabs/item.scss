@@ -2,23 +2,34 @@
 @use "sass/size";
 @use "sass/color";
 
-.TabsItem-button {
+.Tabs-item-button {
     height: 100%;
     padding: 0 size.$gap;
     font-size: size.$text;
-    background-color: transparent;
+    background-color: color.$lightest;
+    color: color.$text;
 
-    &:focus,
-    &:hover {
-        background-color: rgba(color.$white, 0.1);
+    &--dark-bg {
+        background-color: transparent;
+        color: color.$light-text;
     }
 
-    &.is-active {
-        background-color: color.$white;
+    &.is-active,
+    &:hover,
+    &:focus {
+        background-color: color.$darkest;
+        color: color.$light-text;
+        transition: all 400ms ease;
+        transition-property: background-color, color;
+
+        &--dark-bg {
+            background-color: color.$white;
+            color: color.$text;
+        }
     }
 }
 
-.TabsItem-panel {
+.Tabs-item-panel {
     display: none;
     width: 100%;
     height: 100%;
@@ -26,17 +37,5 @@
 
     &.is-active {
         @include mixin.center-items;
-
-        // Code below does not belong here, it's styling for the app menu,
-        // it should be applied to the tabs selector via a seperate css class
-
-        // height: calc(100% - size.$Tab-buttons-height - 2 * size.$gap);
-        // flex-flow: column;
-        // gap: size.$gap;
-
-        // & > div {
-        //     height: calc(100% - size.$gap);
-        //     width: calc(100% - (2 * size.$gap));
-        // }
     }
 }

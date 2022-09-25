@@ -3,7 +3,7 @@ import React from "react";
 
 import "./item.scss";
 
-const NAMESPACE = "TabsItem";
+const NAMESPACE = "Tabs-item";
 
 export interface TabsItemButtonProps extends React.HTMLAttributes<HTMLDivElement> {
     title: string;
