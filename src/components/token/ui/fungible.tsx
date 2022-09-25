@@ -1,11 +1,31 @@
-import React from "react";
-
-import { TokenLabel } from "../../../shared/ui/components/token-label";
-import { Table } from "../../../shared/ui/components/table";
-import { Card } from "../../../shared/ui/components/card";
+import { Card, NearIcons, Scrollable, Table } from "../../../shared/ui/components";
 import { BalancesModel } from "../model/balances";
 import { ContractsData } from "../types";
 import "./fungible.scss";
+
+interface FungibleTokenLabelProps {
+    icon?: string | JSX.Element | null;
+    native?: boolean;
+    symbol?: string;
+}
+
+export const FungibleTokenLabel = ({ icon, native, symbol }: FungibleTokenLabelProps) => (
+    <span className="token-label">
+        {!native && typeof icon === "string" ? (
+            <img
+                className="icon"
+                loading="lazy"
+                src={icon}
+            />
+        ) : (
+            <span className="icon">
+                {native ? <NearIcons.NativeTokenFilled /> : icon || <NearIcons.GenericTokenFilled />}
+            </span>
+        )}
+
+        <span className="symbol">{native ? "NEAR" : symbol}</span>
+    </span>
+);
 
 interface FungibleTokenBalancesProps extends ContractsData {
     className?: string;
@@ -18,7 +38,7 @@ export const FungibleTokenBalances = ({ className, dao, multicall }: FungibleTok
 
     const tableContent = [
         nativeToken.data && [
-            <TokenLabel native />,
+            <FungibleTokenLabel native />,
             nativeToken.data.multicall,
             nativeToken.data.dao,
             nativeToken.data.total,
@@ -26,7 +46,7 @@ export const FungibleTokenBalances = ({ className, dao, multicall }: FungibleTok
     ].concat(
         customTokens.data &&
             customTokens.data.map((customToken) => [
-                <TokenLabel {...customToken.metadata} />,
+                <FungibleTokenLabel {...customToken.metadata} />,
                 customToken.multicall,
                 customToken.dao,
                 customToken.total,
@@ -40,12 +60,12 @@ export const FungibleTokenBalances = ({ className, dao, multicall }: FungibleTok
             {loading ? (
                 <div className="loader" />
             ) : (
-                <div className="scroll-wrapper">
+                <Scrollable>
                     <Table
                         header={["Token", "Multicall", "DAO", "Total"]}
                         rows={tableContent}
                     />
-                </div>
+                </Scrollable>
             )}
         </Card>
     );

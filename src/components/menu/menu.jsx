@@ -1,11 +1,12 @@
-import React, { Component } from "react";
 import Icon from "@mui/material/Icon";
+import clsx from "clsx";
+import { Component } from "react";
+
+import { Tabs } from "../../shared/ui/components";
 import { Builder } from "../builder/builder.jsx";
 import { Editor } from "../editor/editor.jsx";
 import { Export } from "../export/export.jsx";
-import { Tabs } from "../../shared/ui/components/tabs/index.tsx";
 import "./menu.scss";
-import clsx from "clsx";
 
 export class Menu extends Component {
     constructor(props) {

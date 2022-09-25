@@ -1,12 +1,18 @@
 @use "sass/mixin";
 @use "sass/size";
 
-.scroll-wrapper {
-    @include mixin.no-scrollbar;
-    overflow-y: scroll;
-    position: absolute;
-    top: calc(size.$large-text + 1.5 * size.$gap);
-    bottom: 0;
-    left: 0;
-    right: 0;
+.token-label {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+
+    .icon,
+    .icon svg {
+        width: 32px;
+        height: 32px;
+    }
+
+    .symbol {
+        font-weight: bold;
+    }
 }

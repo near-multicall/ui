@@ -2,7 +2,7 @@ import * as nearAPI from "near-api-js";
 import type { NetworkId } from "@near-wallet-selector/core";
 import { Component } from "react";
 
-import { Task, Layout } from "../components.js";
+import { Task, Layout } from "../components";
 
 type CardInfo = {
     call: object;

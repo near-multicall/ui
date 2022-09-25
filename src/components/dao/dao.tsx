@@ -3,7 +3,7 @@ import { DeleteOutline, EditOutlined, AddOutlined, PauseOutlined, PlayArrowOutli
 import clsx from "clsx";
 import { Base64 } from "js-base64";
 import debounce from "lodash.debounce";
-import React, { Component } from "react";
+import { Component, ContextType } from "react";
 
 import { ArgsAccount, ArgsError } from "../../utils/args";
 import { STORAGE } from "../../utils/persistent";
@@ -12,8 +12,7 @@ import { view } from "../../utils/wallet";
 import { useWalletSelector } from "../../contexts/walletSelectorContext";
 import { SputnikDAO, SputnikUI, ProposalKind, ProposalAction } from "../../utils/contracts/sputnik-dao";
 import { Multicall } from "../../utils/contracts/multicall";
-import { Card } from "../../shared/ui/components/card";
-import { Tabs } from "../../shared/ui/components/tabs";
+import { Card, Scrollable, Tabs } from "../../shared/ui/components";
 import { TextInput } from "../editor/elements";
 import { FungibleTokenBalances } from "../token";
 import "./dao.scss";
@@ -33,7 +32,6 @@ interface State {
     loading: boolean;
     proposed: number;
     proposedInfo: object;
-    activeTab: number;
 
     info: {
         admins: string[];
@@ -76,7 +74,7 @@ export class Dao extends Component<Props, State> {
     }
 
     static contextType = Ctx;
-    declare context: React.ContextType<typeof Ctx>;
+    declare context: ContextType<typeof Ctx>;
 
     errors = {
         name: new ArgsError(
@@ -398,7 +396,7 @@ export class Dao extends Component<Props, State> {
 
     getContent() {
         const { selector: walletSelector } = this.context!;
-        const { info, loading, activeTab } = this.state;
+        const { info, loading } = this.state;
 
         // TODO: only require signIn when DAO has no multicall instance (to know if user can propose or vote on existing proposal to create multicall)
         if (!walletSelector.isSignedIn()) {
@@ -470,7 +468,7 @@ export class Dao extends Component<Props, State> {
                                 <Card className="jobs">
                                     <AddOutlined />
                                     <h1 className="title">Jobs</h1>
-                                    <div className="scroll-wrapper">{info.jobs.map((j) => this.job(j))}</div>
+                                    <Scrollable>{info.jobs.map((j) => this.job(j))}</Scrollable>
                                 </Card>
 
                                 <Card className="job-bond">
@@ -528,8 +526,6 @@ export class Dao extends Component<Props, State> {
     }
 
     render() {
-        const { activeTab } = this.state;
-
         return (
             <div className="DaoPage-root">
                 <div className="header">

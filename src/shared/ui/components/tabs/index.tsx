@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import React, { useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 
 import { TabsItemButton, TabsItemPanel } from "./item";
 import { TabsLayout, TabsLayoutProps } from "./layout";
