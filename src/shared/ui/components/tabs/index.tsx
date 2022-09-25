@@ -1,68 +1,43 @@
-import { Tabs as MuiTabs, Tab, Box } from "@mui/material";
 import clsx from "clsx";
-import React, { Fragment, useCallback } from "react";
+import { useCallback, useState } from "react";
 
-interface Props {
-    titles: string[] | JSX.Element[];
-    content: React.ReactNode[];
-    fontWeight?: number;
+import { TabsItemButton, TabsItemButtonProps, TabsItemPanel } from "./item";
+import { TabsLayout, TabsLayoutProps } from "./layout";
+
+interface TabsProps extends Pick<TabsItemButtonProps, "invertedColors"> {
+    classes?: TabsLayoutProps["classes"] & {};
+    items: { content: JSX.Element; lazy?: boolean; title: string }[];
 }
 
-export const Tabs = ({ titles, content }: Props) => {
-    const [activeТаbIndex, activeTabSwitch] = React.useState(0);
+export const Tabs = ({ classes, invertedColors, items }: TabsProps) => {
+    const [activeТаbIndex, activeTabSwitch] = useState<number>(0);
 
-    const onChange = useCallback(
-        (_event: React.ChangeEvent<any>, value: any) => activeTabSwitch(value),
+    const itemButtonClickHandler = useCallback(
+        (itemIndex: number) => () => activeTabSwitch(itemIndex),
         [activeTabSwitch]
     );
 
+    const buttons = items.map(({ title }, tabIndex) => (
+        <TabsItemButton
+            className={clsx({ "is-active": activeТаbIndex === tabIndex })}
+            key={tabIndex}
+            onClick={itemButtonClickHandler(tabIndex)}
+            {...{ invertedColors, title }}
+        />
+    ));
+
     return (
-        <Box sx={{ width: "100%" }}>
-            <Box>
-                <MuiTabs
-                    allowScrollButtonsMobile
-                    scrollButtons="auto"
-                    sx={{ mb: -1, marginRight: 0 }}
-                    TabIndicatorProps={{ style: { display: "none" } }}
-                    value={activeТаbIndex}
-                    {...{ onChange }}
-                >
-                    {titles.map((title, index) => (
-                        <Tab
-                            disableRipple
-                            key={index}
-                            label={title}
-                            sx={{
-                                width: 116,
-                                height: 44,
-                                ml: "19px",
-                                mb: "35px",
-                                mt: "20px",
-                                fontFamily: "Titillium Web",
-                                fontWeight: "bold",
-                                textTransform: "none",
-                                borderRadius: 1,
-                                background: "transparent",
-                                color: "#2a2a2a",
-                                fontSize: "16px",
-                                border: "1px solid #A4BAB8",
-                                opacity: 1,
-
-                                "&.Mui-selected": {
-                                    background: "#A4BAB8",
-                                    color: "#2a2a2a",
-                                    borderColor: "#000000",
-                                },
-                            }}
-                        />
-                    ))}
-                </MuiTabs>
-            </Box>
-
-            {content.map(
-                (tabPanelContent, tabIndex) =>
-                    activeТаbIndex === tabIndex && <Fragment key={tabIndex}>{tabPanelContent}</Fragment>
+        <TabsLayout {...{ buttons, classes }}>
+            {items.map(({ content, lazy = false }, tabIndex) =>
+                activeТаbIndex === tabIndex || !lazy ? (
+                    <TabsItemPanel
+                        className={clsx({ "is-active": activeТаbIndex === tabIndex })}
+                        key={tabIndex}
+                    >
+                        {content}
+                    </TabsItemPanel>
+                ) : null
             )}
-        </Box>
+        </TabsLayout>
     );
 };

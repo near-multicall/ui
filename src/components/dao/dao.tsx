@@ -1,27 +1,29 @@
 import { InputAdornment } from "@mui/material";
 import { DeleteOutline, EditOutlined, AddOutlined, PauseOutlined, PlayArrowOutlined } from "@mui/icons-material";
+import clsx from "clsx";
 import { Base64 } from "js-base64";
 import debounce from "lodash.debounce";
-import React, { Component } from "react";
+import { Component, ContextType } from "react";
 
 import { ArgsAccount, ArgsError } from "../../utils/args";
 import { STORAGE } from "../../utils/persistent";
 import { toNEAR, toYocto, Big } from "../../utils/converter";
 import { view } from "../../utils/wallet";
 import { useWalletSelector } from "../../contexts/walletSelectorContext";
-import { SputnikDAO, SputnikUI, ProposalStatus } from "../../utils/contracts/sputnik-dao";
+import { SputnikDAO, SputnikUI, ProposalKind, ProposalAction } from "../../utils/contracts/sputnik-dao";
+import { Multicall } from "../../utils/contracts/multicall";
+import { Card, Scrollable, Tabs } from "../../shared/ui/components";
 import { TextInput } from "../editor/elements";
 import { FungibleTokenBalances } from "../token";
-import { Multicall } from "../../utils/contracts/multicall";
 import "./dao.scss";
 import "./funds.scss";
 import "./multicall.scss";
-import clsx from "clsx";
 
 import type { ProposalOutput } from "../../utils/contracts/sputnik-dao";
 
 // minimum balance a multicall instance needs for storage + state.
 const MIN_INSTANCE_BALANCE = toYocto(1); // 1 NEAR
+const Ctx = useWalletSelector();
 
 interface Props {}
 
@@ -31,8 +33,7 @@ interface State {
     multicall: Multicall;
     loading: boolean;
     proposed: number;
-    proposedInfo: ProposalOutput;
-    activeTab: number;
+    proposedInfo: object;
 
     info: {
         admins: string[];
@@ -56,7 +57,6 @@ export class Dao extends Component<Props, State> {
             loading: false,
             proposed: -1,
             proposedInfo: {},
-            activeTab: 0,
 
             info: {
                 admins: [],
@@ -72,7 +72,8 @@ export class Dao extends Component<Props, State> {
         });
     }
 
-    static contextType = useWalletSelector();
+    static contextType = Ctx;
+    declare context: ContextType<typeof Ctx>;
 
     errors: { [key: string]: ArgsError } = {
         name: new ArgsError(
@@ -135,8 +136,8 @@ export class Dao extends Component<Props, State> {
     }
 
     createMulticall() {
-        const { accountId } = this.context;
-        const { loading, dao, proposed, proposedInfo } = this.state;
+        const { accountId } = this.context!;
+        const { loading, name, dao, proposed, proposedInfo } = this.state;
         const { noContract, noDao } = this.errors;
 
         if (
@@ -151,10 +152,10 @@ export class Dao extends Component<Props, State> {
         const daoSearchInput: HTMLInputElement = document.querySelector(".address-container input")!;
 
         // can user propose a FunctionCall to DAO?
-        const canPropose = dao.checkUserPermission(accountId, "AddProposal", "FunctionCall");
+        const canPropose = dao.checkUserPermission(accountId!, ProposalAction.AddProposal, ProposalKind.FunctionCall);
 
         // can user vote approve a FunctionCall on the DAO?
-        const canApprove = dao.checkUserPermission(accountId, "VoteApprove", "FunctionCall");
+        const canApprove = dao.checkUserPermission(accountId!, ProposalAction.VoteApprove, ProposalKind.FunctionCall);
 
         const args = {
             proposal: {
@@ -397,8 +398,8 @@ export class Dao extends Component<Props, State> {
     }
 
     getContent() {
-        const { selector: walletSelector } = this.context;
-        const { info, loading, activeTab } = this.state;
+        const { selector: walletSelector } = this.context!;
+        const { info, loading } = this.state;
 
         // TODO: only require signIn when DAO has no multicall instance (to know if user can propose or vote on existing proposal to create multicall)
         if (!walletSelector.isSignedIn()) {
@@ -438,63 +439,66 @@ export class Dao extends Component<Props, State> {
         }
 
         return (
-            <>
-                <div
-                    className={clsx(
-                        { hidden: activeTab !== 0, "active-tab-panel": activeTab === 0 },
-                        "multicall-tab",
-                        "info-container"
-                    )}
-                >
-                    <div className="info-card admins">
-                        <AddOutlined />
-                        <h1 className="title">Admins</h1>
+            <Tabs
+                classes={{ buttonsPanel: "DaoPageTabs-buttonsPanel", contentSpace: "DaoPageTabs-contentSpace" }}
+                items={[
+                    {
+                        title: "Config",
 
-                        <ul className="list">
-                            {info.admins.map((admin) => (
-                                <li key={admin}>{this.toLink(admin)}</li>
-                            ))}
-                        </ul>
-                    </div>
+                        content: (
+                            <div className={clsx("multicall-tab", "info-container")}>
+                                <Card className="admins">
+                                    <AddOutlined />
+                                    <h1 className="title">Admins</h1>
 
-                    <div className="info-card token-whitelist">
-                        <h1 className="title">Whitelisted Tokens</h1>
+                                    <ul className="list">
+                                        {info.admins.map((admin) => (
+                                            <li key={admin}>{this.toLink(admin)}</li>
+                                        ))}
+                                    </ul>
+                                </Card>
 
-                        <ul className="list">
-                            {info.tokens.map((token) => (
-                                <li key={token}>{this.toLink(token)}</li>
-                            ))}
-                        </ul>
-                    </div>
+                                <Card className="token-whitelist">
+                                    <h1 className="title">Whitelisted Tokens</h1>
 
-                    <div className="info-card jobs">
-                        <AddOutlined />
-                        <h1 className="title">Jobs</h1>
-                        <div className="scroll-wrapper">{info.jobs.map((j) => this.job(j))}</div>
-                    </div>
+                                    <ul className="list">
+                                        {info.tokens.map((token) => (
+                                            <li key={token}>{this.toLink(token)}</li>
+                                        ))}
+                                    </ul>
+                                </Card>
 
-                    <div className="info-card job-bond">
-                        <h1 className="title">
-                            Job Bond
-                            <span>{`${info.jobBond !== "..." ? toNEAR(info.jobBond) : "..."} Ⓝ`}</span>
-                        </h1>
-                    </div>
-                </div>
+                                <Card className="jobs">
+                                    <AddOutlined />
+                                    <h1 className="title">Jobs</h1>
+                                    <Scrollable>{info.jobs.map((j) => this.job(j))}</Scrollable>
+                                </Card>
 
-                <div
-                    className={clsx(
-                        { hidden: activeTab !== 1, "active-tab-panel": activeTab === 1 },
-                        "funds-tab",
-                        "info-container"
-                    )}
-                >
-                    <FungibleTokenBalances
-                        className="info-card tokens"
-                        dao={this.state.dao}
-                        multicall={this.state.multicall}
-                    />
-                </div>
-            </>
+                                <Card className="job-bond">
+                                    <h1 className="title">
+                                        Job Bond
+                                        <span>{`${info.jobBond !== "..." ? toNEAR(info.jobBond) : "..."} Ⓝ`}</span>
+                                    </h1>
+                                </Card>
+                            </div>
+                        ),
+                    },
+                    {
+                        title: "Funds",
+                        lazy: true,
+
+                        content: (
+                            <div className={clsx("funds-tab", "info-container")}>
+                                <FungibleTokenBalances
+                                    className="balances"
+                                    dao={this.state.dao}
+                                    multicall={this.state.multicall}
+                                />
+                            </div>
+                        ),
+                    },
+                ]}
+            />
         );
     }
 
@@ -524,29 +528,10 @@ export class Dao extends Component<Props, State> {
         document.addEventListener("onaddressesupdated", () => this.onAddressesUpdated());
     }
 
-    changeTab = (newTab: number) => this.setState({ activeTab: newTab });
-
     render() {
-        const { activeTab, name } = this.state;
         return (
-            <div className="dao-container">
+            <div className="DaoPage-root">
                 <div className="header">
-                    <div className="tab-list">
-                        <button
-                            className={clsx("tab", { "active-tab": activeTab === 0 })}
-                            onClick={() => this.changeTab(0)}
-                        >
-                            Config
-                        </button>
-
-                        <button
-                            className={clsx("tab", { "active-tab": activeTab === 1 })}
-                            onClick={() => this.changeTab(1)}
-                        >
-                            Funds
-                        </button>
-                    </div>
-
                     <div className="address-container">
                         <TextInput
                             placeholder="Insert DAO name here"

@@ -1,16 +1,15 @@
 import { InfoOutlined } from "@mui/icons-material";
 import { TextField } from "@mui/material";
 import { Base64 } from "js-base64";
-import React, { useEffect, useMemo, useReducer, useState } from "react";
+import { useMemo, useReducer, useState } from "react";
 
 import { ArgsError, ArgsString } from "../../utils/args";
 import { SputnikDAO } from "../../utils/contracts/sputnik-dao";
 import { readFile, saveFile } from "../../utils/loader";
 import { STORAGE } from "../../utils/persistent";
 import { Validation } from "../../utils/validation";
-import { Dialog } from "../dialog/dialog";
 import { TextInput } from "../editor/elements";
-import { Tooltip } from "../tooltip/tooltip.jsx";
+import { Dialog, Tooltip } from "../../shared/ui/components";
 import "./dialogs.scss";
 
 const DAPP_LOGIN_INSTRUCTIONS = [

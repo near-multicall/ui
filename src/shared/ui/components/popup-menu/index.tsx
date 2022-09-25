@@ -1,9 +1,16 @@
 import { Chip } from "@mui/material";
 import clsx from "clsx";
+import { ReactNode } from "react";
 
-import "./popup-menu.scss";
+import "./index.scss";
 
-export const PopupMenu = ({ icon, items, triggerClassName }) => (
+interface PopupMenuProps {
+    icon: ReactNode;
+    items: { label: string; onClick: VoidFunction; title: string }[];
+    triggerClassName: string;
+}
+
+export const PopupMenu = ({ icon, items, triggerClassName }: PopupMenuProps) => (
     <div className={clsx("popup-menu", triggerClassName)}>
         {icon}
 

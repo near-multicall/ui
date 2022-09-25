@@ -7,7 +7,7 @@ import {
 } from "@mui/icons-material";
 
 import { Icon } from "@mui/material";
-import React, { Component } from "react";
+import { Component } from "react";
 import { NavLink } from "react-router-dom";
 
 import Discord from "../../assets/discord.svg";
@@ -16,8 +16,7 @@ import Twitter from "../../assets/twitter.svg";
 import { Wallet } from "../wallet/wallet.jsx";
 import { STORAGE } from "../../utils/persistent";
 import { viewAccount } from "../../utils/wallet";
-import { PopupMenu } from "../popup-menu/popup-menu.jsx";
-import { Tooltip } from "../tooltip/tooltip";
+import { PopupMenu, Tooltip } from "../../shared/ui/components";
 
 import {
     DappLoginDialog,

@@ -5,11 +5,11 @@ import {
     DialogActions as MUIDialogActions,
 } from "@mui/material";
 import { clsx } from "clsx";
-import React, { Component, useEffect, useState } from "react";
+import { PropsWithChildren } from "react";
 
-import "./dialog.scss";
+import "./index.scss";
 
-interface DialogProps extends React.PropsWithChildren {
+interface DialogProps extends PropsWithChildren {
     cancelRename?: string;
     className?: string;
     doneRename?: string;

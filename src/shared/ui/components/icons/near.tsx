@@ -1,7 +1,6 @@
 import { SvgIcon, SvgIconProps } from "@mui/material";
-import React from "react";
 
-export const NearIconFilled = (props: SvgIconProps) => (
+const NativeTokenFilled = (props: SvgIconProps) => (
     <SvgIcon
         viewBox="0 0 288 288"
         sx={{
@@ -15,7 +14,7 @@ export const NearIconFilled = (props: SvgIconProps) => (
     </SvgIcon>
 );
 
-export const NearGenericTokenIconFilled = (props: SvgIconProps) => (
+const GenericTokenFilled = (props: SvgIconProps) => (
     <SvgIcon
         viewBox="0 0 24 24"
         sx={{ position: "initial !important" }}
@@ -35,3 +34,8 @@ export const NearGenericTokenIconFilled = (props: SvgIconProps) => (
         ></path>
     </SvgIcon>
 );
+
+export const NearIcons = {
+    GenericTokenFilled,
+    NativeTokenFilled,
+};

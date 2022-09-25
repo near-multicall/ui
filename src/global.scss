@@ -3,17 +3,9 @@
 @use "sass/font";
 @use "sass/mixin";
 
-// displays
-// alignment
-// sizes
-// colors
-// fonts
-
 * {
     margin: 0;
     font-family: font.$text;
-    // outline: 1px solid aqua;
-    // background-color: rgba(aqua, 0.1);
 }
 
 body,
@@ -50,6 +42,10 @@ button {
     background-color: color.$darkest !important;
     color: rgba(232, 230, 227, 0.3);
     cursor: not-allowed !important;
+}
+
+.hidden {
+    display: none;
 }
 
 .warn {

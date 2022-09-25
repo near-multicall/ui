@@ -1,1 +1,1 @@
-export { NearIconFilled, NearGenericTokenIconFilled } from "./near";
+export { NearIcons } from "./near";

@@ -26,22 +26,15 @@ export class Editor extends Component {
 
         const editing = window?.TASKS?.find((t) => t.id === editingID)?.instance.current;
 
-        return (
-            <div
-                value={1}
-                className="tab-panel"
-            >
-                {editing ? (
-                    <>{editing.renderEditor()}</>
-                ) : (
-                    <div className="placeholder">
-                        <AutoAwesomeOutlinedIcon className="huge-icon" />
-                        <h3>
-                            Click the <EditOutlinedIcon className="icon" /> icon in the top right corner of a task to
-                            start editing!
-                        </h3>
-                    </div>
-                )}
+        return editing ? (
+            <>{editing.renderEditor()}</>
+        ) : (
+            <div className="placeholder">
+                <AutoAwesomeOutlinedIcon className="huge-icon" />
+                <h3>
+                    Click the <EditOutlinedIcon className="icon" /> icon in the top right corner of a task to start
+                    editing!
+                </h3>
             </div>
         );
     }

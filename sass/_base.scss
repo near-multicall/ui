@@ -56,27 +56,15 @@
     flex: 1;
 }
 
-.tab-panel {
-    height: calc(100% - size.$tab-list-height - 2 * size.$gap);
-    @include mixin.center-items;
-    flex-flow: column;
-    gap: size.$gap;
-    & > div {
-        display: flex;
-        flex-flow: column nowrap;
-        height: calc(100% - size.$gap);
-        width: calc(100% - (2 * size.$gap));
-        padding: 0 size.$gap size.$gap size.$gap;
-    }
-}
-
 .loader {
     display: flex;
+    flex: 1;
     align-self: center;
     align-items: center;
     justify-content: center;
     width: 100px;
     height: 100px;
+
     &::after {
         content: " ";
         display: block;
@@ -87,6 +75,7 @@
         border-color: color.$lightish transparent color.$lightish transparent;
         animation: lds-dual-ring 1.2s linear infinite;
     }
+
     @keyframes lds-dual-ring {
         0% {
             transform: rotate(0deg);

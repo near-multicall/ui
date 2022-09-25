@@ -4,6 +4,8 @@
 @use "sass/size";
 
 .multicall-tab {
+    display: grid;
+
     grid-template:
         "admins jobs" 6fr
         "token-whitelist jobs" 5fr
@@ -21,27 +23,18 @@
         grid-area: jobs;
         position: relative;
 
-        .scroll-wrapper {
-            @include mixin.no-scrollbar;
-            overflow-y: scroll;
-            position: absolute;
-            top: calc(size.$large-text + 1.5 * size.$gap);
-            bottom: 0;
-            left: 0;
-            right: 0;
+        .job {
+            position: relative;
+            margin: size.$gap;
+            margin-top: 0;
+            border-radius: size.$task-radius;
+            background-color: color.$lightest;
 
-            .job {
-                position: relative;
-                margin: size.$gap;
-                margin-top: 0;
-                border-radius: size.$task-radius;
-                background-color: color.$lightest;
-
-                pre {
-                    padding: 0.5 * size.$gap;
-                    font-family: font.$code;
-                    font-size: size.$small-text;
-                }
+            pre {
+                padding: 0.5 * size.$gap;
+                font-family: font.$code;
+                font-size: size.$small-text;
+                overflow: hidden;
             }
         }
     }

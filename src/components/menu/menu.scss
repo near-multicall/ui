@@ -3,7 +3,7 @@
 @use "sass/mixin";
 @use "sass/animation";
 
-.menu-container {
+.Editor-root {
     position: fixed;
     top: size.$gap;
     right: size.$gap;
@@ -15,33 +15,41 @@
     border-radius: size.$task-radius;
     z-index: 2;
     transition: width animation.$menu-expand-time ease-out;
-    .tabs {
-        height: 100%;
-        .tab-list {
-            @include mixin.center-items;
-            box-shadow: inset 0px 0px 30px 0px rgba(color.$white, 0.1);
-            border-radius: size.$task-radius;
-            margin: size.$gap;
-            padding: 0;
-            width: calc(100% - 2 * size.$gap);
-            height: size.$tab-list-height;
-            overflow: hidden;
-            button {
-                flex: 1;
-                padding: 0;
-                width: 30%;
-                height: 100%;
-                font-size: size.$text;
-                color: color.$light-text;
-                background-color: transparent;
-                &:focus,
-                &:hover {
-                    background-color: rgba(color.$white, 0.1);
-                }
-                &.active-tab {
-                    color: color.$text;
-                    background-color: color.$white;
-                }
+}
+
+.expanded-menu {
+    width: animation.$menu-expand-width;
+    transition: width animation.$menu-expand-time ease-out;
+}
+
+.Editor-tabs-root {
+    height: 100%;
+}
+
+.Editor-tabs-buttonsPanel {
+    box-shadow: inset 0px 0px 30px 0px rgba(color.$white, 0.1);
+    border-radius: size.$task-radius;
+    margin: size.$gap;
+    width: calc(100% - 2 * size.$gap);
+
+    .Tabs-item-button {
+        flex: 1;
+    }
+}
+
+.Editor-tabs-contentSpace {
+    .Tabs-item-panel {
+        &.is-active {
+            flex-flow: column;
+            gap: size.$gap;
+            height: calc(100% - size.$Tabs-layout-buttonsPanel-height);
+
+            & > div {
+                display: flex;
+                flex-flow: column nowrap;
+                height: calc(100% - size.$gap);
+                width: calc(100% - (2 * size.$gap));
+                padding: 0 size.$gap size.$gap size.$gap;
             }
         }
     }
@@ -53,16 +61,20 @@
     top: calc(50% - 0.5 * size.$large-text);
     width: calc(size.$large-text + size.$gap);
     transition: transform animation.$menu-expand-time linear;
+
     .icon {
         scale: 1.2;
     }
+
     &.expand {
         transform: scaleX(1);
+
         .icon {
             @include mixin.icon;
             font-size: size.$large-text;
         }
     }
+
     &.collapse {
         transform: scaleX(-1);
         .icon {
@@ -70,9 +82,4 @@
             font-size: size.$large-text;
         }
     }
-}
-
-.expanded-menu {
-    width: animation.$menu-expand-width;
-    transition: width animation.$menu-expand-time ease-out;
 }

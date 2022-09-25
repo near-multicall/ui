@@ -4,10 +4,13 @@
 @use "sass/size";
 
 .funds-tab {
+    display: grid;
     grid-template: "balances" 1fr / 1fr;
 
     .balances {
         grid-area: balances;
         padding-bottom: size.$gap;
+        position: relative;
+        overflow: hidden;
     }
 }
