@@ -484,6 +484,7 @@ export class Dao extends Component<Props, State> {
                     },
                     {
                         title: "Funds",
+                        lazy: true,
 
                         content: (
                             <div className={clsx("funds-tab", "info-container")}>

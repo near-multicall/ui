@@ -6,7 +6,7 @@ import { TabsLayout, TabsLayoutProps } from "./layout";
 
 interface TabsProps {
     classes?: TabsLayoutProps["classes"] & {};
-    items: { title: string; content: JSX.Element }[];
+    items: { content: JSX.Element; lazy?: boolean; title: string }[];
 }
 
 export const Tabs = ({ classes, items }: TabsProps) => {
@@ -28,17 +28,15 @@ export const Tabs = ({ classes, items }: TabsProps) => {
 
     return (
         <TabsLayout {...{ buttons, classes }}>
-            {items.map(
-                ({ content }, tabIndex) =>
-                    /* TODO: Render inactive tabs too */
-                    activeТаbIndex === tabIndex && (
-                        <TabsItemPanel
-                            className={clsx({ "is-active": activeТаbIndex === tabIndex })}
-                            key={tabIndex}
-                        >
-                            {content}
-                        </TabsItemPanel>
-                    )
+            {items.map(({ content, lazy = false }, tabIndex) =>
+                activeТаbIndex === tabIndex || !lazy ? (
+                    <TabsItemPanel
+                        className={clsx({ "is-active": activeТаbIndex === tabIndex })}
+                        key={tabIndex}
+                    >
+                        {content}
+                    </TabsItemPanel>
+                ) : null
             )}
         </TabsLayout>
     );
