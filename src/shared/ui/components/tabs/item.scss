@@ -12,10 +12,21 @@
     &.is-active,
     &:hover,
     &:focus {
-        background-color: color.$darkest;
-        color: color.$light-text;
         transition: all 400ms ease;
         transition-property: background-color, color;
+    }
+
+    &.is-active {
+        color: color.$light-text;
+    }
+
+    &.is-active,
+    &.is-active:hover {
+        background-color: color.$darkest;
+    }
+
+    &:hover {
+        background-color: rgba(color.$dark, 0.2);
     }
 
     &--invertedColors {
