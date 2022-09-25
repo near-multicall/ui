@@ -227,7 +227,7 @@ class Multicall {
      */
     async addJob(
         multicalls: MulticallArgs[],
-        triggerDate: Date, // Date of job execution
+        triggerDate: Date,
         triggerGas: string,
         totalBudget: string
     ): Promise<void> {
