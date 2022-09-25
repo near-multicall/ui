@@ -339,7 +339,7 @@ export class Export extends Component {
                                         className="icon"
                                         onClick={() => {
                                             EDITOR.edit(e.task.props.id);
-                                            MENU.changeTab(1);
+                                            MENU.activeTabSwitch(1);
                                         }}
                                     />
                                 </div>

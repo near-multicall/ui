@@ -14,7 +14,7 @@ export class Menu extends Component {
 
         this.state = {
             expanded: false,
-            activeTab: 0,
+            activeTabIndex: 0,
         };
 
         document.addEventListener("onaddressesupdated", () => this.forceUpdate());
@@ -24,18 +24,21 @@ export class Menu extends Component {
         window.MENU = this;
     }
 
-    changeTab = (newTab) => this.setState({ activeTab: newTab });
+    activeTabSwitch = (newTabIndex) => this.setState({ activeTabIndex: newTabIndex });
 
     render() {
-        const { expanded } = this.state;
+        const { activeTabIndex, expanded } = this.state;
 
-        const LAYOUT = this.props.layout; // usually global parameter
+        /** Usually global parameter */
+        const LAYOUT = this.props.layout;
 
         return (
             <div className={`Editor-root ${expanded ? "expanded-menu" : ""}`}>
                 <div className="Editor-tabs-root">
                     <Tabs
                         invertedColors
+                        activeItemIndexOverride={activeTabIndex}
+                        activeItemSwitchOverride={this.activeTabSwitch}
                         classes={{
                             buttonsPanel: "Editor-tabs-buttonsPanel",
                             contentSpace: "Editor-tabs-contentSpace",

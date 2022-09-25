@@ -1,38 +1,50 @@
 import clsx from "clsx";
-import { useCallback, useState } from "react";
+import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "react";
 
 import { TabsItemButton, TabsItemButtonProps, TabsItemPanel } from "./item";
 import { TabsLayout, TabsLayoutProps } from "./layout";
 
 interface TabsProps extends Pick<TabsItemButtonProps, "invertedColors"> {
+    activeItemIndexOverride?: number;
+    activeItemSwitchOverride?: Dispatch<SetStateAction<number>>;
     classes?: TabsLayoutProps["classes"] & {};
     items: { content: JSX.Element; lazy?: boolean; title: string }[];
 }
 
-export const Tabs = ({ classes, invertedColors, items }: TabsProps) => {
-    const [activeТаbIndex, activeTabSwitch] = useState<number>(0);
+export const Tabs = ({
+    activeItemIndexOverride,
+    activeItemSwitchOverride,
+    classes,
+    invertedColors,
+    items,
+}: TabsProps) => {
+    const [activeItemIndex, activeItemSwitch] =
+        activeItemIndexOverride === undefined || activeItemSwitchOverride === undefined
+            ? useState<number>(0)
+            : [activeItemIndexOverride, activeItemSwitchOverride];
 
-    const itemButtonClickHandler = useCallback(
-        (itemIndex: number) => () => activeTabSwitch(itemIndex),
-        [activeTabSwitch]
+    const activeItemSwitchBinding = useCallback(
+        (itemIndex: number) => () => activeItemSwitch(itemIndex),
+        [activeItemSwitch]
     );
 
-    const buttons = items.map(({ title }, tabIndex) => (
-        <TabsItemButton
-            className={clsx({ "is-active": activeТаbIndex === tabIndex })}
-            key={tabIndex}
-            onClick={itemButtonClickHandler(tabIndex)}
-            {...{ invertedColors, title }}
-        />
-    ));
-
     return (
-        <TabsLayout {...{ buttons, classes }}>
-            {items.map(({ content, lazy = false }, tabIndex) =>
-                activeТаbIndex === tabIndex || !lazy ? (
+        <TabsLayout
+            {...{ classes }}
+            buttons={items.map(({ title }, itemIndex) => (
+                <TabsItemButton
+                    className={clsx({ "is-active": activeItemIndex === itemIndex })}
+                    key={itemIndex}
+                    onClick={activeItemSwitchBinding(itemIndex)}
+                    {...{ invertedColors, title }}
+                />
+            ))}
+        >
+            {items.map(({ content, lazy = false }, itemIndex) =>
+                activeItemIndex === itemIndex || !lazy ? (
                     <TabsItemPanel
-                        className={clsx({ "is-active": activeТаbIndex === tabIndex })}
-                        key={tabIndex}
+                        className={clsx({ "is-active": activeItemIndex === itemIndex })}
+                        key={itemIndex}
                     >
                         {content}
                     </TabsItemPanel>
