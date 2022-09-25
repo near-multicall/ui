@@ -58,7 +58,15 @@ addMethod(_StringSchema, "sputnikDao", function sputnikDao(message = locale.stri
     return this.contract().test({
         name: "sputnikDao",
         message,
-        test: async (value) => value == null || !!(await SputnikDAO.isSputnikDAO(value)),
+        test: async (value) => {
+            if (value == null) return false;
+            try {
+                return !!(await SputnikDAO.isSputnikDAO(value));
+            } catch (e) {
+                // TODO check reason for error
+                return false;
+            }
+        },
     });
 });
 
@@ -67,7 +75,15 @@ addMethod(_StringSchema, "multicall", function multicall(message = locale.string
     return this.contract().test({
         name: "multicall",
         message,
-        test: async (value) => value == null || !!(await Multicall.isMulticall(value)),
+        test: async (value) => {
+            if (value == null) return false;
+            try {
+                return !!(await Multicall.isMulticall(value));
+            } catch (e) {
+                // TODO check reason for error
+                return false;
+            }
+        },
     });
 });
 

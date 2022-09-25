@@ -17,12 +17,13 @@ interface NormalFieldProps extends React.HTMLProps<HTMLInputElement> {
     errorText: string;
 }
 
-const NormalField = ({ value, onChange, fieldName, formInfo, errorText }: NormalFieldProps) => (
+const NormalField = ({ value, onChange, fieldName, formInfo, errorText, ...props }: NormalFieldProps) => (
     <>
         <input
             type="text"
             value={value}
             onChange={onChange}
+            {...props}
         />
         <div className="error-text">
             {formInfo.errorText(fieldName, {

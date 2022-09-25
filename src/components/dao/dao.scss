@@ -45,6 +45,9 @@
                 color: color.$darkish;
             }
         }
+        form {
+            z-index: 1;
+        }
     }
     &::before {
         content: "";

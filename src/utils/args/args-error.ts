@@ -1,5 +1,4 @@
-import { addMethod, AnySchema, ValidationError } from "yup";
-import Reference from "yup/lib/Reference";
+import { addMethod, ValidationError } from "yup";
 import { ValidateOptions } from "yup/lib/types";
 
 // default error messages go here
@@ -37,7 +36,7 @@ function retain(this: any, options?: retainOptions) {
 }
 
 // check if value is valid, retain evaluation details in meta data
-function check(this: any, value: any, validateOptions: ValidateOptions): boolean {
+function check(this: any, value: any, validateOptions: ValidateOptions): void {
     try {
         const ret = this.spec.meta?.retained;
         this.validateSync(ret?.customValue ?? value, validateOptions);
@@ -50,7 +49,6 @@ function check(this: any, value: any, validateOptions: ValidateOptions): boolean
                 message: "checked",
                 lastValue: value,
             };
-        return true;
     } catch (e: any) {
         if (e instanceof ValidationError) {
             const ret = this.spec.meta?.retained;
@@ -64,12 +62,11 @@ function check(this: any, value: any, validateOptions: ValidateOptions): boolean
                     lastValue: value,
                 };
         }
-        return false;
     }
 }
 
 // asynchronusly check if value is valid, retain evaluation details in meta data
-async function checkAsync(this: any, value: any, validateOptions: ValidateOptions): Promise<boolean> {
+async function checkAsync(this: any, value: any, validateOptions: ValidateOptions): Promise<void> {
     try {
         const ret = this.spec.meta?.retained;
         await this.validate(ret?.customValue ?? value, validateOptions);
@@ -82,7 +79,6 @@ async function checkAsync(this: any, value: any, validateOptions: ValidateOption
                 message: "checked",
                 lastValue: value,
             };
-        return true;
     } catch (e: any) {
         if (e instanceof ValidationError) {
             const ret = this.spec.meta?.retained;
@@ -96,7 +92,6 @@ async function checkAsync(this: any, value: any, validateOptions: ValidateOption
                     lastValue: value,
                 };
         }
-        return false;
     }
 }
 
@@ -126,29 +121,15 @@ function lastValue(this: any): any {
     return this.spec.meta?.retained?.lastValue;
 }
 
-// override value to a sibling reference
-function checkOn(this: any, ref: Reference) {
-    this.retain();
-    const ret = this.spec.meta.retained;
-    return this.meta({
-        retained: {
-            customValue: this.resolve(ref),
-            ...ret,
-        },
-    });
-}
-
 // combine other errors
 function combine(this: any, errors: any[], options?: retainOptions) {
-    this.retain(options);
-    const ret = this.spec.meta.retained;
-    return this.meta({
+    return this.retain(options).meta({
         retained: {
             error: errors[0].error(),
             errors: errors.map((e) => e.errors()).flat(),
             isBad: errors.some((e) => e.isBad()),
-            message: ret.customMessage ?? errors.map((e) => e.message).join(", "),
-            ...ret,
+            message: this.spec.meta.retained.customMessage ?? errors.map((e) => e.message).join(", "),
+            ...this.spec.meta.retained,
         },
     });
 }
@@ -168,7 +149,6 @@ function addErrorMethods(schema: any): void {
         errors,
         message,
         lastValue,
-        checkOn,
         combine,
     });
 }
