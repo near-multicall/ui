@@ -10,7 +10,7 @@
     @include mixin.center-items;
     z-index: 1;
     border-radius: size.$task-radius;
-    height: size.$Tabs-buttons-height;
+    height: size.$Tabs-layout-buttonsPanel-height;
     padding: 0;
     overflow: hidden;
     background-color: transparent;

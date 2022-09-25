@@ -1,15 +1,15 @@
 import clsx from "clsx";
 import { useCallback, useState } from "react";
 
-import { TabsItemButton, TabsItemPanel } from "./item";
+import { TabsItemButton, TabsItemButtonProps, TabsItemPanel } from "./item";
 import { TabsLayout, TabsLayoutProps } from "./layout";
 
-interface TabsProps {
+interface TabsProps extends Pick<TabsItemButtonProps, "invertedColors"> {
     classes?: TabsLayoutProps["classes"] & {};
     items: { content: JSX.Element; lazy?: boolean; title: string }[];
 }
 
-export const Tabs = ({ classes, items }: TabsProps) => {
+export const Tabs = ({ classes, invertedColors, items }: TabsProps) => {
     const [activeТаbIndex, activeTabSwitch] = useState<number>(0);
 
     const itemButtonClickHandler = useCallback(
@@ -22,7 +22,7 @@ export const Tabs = ({ classes, items }: TabsProps) => {
             className={clsx({ "is-active": activeТаbIndex === tabIndex })}
             key={tabIndex}
             onClick={itemButtonClickHandler(tabIndex)}
-            {...{ title }}
+            {...{ invertedColors, title }}
         />
     ));
 

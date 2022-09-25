@@ -42,7 +42,7 @@
         &.is-active {
             flex-flow: column;
             gap: size.$gap;
-            height: calc(100% - size.$Tabs-buttons-height);
+            height: calc(100% - size.$Tabs-layout-buttonsPanel-height);
 
             & > div {
                 display: flex;

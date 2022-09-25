@@ -6,13 +6,20 @@ import "./item.scss";
 const NAMESPACE = "Tabs-item";
 
 export interface TabsItemButtonProps extends React.HTMLAttributes<HTMLDivElement> {
-    title: string;
+    invertedColors?: boolean;
     onClick: VoidFunction;
+    title: string;
 }
 
-export const TabsItemButton = ({ className, onClick, title }: TabsItemButtonProps) => (
+export const TabsItemButton = ({ className, invertedColors = false, onClick, title }: TabsItemButtonProps) => (
     <button
-        className={clsx(`${NAMESPACE}-button`, className)}
+        className={clsx(
+            {
+                [`${NAMESPACE}-button`]: true,
+                [`${NAMESPACE}-button--invertedColors`]: invertedColors,
+            },
+            className
+        )}
         {...{ onClick }}
     >
         {title}

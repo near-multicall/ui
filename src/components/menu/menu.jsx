@@ -35,6 +35,7 @@ export class Menu extends Component {
             <div className={`Editor-root ${expanded ? "expanded-menu" : ""}`}>
                 <div className="Editor-tabs-root">
                     <Tabs
+                        invertedColors
                         classes={{
                             buttonsPanel: "Editor-tabs-buttonsPanel",
                             contentSpace: "Editor-tabs-contentSpace",

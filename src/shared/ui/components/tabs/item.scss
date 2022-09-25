@@ -9,11 +9,6 @@
     background-color: color.$lightest;
     color: color.$text;
 
-    &--dark-bg {
-        background-color: transparent;
-        color: color.$light-text;
-    }
-
     &.is-active,
     &:hover,
     &:focus {
@@ -21,10 +16,23 @@
         color: color.$light-text;
         transition: all 400ms ease;
         transition-property: background-color, color;
+    }
 
-        &--dark-bg {
-            background-color: color.$white;
+    &--invertedColors {
+        background-color: transparent;
+        color: color.$light-text;
+
+        &.is-active {
             color: color.$text;
+        }
+
+        &.is-active,
+        &.is-active:hover {
+            background-color: color.$white;
+        }
+
+        &:hover {
+            background-color: rgba(color.$white, 0.1);
         }
     }
 }
