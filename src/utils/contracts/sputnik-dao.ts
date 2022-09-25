@@ -103,7 +103,7 @@ type FunctionCall = {
 
 type FunctionCallAction = {
     method_name: string;
-    args: string; // (base64 encoded JSON)
+    args: object;
     deposit: string; // (u128 as a string)
     gas: string; // (u64 as a string)
 };
@@ -182,7 +182,7 @@ class SputnikDAO {
             this.address,
             "add_proposal",
             args,
-            toGas("25"), // 25 Tgas
+            toGas("50"), // 50 Tgas
             this.policy.proposal_bond
         );
     }
@@ -339,14 +339,18 @@ class SputnikDAO {
     }
 
     // propose a generic function call to DAO.
-    async proposeFunctionCall(desc: string, pTarget: string, pActions: FunctionCall): Promise<void> {
+    async proposeFunctionCall(desc: string, pTarget: string, pActions: FunctionCallAction[]): Promise<void> {
         const proposalArgs = {
             proposal: {
                 description: desc,
                 kind: {
                     FunctionCall: {
                         receiver_id: pTarget,
-                        actions: pActions,
+                        actions: pActions.map((action) => ({
+                            ...action,
+                            // base64 encode supplied action args
+                            args: Base64.encode(JSON.stringify(action.args)),
+                        })),
                     },
                 },
             },
@@ -367,27 +371,17 @@ class SputnikDAO {
     async proposeMulticall(desc: string, multicallArgs: MulticallArgs, depo: string, gas: string): Promise<void> {
         const { multicall } = STORAGE.addresses;
 
-        const proposalArgs = {
-            proposal: {
-                description: desc,
-                kind: {
-                    FunctionCall: {
-                        receiver_id: multicall,
-                        actions: [
-                            {
-                                method_name: "multicall",
-                                args: Base64.encode(JSON.stringify(multicallArgs)),
-                                deposit: `${depo}`,
-                                gas: `${gas}`,
-                            },
-                        ],
-                    },
-                },
+        const callActions: FunctionCallAction[] = [
+            {
+                method_name: "multicall",
+                args: multicallArgs,
+                deposit: `${depo}`,
+                gas: `${gas}`,
             },
-        };
+        ];
 
         // fire the add_proposal transaction
-        this.addProposal(proposalArgs);
+        this.proposeFunctionCall(desc, multicall, callActions);
     }
 
     /**
@@ -408,33 +402,21 @@ class SputnikDAO {
     ): Promise<void> {
         const { multicall } = STORAGE.addresses;
 
-        const proposalArgs = {
-            proposal: {
-                description: desc,
-                kind: {
-                    FunctionCall: {
-                        receiver_id: tokenAddress,
-                        actions: [
-                            {
-                                method_name: "ft_transfer_call",
-                                args: Base64.encode(
-                                    JSON.stringify({
-                                        receiver_id: multicall,
-                                        amount: amount,
-                                        msg: JSON.stringify({
-                                            function_id: "multicall",
-                                            args: Base64.encode(JSON.stringify(multicallArgs).toString()),
-                                        }).toString(),
-                                    })
-                                ),
-                                deposit: "1", // nep-141: ft_transfer_call expects EXACTLY 1 yocto
-                                gas: gas,
-                            },
-                        ],
-                    },
+        const actions: FunctionCallAction[] = [
+            {
+                method_name: "ft_transfer_call",
+                args: {
+                    receiver_id: multicall,
+                    amount: amount,
+                    msg: JSON.stringify({
+                        function_id: "multicall",
+                        args: Base64.encode(JSON.stringify(multicallArgs).toString()),
+                    }).toString(),
                 },
+                deposit: "1", // nep-141: ft_transfer_call expects EXACTLY 1 yocto
+                gas: gas,
             },
-        };
+        ];
 
         // check if multicall has enough storage on Token
         const [storageBalance, storageBounds] = await Promise.all([
@@ -449,16 +431,16 @@ class SputnikDAO {
         // if storage balance is less than minimum bound, add proposal action to pay for storage
         if (totalStorageBalance.lt(storageMinBound)) {
             // push to beginning of actions array. Has to execute before ft_transfer_call
-            proposalArgs.proposal.kind.FunctionCall.actions.unshift({
+            actions.unshift({
                 method_name: "storage_deposit",
-                args: Base64.encode(JSON.stringify({ account_id: multicall })),
+                args: { account_id: multicall },
                 deposit: storageMinBound.sub(totalStorageBalance).toFixed(), // difference between current storage total and required minimum
                 gas: toGas("5"), // 5 Tgas
             });
         }
 
         // fire the add_proposal transaction
-        this.addProposal(proposalArgs);
+        this.proposeFunctionCall(desc, tokenAddress, actions);
     }
 }
 

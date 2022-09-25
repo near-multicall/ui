@@ -304,7 +304,7 @@ export default class DaoComponent extends Component {
 
     job(job) {
         return (
-            <div class="job">
+            <div className="job">
                 <EditOutlined />
                 <DeleteOutline />
                 {job.is_active ? <PauseOutlined /> : <PlayArrowOutlined />}

@@ -144,29 +144,27 @@ export default class Export extends Component {
         let multicallArgs = {};
         // Multicall args in text form to display for copy/pasting args
         let multicallArgsText = "";
-        if (this.showArgs) {
-            // Return error message if a card has JSON errors. Faulty JSON breaks toBase64.
-            const hasJsonErrors =
-                errors.hasErrors.isBad && allErrors.some((err) => err.message === errorMsg.ERR_INVALID_ARGS);
-            if (hasJsonErrors) {
-                multicallArgsText = "Please fix invalid JSON errors";
-            } else {
-                // toBase64 might throw on failure
-                try {
-                    multicallArgs = { calls: LAYOUT.toBase64() };
-                    multicallArgsText = !this.attachFT
-                        ? JSON.stringify(multicallArgs)
-                        : JSON.stringify({
-                              receiver_id: STORAGE.addresses.multicall,
-                              amount: convert(amount.value, amount.unit, amount.decimals),
-                              msg: JSON.stringify({
-                                  function_id: "multicall",
-                                  args: Base64.encode(JSON.stringify(multicallArgs).toString()),
-                              }).toString(),
-                          });
-                } catch (e) {
-                    multicallArgsText = "ERROR: something went wrong during JSON creation";
-                }
+        // Return error message if a card has JSON errors. Faulty JSON breaks toBase64.
+        const hasJsonErrors =
+            errors.hasErrors.isBad && allErrors.some((err) => err.message === errorMsg.ERR_INVALID_ARGS);
+        if (hasJsonErrors) {
+            multicallArgsText = "Please fix invalid JSON errors";
+        } else {
+            // toBase64 might throw on failure
+            try {
+                multicallArgs = { calls: LAYOUT.toBase64() };
+                multicallArgsText = !this.attachFT
+                    ? JSON.stringify(multicallArgs)
+                    : JSON.stringify({
+                          receiver_id: STORAGE.addresses.multicall,
+                          amount: convert(amount.value, amount.unit, amount.decimals),
+                          msg: JSON.stringify({
+                              function_id: "multicall",
+                              args: Base64.encode(JSON.stringify(multicallArgs).toString()),
+                          }).toString(),
+                      });
+            } catch (e) {
+                multicallArgsText = "ERROR: something went wrong during JSON creation";
             }
         }
 

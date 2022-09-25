@@ -1,6 +1,5 @@
 import { rpcProvider, view, tx } from "../wallet";
 import { Big, toGas, dateToCron } from "../converter";
-import { Base64 } from "js-base64";
 
 import type { FunctionCallAction as daoFunctionCallAction } from "./sputnik-dao";
 
@@ -145,11 +144,7 @@ class Multicall {
         if (croncatManager !== "") {
             actions.push({
                 method_name: "set_croncat_manager",
-                args: Base64.encode(
-                    JSON.stringify({
-                        address: croncatManager,
-                    })
-                ),
+                args: { address: croncatManager },
                 deposit: "1", // 1 yocto
                 gas: toGas("10"), // 10 Tgas
             });
@@ -158,11 +153,7 @@ class Multicall {
         if (jobBond !== "") {
             actions.push({
                 method_name: "set_job_bond",
-                args: Base64.encode(
-                    JSON.stringify({
-                        amount: jobBond,
-                    })
-                ),
+                args: { amount: jobBond },
                 deposit: "1", // 1 yocto
                 gas: toGas("10"), // 10 Tgas
             });
@@ -171,11 +162,7 @@ class Multicall {
         if (removeTokens.length > 0) {
             actions.push({
                 method_name: "tokens_remove",
-                args: Base64.encode(
-                    JSON.stringify({
-                        addresses: removeTokens,
-                    })
-                ),
+                args: { addresses: removeTokens },
                 deposit: "1", // 1 yocto
                 gas: toGas("20"), // 20 Tgas
             });
@@ -184,11 +171,7 @@ class Multicall {
         if (addTokens.length > 0) {
             actions.push({
                 method_name: "tokens_add",
-                args: Base64.encode(
-                    JSON.stringify({
-                        addresses: addTokens,
-                    })
-                ),
+                args: { addresses: addTokens },
                 deposit: "1", // 1 yocto
                 gas: toGas("20"), // 20 Tgas
             });
