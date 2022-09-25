@@ -218,7 +218,7 @@ export class BaseTask extends Component {
                             className="edit icon"
                             onClick={() => {
                                 EDITOR.edit(id);
-                                MENU.changeTab(1);
+                                MENU.activeTabSwitch(1);
                             }}
                         />
                     </Tooltip>
