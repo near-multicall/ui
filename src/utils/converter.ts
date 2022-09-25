@@ -57,11 +57,10 @@ const dateToCron = (date: Date): string => {
 // Cron expression to JS Date.
 const cronToDate = (cronStr: string): Date => {
     const fields = cronStr.split(" ");
-    let year = 0;
     const options: ParserOptions = { utc: true };
     if (fields.length === 7) {
         // remove and save the 7th field (years).
-        year = parseInt(fields.pop()!);
+        const year = fields.pop()!;
         // restrict cron-parser to chosen year. Format follows ISO 8601.
         options.currentDate = `${year}-01-01T00:00:00`; // first moment of "year"
         options.endDate = `${year}-12-31T23:59:59`; // last moment of "year"
