@@ -439,7 +439,7 @@ export class Dao extends Component<Props, State> {
 
         return (
             <Tabs
-                classes={{ buttonsPanel: "DaoPageTabs-buttonsPanel" }}
+                classes={{ buttonsPanel: "DaoPageTabs-buttonsPanel", contentSpace: "DaoPageTabs-contentSpace" }}
                 items={[
                     {
                         title: "Config",

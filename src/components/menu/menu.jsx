@@ -3,6 +3,7 @@ import Icon from "@mui/material/Icon";
 import { Builder } from "../builder/builder.jsx";
 import { Editor } from "../editor/editor.jsx";
 import { Export } from "../export/export.jsx";
+import { Tabs } from "../../shared/ui/components/tabs/index.tsx";
 import "./menu.scss";
 import clsx from "clsx";
 
@@ -25,50 +26,35 @@ export class Menu extends Component {
     changeTab = (newTab) => this.setState({ activeTab: newTab });
 
     render() {
-        const { expanded, activeTab } = this.state;
+        const { expanded } = this.state;
 
         const LAYOUT = this.props.layout; // ususally global parameter
 
         return (
             <div className={`menu-container ${expanded ? "expanded-menu" : ""}`}>
                 <div className="EditorTabs-root">
-                    <div className="Tab-buttons">
-                        <button
-                            className={clsx("tab", { "is-active": activeTab === 0 })}
-                            onClick={() => this.changeTab(0)}
-                        >
-                            Build
-                        </button>
-
-                        <button
-                            className={clsx("tab", { "is-active": activeTab === 1 })}
-                            onClick={() => this.changeTab(1)}
-                        >
-                            Edit
-                        </button>
-
-                        <button
-                            className={clsx("tab", { "is-active": activeTab === 2 })}
-                            onClick={() => this.changeTab(2)}
-                        >
-                            Export
-                        </button>
-                    </div>
-
-                    <div className={clsx("Tab-panel", { active: activeTab === 0 })}>
-                        <Builder
-                            layout={LAYOUT}
-                            menu={this}
-                        />
-                    </div>
-
-                    <div className={clsx("Tab-panel", { active: activeTab === 1 })}>
-                        <Editor />
-                    </div>
-
-                    <div className={clsx("Tab-panel", { active: activeTab === 2 })}>
-                        <Export layout={LAYOUT} />
-                    </div>
+                    <Tabs
+                        classes={{ buttonsPanel: "Tab-buttons", contentSpace: "Tab-panel" }}
+                        items={[
+                            {
+                                title: "Build",
+                                content: (
+                                    <Builder
+                                        layout={LAYOUT}
+                                        menu={this}
+                                    />
+                                ),
+                            },
+                            {
+                                title: "Edit",
+                                content: <Editor />,
+                            },
+                            {
+                                title: "Export",
+                                content: <Export layout={LAYOUT} />,
+                            },
+                        ]}
+                    />
 
                     <div className={clsx("toggle-size", { collapse: expanded, expand: !expanded })}>
                         <Icon
