@@ -4,12 +4,12 @@
 .token-label {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: size.$gap;
 
     .icon,
     .icon svg {
-        width: 32px;
-        height: 32px;
+        width: 1.5 * size.$gap;
+        height: 1.5 * size.$gap;
     }
 
     .symbol {
