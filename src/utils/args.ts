@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useReducer } from "react";
 import { BigSource } from "big.js";
 import { Validation } from "./validation";
-
-import { SputnikDAO } from "./contracts/sputnik-dao";
 import { unitToDecimals, convert, Big } from "./converter";
 
 export default abstract class Args {

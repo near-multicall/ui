@@ -10,7 +10,7 @@ import { STORAGE } from "../../utils/persistent";
 import { toNEAR, toYocto, Big } from "../../utils/converter";
 import { view } from "../../utils/wallet";
 import { useWalletSelector } from "../../contexts/walletSelectorContext";
-import { SputnikDAO, SputnikUI, ProposalKind, ProposalAction } from "../../utils/contracts/sputnik-dao";
+import { SputnikDAO, SputnikUI, ProposalStatus } from "../../utils/contracts/sputnik-dao";
 import { Multicall } from "../../utils/contracts/multicall";
 import { Card, Scrollable, Tabs } from "../../shared/ui/components";
 import { TextInput } from "../editor/elements";
@@ -33,7 +33,7 @@ interface State {
     multicall: Multicall;
     loading: boolean;
     proposed: number;
-    proposedInfo: object;
+    proposedInfo: ProposalOutput;
 
     info: {
         admins: string[];
@@ -97,47 +97,45 @@ export class Dao extends Component<Props, State> {
      *
      * @returns {object} ID and info of proposal to create multicall instance,
      */
-    proposalAlreadyExists(dao: SputnikDAO) {
+    async proposalAlreadyExists(dao: SputnikDAO): Promise<{ proposal_id: number; proposal_info: object }> {
         // Date.now() returns timestamp in milliseconds, SputnikDAO uses nanoseconds
         const currentTime = Big(Date.now()).times("1000000");
         const lastProposalId = dao.lastProposalId;
         const proposalPeriod = dao.policy.proposal_period;
 
-        return dao
-            .getProposals({
-                from_index: lastProposalId < 100 ? 0 : lastProposalId - 100,
-                limit: 100,
-            })
-            .then((response) => {
-                const proposals = response.filter((proposal) => {
-                    // discard if not active proposal to create multicall instance
-                    if (
-                        !(proposal.kind?.FunctionCall?.receiver_id === window.nearConfig.MULTICALL_FACTORY_ADDRESS) ||
-                        !(proposal.kind?.FunctionCall?.actions?.[0]?.method_name === "create") ||
-                        !(proposal.status === ProposalStatus.InProgress)
-                    ) {
-                        return false;
-                    }
-                    // calculate proposal expiration timestamp in nanoseconds
-                    const expirationTime = Big(proposal.submission_time).add(proposalPeriod);
-                    // check if proposal expired
-                    return expirationTime.gt(currentTime) ? true : false;
-                });
+        // get last 100 DAO proposals
+        const proposals = await dao.getProposals({
+            from_index: lastProposalId < 100 ? 0 : lastProposalId - 100,
+            limit: 100,
+        });
+        // Look for active "Create multicall" proposals
+        const activeProposals = proposals.filter((proposal) => {
+            // discard if not active proposal to create multicall instance
+            if (
+                !(proposal.kind?.FunctionCall?.receiver_id === window.nearConfig.MULTICALL_FACTORY_ADDRESS) ||
+                !(proposal.kind?.FunctionCall?.actions?.[0]?.method_name === "create") ||
+                !(proposal.status === ProposalStatus.InProgress)
+            ) {
+                return false;
+            }
+            // calculate proposal expiration timestamp in nanoseconds
+            const expirationTime = Big(proposal.submission_time).add(proposalPeriod);
+            // check if proposal expired
+            return expirationTime.gt(currentTime) ? true : false;
+        });
 
-                // If there many "Create multicall" proposals, return latest.
-                if (proposals.length > 0) {
-                    const lastProposal = proposals.pop();
-                    return { proposal_id: lastProposal?.id, proposal_info: lastProposal };
-                }
-                // No "Create multicall" proposals found.
-                else return { proposal_id: -1, proposal_info: {} };
-            })
-            .catch((e) => {});
+        // If there many "Create multicall" proposals, return latest.
+        if (activeProposals.length > 0) {
+            const lastProposal = activeProposals.pop()!;
+            return { proposal_id: lastProposal.id, proposal_info: lastProposal };
+        }
+        // No "Create multicall" proposals found.
+        else return { proposal_id: -1, proposal_info: {} };
     }
 
     createMulticall() {
         const { accountId } = this.context!;
-        const { loading, name, dao, proposed, proposedInfo } = this.state;
+        const { loading, dao, proposed, proposedInfo } = this.state;
         const { noContract, noDao } = this.errors;
 
         if (
@@ -152,10 +150,10 @@ export class Dao extends Component<Props, State> {
         const daoSearchInput: HTMLInputElement = document.querySelector(".address-container input")!;
 
         // can user propose a FunctionCall to DAO?
-        const canPropose = dao.checkUserPermission(accountId!, ProposalAction.AddProposal, ProposalKind.FunctionCall);
+        const canPropose = dao.checkUserPermission(accountId!, "AddProposal", "FunctionCall");
 
         // can user vote approve a FunctionCall on the DAO?
-        const canApprove = dao.checkUserPermission(accountId!, ProposalAction.VoteApprove, ProposalKind.FunctionCall);
+        const canApprove = dao.checkUserPermission(accountId!, "VoteApprove", "FunctionCall");
 
         const args = {
             proposal: {
@@ -259,7 +257,7 @@ export class Dao extends Component<Props, State> {
                             </a>
                         </div>
                     );
-                } else if (proposedInfo.votes[accountId]) {
+                } else if (proposedInfo.votes[accountId!]) {
                     // user can VoteApprove and already voted
 
                     return (
@@ -529,6 +527,8 @@ export class Dao extends Component<Props, State> {
     }
 
     render() {
+        const { name } = this.state;
+
         return (
             <div className="DaoPage-root">
                 <div className="header">
