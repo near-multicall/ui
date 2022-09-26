@@ -29,12 +29,12 @@ export default class DaoComponent extends Component {
             addr: args
                 .object()
                 .shape({
-                    noAddress: args.string().address().retain(),
-                    noDao: args.string().sputnikDao().retain(),
-                    noMulticall: args
-                        .string()
-                        .multicall()
-                        .retain({ customMessage: "DAO does not have a multicall instance" }),
+                    noAddress: args.string().address().retain({ initial: true }),
+                    noDao: args.string().sputnikDao().retain({ initial: true }),
+                    noMulticall: args.string().multicall().retain({
+                        customMessage: "DAO does not have a multicall instance",
+                        initial: true,
+                    }),
                 })
                 .retain(),
         })
@@ -365,7 +365,8 @@ export default class DaoComponent extends Component {
 
     tryLoadInfo() {
         this.schema.checkAsync(this.state.formData).then(() => {
-            console.log(this.schema.message(), this.schema.lastValue());
+            console.log("CHECKED");
+            console.log(this.schema.message(), this.schema.lastValue(), this.schema.fields.addr.lastValue());
             if (!this.schema.isBad()) {
                 this.confidentlyLoadInfo();
             } else {
@@ -447,7 +448,12 @@ export default class DaoComponent extends Component {
 
         // errors to display
         const displayErrorsList = ["noAddress", "noDao", "noMulticall"];
+        console.log(fields(this.schema, "addr"));
         const displayErrors = Object.entries(fields(this.schema, "addr"))
+            .map(([k, v]) => {
+                console.log([k, v], v.lastValue());
+                return [k, v];
+            })
             .filter(([k, v]) => v.isBad() && displayErrorsList.includes(k))
             .map(([k, v]) => (
                 <p
