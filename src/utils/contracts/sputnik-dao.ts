@@ -148,7 +148,7 @@ class SputnikDAO {
      *
      * @param accountId
      */
-    static async isSputnikDAO (accountId: string): Promise<boolean> {
+    static async isSputnikDAO(accountId: string): Promise<boolean> {
         const accountInfo = await viewAccount(accountId);
         const codeHash: string = accountInfo.code_hash;
         return SputnikDAO.CONTRACT_CODE_HASHES.includes(codeHash);
