@@ -367,7 +367,7 @@ export class Dao extends Component<Props, State> {
                     // or some error happened during DAO object init.
                     noContract.isBad = true;
                     noDao.isBad = true;
-                    this.setState({ dao, loading: false });
+                    this.setState({ dao, multicall: new Multicall(multicallAddress), loading: false });
                     return;
                 } else {
                     // DAO correctly initialized, try to fetch multicall info
@@ -385,10 +385,11 @@ export class Dao extends Component<Props, State> {
                     ]).then(([admins, tokens, jobs, jobBond, proposalData]) =>
                         this.setState((prevState) => ({
                             dao,
+                            multicall: new Multicall(multicallAddress),
                             info: { admins, tokens, jobs, jobBond },
                             loading: false,
                             proposed: proposalData?.proposal_id,
-                            proposedInfo: proposalData?.proposal_info || prevState.proposedInfo,
+                            proposedInfo: proposalData?.proposal_info || {},
                         }))
                     );
                 }
