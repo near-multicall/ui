@@ -10,6 +10,9 @@
     .icon svg {
         width: 1.5 * size.$gap;
         height: 1.5 * size.$gap;
+        cursor: default !important;
+        border-radius: 50%;
+        box-shadow: 0px 5px 11px -3px rgba(0, 0, 0, 0.1);
     }
 
     .symbol {
