@@ -20,9 +20,7 @@ class TextInput extends Component {
                     this.forceUpdate();
                 }}
                 error={errors.some((error) => error?.isBad)}
-                helperText={errors.map((error) => {
-                    if (error?.isBad) return error?.message;
-                })}
+                helperText={errors.find((error) => error.isBad)?.message}
                 InputLabelProps={{ shrink: true }}
                 {...props}
             />
@@ -53,9 +51,7 @@ class TextInputWithUnits extends Component {
                         update?.(e, this);
                     }}
                     error={errors.some((e) => e?.isBad)}
-                    helperText={errors.map((error) => {
-                        if (error?.isBad) return error?.message;
-                    })}
+                    helperText={errors.find((error) => error.isBad)?.message}
                     InputLabelProps={{ shrink: true }}
                     {...textProps}
                     {...props}
