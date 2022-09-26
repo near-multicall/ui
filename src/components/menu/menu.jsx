@@ -1,5 +1,8 @@
-import React, { Component } from "react";
 import Icon from "@mui/material/Icon";
+import clsx from "clsx";
+import { Component } from "react";
+
+import { Tabs } from "../../shared/ui/components";
 import { Builder } from "../builder/builder.jsx";
 import { Editor } from "../editor/editor.jsx";
 import { Export } from "../export/export.jsx";
@@ -11,7 +14,7 @@ export class Menu extends Component {
 
         this.state = {
             expanded: false,
-            tab: 0,
+            activeTabIndex: 0,
         };
 
         document.addEventListener("onaddressesupdated", () => this.forceUpdate());
@@ -21,49 +24,47 @@ export class Menu extends Component {
         window.MENU = this;
     }
 
-    changeTab = (newTab) => this.setState({ tab: newTab });
+    activeTabSwitch = (newTabIndex) => this.setState({ activeTabIndex: newTabIndex });
 
     render() {
-        const { expanded, tab } = this.state;
+        const { activeTabIndex, expanded } = this.state;
 
-        const LAYOUT = this.props.layout; // ususally global parameter
+        /** Usually global parameter */
+        const LAYOUT = this.props.layout;
 
         return (
-            <div className={`menu-container ${expanded ? "expanded-menu" : ""}`}>
-                <div className="tabs">
-                    <div className="tab-list">
-                        <button
-                            className={`tab ${tab === 0 ? "active-tab" : ""}`}
-                            onClick={() => this.changeTab(0)}
-                        >
-                            Build
-                        </button>
-                        <button
-                            className={`tab ${tab === 1 ? "active-tab" : ""}`}
-                            onClick={() => this.changeTab(1)}
-                        >
-                            Edit
-                        </button>
-                        <button
-                            className={`tab ${tab === 2 ? "active-tab" : ""}`}
-                            onClick={() => this.changeTab(2)}
-                        >
-                            Export
-                        </button>
-                    </div>
-                    <div className={`${tab != 0 ? "hidden" : "active-panel"}`}>
-                        <Builder
-                            layout={LAYOUT}
-                            menu={this}
-                        />
-                    </div>
-                    <div className={`${tab != 1 ? "hidden" : "active-panel"}`}>
-                        <Editor />
-                    </div>
-                    <div className={`${tab != 2 ? "hidden" : "active-panel"}`}>
-                        <Export layout={LAYOUT} />
-                    </div>
-                    <div className={`toggle-size ${expanded ? "collapse" : "expand"}`}>
+            <div className={`Editor-root ${expanded ? "expanded-menu" : ""}`}>
+                <div className="Editor-tabs-root">
+                    <Tabs
+                        invertedColors
+                        activeItemIndexOverride={activeTabIndex}
+                        activeItemSwitchOverride={this.activeTabSwitch}
+                        classes={{
+                            buttonsPanel: "Editor-tabs-buttonsPanel",
+                            contentSpace: "Editor-tabs-contentSpace",
+                        }}
+                        items={[
+                            {
+                                title: "Build",
+                                content: (
+                                    <Builder
+                                        layout={LAYOUT}
+                                        menu={this}
+                                    />
+                                ),
+                            },
+                            {
+                                title: "Edit",
+                                content: <Editor />,
+                            },
+                            {
+                                title: "Export",
+                                content: <Export layout={LAYOUT} />,
+                            },
+                        ]}
+                    />
+
+                    <div className={clsx("toggle-size", { collapse: expanded, expand: !expanded })}>
                         <Icon
                             className="icon"
                             onClick={() => {

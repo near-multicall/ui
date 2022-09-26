@@ -6,7 +6,7 @@ import { errorMsg } from "../../utils/errors";
 import { STORAGE } from "../../utils/persistent";
 import { toGas, toYocto, formatTokenAmount, unitToDecimals } from "../../utils/converter";
 import { BaseTask } from "../base";
-import Multicall from "../../utils/contracts/multicall";
+import { Multicall } from "../../utils/contracts/multicall";
 import "./multicall.scss";
 import { TextInput, TextInputWithUnits } from "../../components/editor/elements";
 

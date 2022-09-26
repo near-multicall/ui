@@ -1,13 +1,14 @@
 import { DeleteOutline, MoveDown, EditOutlined } from "@mui/icons-material";
-import { Tooltip } from "../components/tooltip/tooltip";
-import React, { Component } from "react";
+import debounce from "lodash.debounce";
+import { Component } from "react";
+
+import { Tooltip } from "../shared/ui/components";
 import { TextInput, TextInputWithUnits } from "../components/editor/elements";
 import { ArgsAccount, ArgsBig, ArgsError, ArgsJSON, ArgsString } from "../utils/args";
 import Call from "../utils/call";
 import { toGas, toYocto, formatTokenAmount, unitToDecimals } from "../utils/converter";
 import { errorMsg } from "../utils/errors";
 import { hasContract } from "../utils/contracts/generic";
-import debounce from "lodash.debounce";
 import "./base.scss";
 
 export class BaseTask extends Component {
@@ -217,7 +218,7 @@ export class BaseTask extends Component {
                             className="edit icon"
                             onClick={() => {
                                 EDITOR.edit(id);
-                                MENU.changeTab(1);
+                                MENU.activeTabSwitch(1);
                             }}
                         />
                     </Tooltip>

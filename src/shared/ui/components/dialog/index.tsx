@@ -1,16 +1,31 @@
 import {
-    Dialog as MUIDialog,
-    DialogTitle as MUIDialogTitle,
-    DialogContent as MUIDialogContent,
-    DialogActions as MUIDialogAction,
+    Dialog as MuiDialog,
+    DialogTitle as MuiDialogTitle,
+    DialogContent as MuiDialogContent,
+    DialogActions as MuiDialogAction,
+    DialogProps as MuiDialogProps,
 } from "@mui/material";
 import { clsx } from "clsx";
-import React, { Component } from "react";
+import { Component } from "react";
 
-import "./dialog.scss";
+import "./index.scss";
 
-export class Dialog extends Component {
-    constructor(props) {
+interface DialogProps extends MuiDialogProps {
+    cancelRename?: string;
+    disable: () => boolean;
+    doneRename?: string;
+    onClose: VoidFunction;
+    onCancel: VoidFunction;
+    onDone: VoidFunction;
+}
+
+interface DialogState {
+    open: DialogProps["open"];
+    title: DialogProps["title"];
+}
+
+export class Dialog extends Component<DialogProps, DialogState> {
+    constructor(props: DialogProps) {
         super(props);
 
         this.state = {
@@ -29,20 +44,19 @@ export class Dialog extends Component {
         const { className, onClose, onDone, doneRename, onCancel, cancelRename, disable, children } = this.props;
 
         return (
-            <MUIDialog
-                onClose={() => onClose()}
-                open={open}
+            <MuiDialog
                 className={clsx("dialog", className)}
+                {...{ onClose, open }}
             >
-                <MUIDialogTitle className="title">{title}</MUIDialogTitle>
-                <MUIDialogContent className="content">{children}</MUIDialogContent>
-                <MUIDialogAction className="action">
+                <MuiDialogTitle className="title">{title}</MuiDialogTitle>
+                <MuiDialogContent className="content">{children}</MuiDialogContent>
+                <MuiDialogAction className="action">
                     {onCancel !== undefined ? (
                         <button
                             className="cancel"
                             onClick={() => {
                                 onCancel();
-                                onClose();
+                                onClose?.();
                             }}
                         >
                             {cancelRename ?? "Cancel"}
@@ -60,8 +74,8 @@ export class Dialog extends Component {
                             {doneRename ?? "Done"}
                         </button>
                     ) : null}
-                </MUIDialogAction>
-            </MUIDialog>
+                </MuiDialogAction>
+            </MuiDialog>
         );
     }
 }

@@ -1,4 +1,4 @@
-import { rpcProvider } from "../wallet";
+import { viewAccount } from "../wallet";
 
 const FACTORY_ADDRESS_SELECTOR: Record<string, string> = {
     mainnet: "v1.multicall.near",
@@ -15,14 +15,14 @@ const CONTRACT_CODE_HASHES_SELECTOR: Record<string, string[]> = {
     ],
 };
 
-export default class Multicall {
+export class Multicall {
     static FACTORY_ADDRESS: string = FACTORY_ADDRESS_SELECTOR[window.NEAR_ENV];
     static CONTRACT_CODE_HASHES: string[] = CONTRACT_CODE_HASHES_SELECTOR[window.NEAR_ENV];
 
-    MULTICALL_ADDRESS: string;
+    address: string;
 
     constructor(multicall_address: string) {
-        this.MULTICALL_ADDRESS = multicall_address;
+        this.address = multicall_address;
     }
 
     /**
@@ -32,11 +32,7 @@ export default class Multicall {
      * @param accountId
      */
     static async isMulticall(accountId: string): Promise<boolean> {
-        const accountInfo: any = await rpcProvider.query({
-            request_type: "view_account",
-            finality: "final",
-            account_id: accountId,
-        });
+        const accountInfo = await viewAccount(accountId);
         const codeHash: string = accountInfo.code_hash;
         return Multicall.CONTRACT_CODE_HASHES.includes(codeHash);
     }

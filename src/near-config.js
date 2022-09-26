@@ -11,7 +11,7 @@ function getConfig(env) {
                 CRONCAT_MANAGER_ADDRESS: "manager_v1.croncat.near",
                 nodeUrl: "https://rpc.mainnet.near.org",
                 walletUrl: "https://wallet.near.org",
-                helperUrl: "https://helper.mainnet.near.org",
+                helperUrl: "https://api.kitwallet.app",
                 explorerUrl: "https://explorer.mainnet.near.org",
             };
         case "development":
@@ -25,7 +25,7 @@ function getConfig(env) {
                 CRONCAT_MANAGER_ADDRESS: "manager_v1.croncat.testnet",
                 nodeUrl: "https://rpc.testnet.near.org",
                 walletUrl: "https://wallet.testnet.near.org",
-                helperUrl: "https://helper.testnet.near.org",
+                helperUrl: "https://testnet-api.kitwallet.app",
                 explorerUrl: "https://explorer.testnet.near.org",
             };
         case "betanet":

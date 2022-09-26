@@ -3,8 +3,10 @@ import { InputAdornment } from "@mui/material";
 import Icon from "@mui/material/Icon";
 import TextField from "@mui/material/TextField";
 import { Base64 } from "js-base64";
+import debounce from "lodash.debounce";
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
+
 import { ArgsAccount, ArgsBig, ArgsError, ArgsString } from "../../utils/args";
 import { errorMsg } from "../../utils/errors";
 import { STORAGE } from "../../utils/persistent";
@@ -12,7 +14,6 @@ import { convert, toGas, toNEAR } from "../../utils/converter";
 import { view } from "../../utils/wallet";
 import { useWalletSelector } from "../../contexts/walletSelectorContext";
 import { TextInput, TextInputWithUnits } from "../editor/elements";
-import debounce from "lodash.debounce";
 import "./export.scss";
 
 export class Export extends Component {
@@ -241,150 +242,145 @@ export class Export extends Component {
         }
 
         return (
-            <div
-                value={2}
-                className="tab-panel"
-            >
-                <div className="export-container">
-                    <div className="input-container">
-                        <TextInput
-                            label="Proposal description"
-                            value={desc}
-                            error={errors.desc}
-                            multiline
-                            update={this.update}
-                        />
-                        <TextInputWithUnits
-                            label="Total allocated gas"
-                            value={gas}
-                            error={errors.gas}
-                            options={["Tgas", "gas"]}
-                            update={this.update}
-                        />
-                        <div className="attachment">
-                            <p>Attach</p>
-                            <button
-                                className={this.attachNEAR ? "selected" : ""}
-                                onClick={() => {
-                                    this.attachNEAR = !this.attachNEAR;
-                                    this.attachFT = false;
-                                    this.update();
-                                }}
-                            >
-                                NEAR
-                            </button>
-                            <p>or</p>
-                            <button
-                                className={this.attachFT ? "selected" : ""}
-                                onClick={() => {
-                                    this.attachNEAR = false;
-                                    this.attachFT = !this.attachFT;
-                                    this.update();
-                                }}
-                            >
-                                fungible token
-                            </button>
-                        </div>
-                        {this.attachNEAR ? (
-                            <TextInputWithUnits
-                                label="Total attached deposit"
-                                value={depo}
-                                error={errors.depo}
-                                options={["NEAR", "yocto"]}
-                                update={this.update}
-                            />
-                        ) : null}
-                        {this.attachFT ? (
-                            <>
-                                <TextInput
-                                    label="Token address"
-                                    value={token}
-                                    error={[errors.token, errors.noToken, errors.notWhitelisted]}
-                                    update={() => {
-                                        this.update();
-                                        this.updateFTDebounced();
-                                    }}
-                                />
-                                <TextField
-                                    label="Amount"
-                                    value={errors.amount.validOrNull(amount) || errors.amount.intermediate}
-                                    margin="dense"
-                                    size="small"
-                                    onChange={(e) => {
-                                        amount.value = e.target.value;
-                                        errors.amount.validOrNull(amount);
-                                        this.update();
-                                    }}
-                                    error={errors.amount.isBad}
-                                    helperText={errors.amount.isBad && errors.amount.message}
-                                    InputLabelProps={{ shrink: true }}
-                                    InputProps={{
-                                        endAdornment: <InputAdornment position="end">{amount.unit}</InputAdornment>,
-                                    }}
-                                />
-                            </>
-                        ) : null}
+            <div className="export-container">
+                <div className="input-container">
+                    <TextInput
+                        label="Proposal description"
+                        value={desc}
+                        error={errors.desc}
+                        multiline
+                        update={this.update}
+                    />
+                    <TextInputWithUnits
+                        label="Total allocated gas"
+                        value={gas}
+                        error={errors.gas}
+                        options={["Tgas", "gas"]}
+                        update={this.update}
+                    />
+                    <div className="attachment">
+                        <p>Attach</p>
+                        <button
+                            className={this.attachNEAR ? "selected" : ""}
+                            onClick={() => {
+                                this.attachNEAR = !this.attachNEAR;
+                                this.attachFT = false;
+                                this.update();
+                            }}
+                        >
+                            NEAR
+                        </button>
+                        <p>or</p>
+                        <button
+                            className={this.attachFT ? "selected" : ""}
+                            onClick={() => {
+                                this.attachNEAR = false;
+                                this.attachFT = !this.attachFT;
+                                this.update();
+                            }}
+                        >
+                            fungible token
+                        </button>
                     </div>
-                    {/* Display cards' errors */}
-                    {allErrors.length > 0 && (
-                        <div className="error-container">
-                            <div className="header">
-                                <h3>{`Card errors (${allErrors.length})`}</h3>
-                            </div>
-                            <div className="error-list">
-                                {allErrors.map((e, i) => (
-                                    <div
-                                        className="error"
-                                        key={`error-${i}`}
-                                    >
-                                        <p className="msg">{`[${e.task.call.name}] Error: ${e.message}`}</p>
-                                        <EditOutlinedIcon
-                                            className="icon"
-                                            onClick={() => {
-                                                EDITOR.edit(e.task.props.id);
-                                                MENU.changeTab(1);
-                                            }}
-                                        />
-                                    </div>
-                                ))}
-                            </div>
+                    {this.attachNEAR ? (
+                        <TextInputWithUnits
+                            label="Total attached deposit"
+                            value={depo}
+                            error={errors.depo}
+                            options={["NEAR", "yocto"]}
+                            update={this.update}
+                        />
+                    ) : null}
+                    {this.attachFT ? (
+                        <>
+                            <TextInput
+                                label="Token address"
+                                value={token}
+                                error={[errors.token, errors.noToken, errors.notWhitelisted]}
+                                update={() => {
+                                    this.update();
+                                    this.updateFTDebounced();
+                                }}
+                            />
+                            <TextField
+                                label="Amount"
+                                value={errors.amount.validOrNull(amount) || errors.amount.intermediate}
+                                margin="dense"
+                                size="small"
+                                onChange={(e) => {
+                                    amount.value = e.target.value;
+                                    errors.amount.validOrNull(amount);
+                                    this.update();
+                                }}
+                                error={errors.amount.isBad}
+                                helperText={errors.amount.isBad && errors.amount.message}
+                                InputLabelProps={{ shrink: true }}
+                                InputProps={{
+                                    endAdornment: <InputAdornment position="end">{amount.unit}</InputAdornment>,
+                                }}
+                            />
+                        </>
+                    ) : null}
+                </div>
+                {/* Display cards' errors */}
+                {allErrors.length > 0 && (
+                    <div className="error-container">
+                        <div className="header">
+                            <h3>{`Card errors (${allErrors.length})`}</h3>
                         </div>
-                    )}
-                    <div className="section">
-                        <div className="sidebar">
-                            <Icon
-                                className="icon collapse"
-                                onClick={() => this.toggleShowArgs()}
-                                collapsed={this.showArgs ? "no" : "yes"}
-                            >
-                                expand_more
-                            </Icon>
-                            <h3 onClick={() => this.toggleShowArgs()}>Multicall args</h3>
-                            {this.showArgs ? (
-                                <Icon
-                                    className="icon copy"
-                                    onClick={(e) => {
-                                        navigator.clipboard.writeText(multicallArgs);
-                                        this.updateCopyIcon(e);
-                                    }}
+                        <div className="error-list">
+                            {allErrors.map((e, i) => (
+                                <div
+                                    className="error"
+                                    key={`error-${i}`}
                                 >
-                                    content_copy
-                                </Icon>
-                            ) : (
-                                <></>
-                            )}
+                                    <p className="msg">{`[${e.task.call.name}] Error: ${e.message}`}</p>
+                                    <EditOutlinedIcon
+                                        className="icon"
+                                        onClick={() => {
+                                            EDITOR.edit(e.task.props.id);
+                                            MENU.activeTabSwitch(1);
+                                        }}
+                                    />
+                                </div>
+                            ))}
                         </div>
+                    </div>
+                )}
+                <div className="section">
+                    <div className="sidebar">
+                        <Icon
+                            className="icon collapse"
+                            onClick={() => this.toggleShowArgs()}
+                            collapsed={this.showArgs ? "no" : "yes"}
+                        >
+                            expand_more
+                        </Icon>
+                        <h3 onClick={() => this.toggleShowArgs()}>Multicall args</h3>
                         {this.showArgs ? (
-                            <div className="value">
-                                <pre className="code">{multicallArgs}</pre>
-                            </div>
+                            <Icon
+                                className="icon copy"
+                                onClick={(e) => {
+                                    navigator.clipboard.writeText(multicallArgs);
+                                    this.updateCopyIcon(e);
+                                }}
+                            >
+                                content_copy
+                            </Icon>
                         ) : (
                             <></>
                         )}
                     </div>
-                    <div className="spacer"></div>
-                    {this.renderProposeButton()}
+                    {this.showArgs ? (
+                        <div className="value">
+                            <pre className="code">{multicallArgs}</pre>
+                        </div>
+                    ) : (
+                        <></>
+                    )}
                 </div>
+                <div className="spacer"></div>
+                {this.renderProposeButton()}
             </div>
         );
     }
