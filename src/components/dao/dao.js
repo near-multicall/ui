@@ -48,7 +48,7 @@ export default class DaoComponent extends Component {
         .retain();
 
     loadInfoDebounced = debounce(() => this.loadInfos(), 400);
-    confidentlyLoadInfoDebounced = debounce(() => this.confidentlyLoadInfo(), 400);
+    tryLoadInfoDebounced = debounce(() => this.tryLoadInfo(), 400);
 
     lastAddr;
 
@@ -365,6 +365,7 @@ export default class DaoComponent extends Component {
 
     tryLoadInfo() {
         this.schema.checkAsync(this.state.formData).then(() => {
+            console.log(this.schema.message(), this.schema.lastValue());
             if (!this.schema.isBad()) {
                 this.confidentlyLoadInfo();
             } else {
@@ -522,7 +523,10 @@ export default class DaoComponent extends Component {
                     props: {
                         placeholder: "Insert DAO name here",
                     },
-                    postChange: (e) => this.setFormData({ addr: e.target.value }, this.tryLoadInfo),
+                    postChange: (e) => {
+                        this.setFormData({ addr: e.target.value });
+                        this.tryLoadInfoDebounced();
+                    },
                 })}
             </form>
         );

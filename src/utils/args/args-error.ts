@@ -61,6 +61,8 @@ function check(this: any, value: any, validateOptions: ValidateOptions): void {
                     message: ret.customMessage ?? e.message,
                     lastValue: value,
                 };
+        } else {
+            console.error(e);
         }
     }
 }
@@ -91,6 +93,8 @@ async function checkAsync(this: any, value: any, validateOptions: ValidateOption
                     message: ret.customMessage ?? e.message,
                     lastValue: value,
                 };
+        } else {
+            console.error(e);
         }
     }
 }

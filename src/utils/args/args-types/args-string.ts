@@ -46,10 +46,19 @@ addMethod(_StringSchema, "address", function address(message = locale.string.add
 
 // ensure string is a valid NEAR address with a contract
 addMethod(_StringSchema, "contract", function contract(message = locale.string.contract) {
-    return this.address().test({
+    return this.test({
         name: "contract",
         message,
-        test: async (value) => value == null || !!(await hasContract(value)),
+        test: async (value) => {
+            if (value == null) return true;
+            try {
+                return !!(await hasContract(value));
+            } catch (e) {
+                // TODO check reason for error
+                // console.warn("error occured while checking for contract instance at", value);
+                return false;
+            }
+        },
     });
 });
 
@@ -59,11 +68,12 @@ addMethod(_StringSchema, "sputnikDao", function sputnikDao(message = locale.stri
         name: "sputnikDao",
         message,
         test: async (value) => {
-            if (value == null) return false;
+            if (value == null) return true;
             try {
                 return !!(await SputnikDAO.isSputnikDAO(value));
             } catch (e) {
                 // TODO check reason for error
+                // console.warn("error occured while checking for dao instance at", value);
                 return false;
             }
         },
@@ -76,11 +86,12 @@ addMethod(_StringSchema, "multicall", function multicall(message = locale.string
         name: "multicall",
         message,
         test: async (value) => {
-            if (value == null) return false;
+            if (value == null) return true;
             try {
                 return !!(await Multicall.isMulticall(value));
             } catch (e) {
                 // TODO check reason for error
+                // console.warn("error occured while checking for multicall instance at", value);
                 return false;
             }
         },
