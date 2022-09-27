@@ -33,6 +33,7 @@ type retainedData = {
     customMessage: string | null;
     customValue: any | null;
     message: string;
+    messages: string[];
     dummy: boolean;
     lastValue: any | null;
     initial?: boolean;
@@ -48,6 +49,7 @@ interface ErrorMethods {
     error(): ValidationError | null;
     errors(): ValidationError[] | null;
     message(): string;
+    messages(): string[];
     lastValue(): any;
     combine(errors: this[], options?: retainOptions): this;
 }
@@ -63,6 +65,7 @@ function retain(this: any, options?: retainOptions) {
                 isBad: false,
                 customMessage: null,
                 message: "",
+                messages: [],
                 dummy: false,
                 lastValue: null,
                 ...options,
@@ -81,6 +84,10 @@ function _check(this: any, value: any, validateOptions: ValidateOptions): void {
         const fields = Object.entries(this.fields).filter(([k, v]) => !ret?.ignoreFields?.includes(k));
         fields.forEach(([k, v]) => (v as any).check(value[k], validateOptions));
         const errors = fields.map(([k, v]) => (v as any).errors()).flat();
+        const messages = fields
+            .map(([k, v]) => (v as any).messages())
+            .filter((m) => m !== "")
+            .flat();
         if (!!ret && !ret.dummy)
             this.spec.meta.retained = {
                 ...ret,
@@ -88,12 +95,8 @@ function _check(this: any, value: any, validateOptions: ValidateOptions): void {
                 errors,
                 isBad: fields.some(([k, v]) => (v as any).isBad()),
                 lastValue: value,
-                message:
-                    ret.customMessage ??
-                    fields
-                        .map(([k, v]) => (v as any).message())
-                        .filter((m) => m !== "")
-                        .join(", "),
+                message: ret.customMessage ?? messages[0],
+                messages,
             };
     } else {
         try {
@@ -106,6 +109,7 @@ function _check(this: any, value: any, validateOptions: ValidateOptions): void {
                     errors: [],
                     isBad: false,
                     message: "checked",
+                    messages: [],
                     lastValue: value,
                 };
         } catch (e: any) {
@@ -115,9 +119,10 @@ function _check(this: any, value: any, validateOptions: ValidateOptions): void {
                     this.spec.meta.retained = {
                         ...ret,
                         error: e,
-                        errors: [],
+                        errors: [e],
                         isBad: true,
                         message: ret.customMessage ?? e.message,
+                        messages: [ret.customMessage ?? e.message],
                         lastValue: value,
                     };
             } else {
@@ -138,6 +143,10 @@ async function _checkAsync(this: any, value: any, validateOptions: ValidateOptio
         const fields = Object.entries(this.fields).filter(([k, v]) => !ret?.ignoreFields?.includes(k));
         await Promise.all(fields.map(async ([k, v]) => await (v as any)._checkAsync(value[k], validateOptions)));
         const errors = fields.map(([k, v]) => (v as any).errors()).flat();
+        const messages = fields
+            .map(([k, v]) => (v as any).messages())
+            .filter((m) => m !== "")
+            .flat();
         if (!!ret && !ret.dummy)
             this.spec.meta.retained = {
                 ...ret,
@@ -145,12 +154,8 @@ async function _checkAsync(this: any, value: any, validateOptions: ValidateOptio
                 errors,
                 isBad: fields.some(([k, v]) => (v as any).isBad()),
                 lastValue: value,
-                message:
-                    ret.customMessage ??
-                    fields
-                        .map(([k, v]) => (v as any).message())
-                        .filter((m) => m !== "")
-                        .join(", "),
+                message: ret.customMessage ?? messages[0],
+                messages,
             };
     } else {
         try {
@@ -163,6 +168,7 @@ async function _checkAsync(this: any, value: any, validateOptions: ValidateOptio
                     errors: [],
                     isBad: false,
                     message: "checked",
+                    messages: [],
                     lastValue: value,
                 };
         } catch (e: any) {
@@ -175,6 +181,7 @@ async function _checkAsync(this: any, value: any, validateOptions: ValidateOptio
                         errors: [e],
                         isBad: true,
                         message: ret.customMessage ?? e.message,
+                        messages: [ret.customMessage ?? e.message],
                         lastValue: value,
                     };
             } else {
@@ -205,6 +212,11 @@ function message(this: any): string {
     return this.spec.meta?.retained?.message;
 }
 
+// get the (custom) error message for this schema
+function messages(this: any): string[] {
+    return this.spec.meta?.retained?.messages;
+}
+
 // see what value was processed in last evaluation
 function lastValue(this: any): any {
     return this.spec.meta?.retained?.lastValue;
@@ -217,12 +229,8 @@ function combine(this: any, errors: any[], options?: retainOptions) {
             error: errors[0].error(),
             errors: errors.map((e) => e.errors()).flat(),
             isBad: errors.some((e) => e.isBad()),
-            message:
-                this.spec.meta.retained.customMessage ??
-                errors
-                    .map((e) => e.message)
-                    .filter((m) => m !== "")
-                    .join(", "),
+            message: this.spec.meta.retained.customMessage ?? errors[0].message,
+            messages: errors.map((e) => e.errors()).flat(),
             ...this.spec.meta.retained,
         },
     });
@@ -244,6 +252,7 @@ function addErrorMethods(schema: any): void {
         error,
         errors,
         message,
+        messages,
         lastValue,
         combine,
     });
