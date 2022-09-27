@@ -60,10 +60,14 @@ export class Sidebar extends Component {
         document.addEventListener("onaddressesupdated", () => this.forceUpdate());
     }
 
-    componentDidUpdate() {
-        viewAccount(STORAGE.addresses.multicall)
-            .then(() => this.setState({ featureFlags: { ...this.state.featureFlags, multicallDappLogin: true } }))
-            .catch(() => this.setState({ featureFlags: { ...this.state.featureFlags, multicallDappLogin: false } }));
+    componentDidUpdate(_, previousState) {
+        if (this.state !== previousState) {
+            viewAccount(STORAGE.addresses.multicall)
+                .then(() => this.setState({ featureFlags: { ...this.state.featureFlags, multicallDappLogin: true } }))
+                .catch(() =>
+                    this.setState({ featureFlags: { ...this.state.featureFlags, multicallDappLogin: false } })
+                );
+        }
     }
 
     openDialog(name) {
