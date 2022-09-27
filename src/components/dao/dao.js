@@ -362,6 +362,9 @@ export default class DaoComponent extends Component {
     }
 
     tryLoadInfo() {
+        if (this.lastAddr === this.state.formData.addr) return;
+        this.lastAddr = this.state.formData.addr;
+
         this.schema.checkAsync(this.state.formData).then(() => {
             if (!this.schema.isBad()) {
                 this.confidentlyLoadInfo();
@@ -381,9 +384,6 @@ export default class DaoComponent extends Component {
 
         const multicallAddress = `${addr}.${window.nearConfig.MULTICALL_FACTORY_ADDRESS}`;
         const daoAddress = `${addr}.${SputnikDAO.FACTORY_ADDRESS}`;
-
-        if (this.lastAddr === addr) return;
-        this.lastAddr = addr;
 
         noMulticall.isBad(false);
         noDao.isBad(false);
