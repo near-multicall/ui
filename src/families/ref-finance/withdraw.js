@@ -3,10 +3,10 @@ import Call from "../../utils/call";
 import { STORAGE } from "../../utils/persistent";
 import { toGas } from "../../utils/converter";
 import { errorMsg } from "../../utils/errors";
-import BaseTask from "../base";
+import { BaseTask } from "../base";
 import "./ref-finance.scss";
 
-export default class Withdraw extends BaseTask {
+export class Withdraw extends BaseTask {
     uniqueClassName = "ref-withdraw-task";
     errors = {
         ...this.baseErrors,
@@ -26,7 +26,7 @@ export default class Withdraw extends BaseTask {
             name: new ArgsString(json?.name ?? "Withdraw from Ref"),
             addr: new ArgsAccount(STORAGE.addresses.multicall),
             func: new ArgsString(actions?.func ?? "withdraw_from_ref"),
-            /*args: new ArgsObject(json?.args 
+            /*args: new ArgsObject(json?.args
                 ? {
                     ref_adress: new ArgsString(json?.args.ref_adress),
                     tokens: new ArgsArray<ArgsAccount>(json?.args.tokens.map(t => new ArgsAccount(t))),
@@ -41,8 +41,8 @@ export default class Withdraw extends BaseTask {
                     receiver_id: new ArgsAccount(""),
                     withdrawal_gas: new ArgsBig("toGas("55"), 1, "toGas("300"), "gas"),
                     token_transfer_gas: new ArgsBig("toGas("4"), 1, "toGas("300"), "gas"),
-                    deposit: new ArgsBig("1", "1", null, "yocto")                    
-                }    
+                    deposit: new ArgsBig("1", "1", null, "yocto")
+                }
             ),*/
             args: new ArgsJSON(
                 actions?.args

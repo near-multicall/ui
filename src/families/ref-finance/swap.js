@@ -5,10 +5,10 @@ import { ArgsAccount, ArgsBig, ArgsError, ArgsNumber, ArgsString, ArgsObject, Ar
 import Call from "../../utils/call";
 import { errorMsg } from "../../utils/errors";
 import { toGas } from "../../utils/converter";
-import BaseTask from "../base";
+import { BaseTask } from "../base";
 import "./ref-finance.scss";
 
-export default class Swap extends BaseTask {
+export class Swap extends BaseTask {
     uniqueClassName = "ref-swap-task";
     errors = {
         ...this.baseErrors,

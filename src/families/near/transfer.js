@@ -6,11 +6,11 @@ import Call from "../../utils/call";
 import { toGas, formatTokenAmount, unitToDecimals } from "../../utils/converter";
 import { view } from "../../utils/wallet";
 import { errorMsg } from "../../utils/errors";
-import BaseTask from "../base";
+import { BaseTask } from "../base";
 import debounce from "lodash.debounce";
 import "./near.scss";
 
-export default class Transfer extends BaseTask {
+export class Transfer extends BaseTask {
     uniqueClassName = "near-transfer-task";
     errors = {
         ...this.baseErrors,

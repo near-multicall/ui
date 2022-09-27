@@ -1,4 +1,2 @@
-import Withdraw from "./withdraw";
-import Swap from "./swap";
-
-export { Withdraw, Swap };
+export { Withdraw } from "./withdraw";
+export { Swap } from "./swap";
