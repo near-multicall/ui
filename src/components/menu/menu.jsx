@@ -33,8 +33,8 @@ export class Menu extends Component {
         const LAYOUT = this.props.layout;
 
         return (
-            <div className={`Editor-root ${expanded ? "expanded-menu" : ""}`}>
-                <div className="Editor-tabs-root">
+            <div className={`Editor ${expanded ? "expanded-menu" : ""}`}>
+                <div className="Editor-tabs">
                     <Tabs
                         invertedColors
                         activeItemIndexOverride={activeTabIndex}

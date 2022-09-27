@@ -531,7 +531,7 @@ export class Dao extends Component<Props, State> {
         const { name } = this.state;
 
         return (
-            <div className="DaoPage-root">
+            <div className="DaoPage">
                 <div className="header">
                     <div className="address-container">
                         <TextInput

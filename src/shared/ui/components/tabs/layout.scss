@@ -2,7 +2,7 @@
 @use "sass/size";
 @use "sass/color";
 
-.Tabs-layout-root {
+.Tabs-layout {
     height: calc(100% - (2 * size.$gap + 0.5 * size.$large-text));
 }
 

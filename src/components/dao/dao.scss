@@ -4,7 +4,7 @@
 @use "sass/font";
 @use "sass/animation";
 
-.DaoPage-root {
+.DaoPage {
     @include mixin.page-wrapper;
     display: flex;
     flex-flow: column nowrap;

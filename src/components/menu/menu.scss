@@ -3,7 +3,7 @@
 @use "sass/mixin";
 @use "sass/animation";
 
-.Editor-root {
+.Editor {
     position: fixed;
     top: size.$gap;
     right: size.$gap;
@@ -22,7 +22,7 @@
     transition: width animation.$menu-expand-time ease-out;
 }
 
-.Editor-tabs-root {
+.Editor-tabs {
     height: 100%;
 }
 

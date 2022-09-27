@@ -23,7 +23,7 @@ export interface TabsLayoutProps extends React.PropsWithChildren {
 }
 
 export const TabsLayout = ({ buttons, children, classes }: TabsLayoutProps) => (
-    <div className={clsx(`${NAMESPACE}-root`, classes?.root)}>
+    <div className={clsx(`${NAMESPACE}`, classes?.root)}>
         <TabsLayoutButtonsPanel className={classes?.buttonsPanel}>{buttons}</TabsLayoutButtonsPanel>
         <TabsLayoutContentSpace className={classes?.contentSpace}>{children}</TabsLayoutContentSpace>
     </div>
