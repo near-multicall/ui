@@ -362,9 +362,7 @@ export default class DaoComponent extends Component {
     }
 
     tryLoadInfo() {
-        if (this.lastAddr === this.state.formData.addr) return;
         this.lastAddr = this.state.formData.addr;
-
         this.schema.checkAsync(this.state.formData).then(() => {
             if (!this.schema.isBad()) {
                 this.confidentlyLoadInfo();
