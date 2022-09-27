@@ -1,9 +1,12 @@
 import { BigSource } from "big.js";
 import { MixedSchema } from "yup";
 import { Big, formatTokenAmount, parseTokenAmount, toGas, unit, unitToDecimals } from "../../converter";
-import { addErrorMethods, locale } from "../args-error";
-import { addFieldMethods } from "../args-form";
+import { addErrorMethods, ErrorMethods, locale } from "../args-error";
+import { addFieldMethods, FieldMethods } from "../args-form";
 
+declare module "yup" {
+    interface BigSchema extends ErrorMethods, FieldMethods {}
+}
 class BigSchema extends MixedSchema<Big> {
     constructor() {
         super({ type: "big" });

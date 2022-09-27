@@ -2,11 +2,11 @@ import { addMethod, StringSchema as _StringSchema } from "yup";
 import { hasContract } from "../../contracts/generic";
 import Multicall from "../../contracts/multicall";
 import { SputnikDAO } from "../../contracts/sputnik-dao";
-import { locale, addErrorMethods } from "../args-error";
-import { addFieldMethods } from "../args-form";
+import { locale, addErrorMethods, ErrorMethods } from "../args-error";
+import { addFieldMethods, FieldMethods } from "../args-form";
 
 declare module "yup" {
-    interface StringSchema {
+    interface StringSchema extends ErrorMethods, FieldMethods {
         json(message?: string): this;
         address(message?: string): this;
         contract(message?: string): this;

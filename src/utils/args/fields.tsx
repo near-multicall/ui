@@ -1,15 +1,9 @@
-import { ConnectedFields, ErrorTextMap } from "effector-forms/dist-types";
 import React from "react";
+import { FormInfo } from "./args-form";
 
 enum fieldType {
     NORMAL,
 }
-
-type FormInfo = {
-    fields: ConnectedFields<any>;
-    hasError: (fieldName?: string) => boolean;
-    errorText: (fieldName: string, map?: ErrorTextMap) => string;
-};
 
 interface NormalFieldProps extends React.HTMLProps<HTMLInputElement> {
     fieldName: string;
@@ -34,4 +28,3 @@ const NormalField = ({ value, onChange, fieldName, formInfo, errorText, ...props
 );
 
 export { fieldType, NormalField };
-export type { FormInfo };

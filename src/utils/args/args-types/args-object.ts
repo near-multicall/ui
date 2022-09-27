@@ -2,11 +2,14 @@ import { addMethod, array, BaseSchema, object, ObjectSchema as _ObjectSchema } f
 import { StringSchema } from "./args-string";
 import { BigSchema } from "./args-big";
 import { Base64 } from "js-base64";
-import { addErrorMethods } from "../args-error";
-import { addFieldMethods } from "../args-form";
+import { addErrorMethods, ErrorMethods } from "../args-error";
+import { addFieldMethods, FieldMethods } from "../args-form";
 
 declare module "yup" {
-    interface ObjectSchema<TShape, TContext, TIn, TOut> extends BaseSchema<TIn, TContext, TOut> {
+    interface ObjectSchema<TShape, TContext, TIn, TOut>
+        extends BaseSchema<TIn, TContext, TOut>,
+            ErrorMethods,
+            FieldMethods {
         call(): this;
         intoJsonString(): this;
         intoBase64String(): this;

@@ -17,7 +17,15 @@ const locale = {
     },
 };
 
-type retainOptions = { initial?: boolean; dummy?: boolean; customMessage?: string; customValue?: any };
+// Type definitions
+
+type retainOptions = {
+    initial?: boolean;
+    dummy?: boolean;
+    customMessage?: string;
+    customValue?: any;
+};
+
 type retainedData = {
     error: ValidationError | null;
     errors: ValidationError[];
@@ -31,6 +39,18 @@ type retainedData = {
     ignoreFields?: string[];
     ignoreAll?: boolean;
 };
+
+interface ErrorMethods {
+    retain(options?: retainOptions): this;
+    check(value: any, validateOptions: ValidateOptions): void;
+    checkAsync(value: any, validateOptions: ValidateOptions): Promise<void>;
+    isBad(isBad?: boolean): boolean | null;
+    error(): ValidationError | null;
+    errors(): ValidationError[] | null;
+    message(): string;
+    lastValue(): any;
+    combine(errors: this[], options?: retainOptions): this;
+}
 
 // store information on last evaluation in meta data
 function retain(this: any, options?: retainOptions) {
@@ -230,4 +250,4 @@ function addErrorMethods(schema: any): void {
 }
 
 export { addMethods, addErrorMethods, locale };
-export type { retainOptions };
+export type { retainOptions, retainedData, ErrorMethods };

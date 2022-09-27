@@ -1,8 +1,49 @@
-import { ConnectedField } from "effector-forms/dist-types";
+import { ConnectedField, ConnectedFields, ErrorTextMap } from "effector-forms/dist-types";
 import React from "react";
 import { reach } from "yup";
 import { addMethods } from "./args-error";
-import { fieldType, FormInfo, NormalField } from "./fields";
+import { fieldType, NormalField } from "./fields";
+
+// Type definitions
+
+type Rule = {
+    name: string;
+    validator: (v: any) => Promise<{
+        isValid: boolean;
+        value: any;
+        errorText?: string;
+    }>;
+};
+
+type FieldConfig = {
+    init: any;
+    rules: Rule[];
+    validateOn: string[];
+};
+
+type FormInfo = {
+    fields: ConnectedFields<any>;
+    hasError: (fieldName?: string) => boolean;
+    errorText: (fieldName: string, map?: ErrorTextMap) => string;
+};
+
+interface FieldMethods {
+    intoRule(name: string): Rule;
+    intoFieldConfig(fieldName: string): FieldConfig;
+    intoFormConfig(options?: object): object;
+    intoField(
+        formInfo: FormInfo,
+        fieldName: string,
+        options?: {
+            type: fieldType;
+            props: React.HTMLProps<any>;
+            preChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+            postChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+        }
+    ): React.Component;
+}
+
+// Implementation
 
 function intoRule(this: any, name: string) {
     return {
@@ -87,3 +128,4 @@ function fields(schema: any, path: string = ""): object {
 }
 
 export { addFieldMethods, fields };
+export type { Rule, FieldConfig, FormInfo, FieldMethods };
