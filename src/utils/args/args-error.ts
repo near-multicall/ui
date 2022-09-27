@@ -43,8 +43,8 @@ type retainedData = {
 
 interface ErrorMethods {
     retain(options?: retainOptions): this;
-    check(value: any, validateOptions: ValidateOptions): void;
-    checkAsync(value: any, validateOptions: ValidateOptions): Promise<void>;
+    checkSync(value: any, validateOptions: ValidateOptions): void;
+    check(value: any, validateOptions: ValidateOptions): Promise<void>;
     isBad(isBad?: boolean): boolean | null;
     error(): ValidationError | null;
     errors(): ValidationError[] | null;
@@ -73,16 +73,16 @@ function retain(this: any, options?: retainOptions) {
     });
 }
 
-function check(this: any, value: any, validateOptions: ValidateOptions): void {
-    return this._check(this.cast(value), validateOptions);
+function checkSync(this: any, value: any, validateOptions: ValidateOptions): void {
+    return this._checkSync(this.cast(value), validateOptions);
 }
 
 // check if value is valid, retain evaluation details in meta data
-function _check(this: any, value: any, validateOptions: ValidateOptions): void {
+function _checkSync(this: any, value: any, validateOptions: ValidateOptions): void {
     if (this.type === "object" && !this.spec.meta?.retained?.ignoreAll) {
         const ret = this.spec.meta?.retained;
         const fields = Object.entries(this.fields).filter(([k, v]) => !ret?.ignoreFields?.includes(k));
-        fields.forEach(([k, v]) => (v as any).check(value[k], validateOptions));
+        fields.forEach(([k, v]) => (v as any).checkSync(value[k], validateOptions));
         const errors = fields.map(([k, v]) => (v as any).errors()).flat();
         const messages = fields
             .map(([k, v]) => (v as any).messages())
@@ -132,16 +132,16 @@ function _check(this: any, value: any, validateOptions: ValidateOptions): void {
     }
 }
 
-async function checkAsync(this: any, value: any, validateOptions: ValidateOptions): Promise<void> {
-    return await this._checkAsync(this.cast(value), validateOptions);
+async function check(this: any, value: any, validateOptions: ValidateOptions): Promise<void> {
+    return await this._check(this.cast(value), validateOptions);
 }
 
 // asynchronusly check if value is valid, retain evaluation details in meta data
-async function _checkAsync(this: any, value: any, validateOptions: ValidateOptions): Promise<void> {
+async function _check(this: any, value: any, validateOptions: ValidateOptions): Promise<void> {
     if (this.type === "object" && !this.spec.meta?.retained?.ignoreAll) {
         const ret = this.spec.meta?.retained;
         const fields = Object.entries(this.fields).filter(([k, v]) => !ret?.ignoreFields?.includes(k));
-        await Promise.all(fields.map(async ([k, v]) => await (v as any)._checkAsync(value[k], validateOptions)));
+        await Promise.all(fields.map(async ([k, v]) => await (v as any)._check(value[k], validateOptions)));
         const errors = fields.map(([k, v]) => (v as any).errors()).flat();
         const messages = fields
             .map(([k, v]) => (v as any).messages())
@@ -244,10 +244,10 @@ function addMethods(schema: any, fns: object): void {
 function addErrorMethods(schema: any): void {
     addMethods(schema, {
         retain,
+        _checkSync,
+        checkSync,
         _check,
         check,
-        _checkAsync,
-        checkAsync,
         isBad,
         error,
         errors,

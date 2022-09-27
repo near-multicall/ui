@@ -1,21 +1,18 @@
 import { AddOutlined, DeleteOutline, EditOutlined, PauseOutlined, PlayArrowOutlined } from "@mui/icons-material";
-import { InputAdornment } from "@mui/material";
+import { createEffect, forward } from "effector";
+import { createForm, useForm } from "effector-forms";
+import { useStore } from "effector-react";
 import { Base64 } from "js-base64";
 import debounce from "lodash.debounce";
 import React, { Component } from "react";
 import { useWalletSelector } from "../../contexts/walletSelectorContext";
 import { args } from "../../utils/args/args";
+import { fields } from "../../utils/args/args-form";
 import { ProposalAction, ProposalKind, SputnikDAO, SputnikUI } from "../../utils/contracts/sputnik-dao";
 import { Big, toNEAR, toYocto } from "../../utils/converter";
 import { STORAGE } from "../../utils/persistent";
 import { view } from "../../utils/wallet";
-import { TextInput } from "../editor/elements";
-import { ref } from "yup";
-import { useForm, createForm } from "effector-forms";
 import "./dao.scss";
-import { forward, createEffect } from "effector";
-import { useStore } from "effector-react";
-import { fields } from "../../utils/args/args-form";
 
 // minimum balance a multicall instance needs for storage + state.
 const MIN_INSTANCE_BALANCE = toYocto(1); // 1 NEAR
@@ -32,7 +29,7 @@ export default class DaoComponent extends Component {
                     noAddress: args.string().address().retain({ initial: true }),
                     noDao: args.string().sputnikDao().retain({ initial: true }),
                     noMulticall: args.string().multicall().retain({
-                        // customMessage: "DAO does not have a multicall instance",
+                        customMessage: "DAO does not have a multicall instance",
                         initial: true,
                     }),
                 })
@@ -69,7 +66,7 @@ export default class DaoComponent extends Component {
             },
         };
 
-        this.schema.checkAsync(this.state.formData);
+        this.schema.check(this.state.formData);
 
         view(window.nearConfig.MULTICALL_FACTORY_ADDRESS, "get_fee", {}).then((createMulticallFee) => {
             this.fee = createMulticallFee;
@@ -363,7 +360,7 @@ export default class DaoComponent extends Component {
 
     tryLoadInfo() {
         this.lastAddr = this.state.formData.addr;
-        this.schema.checkAsync(this.state.formData).then(() => {
+        this.schema.check(this.state.formData).then(() => {
             if (!this.schema.isBad()) {
                 this.confidentlyLoadInfo();
             } else {

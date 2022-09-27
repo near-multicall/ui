@@ -49,7 +49,7 @@ function intoRule(this: any, name: string) {
     return {
         name,
         validator: async (v: any) => {
-            await this.checkAsync(v);
+            await this.check(v);
             const valid = !this.isBad();
             return {
                 isValid: valid,

@@ -12,7 +12,7 @@ declare module "yup" {
         contract(message?: string): this;
         sputnikDao(message?: string): this;
         multicall(message?: string): this;
-        intoUrl(): this;
+        intoUrl(): string;
     }
 }
 
@@ -64,7 +64,7 @@ addMethod(_StringSchema, "contract", function contract(message = locale.string.c
 
 // ensure string is a valid NEAR address with a SputnikDAO contract
 addMethod(_StringSchema, "sputnikDao", function sputnikDao(message = locale.string.sputnikDao) {
-    return this.contract().test({
+    return this.test({
         name: "sputnikDao",
         message,
         test: async (value) => {
@@ -82,7 +82,7 @@ addMethod(_StringSchema, "sputnikDao", function sputnikDao(message = locale.stri
 
 // ensure string is a valid NEAR address with a multicall contract
 addMethod(_StringSchema, "multicall", function multicall(message = locale.string.multicall) {
-    return this.contract().test({
+    return this.test({
         name: "multicall",
         message,
         test: async (value) => {
