@@ -18,83 +18,148 @@ const locale = {
 };
 
 type retainOptions = { initial?: boolean; dummy?: boolean; customMessage?: string; customValue?: any };
+type retainedData = {
+    error: ValidationError | null;
+    errors: ValidationError[];
+    isBad: boolean;
+    customMessage: string | null;
+    customValue: any | null;
+    message: string;
+    dummy: boolean;
+    lastValue: any | null;
+    initial?: boolean;
+    ignoreFields?: string[];
+    ignoreAll?: boolean;
+};
 
 // store information on last evaluation in meta data
 function retain(this: any, options?: retainOptions) {
     return this.meta({
-        retained: this.spec.meta?.retained ?? {
-            error: null,
-            errors: [],
-            isBad: false,
-            customMessage: null,
-            message: "",
-            dummy: false,
-            lastValue: null,
-            ...options,
-        },
-    });
-}
-
-// check if value is valid, retain evaluation details in meta data
-function check(this: any, value: any, validateOptions: ValidateOptions): void {
-    try {
-        const ret = this.spec.meta?.retained;
-        this.validateSync(ret?.customValue ?? value, validateOptions);
-        if (!!ret && !ret.dummy)
-            this.spec.meta.retained = {
-                ...ret,
+        retained:
+            this.spec.meta?.retained ??
+            <retainedData>{
                 error: null,
                 errors: [],
                 isBad: false,
-                message: "checked",
+                customMessage: null,
+                message: "",
+                dummy: false,
+                lastValue: null,
+                ...options,
+            },
+    });
+}
+
+function check(this: any, value: any, validateOptions: ValidateOptions): void {
+    return this._check(this.cast(value), validateOptions);
+}
+
+// check if value is valid, retain evaluation details in meta data
+function _check(this: any, value: any, validateOptions: ValidateOptions): void {
+    if (this.type === "object" && !this.spec.meta?.retained?.ignoreAll) {
+        const ret = this.spec.meta?.retained;
+        const fields = Object.entries(this.fields).filter(([k, v]) => !ret?.ignoreFields?.includes(k));
+        fields.forEach(([k, v]) => (v as any).check(value[k], validateOptions));
+        const errors = fields.map(([k, v]) => (v as any).errors()).flat();
+        if (!!ret && !ret.dummy)
+            this.spec.meta.retained = {
+                ...ret,
+                error: errors[0],
+                errors,
+                isBad: fields.some(([k, v]) => (v as any).isBad()),
                 lastValue: value,
+                message:
+                    ret.customMessage ??
+                    fields
+                        .map(([k, v]) => (v as any).message())
+                        .filter((m) => m !== "")
+                        .join(", "),
             };
-    } catch (e: any) {
-        if (e instanceof ValidationError) {
+    } else {
+        try {
             const ret = this.spec.meta?.retained;
+            this.validateSync(ret?.customValue ?? value, validateOptions);
             if (!!ret && !ret.dummy)
                 this.spec.meta.retained = {
                     ...ret,
-                    error: e,
+                    error: null,
                     errors: [],
-                    isBad: true,
-                    message: ret.customMessage ?? e.message,
+                    isBad: false,
+                    message: "checked",
                     lastValue: value,
                 };
-        } else {
-            console.error(e);
+        } catch (e: any) {
+            if (e instanceof ValidationError) {
+                const ret = this.spec.meta?.retained;
+                if (!!ret && !ret.dummy)
+                    this.spec.meta.retained = {
+                        ...ret,
+                        error: e,
+                        errors: [],
+                        isBad: true,
+                        message: ret.customMessage ?? e.message,
+                        lastValue: value,
+                    };
+            } else {
+                console.error(e);
+            }
         }
     }
 }
 
-// asynchronusly check if value is valid, retain evaluation details in meta data
 async function checkAsync(this: any, value: any, validateOptions: ValidateOptions): Promise<void> {
-    try {
+    return await this._checkAsync(this.cast(value), validateOptions);
+}
+
+// asynchronusly check if value is valid, retain evaluation details in meta data
+async function _checkAsync(this: any, value: any, validateOptions: ValidateOptions): Promise<void> {
+    if (this.type === "object" && !this.spec.meta?.retained?.ignoreAll) {
         const ret = this.spec.meta?.retained;
-        await this.validate(ret?.customValue ?? value, validateOptions);
+        const fields = Object.entries(this.fields).filter(([k, v]) => !ret?.ignoreFields?.includes(k));
+        await Promise.all(fields.map(async ([k, v]) => await (v as any)._checkAsync(value[k], validateOptions)));
+        const errors = fields.map(([k, v]) => (v as any).errors()).flat();
         if (!!ret && !ret.dummy)
             this.spec.meta.retained = {
                 ...ret,
-                error: null,
-                errors: [],
-                isBad: false,
-                message: "checked",
+                error: errors[0],
+                errors,
+                isBad: fields.some(([k, v]) => (v as any).isBad()),
                 lastValue: value,
+                message:
+                    ret.customMessage ??
+                    fields
+                        .map(([k, v]) => (v as any).message())
+                        .filter((m) => m !== "")
+                        .join(", "),
             };
-    } catch (e: any) {
-        if (e instanceof ValidationError) {
+    } else {
+        try {
             const ret = this.spec.meta?.retained;
+            await this.validate(ret?.customValue ?? value, validateOptions);
             if (!!ret && !ret.dummy)
                 this.spec.meta.retained = {
                     ...ret,
-                    error: e,
-                    errors: [e],
-                    isBad: true,
-                    message: ret.customMessage ?? e.message,
+                    error: null,
+                    errors: [],
+                    isBad: false,
+                    message: "checked",
                     lastValue: value,
                 };
-        } else {
-            console.error(e);
+        } catch (e: any) {
+            if (e instanceof ValidationError) {
+                const ret = this.spec.meta?.retained;
+                if (!!ret && !ret.dummy)
+                    this.spec.meta.retained = {
+                        ...ret,
+                        error: e,
+                        errors: [e],
+                        isBad: true,
+                        message: ret.customMessage ?? e.message,
+                        lastValue: value,
+                    };
+            } else {
+                console.error(e);
+            }
         }
     }
 }
@@ -132,7 +197,12 @@ function combine(this: any, errors: any[], options?: retainOptions) {
             error: errors[0].error(),
             errors: errors.map((e) => e.errors()).flat(),
             isBad: errors.some((e) => e.isBad()),
-            message: this.spec.meta.retained.customMessage ?? errors.map((e) => e.message).join(", "),
+            message:
+                this.spec.meta.retained.customMessage ??
+                errors
+                    .map((e) => e.message)
+                    .filter((m) => m !== "")
+                    .join(", "),
             ...this.spec.meta.retained,
         },
     });
@@ -146,7 +216,9 @@ function addMethods(schema: any, fns: object): void {
 function addErrorMethods(schema: any): void {
     addMethods(schema, {
         retain,
+        _check,
         check,
+        _checkAsync,
         checkAsync,
         isBad,
         error,

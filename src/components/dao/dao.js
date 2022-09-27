@@ -32,19 +32,17 @@ export default class DaoComponent extends Component {
                     noAddress: args.string().address().retain({ initial: true }),
                     noDao: args.string().sputnikDao().retain({ initial: true }),
                     noMulticall: args.string().multicall().retain({
-                        customMessage: "DAO does not have a multicall instance",
+                        // customMessage: "DAO does not have a multicall instance",
                         initial: true,
                     }),
                 })
+                .transform((_, addr) => ({
+                    noAddress: addr,
+                    noDao: addr,
+                    noMulticall: `${this.getBaseAddress(addr)}.${window.nearConfig.MULTICALL_FACTORY_ADDRESS}`,
+                }))
                 .retain(),
         })
-        .transform((formData) => ({
-            addr: {
-                noAddress: formData.addr,
-                noDao: formData.addr,
-                noMulticall: `${this.getBaseAddress(formData.addr)}.${window.nearConfig.MULTICALL_FACTORY_ADDRESS}`,
-            },
-        }))
         .retain();
 
     loadInfoDebounced = debounce(() => this.loadInfos(), 400);
@@ -365,8 +363,6 @@ export default class DaoComponent extends Component {
 
     tryLoadInfo() {
         this.schema.checkAsync(this.state.formData).then(() => {
-            console.log("CHECKED");
-            console.log(this.schema.message(), this.schema.lastValue(), this.schema.fields.addr.lastValue());
             if (!this.schema.isBad()) {
                 this.confidentlyLoadInfo();
             } else {
@@ -448,12 +444,7 @@ export default class DaoComponent extends Component {
 
         // errors to display
         const displayErrorsList = ["noAddress", "noDao", "noMulticall"];
-        console.log(fields(this.schema, "addr"));
         const displayErrors = Object.entries(fields(this.schema, "addr"))
-            .map(([k, v]) => {
-                console.log([k, v], v.lastValue());
-                return [k, v];
-            })
             .filter(([k, v]) => v.isBad() && displayErrorsList.includes(k))
             .map(([k, v]) => (
                 <p
