@@ -143,7 +143,7 @@ export default class Sidebar extends Component {
                         />
                     </a>
                     {/* <img src={Telegram}/> */}
-                    {/* <Wallet /> */}
+                    <Wallet />
                 </div>
                 {this.dialogs()}
             </div>
