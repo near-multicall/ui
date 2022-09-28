@@ -1,6 +1,7 @@
 {
     "homepage": "http://near-multicall.github.io/ui",
     "name": "ui",
+    "type": "module",
     "version": "0.1.0",
     "license": "UNLICENSED",
     "scripts": {
