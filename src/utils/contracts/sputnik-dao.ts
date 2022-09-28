@@ -1,6 +1,6 @@
 import { tx, view, viewAccount } from "../wallet";
 import { toGas } from "../converter";
-import { ArgsAccount } from "../args";
+import { ArgsAccount } from "../args-old";
 
 const FACTORY_ADDRESS_SELECTOR: Record<string, string> = {
     mainnet: "sputnik-dao.near",
@@ -43,12 +43,31 @@ type Policy = {
     default_vote_policy: object;
     // Proposal bond. (u128 as a string)
     proposal_bond: string;
-    // Expiration period for proposals in nanoseconds. (u64 as a string)
+    // Expiration period for proposals in nanoseconds. (u64)
     proposal_period: string;
     // Bond for claiming a bounty. (u128 as a string)
     bounty_bond: string;
-    // Period in which giving up on bounty is not punished. (u64 as a string)
+    // Period in which giving up on bounty is not punished. (u64)
     bounty_forgiveness_period: string;
+};
+
+// TODO implement "actual" ProposalKind (https://github.com/near-daos/sputnik-dao-contract/blob/f1b0724f5d42b4a8e32ec162850701baa613347e/sputnikdao2/src/proposals.rs#L62)
+type Proposal = {
+    /// Original proposer.
+    proposer: string;
+    /// Description of this proposal.
+    description: String;
+    /// Kind of proposal with relevant information.
+    kind: any;
+    /// Current status of the proposal.
+    status: ProposalStatus;
+    /// Count of votes per role per decision: yes / no / spam.
+    vote_counts: object;
+    /// Map of who voted and how.
+    votes: any;
+    /// Submission time (for voting period).
+    submission_time: number;
+    id: number; // TODO we use this, but its not in the rust file ???
 };
 
 enum ProposalKind {
@@ -87,6 +106,21 @@ enum ProposalAction {
     Finalize = "Finalize",
     /// Move a proposal to the hub to shift into another DAO.
     MoveToHub = "MoveToHub",
+}
+
+enum ProposalStatus {
+    InProgress = "InProgress",
+    Approves = "Approved",
+    Rejected = "Rejected",
+    Removed = "Removed",
+    Expired = "Expired",
+    Moved = "Moved",
+    Failed = "Failed",
+}
+
+enum VoteStatus {
+    Active = "Active",
+    Expired = "Expired",
 }
 
 class SputnikDAO {
@@ -174,11 +208,11 @@ class SputnikDAO {
         );
     }
 
-    async getProposals(args: { from_index: number; limit: number }): Promise<object[]> {
+    async getProposals(args: { from_index: number; limit: number }): Promise<Proposal[]> {
         return view(this.address, "get_proposals", args);
     }
 
-    async getProposal(proposal_id: number): Promise<object> {
+    async getProposal(proposal_id: number): Promise<Proposal> {
         return view(this.address, "get_proposal", { id: proposal_id });
     }
 
@@ -232,7 +266,7 @@ class SputnikDAO {
     }
 
     // get proposal page URL on UI of choice
-    getProposalUrl(ui: SputnikUI, proposal_id: string): string {
+    getProposalUrl(ui: SputnikUI, proposal_id: number): string {
         // exit if UI not supported
         if (!(ui in SputnikUI)) return "";
         // we have a supported UI
@@ -317,3 +351,4 @@ class SputnikDAO {
 }
 
 export { SputnikDAO, SputnikUI, ProposalKind, ProposalAction };
+export type { Proposal };

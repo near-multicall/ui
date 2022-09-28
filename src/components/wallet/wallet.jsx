@@ -10,7 +10,7 @@ import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
 import { Icon } from "@mui/material";
 import "./wallet.scss";
-import { ArgsAccount, ArgsError } from "../../utils/args";
+import { ArgsAccount, ArgsError } from "../../utils/args-old";
 import debounce from "lodash.debounce";
 
 export class Wallet extends Component {

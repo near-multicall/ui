@@ -20,7 +20,7 @@ type CardCopy = {
 declare global {
     interface Window {
         // Page components
-        DAO: Component;
+        DAO_COMPONENT: Component;
 
         MENU: Component;
         EDITOR: Component;

@@ -64,6 +64,9 @@
                 }
             }
         }
+        form {
+            z-index: 1;
+        }
     }
 
     &::before {

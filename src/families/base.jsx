@@ -4,7 +4,7 @@ import { Component } from "react";
 
 import { Tooltip } from "../shared/ui/components";
 import { TextInput, TextInputWithUnits } from "../components/editor/elements";
-import { ArgsAccount, ArgsBig, ArgsError, ArgsJSON, ArgsString } from "../utils/args";
+import { ArgsAccount, ArgsBig, ArgsError, ArgsJSON, ArgsString } from "../utils/args-old";
 import Call from "../utils/call";
 import { toGas, toYocto, formatTokenAmount, unitToDecimals } from "../utils/converter";
 import { errorMsg } from "../utils/errors";
