@@ -125,13 +125,13 @@
     }
 }
 
-.DaoPageTabs-buttonsPanel {
+.DaoPage-tabs-buttonsPanel {
     justify-content: flex-start;
     max-width: 120rem;
     margin: size.$gap auto 0 auto;
     padding: 0 size.$gap;
 }
 
-.DaoPageTabs-contentSpace {
+.DaoPage-tabs-contentSpace {
     height: calc(100% - size.$gap - size.$Tabs-layout-buttonsPanel-height);
 }

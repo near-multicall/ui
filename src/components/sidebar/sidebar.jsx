@@ -13,7 +13,7 @@ import { NavLink } from "react-router-dom";
 import Discord from "../../assets/discord.svg";
 import Github from "../../assets/github.svg";
 import Twitter from "../../assets/twitter.svg";
-import { Wallet } from "../wallet/wallet.jsx";
+import { Wallet } from "../../entities/wallet";
 import { STORAGE } from "../../utils/persistent";
 import { viewAccount } from "../../utils/wallet";
 import { PopupMenu, Tooltip } from "../../shared/ui/components";
@@ -248,7 +248,7 @@ export class Sidebar extends Component {
                     </a>
 
                     {/* <img src={Telegram}/> */}
-                    <Wallet />
+                    <Wallet.Selector />
                 </div>
 
                 {this.dialogs()}

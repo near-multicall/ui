@@ -1,38 +1,21 @@
-import { Base64 } from "js-base64";
-import React, { Component } from "react";
-import { toGas, Big } from "../../utils/converter";
-import { tx, view } from "../../utils/wallet";
-import { STORAGE } from "../../utils/persistent";
-import { useWalletSelector } from "../../contexts/walletSelectorContext";
-import { SputnikDAO } from "../../utils/contracts/sputnik-dao";
-import { errorMsg } from "../../utils/errors";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
 import { Icon } from "@mui/material";
-import "./wallet.scss";
-import { ArgsAccount, ArgsError } from "../../utils/args";
+import { Base64 } from "js-base64";
 import debounce from "lodash.debounce";
+import { Component } from "react";
 
-export class Wallet extends Component {
-    static contextType = useWalletSelector();
+import { ArgsAccount, ArgsError } from "../../../utils/args";
+import { SputnikDAO } from "../../../utils/contracts/sputnik-dao";
+import { toGas, Big } from "../../../utils/converter";
+import { STORAGE } from "../../../utils/persistent";
+import { tx, view } from "../../../utils/wallet";
+import { errorMsg } from "../../../utils/errors";
+import { useSelector } from "./providers";
+import "./index.scss";
 
-    errors = {
-        noDao: new ArgsError(errorMsg.ERR_NO_DAO_ON_ADDR, (value) => this.errors.noDao.isBad),
-        noRights: new ArgsError(errorMsg.ERR_CANNOT_PROPOSE_TO_DAO, (value) => this.errors.noRights),
-        noContract: new ArgsError(errorMsg.ERR_DAO_HAS_NO_MTCL, (value) => this.errors.noContract.isBad),
-    };
-
-    daoList = [];
-
-    daoSearchDebounced = debounce(
-        // debounced function
-        (newValue) => {
-            this.daoSearch(newValue);
-        },
-        // debounce time
-        400
-    );
-
+/* TODO: Decompose code */
+export class WalletComponent extends Component {
     constructor(props, context) {
         super(props, context);
 
@@ -57,6 +40,25 @@ export class Wallet extends Component {
                 .then(() => this.forceUpdate());
         }
     }
+
+    static contextType = useSelector();
+
+    errors = {
+        noDao: new ArgsError(errorMsg.ERR_NO_DAO_ON_ADDR, (value) => this.errors.noDao.isBad),
+        noRights: new ArgsError(errorMsg.ERR_CANNOT_PROPOSE_TO_DAO, (value) => this.errors.noRights),
+        noContract: new ArgsError(errorMsg.ERR_DAO_HAS_NO_MTCL, (value) => this.errors.noContract.isBad),
+    };
+
+    daoList = [];
+
+    daoSearchDebounced = debounce(
+        // debounced function
+        (newValue) => {
+            this.daoSearch(newValue);
+        },
+        // debounce time
+        400
+    );
 
     signIn() {
         const { modal } = this.context;
@@ -167,7 +169,7 @@ export class Wallet extends Component {
         tx(dao, "add_proposal", args, toGas("15"), proposal_bond);
     }
 
-    connectDao(dao) {
+    connectDao(dao: SputnikDAO["address"]) {
         const { accountId } = this.context;
 
         const { noDao, noRights, noContract } = this.errors;
@@ -196,9 +198,9 @@ export class Wallet extends Component {
             }),
         ])
             .then(([initializedDAO, admins]) => {
-                if (!initializedDAO.ready) {
+                if (!initializedDAO?.ready) {
                     noDao.isBad = true;
-                    MENU.forceUpdate();
+                    window.MENU?.forceUpdate();
                     return;
                 }
 
@@ -273,7 +275,9 @@ export class Wallet extends Component {
                     >
                         {expanded.user && walletSelector.isSignedIn() ? "chevron_left" : "person"}
                     </Icon>
+
                     <div className="peek">{accountId}</div>
+
                     <div className="expand">
                         {walletSelector.isSignedIn() ? (
                             <>
@@ -290,7 +294,9 @@ export class Wallet extends Component {
                         )}
                     </div>
                 </div>
+
                 <span>for</span>
+
                 <div
                     className={`dao ${color}`}
                     expand={expanded.dao ? "yes" : "no"}
@@ -301,6 +307,7 @@ export class Wallet extends Component {
                     >
                         {expanded.dao && STORAGE.addresses.dao !== "" ? "chevron_left" : "groups"}
                     </Icon>
+
                     <div className="expand">
                         <Autocomplete
                             className="dao-selector"
@@ -324,6 +331,7 @@ export class Wallet extends Component {
                             }}
                         />
                     </div>
+
                     <div className="peek">{STORAGE.addresses.dao}</div>
                 </div>
             </div>

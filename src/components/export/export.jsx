@@ -12,12 +12,12 @@ import { errorMsg } from "../../utils/errors";
 import { STORAGE } from "../../utils/persistent";
 import { convert, toGas, toNEAR } from "../../utils/converter";
 import { view } from "../../utils/wallet";
-import { useWalletSelector } from "../../contexts/walletSelectorContext";
+import { Wallet } from "../../entities";
 import { TextInput, TextInputWithUnits } from "../editor/elements";
 import "./export.scss";
 
 export class Export extends Component {
-    static contextType = useWalletSelector();
+    static contextType = Wallet.useSelector();
 
     errors = {
         user: new ArgsError(errorMsg.ERR_INVALID_ADDR, (value) => ArgsAccount.isValid(value), true),

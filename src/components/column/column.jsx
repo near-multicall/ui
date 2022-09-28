@@ -1,8 +1,9 @@
+import Icon from "@mui/material/Icon";
+import hash from "object-hash";
 import React, { Component } from "react";
 import { Droppable, Draggable } from "react-beautiful-dnd";
-import Icon from "@mui/material/Icon";
-import { Task } from "../task/task.jsx";
-import hash from "object-hash";
+
+import { Task } from "../../entities";
 import "./column.scss";
 
 export class Column extends Component {
@@ -54,7 +55,7 @@ export class Column extends Component {
                                     {...provided.droppableProps}
                                 >
                                     {this.props.tasks.map((task, index) => (
-                                        <Task
+                                        <Task.Card
                                             key={hash(task, { algorithm: "md5", encoding: "base64" })}
                                             task={task}
                                             index={index}

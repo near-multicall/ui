@@ -3,24 +3,24 @@
 @use "sass/mixin";
 @use "sass/size";
 
-.multicall-tab {
+.ConfigTab {
     display: grid;
 
     grid-template:
-        "admins jobs" 6fr
-        "token-whitelist jobs" 5fr
-        "token-whitelist job-bond" 1fr / 1fr 1fr;
+        "admins Jobs" 6fr
+        "TokenWhitelist Jobs" 5fr
+        "TokenWhitelist JobBond" 1fr / 1fr 1fr;
 
     .admins {
         grid-area: admins;
     }
 
-    .token-whitelist {
-        grid-area: token-whitelist;
+    .TokenWhitelist {
+        grid-area: TokenWhitelist;
     }
 
-    .jobs {
-        grid-area: jobs;
+    .Jobs {
+        grid-area: Jobs;
         position: relative;
 
         .job {
@@ -39,8 +39,8 @@
         }
     }
 
-    .job-bond {
-        grid-area: job-bond;
+    .JobBond {
+        grid-area: JobBond;
 
         .title {
             @include mixin.center-items(space-between, center);

@@ -1,9 +1,11 @@
 import React, { Component } from "react";
 import { Draggable } from "react-beautiful-dnd";
-import { Family } from "../../families/index.js";
-import "./task.scss";
 
-export class Task extends Component {
+import { Family } from "../../../families/index.js";
+import "./card.scss";
+
+/* TODO: Decompose model and view */
+export class TaskCard extends Component {
     id;
 
     constructor(props) {
