@@ -14,8 +14,8 @@ import Discord from "../../assets/discord.svg";
 import Github from "../../assets/github.svg";
 import Twitter from "../../assets/twitter.svg";
 import { Wallet } from "../../entities/wallet";
-import { STORAGE } from "../../utils/persistent";
-import { viewAccount } from "../../utils/wallet";
+import { STORAGE } from "../../shared/lib/persistent";
+import { viewAccount } from "../../shared/lib/wallet";
 import { PopupMenu, Tooltip } from "../../shared/ui/components";
 
 import {

@@ -1,6 +1,6 @@
-import { SputnikDAO } from "../../utils/contracts/sputnik-dao";
-import { FungibleToken } from "../../utils/standards/fungibleToken";
-import { Multicall } from "../../utils/contracts/multicall";
+import { SputnikDAO } from "../../shared/lib/contracts/sputnik-dao";
+import { FungibleToken } from "../../shared/lib/standards/fungibleToken";
+import { Multicall } from "../../shared/lib/contracts/multicall";
 
 export interface ContractsData {
     dao: SputnikDAO;

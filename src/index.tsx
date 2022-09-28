@@ -3,7 +3,7 @@ import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AppPage } from "./pages/app";
 import { DaoPage } from "./pages/dao";
 import { Wallet } from "./entities";
-import "./utils/persistent";
+import "./shared/lib/persistent";
 import "@near-wallet-selector/modal-ui/styles.css";
 
 window.PAGE = "app";

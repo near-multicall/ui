@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 
-import { Big, formatTokenAmount } from "../../../utils/converter";
-import { viewAccount } from "../../../utils/wallet";
-import { FungibleToken } from "../../../utils/standards/fungibleToken";
+import { Big, formatTokenAmount } from "../../../shared/lib/converter";
+import { viewAccount } from "../../../shared/lib/wallet";
+import { FungibleToken } from "../../../shared/lib/standards/fungibleToken";
 import { ContractsData } from "../types";
 
 const FRAC_DIGITS = 5;

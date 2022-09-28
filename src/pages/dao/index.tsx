@@ -9,18 +9,18 @@ import { Sidebar } from "../../widgets";
 import { TextInput } from "../../widgets/editor/elements";
 import { Wallet } from "../../entities";
 import { FungibleTokenBalances } from "../../entities/token";
-import { ArgsAccount, ArgsError } from "../../utils/args";
-import { SputnikDAO, SputnikUI, ProposalStatus } from "../../utils/contracts/sputnik-dao";
-import { Multicall } from "../../utils/contracts/multicall";
-import { toNEAR, toYocto, Big } from "../../utils/converter";
-import { STORAGE } from "../../utils/persistent";
-import { view } from "../../utils/wallet";
+import { ArgsAccount, ArgsError } from "../../shared/lib/args";
+import { SputnikDAO, SputnikUI, ProposalStatus } from "../../shared/lib/contracts/sputnik-dao";
+import { Multicall } from "../../shared/lib/contracts/multicall";
+import { toNEAR, toYocto, Big } from "../../shared/lib/converter";
+import { STORAGE } from "../../shared/lib/persistent";
+import { view } from "../../shared/lib/wallet";
 import { Card, Scrollable, Tabs } from "../../shared/ui/components";
 import "./funds/index.scss";
 import "./config/index.scss";
 import "./index.scss";
 
-import type { ProposalOutput } from "../../utils/contracts/sputnik-dao";
+import type { ProposalOutput } from "../../shared/lib/contracts/sputnik-dao";
 
 // minimum balance a multicall instance needs for storage + state.
 const MIN_INSTANCE_BALANCE = toYocto(1); // 1 NEAR

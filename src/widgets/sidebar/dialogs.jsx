@@ -3,11 +3,11 @@ import { TextField } from "@mui/material";
 import { Base64 } from "js-base64";
 import { useMemo, useReducer, useState } from "react";
 
-import { ArgsError, ArgsString } from "../../utils/args";
-import { SputnikDAO } from "../../utils/contracts/sputnik-dao";
-import { readFile, saveFile } from "../../utils/loader";
-import { STORAGE } from "../../utils/persistent";
-import { Validation } from "../../utils/validation";
+import { ArgsError, ArgsString } from "../../shared/lib/args";
+import { SputnikDAO } from "../../shared/lib/contracts/sputnik-dao";
+import { readFile, saveFile } from "../../shared/lib/loader";
+import { STORAGE } from "../../shared/lib/persistent";
+import { Validation } from "../../shared/lib/validation";
 import { TextInput } from "../editor/elements";
 import { Dialog, Tooltip } from "../../shared/ui/components";
 import "./dialogs.scss";

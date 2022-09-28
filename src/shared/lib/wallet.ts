@@ -1,7 +1,7 @@
 // TODO: de-deprecate near-wallet on wallet selector. Use patch
 import { providers } from "near-api-js";
 import type { NetworkId } from "@near-wallet-selector/core";
-import { getConfig } from "../near-config";
+import { getConfig } from "../../near-config";
 import { Base64 } from "js-base64";
 
 declare global {

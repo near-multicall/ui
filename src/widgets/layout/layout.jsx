@@ -4,7 +4,7 @@ import { Column } from "../column/column.jsx";
 import { Menu } from "../menu/menu.jsx";
 import { initialData } from "../../initial-data.js";
 import { Base64 } from "js-base64";
-import { STORAGE } from "../../utils/persistent";
+import { STORAGE } from "../../shared/lib/persistent";
 import "./layout.scss";
 
 export class Layout extends Component {

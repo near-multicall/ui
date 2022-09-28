@@ -1,10 +1,10 @@
 import { TextField } from "@mui/material";
 import React from "react";
 import { TextInput, TextInputWithUnits } from "../../widgets/editor/elements";
-import { ArgsAccount, ArgsBig, ArgsError, ArgsNumber, ArgsString, ArgsObject, ArgsArray } from "../../utils/args";
-import Call from "../../utils/call";
-import { errorMsg } from "../../utils/errors";
-import { toGas } from "../../utils/converter";
+import { ArgsAccount, ArgsBig, ArgsError, ArgsNumber, ArgsString, ArgsObject, ArgsArray } from "../../shared/lib/args";
+import Call from "../../shared/lib/call";
+import { errorMsg } from "../../shared/lib/errors";
+import { toGas } from "../../shared/lib/converter";
 import { BaseTask } from "../base";
 import "./ref-finance.scss";
 

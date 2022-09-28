@@ -7,11 +7,11 @@ import debounce from "lodash.debounce";
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 
-import { ArgsAccount, ArgsBig, ArgsError, ArgsString } from "../../utils/args";
-import { errorMsg } from "../../utils/errors";
-import { STORAGE } from "../../utils/persistent";
-import { convert, toGas, toNEAR } from "../../utils/converter";
-import { view } from "../../utils/wallet";
+import { ArgsAccount, ArgsBig, ArgsError, ArgsString } from "../../shared/lib/args";
+import { errorMsg } from "../../shared/lib/errors";
+import { STORAGE } from "../../shared/lib/persistent";
+import { convert, toGas, toNEAR } from "../../shared/lib/converter";
+import { view } from "../../shared/lib/wallet";
 import { Wallet } from "../../entities";
 import { TextInput, TextInputWithUnits } from "../editor/elements";
 import "./export.scss";

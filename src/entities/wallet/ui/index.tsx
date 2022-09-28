@@ -5,12 +5,12 @@ import { Base64 } from "js-base64";
 import debounce from "lodash.debounce";
 import { Component } from "react";
 
-import { ArgsAccount, ArgsError } from "../../../utils/args";
-import { SputnikDAO } from "../../../utils/contracts/sputnik-dao";
-import { toGas, Big } from "../../../utils/converter";
-import { STORAGE } from "../../../utils/persistent";
-import { tx, view } from "../../../utils/wallet";
-import { errorMsg } from "../../../utils/errors";
+import { ArgsAccount, ArgsError } from "../../../shared/lib/args";
+import { SputnikDAO } from "../../../shared/lib/contracts/sputnik-dao";
+import { toGas, Big } from "../../../shared/lib/converter";
+import { STORAGE } from "../../../shared/lib/persistent";
+import { tx, view } from "../../../shared/lib/wallet";
+import { errorMsg } from "../../../shared/lib/errors";
 import { useSelector } from "./providers";
 import "./index.scss";
 
