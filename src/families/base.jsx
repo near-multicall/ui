@@ -3,7 +3,7 @@ import debounce from "lodash.debounce";
 import { Component } from "react";
 
 import { Tooltip } from "../shared/ui/components";
-import { TextInput, TextInputWithUnits } from "../components/editor/elements";
+import { TextInput, TextInputWithUnits } from "../widgets/editor/elements";
 import { ArgsAccount, ArgsBig, ArgsError, ArgsJSON, ArgsString } from "../utils/args";
 import Call from "../utils/call";
 import { toGas, toYocto, formatTokenAmount, unitToDecimals } from "../utils/converter";

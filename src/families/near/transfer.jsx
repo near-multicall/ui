@@ -1,6 +1,6 @@
 import { InputAdornment } from "@mui/material";
 import React from "react";
-import { TextInput, TextInputWithUnits } from "../../components/editor/elements";
+import { TextInput, TextInputWithUnits } from "../../widgets/editor/elements";
 import { ArgsAccount, ArgsBig, ArgsError, ArgsObject, ArgsString } from "../../utils/args";
 import Call from "../../utils/call";
 import { toGas, formatTokenAmount, unitToDecimals } from "../../utils/converter";

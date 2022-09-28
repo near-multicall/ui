@@ -1,6 +1,6 @@
 import { TextField } from "@mui/material";
 import React from "react";
-import { TextInput, TextInputWithUnits } from "../../components/editor/elements";
+import { TextInput, TextInputWithUnits } from "../../widgets/editor/elements";
 import { ArgsAccount, ArgsBig, ArgsError, ArgsNumber, ArgsString, ArgsObject, ArgsArray } from "../../utils/args";
 import Call from "../../utils/call";
 import { errorMsg } from "../../utils/errors";

@@ -5,8 +5,8 @@ import { Base64 } from "js-base64";
 import debounce from "lodash.debounce";
 import { Component, ContextType } from "react";
 
-import { Sidebar } from "../../components";
-import { TextInput } from "../../components/editor/elements";
+import { Sidebar } from "../../widgets";
+import { TextInput } from "../../widgets/editor/elements";
 import { Wallet } from "../../entities";
 import { FungibleTokenBalances } from "../../entities/token";
 import { ArgsAccount, ArgsError } from "../../utils/args";

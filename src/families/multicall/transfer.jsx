@@ -8,7 +8,7 @@ import { toGas, toYocto, formatTokenAmount, unitToDecimals } from "../../utils/c
 import { BaseTask } from "../base";
 import { Multicall } from "../../utils/contracts/multicall";
 import "./multicall.scss";
-import { TextInput, TextInputWithUnits } from "../../components/editor/elements";
+import { TextInput, TextInputWithUnits } from "../../widgets/editor/elements";
 
 export class Transfer extends BaseTask {
     uniqueClassName = "multicall-transfer-task";
