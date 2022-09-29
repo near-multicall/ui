@@ -9,7 +9,7 @@
     display: flex;
     flex-flow: column nowrap;
 
-    .header {
+    &-header {
         @include mixin.center-items(space-between);
         flex-flow: row nowrap;
         flex-basis: calc(2 * size.$gap + 0.5 * size.$large-text);
@@ -17,7 +17,7 @@
         max-width: 120rem;
         margin: 0 auto;
 
-        .address-container {
+        .DaoSearch {
             @include mixin.center-items;
             flex-flow: row nowrap;
             width: auto;
@@ -76,7 +76,7 @@
         background-color: color.$light;
     }
 
-    .info-container {
+    .InfoContainer {
         @include mixin.full;
         gap: size.$gap;
         padding: size.$gap;
@@ -100,7 +100,7 @@
             }
         }
 
-        .info-text {
+        .Alert {
             font-size: size.$text;
             color: color.$dark;
             max-width: 40em;

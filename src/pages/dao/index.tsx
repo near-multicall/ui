@@ -148,7 +148,7 @@ export class DaoPage extends Component<Props, State> {
         }
 
         const depo = Big(this.fee).plus(MIN_INSTANCE_BALANCE);
-        const daoSearchInput: HTMLInputElement = document.querySelector(".address-container input")!;
+        const daoSearchInput: HTMLInputElement = document.querySelector(".DaoSearch input")!;
 
         // can user propose a FunctionCall to DAO?
         const canPropose = dao.checkUserPermission(accountId!, "AddProposal", "FunctionCall");
@@ -204,7 +204,7 @@ export class DaoPage extends Component<Props, State> {
 
                     return (
                         <>
-                            <div className="info-text">
+                            <div className="Alert">
                                 {/* hint: you can use "genesis" or "test" as DAO to get to this message */}
                                 {`A multicall instance can only be created for `}
 
@@ -233,7 +233,7 @@ export class DaoPage extends Component<Props, State> {
                     // ... and user cannot propose FunctionCall
 
                     return (
-                        <div className="info-text">
+                        <div className="Alert">
                             {/* hint: you can use "ref-community-board-testnet" as DAO to get to this message */}
                             {`This DAO has no multicall instance. A DAO member with proposing permissions should make a proposal.`}
                         </div>
@@ -246,7 +246,7 @@ export class DaoPage extends Component<Props, State> {
                     // user does not have rights to VoteApprove
 
                     return (
-                        <div className="info-text">
+                        <div className="Alert">
                             {`Proposal to create a multicall exists (#${proposed}), but you have no voting permissions on this DAO.`}
                             <br />
                             <a
@@ -262,7 +262,7 @@ export class DaoPage extends Component<Props, State> {
                     // user can VoteApprove and already voted
 
                     return (
-                        <div className="info-text">
+                        <div className="Alert">
                             {`You have voted on creating a multicall instance for this DAO. It will be created as soon as the proposal passes voting.`}
                             <br />
                             <a
@@ -279,7 +279,7 @@ export class DaoPage extends Component<Props, State> {
 
                     return (
                         <>
-                            <div className="info-text">
+                            <div className="Alert">
                                 {/* hint: you can use "genesis" or "test" as DAO to get to this message */}
                                 {`There exists a proposal (#${proposed}) to create a multicall instance for this DAO. `}
 
@@ -326,7 +326,7 @@ export class DaoPage extends Component<Props, State> {
 
     job(job: any) {
         return (
-            <div className="job">
+            <div className="Jobs-item">
                 <EditOutlined />
                 <DeleteOutline />
                 {job.is_active ? <PauseOutlined /> : <PlayArrowOutlined />}
@@ -403,7 +403,7 @@ export class DaoPage extends Component<Props, State> {
 
         // TODO: only require signIn when DAO has no multicall instance (to know if user can propose or vote on existing proposal to create multicall)
         if (!walletSelector.isSignedIn()) {
-            return <div className="info-container error">Please sign in to continue</div>;
+            return <div className="InfoContainer error">Please sign in to continue</div>;
         }
 
         const displayErrorsList = ["name", "noDao", "noContract"];
@@ -423,19 +423,19 @@ export class DaoPage extends Component<Props, State> {
         if (displayErrors.length > 0)
             return (
                 <>
-                    <div className="info-container error">
+                    <div className="InfoContainer error">
                         <div>{displayErrors}</div>
                         {this.createMulticall()}
                     </div>
                 </>
             );
 
-        if (loading) return <div className="info-container loader" />;
+        if (loading) return <div className="InfoContainer loader" />;
 
         // everything should be loaded
         if (!info.admins || !info.tokens || !info.jobBond) {
             console.error("info incomplete", info);
-            return <div className="info-container error">Unexpected error! Multicall might be outdated.</div>;
+            return <div className="InfoContainer error">Unexpected error! Multicall might be outdated.</div>;
         }
 
         return (
@@ -446,8 +446,8 @@ export class DaoPage extends Component<Props, State> {
                         title: "Config",
 
                         content: (
-                            <div className={clsx("ConfigTab", "info-container")}>
-                                <Card className="admins">
+                            <div className={clsx("ConfigTab", "InfoContainer")}>
+                                <Card className="AdminsList">
                                     <AddOutlined />
                                     <h1 className="title">Admins</h1>
 
@@ -468,14 +468,14 @@ export class DaoPage extends Component<Props, State> {
                                     </ul>
                                 </Card>
 
-                                <Card className="Jobs">
+                                <Card className="JobsList">
                                     <AddOutlined />
                                     <h1 className="title">Jobs</h1>
                                     <Scrollable>{info.jobs.map((j) => this.job(j))}</Scrollable>
                                 </Card>
 
                                 <Card className="JobBond">
-                                    <h1 className="title">
+                                    <h1 className="JobBond-title title">
                                         Job Bond
                                         <span>{`${info.jobBond !== "..." ? toNEAR(info.jobBond) : "..."} Ⓝ`}</span>
                                     </h1>
@@ -488,7 +488,7 @@ export class DaoPage extends Component<Props, State> {
                         lazy: true,
 
                         content: (
-                            <div className={clsx("FundsTab", "info-container")}>
+                            <div className={clsx("FundsTab", "InfoContainer")}>
                                 <TokensBalances
                                     className="balances"
                                     daoContracts={{ dao, multicall }}
@@ -537,8 +537,8 @@ export class DaoPage extends Component<Props, State> {
                 <Sidebar full={true} />
 
                 <div className="DaoPage">
-                    <div className="header">
-                        <div className="address-container">
+                    <div className="DaoPage-header">
+                        <div className="DaoSearch">
                             <TextInput
                                 placeholder="Insert DAO name here"
                                 value={name}

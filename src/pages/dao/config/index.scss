@@ -7,23 +7,23 @@
     display: grid;
 
     grid-template:
-        "admins Jobs" 6fr
+        "AdminsList Jobs" 6fr
         "TokenWhitelist Jobs" 5fr
         "TokenWhitelist JobBond" 1fr / 1fr 1fr;
 
-    .admins {
-        grid-area: admins;
+    .AdminsList {
+        grid-area: AdminsList;
     }
 
     .TokenWhitelist {
         grid-area: TokenWhitelist;
     }
 
-    .Jobs {
+    .JobsList {
         grid-area: Jobs;
         position: relative;
 
-        .job {
+        &-item {
             position: relative;
             margin: size.$gap;
             margin-top: 0;
@@ -42,7 +42,7 @@
     .JobBond {
         grid-area: JobBond;
 
-        .title {
+        &-title {
             @include mixin.center-items(space-between, center);
             height: 100%;
         }
