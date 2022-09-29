@@ -4,6 +4,8 @@ import type { NetworkId } from "@near-wallet-selector/core";
 import { getConfig } from "../near-config";
 import { Base64 } from "js-base64";
 
+import type { AccountView, ViewStateResult } from "near-api-js/lib/providers/provider";
+
 declare global {
     interface Window {
         NEAR_ENV: NetworkId;
@@ -81,16 +83,8 @@ async function view(addr: string, func: string, args: object): Promise<any> {
  *
  * @param accountId
  */
-async function viewAccount(accountId: string): Promise<{
-    amount: string;
-    locked: string;
-    code_hash: string;
-    storage_usage: number;
-    storage_paid_at: number;
-    block_height: number;
-    block_hash: string;
-}> {
-    const accountInfo: any = await rpcProvider.query({
+async function viewAccount(accountId: string): Promise<AccountView> {
+    const accountInfo = await rpcProvider.query<AccountView>({
         request_type: "view_account",
         finality: "final",
         account_id: accountId,
@@ -99,4 +93,29 @@ async function viewAccount(accountId: string): Promise<{
     return accountInfo;
 }
 
-export { tx, view, viewAccount, rpcProvider };
+async function viewState(
+    accountId: string,
+    prefix: string = ""
+): Promise<
+    {
+        key: string;
+        value: string;
+    }[]
+> {
+    // encode prefix in base64
+    if (prefix !== "") prefix = Base64.encode(prefix);
+    // query RPC, returns state value in base64 encoding
+    const state = await rpcProvider.query<ViewStateResult>({
+        request_type: "view_state",
+        finality: "final",
+        account_id: accountId,
+        prefix_base64: prefix,
+    });
+
+    return state.values.map((item) => ({
+        key: Base64.decode(item.key),
+        value: Base64.decode(item.value),
+    }));
+}
+
+export { tx, view, viewAccount, viewState, rpcProvider };

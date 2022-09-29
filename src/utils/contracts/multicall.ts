@@ -1,4 +1,4 @@
-import { viewAccount, view, tx } from "../wallet";
+import { viewAccount, viewState, view, tx } from "../wallet";
 import { Big, toGas, dateToCron } from "../converter";
 
 import type { FunctionCallAction as daoFunctionCallAction } from "./sputnik-dao";
@@ -17,6 +17,8 @@ const CONTRACT_CODE_HASHES_SELECTOR: Record<string, string[]> = {
         "6Em7E4Zs7d9oQkZSkMZ2CQuT2Wem3gPSpqDJ4VwFM79f", // v1_03
     ],
 };
+
+const KEY_JOB_COUNT: string = "g";
 
 // Schema for Multicall jobs
 type JobSchema = {
@@ -209,6 +211,15 @@ class Multicall {
      */
     async getJobs(): Promise<{ id: number; job: JobSchema }[]> {
         return view(this.address, "get_jobs", {});
+    }
+
+    /**
+     * get current value of jobs counter. Contract doesn't have a getter method
+     * so we query contract state using RPC.
+     */
+    async getJobCount(): Promise<number> {
+        const state = await viewState(this.address, KEY_JOB_COUNT);
+        return parseInt(state[0].value);
     }
 
     /**
