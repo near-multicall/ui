@@ -9,29 +9,29 @@ import {
 } from "@mui/material";
 import React from "react";
 
-import { TableRowCard, TableRowDefault, TableRowProps } from "./row";
+import { TableRowCard, TableRow, type TableRowProps } from "./row";
 import "./index.scss";
 
-export const Table = ({
-    header,
-    rows = [["...", "...", "...", "..."]],
-}: {
+interface TableProps {
     header: TableRowProps["headerCells"];
     rows?: TableRowProps["cells"][];
-}) => {
+}
+
+export const Table = ({ header, rows }: TableProps) => {
     const matches = useMediaQuery(useTheme().breakpoints.down("md"));
 
     return (
         <>
             {matches ? (
                 <div className="Table--column">
-                    {rows.map((cells, index) => (
-                        <TableRowCard
-                            headerCells={header}
-                            key={index}
-                            {...{ cells }}
-                        />
-                    ))}
+                    {rows &&
+                        rows.map((cells, index) => (
+                            <TableRowCard
+                                headerCells={header}
+                                key={index}
+                                {...{ cells }}
+                            />
+                        ))}
                 </div>
             ) : (
                 <TableContainer className="table-container">
@@ -45,10 +45,11 @@ export const Table = ({
                         </TableHead>
 
                         <TableBody>
-                            {rows.map((cells, index) => (
-                                <TableRowDefault
+                            {(rows || header).map((cells, index) => (
+                                <TableRow
+                                    headerCells={header}
                                     key={`row-${index}`}
-                                    {...{ cells }}
+                                    cells={typeof cells !== "string" ? cells : null}
                                 />
                             ))}
                         </TableBody>

@@ -3,10 +3,10 @@ import { HTMLAttributes, PropsWithChildren } from "react";
 
 import "./index.scss";
 
-const NAMESPACE = "Card";
+const CardNamespace = "Card";
 
 export interface CardProps extends PropsWithChildren, HTMLAttributes<HTMLDivElement> {}
 
 export const Card = ({ children, className }: CardProps) => (
-    <div className={clsx(NAMESPACE, className)}>{children}</div>
+    <div className={clsx(CardNamespace, className)}>{children}</div>
 );

@@ -1,13 +1,12 @@
 @use "sass/mixin";
 @use "sass/size";
 
-.token-label {
+.TokenLabel {
     display: flex;
     align-items: center;
     gap: size.$gap;
 
-    .icon,
-    .icon svg {
+    &-icon {
         width: 1.5 * size.$gap;
         height: 1.5 * size.$gap;
         cursor: default !important;
@@ -15,7 +14,7 @@
         box-shadow: 0px 5px 11px -3px rgba(0, 0, 0, 0.1);
     }
 
-    .symbol {
+    &-symbol {
         font-weight: bold;
     }
 }

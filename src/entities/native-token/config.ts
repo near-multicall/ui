@@ -1,0 +1,1 @@
+export const FRACTIONAL_PART_LENGTH = 5;

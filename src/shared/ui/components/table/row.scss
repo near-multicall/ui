@@ -2,7 +2,7 @@
 @use "sass/size";
 @use "sass/font";
 
-.table-row-default {
+.Table-row {
     overflow: hidden;
     position: relative;
     white-space: pre;
@@ -30,7 +30,7 @@
     }
 }
 
-.table-row-card {
+.Table-row--card {
     display: flex;
     flex-direction: column;
     gap: size.$gap;
@@ -38,7 +38,7 @@
     padding: 16px;
     background-color: color.$light;
 
-    .content {
+    &-content {
         display: flex;
         justify-content: space-between;
         grid-template-columns: auto 100%;

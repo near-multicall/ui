@@ -8,7 +8,7 @@ import { Component, ContextType } from "react";
 import { Sidebar } from "../../widgets";
 import { TextInput } from "../../widgets/editor/elements";
 import { Wallet } from "../../entities";
-import { FungibleTokenBalances } from "../../entities/token";
+import { TokensBalances } from "../../widgets/tokens-balances";
 import { ArgsAccount, ArgsError } from "../../shared/lib/args";
 import { SputnikDAO, SputnikUI, ProposalStatus } from "../../shared/lib/contracts/sputnik-dao";
 import { Multicall } from "../../shared/lib/contracts/multicall";
@@ -399,7 +399,7 @@ export class DaoPage extends Component<Props, State> {
 
     getContent() {
         const { selector: walletSelector } = this.context!;
-        const { info, loading } = this.state;
+        const { dao, info, loading, multicall } = this.state;
 
         // TODO: only require signIn when DAO has no multicall instance (to know if user can propose or vote on existing proposal to create multicall)
         if (!walletSelector.isSignedIn()) {
@@ -489,10 +489,9 @@ export class DaoPage extends Component<Props, State> {
 
                         content: (
                             <div className={clsx("FundsTab", "info-container")}>
-                                <FungibleTokenBalances
+                                <TokensBalances
                                     className="balances"
-                                    dao={this.state.dao}
-                                    multicall={this.state.multicall}
+                                    daoContracts={{ dao, multicall }}
                                 />
                             </div>
                         ),

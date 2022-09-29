@@ -3,10 +3,10 @@ import { HTMLAttributes, PropsWithChildren } from "react";
 
 import "./index.scss";
 
-const NAMESPACE = "Scrollable";
+const ScrollableNamespace = "Scrollable";
 
 interface ScrollableProps extends PropsWithChildren, HTMLAttributes<HTMLDivElement> {}
 
 export const Scrollable = ({ children, className }: ScrollableProps) => (
-    <div className={clsx(NAMESPACE, className)}>{children}</div>
+    <div className={clsx(ScrollableNamespace, className)}>{children}</div>
 );

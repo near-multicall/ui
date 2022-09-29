@@ -1,29 +1,31 @@
 import { TableCell, TableRow as MuiTableRow, Typography } from "@mui/material";
-import React from "react";
 
 import "./row.scss";
 
-interface TableRowDefaultProps {
+const TableRowNamespace = "Table-row";
+
+export interface TableRowProps {
     cells?: (string | number | JSX.Element)[] | null;
+    headerCells: string[];
 }
 
-export const TableRowDefault = ({ cells }: TableRowDefaultProps) => (
+export const TableRow = ({ cells, headerCells }: TableRowProps) => (
     <>
-        <MuiTableRow className="table-row-default">
-            {cells && cells.map((cell, index) => <TableCell key={index}>{cell}</TableCell>)}
+        <MuiTableRow className={TableRowNamespace}>
+            {(cells || headerCells).map((cell, index) => (
+                <TableCell key={index}>{cells ? cell : "No data"}</TableCell>
+            ))}
         </MuiTableRow>
     </>
 );
 
-interface TableRowCardProps extends TableRowDefaultProps {
-    headerCells: string[];
-}
+const TableRowCardNamespace = `${TableRowNamespace}--card`;
 
-export const TableRowCard = ({ cells, headerCells }: TableRowCardProps) => (
-    <div className="table-row-card">
+export const TableRowCard = ({ cells, headerCells }: TableRowProps) => (
+    <div className={TableRowCardNamespace}>
         {headerCells.map((headerCell, headerCellIndex) => (
             <div
-                className="content"
+                className={`${TableRowCardNamespace}-content`}
                 key={headerCellIndex}
             >
                 <Typography
@@ -39,18 +41,20 @@ export const TableRowCard = ({ cells, headerCells }: TableRowCardProps) => (
                     component="div"
                     fontSize="2rem"
                 >
-                    {cells && cells[headerCellIndex]}
+                    {cells ? cells[headerCellIndex] : "No data"}
                 </Typography>
             </div>
         ))}
     </div>
 );
 
+/*
 export interface TableRowProps extends TableRowDefaultProps, TableRowCardProps {}
 
 export const TableRow = (props: TableRowProps) => (
     <>
-        <TableRowDefault {...props} />
+        <TableRow {...props} />
         <TableRowCard {...props} />
     </>
 );
+*/

@@ -3,7 +3,8 @@ import React from "react";
 
 import "./item.scss";
 
-const NAMESPACE = "Tabs-item";
+const TabsItemNamespace = "Tabs-item",
+    TabsItemButtonNamespace = `${TabsItemNamespace}-button`;
 
 export interface TabsItemButtonProps extends React.HTMLAttributes<HTMLDivElement> {
     invertedColors?: boolean;
@@ -15,8 +16,8 @@ export const TabsItemButton = ({ className, invertedColors = false, onClick, tit
     <button
         className={clsx(
             {
-                [`${NAMESPACE}-button`]: true,
-                [`${NAMESPACE}-button--invertedColors`]: invertedColors,
+                [TabsItemButtonNamespace]: true,
+                [`${TabsItemButtonNamespace}--invertedColors`]: invertedColors,
             },
             className
         )}
@@ -29,5 +30,5 @@ export const TabsItemButton = ({ className, invertedColors = false, onClick, tit
 export interface TabsItemPanelProps extends React.PropsWithChildren, React.HTMLAttributes<HTMLDivElement> {}
 
 export const TabsItemPanel = ({ children, className }: TabsItemPanelProps) => (
-    <div className={clsx(`${NAMESPACE}-panel`, className)}>{children}</div>
+    <div className={clsx(`${TabsItemNamespace}-panel`, className)}>{children}</div>
 );
