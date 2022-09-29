@@ -193,7 +193,7 @@ export const LoadFromProposalDialog = ({ onClose, open }) => {
 
     return (
         <Dialog
-            className="proposal-multicall-import modal-dialog"
+            className="modal-dialog"
             doneRename="Load"
             onSubmit={() => window.LAYOUT.fromBase64(argsFromProposal)}
             noSubmit={URLInvalid.$detected || proposalURLInvalid.$detected || proposalNonCompatible.$detected}

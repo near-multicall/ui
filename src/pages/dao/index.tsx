@@ -326,7 +326,7 @@ export class DaoPage extends Component<Props, State> {
 
     job(job: any) {
         return (
-            <div className="Jobs-item">
+            <div className="JobsList-item">
                 <EditOutlined />
                 <DeleteOutline />
                 {job.is_active ? <PauseOutlined /> : <PlayArrowOutlined />}
@@ -403,7 +403,7 @@ export class DaoPage extends Component<Props, State> {
 
         // TODO: only require signIn when DAO has no multicall instance (to know if user can propose or vote on existing proposal to create multicall)
         if (!walletSelector.isSignedIn()) {
-            return <div className="InfoContainer error">Please sign in to continue</div>;
+            return <div className="DaoPage-body error">Please sign in to continue</div>;
         }
 
         const displayErrorsList = ["name", "noDao", "noContract"];
@@ -423,19 +423,19 @@ export class DaoPage extends Component<Props, State> {
         if (displayErrors.length > 0)
             return (
                 <>
-                    <div className="InfoContainer error">
+                    <div className="DaoPage-body error">
                         <div>{displayErrors}</div>
                         {this.createMulticall()}
                     </div>
                 </>
             );
 
-        if (loading) return <div className="InfoContainer loader" />;
+        if (loading) return <div className="DaoPage-body loader" />;
 
         // everything should be loaded
         if (!info.admins || !info.tokens || !info.jobBond) {
             console.error("info incomplete", info);
-            return <div className="InfoContainer error">Unexpected error! Multicall might be outdated.</div>;
+            return <div className="DaoPage-body error">Unexpected error! Multicall might be outdated.</div>;
         }
 
         return (
@@ -446,7 +446,7 @@ export class DaoPage extends Component<Props, State> {
                         title: "Config",
 
                         content: (
-                            <div className={clsx("ConfigTab", "InfoContainer")}>
+                            <div className={clsx("ConfigTab", "DaoPage-body")}>
                                 <Card className="AdminsList">
                                     <AddOutlined />
                                     <h1 className="title">Admins</h1>
@@ -488,7 +488,7 @@ export class DaoPage extends Component<Props, State> {
                         lazy: true,
 
                         content: (
-                            <div className={clsx("FundsTab", "InfoContainer")}>
+                            <div className={clsx("FundsTab", "DaoPage-body")}>
                                 <TokensBalances
                                     className="balances"
                                     daoContracts={{ dao, multicall }}

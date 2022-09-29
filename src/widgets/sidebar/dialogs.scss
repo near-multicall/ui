@@ -1,6 +1,10 @@
 @use "sass/size";
 @use "sass/mixin";
 
+.modal-dialog .MuiPaper-root {
+    min-width: size.$task-width;
+}
+
 .dapp-login-steps {
     padding: 0 size.$gap;
     list-style-type: decimal;
@@ -20,14 +24,6 @@
 
         &::marker {
             font-weight: 800;
-        }
-    }
-}
-
-.proposal-multicall-import {
-    &.modal-dialog {
-        .MuiPaper-root {
-            min-width: 360px;
         }
     }
 }

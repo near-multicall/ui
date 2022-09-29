@@ -3,7 +3,7 @@
 @use "sass/mixin";
 @use "sass/animation";
 
-.Editor {
+.Menu {
     position: fixed;
     top: size.$gap;
     right: size.$gap;
@@ -15,43 +15,39 @@
     border-radius: size.$task-radius;
     z-index: 2;
     transition: width animation.$menu-expand-time ease-out;
-}
+    &-tabs {
+        height: 100%;
+        &-buttonsPanel {
+            box-shadow: inset 0px 0px 30px 0px rgba(color.$white, 0.1);
+            border-radius: size.$task-radius;
+            margin: size.$gap;
+            width: calc(100% - 2 * size.$gap);
 
-.expanded-menu {
-    width: animation.$menu-expand-width;
-    transition: width animation.$menu-expand-time ease-out;
-}
-
-.Editor-tabs {
-    height: 100%;
-}
-
-.Editor-tabs-buttonsPanel {
-    box-shadow: inset 0px 0px 30px 0px rgba(color.$white, 0.1);
-    border-radius: size.$task-radius;
-    margin: size.$gap;
-    width: calc(100% - 2 * size.$gap);
-
-    .Tabs-item-button {
-        flex: 1;
-    }
-}
-
-.Editor-tabs-contentSpace {
-    .Tabs-item-panel {
-        &.is-active {
-            flex-flow: column;
-            gap: size.$gap;
-            height: calc(100% - size.$Tabs-layout-buttonsPanel-height);
-
-            & > div {
-                display: flex;
-                flex-flow: column nowrap;
-                height: calc(100% - size.$gap);
-                width: calc(100% - (2 * size.$gap));
-                padding: 0 size.$gap size.$gap size.$gap;
+            .Tabs-item-button {
+                flex: 1;
             }
         }
+        &-contentSpace {
+            .Tabs-item-panel {
+                &.is-active {
+                    flex-flow: column;
+                    gap: size.$gap;
+                    height: calc(100% - size.$Tabs-layout-buttonsPanel-height);
+
+                    & > div {
+                        display: flex;
+                        flex-flow: column nowrap;
+                        height: calc(100% - size.$gap);
+                        width: calc(100% - (2 * size.$gap));
+                        padding: 0 size.$gap size.$gap size.$gap;
+                    }
+                }
+            }
+        }
+    }
+    &--expanded {
+        width: animation.$menu-expand-width;
+        transition: width animation.$menu-expand-time ease-out;
     }
 }
 

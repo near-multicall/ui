@@ -76,7 +76,7 @@
         background-color: color.$light;
     }
 
-    .InfoContainer {
+    &-body {
         @include mixin.full;
         gap: size.$gap;
         padding: size.$gap;
@@ -98,28 +98,28 @@
             p.green {
                 color: color.$green;
             }
-        }
 
-        .Alert {
-            font-size: size.$text;
-            color: color.$dark;
-            max-width: 40em;
+            .Alert {
+                font-size: size.$text;
+                color: color.$dark;
+                max-width: 40em;
 
-            a {
-                color: darken(color.$blue, 20%) !important;
+                a {
+                    color: darken(color.$blue, 20%) !important;
+                }
             }
-        }
 
-        .create-multicall {
-            width: fit-content;
-            align-self: center;
-            font-size: size.$text;
-            padding: 0.25em 0.75em;
-            border-radius: 0.5em;
-            background-color: color.$green;
+            .create-multicall {
+                width: fit-content;
+                align-self: center;
+                font-size: size.$text;
+                padding: 0.25em 0.75em;
+                border-radius: 0.5em;
+                background-color: color.$green;
 
-            &.proposal-exists {
-                background-color: color.$blue !important;
+                &.proposal-exists {
+                    background-color: color.$blue !important;
+                }
             }
         }
     }

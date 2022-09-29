@@ -33,15 +33,15 @@ export class Menu extends Component {
         const LAYOUT = this.props.layout;
 
         return (
-            <div className={`Editor ${expanded ? "expanded-menu" : ""}`}>
-                <div className="Editor-tabs">
+            <div className={`Menu ${expanded ? "Menu--expanded" : ""}`}>
+                <div className="Menu-tabs">
                     <Tabs
                         invertedColors
                         activeItemIndexOverride={activeTabIndex}
                         activeItemSwitchOverride={this.activeTabSwitch}
                         classes={{
-                            buttonsPanel: "Editor-tabs-buttonsPanel",
-                            contentSpace: "Editor-tabs-contentSpace",
+                            buttonsPanel: "Menu-tabs-buttonsPanel",
+                            contentSpace: "Menu-tabs-contentSpace",
                         }}
                         items={[
                             {
