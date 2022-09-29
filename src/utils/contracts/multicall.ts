@@ -1,4 +1,4 @@
-import { rpcProvider, view, tx } from "../wallet";
+import { viewAccount, view, tx } from "../wallet";
 import { Big, toGas, dateToCron } from "../converter";
 
 import type { FunctionCallAction as daoFunctionCallAction } from "./sputnik-dao";
@@ -112,11 +112,7 @@ class Multicall {
      * @param accountId
      */
     static async isMulticall(accountId: string): Promise<boolean> {
-        const accountInfo: any = await rpcProvider.query({
-            request_type: "view_account",
-            finality: "final",
-            account_id: accountId,
-        });
+        const accountInfo = await viewAccount(accountId);
         const codeHash: string = accountInfo.code_hash;
         return Multicall.CONTRACT_CODE_HASHES.includes(codeHash);
     }

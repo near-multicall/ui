@@ -52,6 +52,7 @@ async function tx(
 
 /**
  * make view calls using RPC, no need for user to sign in.
+ * see: https://docs.near.org/api/rpc/contracts#call-a-contract-function
  *
  * @param addr
  * @param func
@@ -74,4 +75,28 @@ async function view(addr: string, func: string, args: object): Promise<any> {
     return JSON.parse(strResult);
 }
 
-export { tx, view, rpcProvider };
+/**
+ * queries RPC for basic account information.
+ * see: https://docs.near.org/api/rpc/contracts#view-account
+ *
+ * @param accountId
+ */
+async function viewAccount(accountId: string): Promise<{
+    amount: string;
+    locked: string;
+    code_hash: string;
+    storage_usage: number;
+    storage_paid_at: number;
+    block_height: number;
+    block_hash: string;
+}> {
+    const accountInfo: any = await rpcProvider.query({
+        request_type: "view_account",
+        finality: "final",
+        account_id: accountId,
+    });
+
+    return accountInfo;
+}
+
+export { tx, view, viewAccount, rpcProvider };

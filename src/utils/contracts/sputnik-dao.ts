@@ -1,6 +1,6 @@
 // TODO: use token functions in proposeMulticallFT
 
-import { tx, view, rpcProvider } from "../wallet";
+import { tx, view, viewAccount } from "../wallet";
 import { toGas, Big } from "../converter";
 import { ArgsAccount } from "../args";
 import { STORAGE } from "../../utils/persistent";
@@ -168,11 +168,7 @@ class SputnikDAO {
      * @param accountId
      */
     static async isSputnikDAO(accountId: string): Promise<boolean> {
-        const accountInfo: any = await rpcProvider.query({
-            request_type: "view_account",
-            finality: "final",
-            account_id: accountId,
-        });
+        const accountInfo = await viewAccount(accountId);
         const codeHash: string = accountInfo.code_hash;
         return SputnikDAO.CONTRACT_CODE_HASHES.includes(codeHash);
     }
@@ -255,7 +251,7 @@ class SputnikDAO {
     }
 
     // get proposal page URL on UI of choice
-    getProposalUrl(ui: SputnikUI, proposal_id: string): string {
+    getProposalUrl(ui: SputnikUI, proposal_id: number): string {
         // exit if UI not supported
         if (!(ui in SputnikUI)) return "";
         // we have a supported UI

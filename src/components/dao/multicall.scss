@@ -1,0 +1,50 @@
+@use "sass/color";
+@use "sass/font";
+@use "sass/mixin";
+@use "sass/size";
+
+.multicall-tab {
+    display: grid;
+
+    grid-template:
+        "admins jobs" 6fr
+        "token-whitelist jobs" 5fr
+        "token-whitelist job-bond" 1fr / 1fr 1fr;
+
+    .admins {
+        grid-area: admins;
+    }
+
+    .token-whitelist {
+        grid-area: token-whitelist;
+    }
+
+    .jobs {
+        grid-area: jobs;
+        position: relative;
+
+        .job {
+            position: relative;
+            margin: size.$gap;
+            margin-top: 0;
+            border-radius: size.$task-radius;
+            background-color: color.$lightest;
+
+            pre {
+                padding: 0.5 * size.$gap;
+                font-family: font.$code;
+                font-size: size.$small-text;
+                overflow: hidden;
+            }
+        }
+    }
+
+    .job-bond {
+        grid-area: job-bond;
+
+        .title {
+            @include mixin.center-items(space-between, center);
+            height: 100%;
+        }
+    }
+}
