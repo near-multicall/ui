@@ -5,6 +5,7 @@ import { toGas, Big } from "../converter";
 import { ArgsAccount } from "../args";
 import { STORAGE } from "../../utils/persistent";
 import { Base64 } from "js-base64";
+import { FungibleToken } from "../standards/fungibleToken";
 
 import type { MulticallArgs } from "./multicall";
 
@@ -381,6 +382,29 @@ class SputnikDAO {
     }
 
     /**
+     * propose activating a multicall job
+     *
+     * @param {string} desc DAO proposal description
+     * @param {number} jobId ID of job to be activated
+     * @param {string} depo NEAR amount to be attached to job activation
+     */
+    async proposeJobActivation(desc: string, jobId: number, depo: string): Promise<void> {
+        const { multicall } = STORAGE.addresses;
+
+        const callActions: FunctionCallAction[] = [
+            {
+                method_name: "job_activate",
+                args: { job_id: jobId },
+                deposit: `${depo}`,
+                gas: toGas("100"), // 100 Tgas
+            },
+        ];
+
+        // fire the add_proposal transaction
+        this.proposeFunctionCall(desc, multicall, callActions);
+    }
+
+    /**
      * propose multicall with attached FT using args from LAYOUT
      *
      * @param {string} desc DAO proposal description
@@ -397,6 +421,7 @@ class SputnikDAO {
         amount: string
     ): Promise<void> {
         const { multicall } = STORAGE.addresses;
+        const token = new FungibleToken(tokenAddress);
 
         const actions: FunctionCallAction[] = [
             {
@@ -417,11 +442,64 @@ class SputnikDAO {
         // check if multicall has enough storage on Token
         const [storageBalance, storageBounds] = await Promise.all([
             // get storage balance of multicall on the token
-            view(tokenAddress, "storage_balance_of", { account_id: multicall }).catch((e) => "0"), // return 0 if failed
+            token.storageBalanceOf(multicall),
             // get storage balance bounds in case multicall has no storage on the token and it needs to be paid
-            view(tokenAddress, "storage_balance_bounds", {}).catch((e) => {}),
+            token.storageBalanceBounds(),
         ]);
-        const totalStorageBalance = Big(storageBalance?.total ?? "0");
+        const totalStorageBalance = Big(storageBalance.total);
+        const storageMinBound = Big(storageBounds.min);
+
+        // if storage balance is less than minimum bound, add proposal action to pay for storage
+        if (totalStorageBalance.lt(storageMinBound)) {
+            // push to beginning of actions array. Has to execute before ft_transfer_call
+            actions.unshift({
+                method_name: "storage_deposit",
+                args: { account_id: multicall },
+                deposit: storageMinBound.sub(totalStorageBalance).toFixed(), // difference between current storage total and required minimum
+                gas: toGas("5"), // 5 Tgas
+            });
+        }
+
+        // fire the add_proposal transaction
+        this.proposeFunctionCall(desc, tokenAddress, actions);
+    }
+
+    /**
+     * propose multicall with attached FT using args from LAYOUT
+     *
+     * @param {string} desc DAO proposal description
+     * @param {number} jobId ID of job to be activated
+     * @param {string} tokenAddress attached FT address
+     * @param {string} amount attached FT amount
+     */
+    async proposeJobActivationFT(desc: string, jobId: number, tokenAddress: string, amount: string): Promise<void> {
+        const { multicall } = STORAGE.addresses;
+        const token = new FungibleToken(tokenAddress);
+
+        const actions: FunctionCallAction[] = [
+            {
+                method_name: "ft_transfer_call",
+                args: {
+                    receiver_id: multicall,
+                    amount: amount,
+                    msg: JSON.stringify({
+                        function_id: "job_activate",
+                        args: Base64.encode(JSON.stringify({ job_id: jobId }).toString()),
+                    }).toString(),
+                },
+                deposit: "1", // nep-141: ft_transfer_call expects EXACTLY 1 yocto
+                gas: toGas("150"), // 150 Tgas
+            },
+        ];
+
+        // check if multicall has enough storage on Token
+        const [storageBalance, storageBounds] = await Promise.all([
+            // get storage balance of multicall on the token
+            token.storageBalanceOf(multicall),
+            // get storage balance bounds in case multicall has no storage on the token and it needs to be paid
+            token.storageBalanceBounds(),
+        ]);
+        const totalStorageBalance = Big(storageBalance.total);
         const storageMinBound = Big(storageBounds.min);
 
         // if storage balance is less than minimum bound, add proposal action to pay for storage
