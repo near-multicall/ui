@@ -437,8 +437,9 @@ export class Dao extends Component<Props, State> {
         const { addr } = this.state.formData;
         const { noMulticall, noDao } = fields(this.schema, "addr");
 
-        const multicallAddress = `${addr}.${window.nearConfig.MULTICALL_FACTORY_ADDRESS}`;
-        const daoAddress = `${addr}.${SputnikDAO.FACTORY_ADDRESS}`;
+        const baseAddresss = this.getBaseAddress(addr);
+        const multicallAddress = `${baseAddresss}.${window.nearConfig.MULTICALL_FACTORY_ADDRESS}`;
+        const daoAddress = `${baseAddresss}.${SputnikDAO.FACTORY_ADDRESS}`;
 
         noMulticall.isBad(false);
         noDao.isBad(false);
