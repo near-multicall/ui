@@ -1,8 +1,8 @@
 import { AddOutlined, DeleteOutline, EditOutlined, PauseOutlined, PlayArrowOutlined } from "@mui/icons-material";
 import clsx from "clsx";
-import { createEffect, forward } from "effector";
-import { createForm, useForm } from "effector-forms";
-import { useStore } from "effector-react";
+// import { createEffect, forward } from "effector";
+// import { createForm, useForm } from "effector-forms";
+// import { useStore } from "effector-react";
 import { Base64 } from "js-base64";
 import debounce from "lodash.debounce";
 import React from "react";
@@ -18,6 +18,7 @@ import { Big, toNEAR, toYocto } from "../../utils/converter";
 import { STORAGE } from "../../utils/persistent";
 import { view } from "../../utils/wallet";
 import { FungibleTokenBalances } from "../token";
+import { Formik, Form, Field } from "formik";
 import "./dao.scss";
 import "./funds.scss";
 import "./multicall.scss";
@@ -72,7 +73,7 @@ export class Dao extends Component<Props, State> {
 
     lastAddr: string;
     fee?: string;
-    searchDao: any;
+    formikSetValues?: (fields: State["formData"], shouldValidate?: boolean) => void;
 
     constructor(props: Props) {
         super(props);
@@ -105,18 +106,6 @@ export class Dao extends Component<Props, State> {
             this.fee = createMulticallFee;
             this.tryLoadInfo();
         });
-
-        const formConfig = this.schema.intoFormConfig();
-        formConfig.fields.addr.init = this.state.formData.addr;
-        const form = createForm(formConfig),
-            fx = createEffect();
-
-        forward({
-            from: form.formValidated,
-            to: fx,
-        });
-
-        this.searchDao = { form, fx };
 
         document.addEventListener("onaddressesupdated", (e) => this.onAddressesUpdated(e as CustomEvent));
 
@@ -188,17 +177,12 @@ export class Dao extends Component<Props, State> {
 
     onAddressesUpdated(e: CustomEvent<{ dao: string }>) {
         if (e.detail.dao !== this.state.formData.addr) {
-            this.setState(
-                {
-                    formData: {
-                        addr: e.detail.dao,
-                    },
-                    multicall: new Multicall(
-                        `${this.getBaseAddress(e.detail.dao)}.${window.nearConfig.MULTICALL_FACTORY_ADDRESS}`
-                    ),
-                },
-                this.tryLoadInfo
-            );
+            this.setState({
+                multicall: new Multicall(
+                    `${this.getBaseAddress(e.detail.dao)}.${window.nearConfig.MULTICALL_FACTORY_ADDRESS}`
+                ),
+            });
+            this.formikSetValues?.({ addr: e.detail.dao });
         }
     }
 
@@ -421,9 +405,15 @@ export class Dao extends Component<Props, State> {
     tryLoadInfo() {
         this.lastAddr = this.state.formData.addr;
         this.schema.check(this.state.formData).then(() => {
+            const { noDao } = fields(this.schema, "addr");
             if (!this.schema.isBad()) {
+                // case 0: DAO and Multicall exist
                 this.confidentlyLoadInfo();
+            } else if (!noDao.isBad()) {
+                // case 1: Only DAO exists
+                this.confidentlyLoadOnlyDaoInfo();
             } else {
+                // case 2: neither exist
                 this.setState({
                     proposed: -1,
                     proposedInfo: null,
@@ -433,21 +423,53 @@ export class Dao extends Component<Props, State> {
         });
     }
 
-    confidentlyLoadInfo() {
+    confidentlyLoadOnlyDaoInfo() {
         const { addr } = this.state.formData;
-        const { noMulticall, noDao } = fields(this.schema, "addr");
 
         const baseAddresss = this.getBaseAddress(addr);
         const multicallAddress = `${baseAddresss}.${window.nearConfig.MULTICALL_FACTORY_ADDRESS}`;
-        const daoAddress = `${baseAddresss}.${SputnikDAO.FACTORY_ADDRESS}`;
-
-        noMulticall.isBad(false);
-        noDao.isBad(false);
 
         this.setState({ loading: true });
 
         // initialize DAO object
-        SputnikDAO.init(daoAddress)
+        SputnikDAO.init(addr)
+            .catch((e) => {})
+            .then((newDao) => {
+                if (!newDao) return;
+                // some error happened during DAO object init.
+                if (!newDao.ready) {
+                    this.setState({
+                        dao: newDao,
+                        multicall: new Multicall(multicallAddress),
+                        loading: false,
+                    });
+                    return;
+                } else {
+                    this.proposalAlreadyExists(newDao)
+                        .catch((e) => {})
+                        .then((proposalData) =>
+                            this.setState(() => ({
+                                dao: newDao,
+                                multicall: new Multicall(multicallAddress),
+                                loading: false,
+                                proposed: proposalData?.proposal_id || -1,
+                                proposedInfo: proposalData?.proposal_info || null,
+                            }))
+                        );
+                }
+            });
+    }
+
+    confidentlyLoadInfo() {
+        const { addr } = this.state.formData;
+
+        const baseAddresss = this.getBaseAddress(addr);
+        const multicallAddress = `${baseAddresss}.${window.nearConfig.MULTICALL_FACTORY_ADDRESS}`;
+
+        this.setState({ loading: true });
+
+        // initialize DAO object
+        SputnikDAO.init(addr)
             .catch((e) => {})
             .then((newDao) => {
                 if (!newDao) return;
@@ -586,30 +608,29 @@ export class Dao extends Component<Props, State> {
         );
     }
 
-    searchDaoComponent = () => {
-        const formInfo = useForm(this.searchDao.form);
-        const pending = useStore(this.searchDao.fx.pending);
-        return (
-            <form>
-                {this.schema.intoField(formInfo, "addr", {
-                    props: {
-                        placeholder: "Insert DAO name here",
-                    },
-                    postChange: (e) => {
-                        this.setFormData({ addr: e.target.value });
-                        this.tryLoadInfoDebounced();
-                    },
-                })}
-            </form>
-        );
-    };
-
     render() {
         return (
             <div className="DaoPage-root">
                 <div className="header">
                     <div className="address-container">
-                        <this.searchDaoComponent />
+                        <Formik
+                            initialValues={{ addr: STORAGE.addresses.dao ?? "" }}
+                            validate={(values) => {
+                                this.setFormData({ addr: values.addr });
+                                this.tryLoadInfoDebounced();
+                            }}
+                            onSubmit={() => {}}
+                        >
+                            {({ setValues }) => {
+                                this.formikSetValues = setValues;
+
+                                return (
+                                    <Form>
+                                        <Field name="addr" />
+                                    </Form>
+                                );
+                            }}
+                        </Formik>
                     </div>
                 </div>
 

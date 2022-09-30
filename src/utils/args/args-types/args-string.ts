@@ -3,10 +3,9 @@ import { hasContract } from "../../contracts/generic";
 import { Multicall } from "../../contracts/multicall";
 import { SputnikDAO } from "../../contracts/sputnik-dao";
 import { locale, addErrorMethods, ErrorMethods } from "../args-error";
-import { addFieldMethods, FieldMethods } from "../args-form";
 
 declare module "yup" {
-    interface StringSchema extends ErrorMethods, FieldMethods {
+    interface StringSchema extends ErrorMethods {
         json(message?: string): this;
         address(message?: string): this;
         contract(message?: string): this;
@@ -104,6 +103,5 @@ addMethod(_StringSchema, "intoUrl", function intoUrl() {
 });
 
 addErrorMethods(_StringSchema);
-addFieldMethods(_StringSchema);
 
 export { _StringSchema as StringSchema };

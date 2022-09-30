@@ -3,13 +3,9 @@ import { StringSchema } from "./args-string";
 import { BigSchema } from "./args-big";
 import { Base64 } from "js-base64";
 import { addErrorMethods, ErrorMethods } from "../args-error";
-import { addFieldMethods, FieldMethods } from "../args-form";
 
 declare module "yup" {
-    interface ObjectSchema<TShape, TContext, TIn, TOut>
-        extends BaseSchema<TIn, TContext, TOut>,
-            ErrorMethods,
-            FieldMethods {
+    interface ObjectSchema<TShape, TContext, TIn, TOut> extends BaseSchema<TIn, TContext, TOut>, ErrorMethods {
         call(): this;
         intoJsonString(): this;
         intoBase64String(): this;
@@ -58,7 +54,6 @@ addMethod(_ObjectSchema, "intoCallString", function intoCallString() {
 });
 
 addErrorMethods(_ObjectSchema);
-addFieldMethods(_ObjectSchema);
 
 function fields(schema: _ObjectSchema<any>, path: string = ""): Record<string, _ObjectSchema<any>> {
     return reach(schema, path).fields;
