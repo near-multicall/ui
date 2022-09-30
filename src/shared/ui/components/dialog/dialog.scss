@@ -12,11 +12,13 @@
     }
 
     &-title {
-        font-size: size.$large-text;
-        font-weight: 800;
-        font-family: font.$text;
-        padding: size.$gap;
-        padding-bottom: 0.5 * size.$gap;
+        &.MuiDialogTitle-root {
+            font-size: size.$large-text;
+            font-weight: 800;
+            font-family: font.$text;
+            padding: size.$gap;
+            padding-bottom: 0.5 * size.$gap;
+        }
     }
 
     &-content {
@@ -26,25 +28,27 @@
 
         .MuiTextField-root {
             width: 100%;
-        }
 
-        p.Mui-error {
-            color: color.$red;
-            font-weight: 800;
-            font-family: font.$text;
-            font-size: size.$small-text;
+            p.Mui-error {
+                color: color.$red;
+                font-weight: 800;
+                font-family: font.$text;
+                font-size: size.$small-text;
 
-            &::before {
-                content: "Error: ";
+                &::before {
+                    content: "Error: ";
+                }
             }
         }
     }
 
     &-actions {
-        @include mixin.center-items(space-between, center);
-        flex-flow: row nowrap;
-        padding: size.$gap;
-        padding-top: 0;
+        &.MuiDialogActions-root {
+            @include mixin.center-items(space-between, center);
+            flex-flow: row nowrap;
+            padding: size.$gap;
+            padding-top: 0;
+        }
     }
 
     &-action {

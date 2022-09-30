@@ -47,7 +47,7 @@ export const Dialog = ({
         <MUIDialogActions className={`${_Dialog}-actions`}>
             {!noCancel ? (
                 <button
-                    className={`${_Dialog}-action--cancel`}
+                    className={clsx(`${_Dialog}-action`, `${_Dialog}-action--cancel`)}
                     onClick={() => {
                         onCancel?.();
                         onClose?.();
@@ -58,7 +58,7 @@ export const Dialog = ({
             ) : null}
 
             <button
-                className={clsx(`${_Dialog}-action--done`, { disabled: noSubmit })}
+                className={clsx(`${_Dialog}-action`, `${_Dialog}-action--done`, { disabled: noSubmit })}
                 disabled={noSubmit}
                 onClick={() => {
                     onSubmit?.();

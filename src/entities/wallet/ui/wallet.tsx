@@ -11,7 +11,7 @@ import { toGas, Big } from "../../../shared/lib/converter";
 import { STORAGE } from "../../../shared/lib/persistent";
 import { tx, view } from "../../../shared/lib/wallet";
 import { errorMsg } from "../../../shared/lib/errors";
-import { useSelector } from "./providers";
+import { useWalletSelector } from "./providers";
 import "./wallet.scss";
 
 /* TODO: Decompose code */
@@ -41,7 +41,7 @@ export class WalletComponent extends Component {
         }
     }
 
-    static contextType = useSelector();
+    static contextType = useWalletSelector();
 
     errors = {
         noDao: new ArgsError(errorMsg.ERR_NO_DAO_ON_ADDR, (value) => this.errors.noDao.isBad),

@@ -14,13 +14,7 @@ export interface TabsItemButtonProps extends React.HTMLAttributes<HTMLDivElement
 
 export const TabsItemButton = ({ className, invertedColors = false, onClick, title }: TabsItemButtonProps) => (
     <button
-        className={clsx(
-            {
-                _TabsItemButton,
-                [`${_TabsItemButton}--invertedColors`]: invertedColors,
-            },
-            className
-        )}
+        className={clsx(_TabsItemButton, { [`${_TabsItemButton}--invertedColors`]: invertedColors }, className)}
         {...{ onClick }}
     >
         {title}
