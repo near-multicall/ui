@@ -10,9 +10,9 @@ import { Icon } from "@mui/material";
 import { Component } from "react";
 import { NavLink } from "react-router-dom";
 
-import Discord from "../../assets/discord.svg";
-import Github from "../../assets/github.svg";
-import Twitter from "../../assets/twitter.svg";
+import Discord from "../../shared/ui/components/icons/discord.svg";
+import Github from "../../shared/ui/components/icons/github.svg";
+import Twitter from "../../shared/ui/components/icons/twitter.svg";
 import { Wallet } from "../../entities/wallet";
 import { STORAGE } from "../../shared/lib/persistent";
 import { viewAccount } from "../../shared/lib/wallet";
