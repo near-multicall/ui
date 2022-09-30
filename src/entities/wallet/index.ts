@@ -1,8 +1,8 @@
-import { WalletComponent } from "./ui";
-import { useSelector, WalletSelectorContextProvider } from "./ui/providers";
+import { WalletComponent } from "./ui/wallet";
+import { useWalletSelector, WalletSelectorContextProvider } from "./ui/providers";
 
-export const Wallet = {
-    Selector: WalletComponent,
-    SelectorContextProvider: WalletSelectorContextProvider,
-    useSelector,
-};
+export class Wallet {
+    static Selector = WalletComponent;
+    static SelectorContextProvider = WalletSelectorContextProvider;
+    static useSelector = useWalletSelector;
+}

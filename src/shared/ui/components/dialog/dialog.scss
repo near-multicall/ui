@@ -3,52 +3,61 @@
 @use "sass/font";
 @use "sass/mixin";
 
-.dialog {
-    .title {
-        font-size: size.$large-text;
-        font-weight: 800;
-        font-family: font.$text;
-        padding: size.$gap;
-        padding-bottom: 0.5 * size.$gap;
-    }
+.Dialog {
     .MuiPaper-root {
         background-color: color.$black;
         color: color.$light-text;
         border-radius: size.$task-radius;
         font-size: size.$text;
     }
-    .content {
+
+    &-title {
+        font-size: size.$large-text;
+        font-weight: 800;
+        font-family: font.$text;
+        padding: size.$gap;
+        padding-bottom: 0.5 * size.$gap;
+    }
+
+    &-content {
         display: flex;
         flex-flow: column nowrap;
         gap: 0.5 * size.$gap;
+
         .MuiTextField-root {
             width: 100%;
         }
+
         p.Mui-error {
             color: color.$red;
             font-weight: 800;
             font-family: font.$text;
             font-size: size.$small-text;
+
             &::before {
                 content: "Error: ";
             }
         }
     }
-    .action {
+
+    &-actions {
         @include mixin.center-items(space-between, center);
         flex-flow: row nowrap;
         padding: size.$gap;
         padding-top: 0;
-        button {
-            font-size: size.$text;
-            border-radius: size.$task-radius;
-            padding: 0.25 * size.$gap size.$gap;
-            &.cancel {
-                background-color: color.$red;
-            }
-            &.done {
-                background-color: color.$green;
-            }
+    }
+
+    &-action {
+        font-size: size.$text;
+        border-radius: size.$task-radius;
+        padding: 0.25 * size.$gap size.$gap;
+
+        &--cancel {
+            background-color: color.$red;
+        }
+
+        &--done {
+            background-color: color.$green;
         }
     }
 }

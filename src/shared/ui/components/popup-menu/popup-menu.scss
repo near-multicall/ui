@@ -1,14 +1,14 @@
 @use "sass/color";
 @use "sass/size";
 
-.popup-menu {
+.PopupMenu {
     position: relative;
 
-    &:hover .popup-menu-content {
+    &:hover &-content {
         visibility: visible !important;
     }
 
-    .popup-menu-content {
+    &-content {
         visibility: hidden;
         position: absolute;
         left: size.$sidebar-width;

@@ -2,25 +2,29 @@ import { Chip } from "@mui/material";
 import clsx from "clsx";
 import { ReactNode } from "react";
 
-import "./index.scss";
+import "./popup-menu.scss";
 
 interface PopupMenuProps {
     icon: ReactNode;
-    items: { label: string; onClick: VoidFunction; title: string }[];
+    items: { disabled?: boolean; label: string; onClick?: VoidFunction; title: string }[];
     triggerClassName: string;
 }
 
 export const PopupMenu = ({ icon, items, triggerClassName }: PopupMenuProps) => (
-    <div className={clsx("popup-menu", triggerClassName)}>
+    <div className={clsx("PopupMenu", triggerClassName)}>
         {icon}
 
-        <div className="popup-menu-content">
+        <div className="PopupMenu-content">
             <ul>
                 {items.map(({ disabled = false, label, onClick, title }) => (
                     <li
                         className={clsx({ disabled })}
                         key={title}
-                        onClick={disabled ? null : onClick}
+                        /*
+                         * `undefined` is being used here because native HTML elements
+                         * doesn't accept `null` as onClick prop
+                         */
+                        onClick={disabled ? undefined : onClick}
                     >
                         {title}
                         {label && <Chip {...{ label }} />}

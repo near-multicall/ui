@@ -7,10 +7,9 @@ import {
     useMediaQuery,
     useTheme,
 } from "@mui/material";
-import React from "react";
 
 import { TableRowCard, TableRow, type TableRowProps } from "./row";
-import "./index.scss";
+import "./table.scss";
 
 interface TableProps {
     header: TableRowProps["headerCells"];
@@ -23,7 +22,7 @@ export const Table = ({ header, rows }: TableProps) => {
     return (
         <>
             {matches ? (
-                <div className="Table--column">
+                <div className="Table-column">
                     {rows &&
                         rows.map((cells, index) => (
                             <TableRowCard
@@ -34,9 +33,9 @@ export const Table = ({ header, rows }: TableProps) => {
                         ))}
                 </div>
             ) : (
-                <TableContainer className="table-container">
+                <TableContainer className="Table">
                     <table>
-                        <TableHead className="table-head">
+                        <TableHead className="Table-head">
                             <MuiTableRow>
                                 {header.map((headerCell, index) => (
                                     <TableCell key={index}>{headerCell}</TableCell>

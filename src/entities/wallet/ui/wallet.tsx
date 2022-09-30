@@ -12,7 +12,7 @@ import { STORAGE } from "../../../shared/lib/persistent";
 import { tx, view } from "../../../shared/lib/wallet";
 import { errorMsg } from "../../../shared/lib/errors";
 import { useSelector } from "./providers";
-import "./index.scss";
+import "./wallet.scss";
 
 /* TODO: Decompose code */
 export class WalletComponent extends Component {

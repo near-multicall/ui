@@ -15,12 +15,11 @@ import { Multicall } from "../../shared/lib/contracts/multicall";
 import { toNEAR, toYocto, Big } from "../../shared/lib/converter";
 import { STORAGE } from "../../shared/lib/persistent";
 import { view } from "../../shared/lib/wallet";
-import { Card, Scrollable, Tabs } from "../../shared/ui/components";
-import "./funds/index.scss";
-import "./config/index.scss";
-import "./index.scss";
-
 import type { ProposalOutput } from "../../shared/lib/contracts/sputnik-dao";
+import { Card, Scrollable, Tabs } from "../../shared/ui/components";
+import "./funds/tab.scss";
+import "./config/tab.scss";
+import "./page.scss";
 
 // minimum balance a multicall instance needs for storage + state.
 const MIN_INSTANCE_BALANCE = toYocto(1); // 1 NEAR

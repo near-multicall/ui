@@ -1,7 +1,7 @@
 import { NearIcons } from "../icons";
-import "./index.scss";
+import "./token-label.scss";
 
-const TokenLabelNamespace = "TokenLabel";
+const _TokenLabel = "TokenLabel";
 
 interface TokenLabelProps {
     icon?: string | null;
@@ -10,19 +10,19 @@ interface TokenLabelProps {
 }
 
 export const TokenLabel = ({ icon, native, symbol }: TokenLabelProps) => (
-    <span className={TokenLabelNamespace}>
+    <span className={_TokenLabel}>
         {!native && typeof icon === "string" ? (
             <img
-                className={`${TokenLabelNamespace}-icon`}
+                className={`${_TokenLabel}-icon`}
                 loading="lazy"
                 src={icon}
             />
         ) : native ? (
-            <NearIcons.NativeTokenFilled className={`${TokenLabelNamespace}-icon`} />
+            <NearIcons.NativeTokenFilled className={`${_TokenLabel}-icon`} />
         ) : (
-            <NearIcons.GenericTokenFilled className={`${TokenLabelNamespace}-icon`} />
+            <NearIcons.GenericTokenFilled className={`${_TokenLabel}-icon`} />
         )}
 
-        <span className={`${TokenLabelNamespace}-symbol`}>{native ? "NEAR" : symbol}</span>
+        <span className={`${_TokenLabel}-symbol`}>{native ? "NEAR" : symbol}</span>
     </span>
 );

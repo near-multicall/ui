@@ -2,7 +2,7 @@ import { TableCell, TableRow as MuiTableRow, Typography } from "@mui/material";
 
 import "./row.scss";
 
-const TableRowNamespace = "Table-row";
+const _TableRow = "Table-row";
 
 export interface TableRowProps {
     cells?: (string | number | JSX.Element)[] | null;
@@ -11,7 +11,7 @@ export interface TableRowProps {
 
 export const TableRow = ({ cells, headerCells }: TableRowProps) => (
     <>
-        <MuiTableRow className={TableRowNamespace}>
+        <MuiTableRow className={_TableRow}>
             {(cells || headerCells).map((cell, index) => (
                 <TableCell key={index}>{cells ? cell : "No data"}</TableCell>
             ))}
@@ -19,13 +19,13 @@ export const TableRow = ({ cells, headerCells }: TableRowProps) => (
     </>
 );
 
-const TableRowCardNamespace = `${TableRowNamespace}--card`;
+const _TableRowCard = `${_TableRow}--card`;
 
 export const TableRowCard = ({ cells, headerCells }: TableRowProps) => (
-    <div className={TableRowCardNamespace}>
+    <div className={_TableRowCard}>
         {headerCells.map((headerCell, headerCellIndex) => (
             <div
-                className={`${TableRowCardNamespace}-content`}
+                className={`${_TableRowCard}-content`}
                 key={headerCellIndex}
             >
                 <Typography
