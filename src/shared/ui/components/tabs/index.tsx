@@ -23,9 +23,9 @@ export const Tabs = ({
             ? useState<number>(0)
             : [activeItemIndexOverride, activeItemSwitchOverride];
 
-    const activeItemSwitchBinding = useCallback(
+    const activeItemSwitchBond = useCallback(
         (itemIndex: number) => () => activeItemSwitch(itemIndex),
-        [activeItemSwitch]
+        [activeItemSwitch, items]
     );
 
     return (
@@ -35,7 +35,7 @@ export const Tabs = ({
                 <TabsItemButton
                     className={clsx({ "is-active": activeItemIndex === itemIndex })}
                     key={itemIndex}
-                    onClick={activeItemSwitchBinding(itemIndex)}
+                    onClick={activeItemSwitchBond(itemIndex)}
                     {...{ invertedColors, title }}
                 />
             ))}

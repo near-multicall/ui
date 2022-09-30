@@ -1,4 +1,4 @@
-import { Layout, Sidebar } from "../../components";
+import { Layout, Sidebar } from "../../widgets";
 
 export const AppPage = () => {
     window.PAGE = "app";

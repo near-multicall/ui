@@ -2,7 +2,7 @@
 @use "sass/size";
 @use "sass/font";
 
-.table-row-default {
+.Table-row {
     overflow: hidden;
     position: relative;
     white-space: pre;
@@ -28,30 +28,30 @@
     &:hover {
         background-color: color.$lightest;
     }
-}
 
-.table-row-card {
-    display: flex;
-    flex-direction: column;
-    gap: size.$gap;
-    border-radius: 16px;
-    padding: 16px;
-    background-color: color.$light;
-
-    .content {
+    &--card {
         display: flex;
-        justify-content: space-between;
-        grid-template-columns: auto 100%;
+        flex-direction: column;
+        gap: size.$gap;
+        border-radius: 16px;
+        padding: 16px;
+        background-color: color.$light;
 
-        > div:first-of-type {
-            white-space: nowrap;
-        }
-
-        > div:last-child {
-            width: 100%;
+        &-content {
             display: flex;
-            justify-content: flex-end;
-            align-items: center;
+            justify-content: space-between;
+            grid-template-columns: auto 100%;
+
+            > div:first-of-type {
+                white-space: nowrap;
+            }
+
+            > div:last-child {
+                width: 100%;
+                display: flex;
+                justify-content: flex-end;
+                align-items: center;
+            }
         }
     }
 }

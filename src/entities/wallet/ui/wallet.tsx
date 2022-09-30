@@ -1,0 +1,235 @@
+// TODO: use Multical helper class to fetch & store infos, like admins, tokens etc...
+
+import Autocomplete from "@mui/material/Autocomplete";
+import TextField from "@mui/material/TextField";
+import { Icon } from "@mui/material";
+import debounce from "lodash.debounce";
+import { Component } from "react";
+
+import { ArgsAccount, ArgsError } from "../../../shared/lib/args";
+import { SputnikDAO } from "../../../shared/lib/contracts/sputnik-dao";
+import { Multicall } from "../../../shared/lib/contracts/multicall";
+import { STORAGE } from "../../../shared/lib/persistent";
+import { errorMsg } from "../../../shared/lib/errors";
+import { useWalletSelector } from "./providers";
+import "./wallet.scss";
+
+/* TODO: Decompose code */
+export class WalletComponent extends Component {
+    constructor(props, context) {
+        super(props, context);
+
+        this.state = {
+            currentDAO: new SputnikDAO(STORAGE.addresses.dao),
+            expanded: {
+                user: false,
+                dao: false || STORAGE.addresses.dao === "",
+            },
+        };
+
+        const { accountId } = context;
+        STORAGE.setAddresses({ user: accountId });
+        window.WALLET_COMPONENT = this;
+        if (accountId) {
+            const URL = `https://api.${
+                window.NEAR_ENV === "mainnet" ? "" : "testnet."
+            }app.astrodao.com/api/v1/daos/account-daos/${accountId}`;
+            fetch(URL)
+                .then((response) => response.json())
+                .then((data) => (this.daoList = data.map((dao) => dao.id)))
+                .then(() => this.forceUpdate());
+        }
+    }
+
+    static contextType = useWalletSelector();
+
+    errors = {
+        noDao: new ArgsError(errorMsg.ERR_NO_DAO_ON_ADDR, (value) => this.errors.noDao.isBad),
+        noRights: new ArgsError(errorMsg.ERR_CANNOT_PROPOSE_TO_DAO, (value) => this.errors.noRights),
+        noContract: new ArgsError(errorMsg.ERR_DAO_HAS_NO_MTCL, (value) => this.errors.noContract.isBad),
+    };
+
+    daoList = [];
+
+    daoSearchDebounced = debounce(
+        // debounced function
+        (newValue) => {
+            this.daoSearch(newValue);
+        },
+        // debounce time
+        400
+    );
+
+    signIn() {
+        const { modal } = this.context;
+        modal.show();
+    }
+
+    async signOut() {
+        const { selector } = this.context;
+        const wallet = await selector.wallet();
+
+        wallet.signOut().catch((err) => {
+            console.log("Failed to sign out");
+            console.error(err);
+        });
+    }
+
+    connectDao(daoAddress: SputnikDAO["address"]) {
+        const { accountId } = this.context;
+
+        const { noDao, noRights, noContract } = this.errors;
+
+        noRights.isBad = false;
+        noDao.isBad = false;
+        noContract.isBad = false;
+
+        const multicallAddress = daoAddress.replace(SputnikDAO.FACTORY_ADDRESS, Multicall.FACTORY_ADDRESS);
+
+        Promise.all([
+            // on failure return non-initialized DAO instance (per default: ready = false)
+            SputnikDAO.init(daoAddress).catch((e) => new SputnikDAO(daoAddress)),
+            Multicall.isMulticall(multicallAddress).catch((e) => false),
+        ])
+            .then(([initializedDAO, hasMulticall]) => {
+                if (!initializedDAO.ready || !hasMulticall) {
+                    noDao.isBad = !initializedDAO.ready;
+                    noContract.isBad = !hasMulticall;
+                    window.MENU?.forceUpdate();
+                    return;
+                }
+
+                this.setState({
+                    currentDAO: initializedDAO,
+                });
+
+                // can user propose FunctionCall to DAO?
+                const canPropose = initializedDAO.checkUserPermission(accountId, "AddProposal", "FunctionCall");
+
+                if (!canPropose) noRights.isBad = true; // no add proposal rights
+
+                window.MENU?.forceUpdate();
+            })
+            .finally(() => {
+                let color = "red";
+
+                if (ArgsAccount.isValid(daoAddress) && !noDao.isBad) color = "yellow";
+
+                if (!noContract.isBad) color = "";
+
+                this.setState({ color: color });
+            });
+    }
+
+    toggleExpandedDao() {
+        const { expanded } = this.state;
+
+        this.setState({
+            expanded: {
+                user: expanded.user,
+                dao: !expanded.dao,
+            },
+        });
+    }
+
+    toggleExpandedUser() {
+        const { expanded } = this.state;
+
+        this.setState({
+            expanded: {
+                user: !expanded.user,
+                dao: expanded.dao,
+            },
+        });
+    }
+
+    daoSearch(newValue) {
+        STORAGE.setAddresses({}); // hack: empty setAddresses call to invoke callbacks
+        if (newValue !== undefined && ArgsAccount.isValid(newValue)) {
+            this.connectDao(newValue);
+        } else {
+            this.setState({ color: newValue === "" ? "" : "red" });
+        }
+    }
+
+    render() {
+        const { selector: walletSelector, accountId } = this.context;
+        const { expanded, color } = this.state;
+
+        if (!walletSelector) return null;
+
+        return (
+            <div className="wallet">
+                <div
+                    className="user"
+                    expand={expanded.user || !walletSelector.isSignedIn() ? "yes" : "no"}
+                >
+                    <Icon
+                        className="icon"
+                        onClick={() => this.toggleExpandedUser()}
+                    >
+                        {expanded.user && walletSelector.isSignedIn() ? "chevron_left" : "person"}
+                    </Icon>
+
+                    <div className="peek">{accountId}</div>
+
+                    <div className="expand">
+                        {walletSelector.isSignedIn() ? (
+                            <>
+                                {accountId}
+                                <button
+                                    className="logout"
+                                    onClick={() => this.signOut()}
+                                >
+                                    sign out
+                                </button>
+                            </>
+                        ) : (
+                            <button onClick={() => this.signIn()}>sign in</button>
+                        )}
+                    </div>
+                </div>
+
+                <span>for</span>
+
+                <div
+                    className={`dao ${color}`}
+                    expand={expanded.dao ? "yes" : "no"}
+                >
+                    <Icon
+                        className="icon"
+                        onClick={() => this.toggleExpandedDao()}
+                    >
+                        {expanded.dao && STORAGE.addresses.dao !== "" ? "chevron_left" : "groups"}
+                    </Icon>
+
+                    <div className="expand">
+                        <Autocomplete
+                            className="dao-selector"
+                            freeSolo
+                            value={STORAGE.addresses.dao}
+                            options={this.daoList}
+                            renderInput={(params) => (
+                                <TextField
+                                    {...params}
+                                    placeholder="Select DAO"
+                                />
+                            )}
+                            onInputChange={(e, newValue) => {
+                                // set STORAGE.addresses to have no delay, thus no rubber banding
+                                STORAGE.addresses.dao = newValue ?? "";
+                                STORAGE.addresses.multicall = newValue?.replace(
+                                    SputnikDAO.FACTORY_ADDRESS,
+                                    Multicall.FACTORY_ADDRESS
+                                );
+                                this.daoSearchDebounced(newValue);
+                            }}
+                        />
+                    </div>
+
+                    <div className="peek">{STORAGE.addresses.dao}</div>
+                </div>
+            </div>
+        );
+    }
+}
