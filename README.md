@@ -27,13 +27,13 @@ yarn
 For **NEAR Testnet**:
 
 ```sh
-yarn dev
+yarn start:testnet
 ```
 
 For **NEAR Mainnet**:
 
 ```sh
-yarn dev:mainnet
+yarn start:mainnet
 ```
 
 #### Architectural specification
