@@ -1,6 +1,4 @@
 import { InputAdornment } from "@mui/material";
-import { DeleteOutline, EditOutlined, AddOutlined, PauseOutlined, PlayArrowOutlined } from "@mui/icons-material";
-import clsx from "clsx";
 import { Base64 } from "js-base64";
 import debounce from "lodash.debounce";
 import { Component, ContextType } from "react";
@@ -8,16 +6,17 @@ import { Component, ContextType } from "react";
 import { Sidebar } from "../../widgets";
 import { TextInput } from "../../widgets/editor/elements";
 import { Wallet } from "../../entities";
-import { TokensBalances } from "../../widgets/tokens-balances";
 import { ArgsAccount, ArgsError } from "../../shared/lib/args";
 import { SputnikDAO, SputnikUI, ProposalStatus } from "../../shared/lib/contracts/sputnik-dao";
 import { JobSchema, Multicall } from "../../shared/lib/contracts/multicall";
-import { toNEAR, toYocto, Big, toGas } from "../../shared/lib/converter";
+import { toYocto, Big, toGas } from "../../shared/lib/converter";
 import { STORAGE } from "../../shared/lib/persistent";
 import type { ProposalOutput } from "../../shared/lib/contracts/sputnik-dao";
-import { Card, Scrollable, Tabs } from "../../shared/ui/components";
-import "./funds/tab.scss";
-import "./config/tab.scss";
+import { Tabs } from "../../shared/ui/components";
+
+import { DaoFundsTab } from "./funds/tab";
+import { DaoJobsTab } from "./jobs/tab";
+import { DaoConfigTab } from "./config/tab";
 import "./page.scss";
 
 // minimum balance a multicall instance needs for storage + state.
@@ -35,6 +34,8 @@ interface State {
     proposedInfo: ProposalOutput | null;
     jobs: JobSchema[];
 }
+
+const _DaoPage = "DaoPage";
 
 export class DaoPage extends Component<Props, State> {
     constructor(props: Props) {
@@ -297,37 +298,6 @@ export class DaoPage extends Component<Props, State> {
         }
     }
 
-    toLink(address: string, deleteIcon: boolean = false) {
-        const addr = new ArgsAccount(address);
-
-        return (
-            <span>
-                <a
-                    href={addr.toUrl()}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    {addr.value}
-                </a>
-                {deleteIcon ? <DeleteOutline /> : null}
-            </span>
-        );
-    }
-
-    job(job: JobSchema) {
-        return (
-            <div
-                className="JobsList-item"
-                key={job.croncat_hash}
-            >
-                <EditOutlined />
-                <DeleteOutline />
-                {job.is_active ? <PauseOutlined /> : <PlayArrowOutlined />}
-                <pre>{JSON.stringify(job, null, "  ")}</pre>
-            </div>
-        );
-    }
-
     loadInfo() {
         const { address, noContract, noDao } = this.errors;
         const { name } = this.state;
@@ -394,7 +364,7 @@ export class DaoPage extends Component<Props, State> {
 
         // TODO: only require signIn when DAO has no multicall instance (to know if user can propose or vote on existing proposal to create multicall)
         if (!walletSelector.isSignedIn()) {
-            return <div className="DaoPage-body error">Please sign in to continue</div>;
+            return <div className="DaoPage-content error">Please sign in to continue</div>;
         }
 
         const displayErrorsList = ["name", "noDao", "noContract"];
@@ -414,81 +384,28 @@ export class DaoPage extends Component<Props, State> {
         if (displayErrors.length > 0)
             return (
                 <>
-                    <div className="DaoPage-body error">
+                    <div className="DaoPage-content error">
                         <div>{displayErrors}</div>
                         {this.createMulticall()}
                     </div>
                 </>
             );
 
-        if (loading) return <div className="DaoPage-body loader" />;
+        if (loading) return <div className="DaoPage-content loader" />;
 
         // everything should be loaded
         if (!multicall.admins || !multicall.tokensWhitelist || !multicall.jobBond) {
             console.error("multicall infos incomplete", multicall);
-            return <div className="DaoPage-body error">Unexpected error! Multicall might be outdated.</div>;
+            return <div className="DaoPage-content error">Unexpected error! Multicall might be outdated.</div>;
         }
 
         return (
             <Tabs
                 classes={{ buttonsPanel: "DaoPage-tabs-buttonsPanel", contentSpace: "DaoPage-tabs-contentSpace" }}
                 items={[
-                    {
-                        title: "Config",
-
-                        content: (
-                            <div className={clsx("ConfigTab", "DaoPage-body")}>
-                                <Card className="AdminsList">
-                                    <AddOutlined />
-                                    <h1 className="title">Admins</h1>
-
-                                    <ul className="list">
-                                        {multicall.admins.map((admin) => (
-                                            <li key={admin}>{this.toLink(admin)}</li>
-                                        ))}
-                                    </ul>
-                                </Card>
-
-                                <Card className="TokenWhitelist">
-                                    <h1 className="title">Whitelisted Tokens</h1>
-
-                                    <ul className="list">
-                                        {multicall.tokensWhitelist.map((token) => (
-                                            <li key={token}>{this.toLink(token)}</li>
-                                        ))}
-                                    </ul>
-                                </Card>
-
-                                <Card className="JobsList">
-                                    <AddOutlined />
-                                    <h1 className="title">Jobs</h1>
-                                    <Scrollable>{jobs.map((job) => this.job(job))}</Scrollable>
-                                </Card>
-
-                                <Card className="JobBond">
-                                    <h1 className="JobBond-title title">
-                                        Job Bond
-                                        <span>{`${
-                                            multicall.jobBond !== "" ? toNEAR(multicall.jobBond) : "..."
-                                        } Ⓝ`}</span>
-                                    </h1>
-                                </Card>
-                            </div>
-                        ),
-                    },
-                    {
-                        title: "Funds",
-                        lazy: true,
-
-                        content: (
-                            <div className={clsx("FundsTab", "DaoPage-body")}>
-                                <TokensBalances
-                                    className="balances"
-                                    daoContracts={{ dao, multicall }}
-                                />
-                            </div>
-                        ),
-                    },
+                    DaoConfigTab.connect({ className: `${_DaoPage}-content`, contracts: { multicall } }),
+                    DaoFundsTab.connect({ className: `${_DaoPage}-content`, contracts: { dao, multicall } }),
+                    DaoJobsTab.connect({ className: `${_DaoPage}-content`, jobs }),
                 ]}
             />
         );
@@ -502,7 +419,6 @@ export class DaoPage extends Component<Props, State> {
             this.setState(
                 {
                     name: new ArgsAccount(daoAccount.deconstructAddress().name),
-
                     multicall: new Multicall(`${daoAccount.deconstructAddress().name}.${Multicall.FACTORY_ADDRESS}`),
                 },
 

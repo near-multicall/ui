@@ -3,12 +3,12 @@
 @use "sass/mixin";
 @use "sass/size";
 
-.ConfigTab {
+.DaoConfigTab {
     display: grid;
 
     grid-template:
-        "AdminsList Jobs" 6fr
-        "TokenWhitelist Jobs" 5fr
+        "AdminsList ." 6fr
+        "TokenWhitelist ." 5fr
         "TokenWhitelist JobBond" 1fr / 1fr 1fr;
 
     .AdminsList {
@@ -17,26 +17,6 @@
 
     .TokenWhitelist {
         grid-area: TokenWhitelist;
-    }
-
-    .JobsList {
-        grid-area: Jobs;
-        position: relative;
-
-        &-item {
-            position: relative;
-            margin: size.$gap;
-            margin-top: 0;
-            border-radius: size.$task-radius;
-            background-color: color.$lightest;
-
-            pre {
-                padding: 0.5 * size.$gap;
-                font-family: font.$code;
-                font-size: size.$small-text;
-                overflow: hidden;
-            }
-        }
     }
 
     .JobBond {

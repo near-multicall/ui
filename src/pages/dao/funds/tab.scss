@@ -3,12 +3,12 @@
 @use "sass/mixin";
 @use "sass/size";
 
-.FundsTab {
+.DaoFundsTab {
     display: grid;
-    grid-template: "balances" 1fr / 1fr;
+    grid-template: "tokenBalances" 1fr / 1fr;
 
-    .balances {
-        grid-area: balances;
+    &-tokenBalances {
+        grid-area: tokenBalances;
         padding-bottom: size.$gap;
         position: relative;
         overflow: hidden;

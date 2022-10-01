@@ -30,10 +30,10 @@ const nativeTokenDataFx = async ({ dao, multicall }: DaoContracts, callback: (da
     });
 };
 
-const useNativeTokenData = (daoContracts: DaoContracts) => {
+const useNativeTokenData = (contracts: DaoContracts) => {
     const [state, stateUpdate] = useState<NativeTokenData>({ data: null, loading: true });
 
-    useEffect(() => void nativeTokenDataFx(daoContracts, stateUpdate), []);
+    useEffect(() => void nativeTokenDataFx(contracts, stateUpdate), []);
 
     return state;
 };

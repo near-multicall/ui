@@ -3,11 +3,11 @@ import type { DaoContracts } from "../../types";
 import { NativeTokenBalancesModel } from "../model/balances";
 
 interface NativeTokenBalancesRenderProps {
-    daoContracts: DaoContracts;
+    contracts: DaoContracts;
 }
 
-export const nativeTokenBalancesRender = ({ daoContracts }: NativeTokenBalancesRenderProps) => {
-    const { data } = NativeTokenBalancesModel.useData(daoContracts);
+export const nativeTokenBalancesRender = ({ contracts }: NativeTokenBalancesRenderProps) => {
+    const { data } = NativeTokenBalancesModel.useData(contracts);
 
     return !data ? null : [<TokenLabel native />, data.multicall, data.dao, data.total];
 };

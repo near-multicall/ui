@@ -1,1 +1,1 @@
-export { TokensBalances } from "./ui/card";
+export { TokensBalances, type TokensBalancesProps } from "./ui/card";
