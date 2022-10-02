@@ -16,6 +16,25 @@ import "./wallet.scss";
 
 /* TODO: Decompose code */
 export class WalletComponent extends Component {
+    static contextType = useWalletSelector();
+
+    errors = {
+        noDao: new ArgsError(errorMsg.ERR_NO_DAO_ON_ADDR, (value) => this.errors.noDao.isBad),
+        noRights: new ArgsError(errorMsg.ERR_CANNOT_PROPOSE_TO_DAO, (value) => this.errors.noRights),
+        noContract: new ArgsError(errorMsg.ERR_DAO_HAS_NO_MTCL, (value) => this.errors.noContract.isBad),
+    };
+
+    daoList = [];
+
+    daoSearchDebounced = debounce(
+        // debounced function
+        (newValue) => {
+            this.daoSearch(newValue);
+        },
+        // debounce time
+        400
+    );
+
     constructor(props, context) {
         super(props, context);
 
@@ -40,25 +59,6 @@ export class WalletComponent extends Component {
                 .then(() => this.forceUpdate());
         }
     }
-
-    static contextType = useWalletSelector();
-
-    errors = {
-        noDao: new ArgsError(errorMsg.ERR_NO_DAO_ON_ADDR, (value) => this.errors.noDao.isBad),
-        noRights: new ArgsError(errorMsg.ERR_CANNOT_PROPOSE_TO_DAO, (value) => this.errors.noRights),
-        noContract: new ArgsError(errorMsg.ERR_DAO_HAS_NO_MTCL, (value) => this.errors.noContract.isBad),
-    };
-
-    daoList = [];
-
-    daoSearchDebounced = debounce(
-        // debounced function
-        (newValue) => {
-            this.daoSearch(newValue);
-        },
-        // debounce time
-        400
-    );
 
     signIn() {
         const { modal } = this.context;

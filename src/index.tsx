@@ -5,6 +5,7 @@ import { DaoPage } from "./pages/dao";
 import { Wallet } from "./entities";
 import "./shared/lib/persistent";
 import "@near-wallet-selector/modal-ui/styles.css";
+import { Sidebar } from "./widgets";
 
 window.PAGE = "app";
 
@@ -24,12 +25,22 @@ ReactDOM.render(
 
                 <Route
                     path="/app"
-                    element={<AppPage />}
+                    element={
+                        <>
+                            <Sidebar full={true} />
+                            <AppPage />
+                        </>
+                    }
                 />
 
                 <Route
                     path="/dao"
-                    element={<DaoPage />}
+                    element={
+                        <>
+                            <Sidebar full={true} />
+                            <DaoPage />
+                        </>
+                    }
                 />
             </Routes>
         </HashRouter>
