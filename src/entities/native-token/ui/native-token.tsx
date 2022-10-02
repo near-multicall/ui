@@ -1,6 +1,6 @@
 import { TokenLabel } from "../../../shared/ui/components";
 import type { DaoContracts } from "../../types";
-import { NativeTokenBalancesModel } from "../model/balances";
+import { NativeTokenBalancesModel } from "../model/native-token";
 
 interface NativeTokenBalancesRenderProps {
     daoContracts: DaoContracts;

@@ -1,1 +1,1 @@
-export { TokensBalances } from "./ui/card";
+export { TokensBalances } from "./ui/token-balances";

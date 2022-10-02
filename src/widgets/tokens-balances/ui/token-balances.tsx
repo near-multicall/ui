@@ -1,4 +1,4 @@
-import { Card, Scrollable, Table } from "../../../shared/ui/components";
+import { Facet, Scrollable, Table } from "../../../shared/ui/components";
 import { type DaoContracts } from "../../../entities/types";
 import { FungibleToken, NativeToken } from "../../../entities";
 
@@ -12,7 +12,7 @@ export const TokensBalances = ({ className, daoContracts }: TokensBalancesProps)
         fungibleTokensBalances = FungibleToken.allBalancesRender({ daoContracts });
 
     return (
-        <Card {...{ className }}>
+        <Facet {...{ className }}>
             <h1 className="title">Token Balances</h1>
 
             {!nativeTokenBalance || !fungibleTokensBalances ? (
@@ -25,6 +25,6 @@ export const TokensBalances = ({ className, daoContracts }: TokensBalancesProps)
                     />
                 </Scrollable>
             )}
-        </Card>
+        </Facet>
     );
 };

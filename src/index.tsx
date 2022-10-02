@@ -1,7 +1,7 @@
 import ReactDOM from "react-dom";
 import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AppPage } from "./pages/app";
-import { DaoPage } from "./pages/dao";
+import { DaoPage } from "./pages/dao/dao";
 import { Wallet } from "./entities";
 import "./shared/lib/persistent";
 import "@near-wallet-selector/modal-ui/styles.css";
