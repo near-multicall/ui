@@ -183,7 +183,7 @@ export class WalletComponent extends Component {
         Promise.all([
             SputnikDAO.init(dao).catch(() => {
                 // return non-initialized DAO obj as ready = false per default.
-                new SputnikDAO(dao);
+                return new SputnikDAO(dao);
             }),
             view(multicall, "get_admins", {}).catch((e) => {
                 if (
