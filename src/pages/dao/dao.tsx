@@ -2,25 +2,22 @@ import { AddOutlined, DeleteOutline, EditOutlined, PauseOutlined, PlayArrowOutli
 import clsx from "clsx";
 import { Base64 } from "js-base64";
 import debounce from "lodash.debounce";
-import React from "react";
 import { Component, ContextType } from "react";
 
+import { Field, Form, Formik } from "formik";
 import { Wallet } from "../../entities";
+import { args } from "../../shared/lib/args/args";
+import { fields } from "../../shared/lib/args/args-types/args-object";
 import { Multicall } from "../../shared/lib/contracts/multicall";
 import type { ProposalOutput } from "../../shared/lib/contracts/sputnik-dao";
-import { ProposalStatus, SputnikDAO, SputnikUI } from "../../shared/lib/contracts/sputnik-dao";
+import { SputnikDAO, SputnikUI } from "../../shared/lib/contracts/sputnik-dao";
 import { Big, toNEAR, toYocto } from "../../shared/lib/converter";
 import { STORAGE } from "../../shared/lib/persistent";
 import { view } from "../../shared/lib/wallet";
 import { Facet, Scrollable, Tabs } from "../../shared/ui/components";
-import { TextInput } from "../../widgets/editor/elements";
 import { TokensBalances } from "../../widgets/tokens-balances";
-import { args } from "../../shared/lib/args/args";
-import { fields } from "../../shared/lib/args/args-types/args-object";
 import "./config/config.scss";
 import "./funds/funds.scss";
-import { Formik, Form, Field } from "formik";
-
 import "./dao.scss";
 
 // minimum balance a multicall instance needs for storage + state.
@@ -46,7 +43,7 @@ interface State {
         jobBond: string;
     };
 }
-export class Dao extends Component<Props, State> {
+export class DaoPage extends Component<Props, State> {
     static contextType = Ctx;
     declare context: ContextType<typeof Ctx>;
 
@@ -597,9 +594,9 @@ export class Dao extends Component<Props, State> {
 
     render() {
         return (
-            <div className="DaoPage-root">
-                <div className="header">
-                    <div className="address-container">
+            <div className="DaoPage">
+                <div className="DaoPage-header">
+                    <div className="DaoSearch">
                         <Formik
                             initialValues={{ addr: STORAGE.addresses.dao ?? "" }}
                             validate={(values) => {
