@@ -18,12 +18,16 @@ export class Layout extends Component {
 
         this.clear();
 
-        document.addEventListener("onlayoutupdated", () => this.forceUpdate());
+        document.addEventListener("onlayoutupdated", this.forceUpdate);
     }
 
     componentDidMount() {
         window.LAYOUT = this;
         STORAGE.load();
+    }
+
+    componentWillUnmount() {
+        document.removeEventListener("onlayoutupdated", this.forceUpdate);
     }
 
     getTaskID = () => this.taskID;

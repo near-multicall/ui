@@ -56,7 +56,11 @@ export class Sidebar extends Component {
 
     componentDidMount() {
         window.SIDEBAR = this;
-        document.addEventListener("onaddressesupdated", () => this.forceUpdate());
+        document.addEventListener("onaddressesupdated", this.forceUpdate);
+    }
+
+    componentWillUnmount() {
+        document.removeEventListener("onaddressesupdated", this.forceUpdate);
     }
 
     componentDidUpdate(_, previousState) {

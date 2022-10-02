@@ -17,11 +17,15 @@ export class Menu extends Component {
             activeTabIndex: 0,
         };
 
-        document.addEventListener("onaddressesupdated", () => this.forceUpdate());
+        document.addEventListener("onaddressesupdated", this.forceUpdate);
     }
 
     componentDidMount() {
         window.MENU = this;
+    }
+
+    componentWillUnmount() {
+        document.removeEventListener("onaddressesupdated", this.forceUpdate);
     }
 
     activeTabSwitch = (newTabIndex) => this.setState({ activeTabIndex: newTabIndex });
