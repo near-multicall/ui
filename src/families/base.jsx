@@ -59,7 +59,7 @@ export class BaseTask extends Component {
 
         this.updateCard = this.updateCard.bind(this);
 
-        document.addEventListener("onaddressesupdated", this.onAddressesUpdated);
+        document.addEventListener("onaddressesupdated", (e) => this.onAddressesUpdated(e));
 
         this.updateContract();
     }
@@ -125,10 +125,6 @@ export class BaseTask extends Component {
     componentDidMount() {
         this.loadErrors?.();
         this.forceUpdate();
-    }
-
-    componentWillUnmount() {
-        document.removeEventListener("onaddressesupdated", this.onAddressesUpdated);
     }
 
     onAddressesUpdated() {}

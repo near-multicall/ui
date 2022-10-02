@@ -523,11 +523,7 @@ export class DaoPage extends Component<Props, State> {
 
     componentDidMount(): void {
         window.PAGE = "dao";
-        document.addEventListener("onaddressesupdated", this.onAddressesUpdated);
-    }
-
-    componentWillUnmount() {
-        document.removeEventListener("onaddressesupdated", this.onAddressesUpdated);
+        document.addEventListener("onaddressesupdated", () => this.onAddressesUpdated());
     }
 
     render() {

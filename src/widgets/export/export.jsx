@@ -58,15 +58,11 @@ export class Export extends Component {
 
         this.update = this.update.bind(this);
 
-        document.addEventListener("onaddressesupdated", this.onAddressesUpdated);
+        document.addEventListener("onaddressesupdated", (e) => this.onAddressesUpdated(e));
     }
 
     componentDidMount() {
         window.EXPORT = this;
-    }
-
-    componentWillUnmount() {
-        document.removeEventListener("onaddressesupdated", this.onAddressesUpdated);
     }
 
     onAddressesUpdated() {
