@@ -1,6 +1,6 @@
 // TODO: use Multical helper class to fetch & store infos, like admins, tokens etc...
 
-import React, { Component } from "react";
+import { Component } from "react";
 import { STORAGE } from "../../utils/persistent";
 import { useWalletSelector } from "../../contexts/walletSelectorContext";
 import { SputnikDAO, ProposalKind, ProposalAction } from "../../utils/contracts/sputnik-dao";

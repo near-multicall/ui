@@ -1,10 +1,10 @@
 // TODO: de-deprecate near-wallet on wallet selector. Use patch
 import { providers } from "near-api-js";
-import type { NetworkId } from "@near-wallet-selector/core";
 import { getConfig } from "../near-config";
 import { Base64 } from "js-base64";
 
 import type { AccountView, ViewStateResult } from "near-api-js/lib/providers/provider";
+import type { NetworkId, Transaction } from "@near-wallet-selector/core";
 
 declare global {
     interface Window {
@@ -13,6 +13,8 @@ declare global {
     }
 }
 
+type Tx = Omit<Transaction, "signerId">;
+
 window.NEAR_ENV = <NetworkId>process.env.NEAR_ENV ?? "testnet";
 window.nearConfig = getConfig(window.NEAR_ENV);
 // create RPC Provider object.
@@ -20,13 +22,8 @@ const rpcProvider = new providers.JsonRpcProvider({
     url: window.nearConfig.nodeUrl,
 });
 
-async function tx(
-    addr: string,
-    func: string,
-    args: object | Uint8Array,
-    gas: string,
-    depo: string = "0"
-): Promise<any> {
+async function signAndSendTxs(txs: Tx[]): Promise<any> {
+    if (txs.length < 1) return;
     // is user logged in?
     if (!window.selector.isSignedIn()) {
         console.error("Wallet not connected");
@@ -36,20 +33,7 @@ async function tx(
 
     // get wallet from wallet selector
     const wallet = await window.selector.wallet();
-    return wallet.signAndSendTransaction({
-        receiverId: addr,
-        actions: [
-            {
-                type: "FunctionCall",
-                params: {
-                    methodName: func,
-                    args: args,
-                    gas: gas,
-                    deposit: depo,
-                },
-            },
-        ],
-    });
+    return wallet.signAndSendTransactions({ transactions: txs });
 }
 
 /**
@@ -118,4 +102,5 @@ async function viewState(
     }));
 }
 
-export { tx, view, viewAccount, viewState, rpcProvider };
+export { signAndSendTxs, view, viewAccount, viewState, rpcProvider };
+export type { Tx };

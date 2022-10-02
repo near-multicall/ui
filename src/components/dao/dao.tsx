@@ -9,6 +9,7 @@ import { ArgsAccount, ArgsError } from "../../utils/args";
 import { STORAGE } from "../../utils/persistent";
 import { toNEAR, toYocto, toGas, Big } from "../../utils/converter";
 import { useWalletSelector } from "../../contexts/walletSelectorContext";
+import { signAndSendTxs } from "../../utils/wallet";
 import { SputnikDAO, SputnikUI, ProposalKind, ProposalAction } from "../../utils/contracts/sputnik-dao";
 import { Multicall } from "../../utils/contracts/multicall";
 import { Card, Scrollable, Tabs } from "../../shared/ui/components";
@@ -199,7 +200,7 @@ export class Dao extends Component<Props, State> {
                             <button
                                 className="create-multicall"
                                 onClick={() => {
-                                    dao.addProposal(args);
+                                    dao.addProposal(args).then((tx) => signAndSendTxs([tx]));
                                 }}
                             >
                                 Propose
@@ -272,7 +273,7 @@ export class Dao extends Component<Props, State> {
                             <button
                                 className="create-multicall proposal-exists"
                                 onClick={() => {
-                                    dao.actProposal(proposed, "VoteApprove");
+                                    dao.actProposal(proposed, "VoteApprove").then((tx) => signAndSendTxs([tx]));
                                 }}
                             >
                                 {`vote YES`}

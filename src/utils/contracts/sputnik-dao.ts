@@ -1,6 +1,6 @@
 // TODO: use token functions in proposeMulticallFT
 
-import { tx, view, viewAccount } from "../wallet";
+import { signAndSendTxs, view, viewAccount } from "../wallet";
 import { toGas, Big } from "../converter";
 import { ArgsAccount } from "../args";
 import { STORAGE } from "../../utils/persistent";
@@ -8,6 +8,7 @@ import { Base64 } from "js-base64";
 import { FungibleToken } from "../standards/fungibleToken";
 
 import type { MulticallArgs } from "./multicall";
+import type { Tx } from "../wallet";
 
 const FACTORY_ADDRESS_SELECTOR: Record<string, string> = {
     mainnet: "sputnik-dao.near",
@@ -174,24 +175,38 @@ class SputnikDAO {
         return SputnikDAO.CONTRACT_CODE_HASHES.includes(codeHash);
     }
 
-    async addProposal(args: object | Uint8Array) {
-        return tx(
-            this.address,
-            "add_proposal",
-            args,
-            toGas("50"), // 50 Tgas
-            this.policy.proposal_bond
-        );
+    async addProposal(args: object | Uint8Array): Promise<Tx> {
+        return {
+            receiverId: this.address,
+            actions: [
+                {
+                    type: "FunctionCall",
+                    params: {
+                        methodName: "add_proposal",
+                        args,
+                        gas: toGas("50"), // 50 Tgas
+                        deposit: this.policy.proposal_bond,
+                    },
+                },
+            ],
+        };
     }
 
-    async actProposal(proposal_id: number, proposal_action: string) {
-        return tx(
-            this.address,
-            "act_proposal",
-            { id: proposal_id, action: proposal_action },
-            toGas("200"), // 200 Tgas
-            "0"
-        );
+    async actProposal(proposal_id: number, proposal_action: string): Promise<Tx> {
+        return {
+            receiverId: this.address,
+            actions: [
+                {
+                    type: "FunctionCall",
+                    params: {
+                        methodName: "act_proposal",
+                        args: { id: proposal_id, action: proposal_action },
+                        gas: toGas("200"), // 200 Tgas,
+                        deposit: "0",
+                    },
+                },
+            ],
+        };
     }
 
     async getProposals(args: { from_index: number; limit: number }): Promise<object[]> {
@@ -336,7 +351,7 @@ class SputnikDAO {
     }
 
     // propose a generic function call to DAO.
-    async proposeFunctionCall(desc: string, pTarget: string, pActions: FunctionCallAction[]): Promise<void> {
+    async proposeFunctionCall(desc: string, pTarget: string, pActions: FunctionCallAction[]): Promise<Tx> {
         const proposalArgs = {
             proposal: {
                 description: desc,
@@ -353,8 +368,8 @@ class SputnikDAO {
             },
         };
 
-        // fire the add_proposal transaction
-        this.addProposal(proposalArgs);
+        // return the add_proposal transaction
+        return this.addProposal(proposalArgs);
     }
 
     /**
@@ -365,7 +380,7 @@ class SputnikDAO {
      * @param {string} depo NEAR amount to be attached to multicall
      * @param {string} gas Gas amount dedicated to multicall execution
      */
-    async proposeMulticall(desc: string, multicallArgs: MulticallArgs, depo: string, gas: string): Promise<void> {
+    async proposeMulticall(desc: string, multicallArgs: MulticallArgs, depo: string, gas: string): Promise<Tx> {
         const { multicall } = STORAGE.addresses;
 
         const callActions: FunctionCallAction[] = [
@@ -377,8 +392,8 @@ class SputnikDAO {
             },
         ];
 
-        // fire the add_proposal transaction
-        this.proposeFunctionCall(desc, multicall, callActions);
+        // return the add_proposal transaction
+        return this.proposeFunctionCall(desc, multicall, callActions);
     }
 
     /**
@@ -388,7 +403,7 @@ class SputnikDAO {
      * @param {number} jobId ID of job to be activated
      * @param {string} depo NEAR amount to be attached to job activation
      */
-    async proposeJobActivation(desc: string, jobId: number, depo: string): Promise<void> {
+    async proposeJobActivation(desc: string, jobId: number, depo: string): Promise<Tx> {
         const { multicall } = STORAGE.addresses;
 
         const callActions: FunctionCallAction[] = [
@@ -400,8 +415,8 @@ class SputnikDAO {
             },
         ];
 
-        // fire the add_proposal transaction
-        this.proposeFunctionCall(desc, multicall, callActions);
+        // return the add_proposal transaction
+        return this.proposeFunctionCall(desc, multicall, callActions);
     }
 
     /**
@@ -419,7 +434,7 @@ class SputnikDAO {
         gas: string,
         tokenAddress: string,
         amount: string
-    ): Promise<void> {
+    ): Promise<Tx> {
         const { multicall } = STORAGE.addresses;
         const token = new FungibleToken(tokenAddress);
 
@@ -460,8 +475,8 @@ class SputnikDAO {
             });
         }
 
-        // fire the add_proposal transaction
-        this.proposeFunctionCall(desc, tokenAddress, actions);
+        // return the add_proposal transaction
+        return this.proposeFunctionCall(desc, tokenAddress, actions);
     }
 
     /**
@@ -472,7 +487,7 @@ class SputnikDAO {
      * @param {string} tokenAddress attached FT address
      * @param {string} amount attached FT amount
      */
-    async proposeJobActivationFT(desc: string, jobId: number, tokenAddress: string, amount: string): Promise<void> {
+    async proposeJobActivationFT(desc: string, jobId: number, tokenAddress: string, amount: string): Promise<Tx> {
         const { multicall } = STORAGE.addresses;
         const token = new FungibleToken(tokenAddress);
 
@@ -513,8 +528,8 @@ class SputnikDAO {
             });
         }
 
-        // fire the add_proposal transaction
-        this.proposeFunctionCall(desc, tokenAddress, actions);
+        // return the add_proposal transaction
+        return this.proposeFunctionCall(desc, tokenAddress, actions);
     }
 }
 

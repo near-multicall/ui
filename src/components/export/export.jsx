@@ -2,16 +2,22 @@ import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { InputAdornment } from "@mui/material";
 import Icon from "@mui/material/Icon";
 import TextField from "@mui/material/TextField";
+import Radio from "@mui/material/Radio";
+import RadioGroup from "@mui/material/RadioGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormControl from "@mui/material/FormControl";
+import FormLabel from "@mui/material/FormLabel";
 import { Base64 } from "js-base64";
 import debounce from "lodash.debounce";
-import React, { Component } from "react";
+import { Component } from "react";
 import { Link } from "react-router-dom";
 
 import { ArgsAccount, ArgsBig, ArgsError, ArgsString } from "../../utils/args";
+import { Multicall } from "../../utils/contracts/multicall";
 import { errorMsg } from "../../utils/errors";
 import { STORAGE } from "../../utils/persistent";
-import { convert, toGas, toNEAR } from "../../utils/converter";
-import { view } from "../../utils/wallet";
+import { convert, toGas, toNEAR, toYocto } from "../../utils/converter";
+import { signAndSendTxs, view } from "../../utils/wallet";
 import { useWalletSelector } from "../../contexts/walletSelectorContext";
 import { TextInput, TextInputWithUnits } from "../editor/elements";
 import "./export.scss";
@@ -37,6 +43,8 @@ export class Export extends Component {
     };
 
     total = {
+        // Keep max gas below 270 Tgas, leaves a max of 30 Tgas for DAO operations if users vote with 300 Tgas.
+        // Keep max gas below 270 Tgas for jobs (croncat compatibility). See: https://github.com/CronCats/contracts/blob/cafd3caafb91b45abb6e811ce0fa2819980d6f96/manager/src/tasks.rs#L84
         gas: new ArgsBig("267.5", toGas("1"), toGas("270"), "Tgas"),
         depo: new ArgsBig(toNEAR("1"), "1", null, "NEAR"),
         desc: new ArgsString(""),
@@ -47,14 +55,17 @@ export class Export extends Component {
         token: new ArgsAccount(window.nearConfig.WNEAR_ADDRESS),
     };
 
-    attachNEAR = false;
-    attachFT = false;
-    showArgs = false;
-
     updateFTDebounced = debounce(() => this.updateFT(), 500);
 
     constructor(props) {
         super(props);
+
+        this.state = {
+            attachNEAR: false,
+            attachFT: false,
+            showArgs: false,
+            useJobs: false,
+        };
 
         this.update = this.update.bind(this);
 
@@ -81,8 +92,8 @@ export class Export extends Component {
     }
 
     toggleShowArgs() {
-        this.showArgs = !this.showArgs;
-        this.forceUpdate();
+        const { showArgs: oldValue } = this.state;
+        this.setState({ showArgs: !oldValue });
     }
 
     update() {
@@ -150,7 +161,9 @@ export class Export extends Component {
         }
         // normal propose multicall to DAO functionality
         else {
+            const { attachNEAR, attachFT, useJobs } = this.state;
             const { gas, depo, desc } = this.total;
+            const { token, amount } = this.ft;
             const errors = this.errors;
             // check if "propose" button is disabled
             const isProposeDisabled =
@@ -159,7 +172,7 @@ export class Export extends Component {
                 errors.depo.isBad ||
                 errors.desc.isBad ||
                 errors.hasErrors.isBad ||
-                (this.attachFT &&
+                (attachFT &&
                     (errors.amount.isBad ||
                         errors.token.isBad ||
                         errors.noToken.isBad ||
@@ -170,32 +183,69 @@ export class Export extends Component {
                 <button
                     className="propose button"
                     disabled={isProposeDisabled}
-                    onClick={() => {
-                        // multicall with attached FT
-                        if (this.attachFT)
-                            WALLET_COMPONENT.state.currentDAO.proposeMulticallFT(
-                                desc.value,
-                                multicallArgs,
-                                convert(gas.value, gas.unit),
-                                token.value,
-                                convert(amount.value, amount.unit, amount.decimals)
-                            );
-                        // multicall with attached NEAR
-                        else if (this.attachNEAR)
-                            WALLET_COMPONENT.state.currentDAO.proposeMulticall(
-                                desc.value,
-                                multicallArgs,
-                                convert(depo.value, depo.unit),
-                                convert(gas.value, gas.unit)
-                            );
-                        // attach NEAR disabled, ignore depo amount and attach 1 yocto.
-                        else
-                            WALLET_COMPONENT.state.currentDAO.proposeMulticall(
-                                desc.value,
-                                multicallArgs,
-                                "1",
-                                convert(gas.value, gas.unit)
-                            );
+                    onClick={async () => {
+                        const { currentDAO: dao } = WALLET_COMPONENT.state;
+                        // case 1: immediate execution => basic multicall
+                        if (!useJobs) {
+                            // multicall with attached FT
+                            if (attachFT) {
+                                const tx = await dao.proposeMulticallFT(
+                                    desc.value,
+                                    multicallArgs,
+                                    convert(gas.value, gas.unit),
+                                    token.value,
+                                    convert(amount.value, amount.unit, amount.decimals)
+                                );
+                                signAndSendTxs([tx]);
+                            }
+                            // multicall with attached NEAR
+                            else {
+                                const tx = await dao.proposeMulticall(
+                                    desc.value,
+                                    multicallArgs,
+                                    // if attach NEAR disabled, ignore depo amount and attach 1 yocto.
+                                    attachNEAR ? convert(depo.value, depo.unit) : "1",
+                                    convert(gas.value, gas.unit)
+                                );
+                                signAndSendTxs([tx]);
+                            }
+                        }
+                        // case2: scheduled execution => use jobs
+                        else {
+                            const multicallAddress = STORAGE.addresses.multicall;
+                            const temporary = new Multicall(multicallAddress);
+                            // multicall with attached FT
+                            if (attachFT) {
+                                console.log("multicall job with attached FT");
+                            }
+                            //    WALLET_COMPONENT.state.currentDAO.proposeMulticallFT(
+                            //        desc.value,
+                            //        multicallArgs,
+                            //        convert(gas.value, gas.unit),
+                            //        token.value,
+                            //        convert(amount.value, amount.unit, amount.decimals)
+                            //    );
+                            // multicall with attached NEAR
+                            else {
+                                console.log("multicall job with attached NEAR");
+                                const [jobCount, multicall] = await Promise.all([
+                                    temporary.getJobCount(),
+                                    Multicall.init(STORAGE.addresses.multicall),
+                                ]);
+                                const [addJobTx, proposeJobTx] = await Promise.all([
+                                    multicall.addJob([], new Date(), toGas("100"), toYocto("1")),
+                                    dao.proposeJobActivation("test job activation", jobCount, toYocto("1")),
+                                ]);
+                                signAndSendTxs([addJobTx, proposeJobTx]);
+                            }
+                            //    WALLET_COMPONENT.state.currentDAO.proposeMulticall(
+                            //        desc.value,
+                            //        multicallArgs,
+                            //        // if attach NEAR disabled, ignore depo amount and attach 1 yocto.
+                            //        attachNEAR ? convert(depo.value, depo.unit) : "1",
+                            //        convert(gas.value, gas.unit)
+                            //    );
+                        }
                     }}
                 >
                     {`Propose on ${STORAGE.addresses.dao}`}
@@ -207,7 +257,7 @@ export class Export extends Component {
 
     render() {
         const LAYOUT = this.props.layout; // ususally global parameter
-
+        const { attachNEAR, attachFT, showArgs } = this.state;
         const { gas, depo, desc } = this.total;
         const { amount, token } = this.ft;
 
@@ -235,7 +285,7 @@ export class Export extends Component {
             // toBase64 might throw on failure
             try {
                 multicallArgs = { calls: LAYOUT.toBase64() };
-                multicallArgsText = !this.attachFT
+                multicallArgsText = !attachFT
                     ? JSON.stringify(multicallArgs)
                     : JSON.stringify({
                           receiver_id: STORAGE.addresses.multicall,
@@ -270,28 +320,30 @@ export class Export extends Component {
                     <div className="attachment">
                         <p>Attach</p>
                         <button
-                            className={this.attachNEAR ? "selected" : ""}
+                            className={attachNEAR ? "selected" : ""}
                             onClick={() => {
-                                this.attachNEAR = !this.attachNEAR;
-                                this.attachFT = false;
-                                this.update();
+                                this.setState({
+                                    attachNEAR: !attachNEAR,
+                                    attachFT: false,
+                                });
                             }}
                         >
                             NEAR
                         </button>
                         <p>or</p>
                         <button
-                            className={this.attachFT ? "selected" : ""}
+                            className={attachFT ? "selected" : ""}
                             onClick={() => {
-                                this.attachNEAR = false;
-                                this.attachFT = !this.attachFT;
-                                this.update();
+                                this.setState({
+                                    attachNEAR: false,
+                                    attachFT: !attachFT,
+                                });
                             }}
                         >
                             fungible token
                         </button>
                     </div>
-                    {this.attachNEAR ? (
+                    {attachNEAR ? (
                         <TextInputWithUnits
                             label="Total attached deposit"
                             value={depo}
@@ -300,7 +352,7 @@ export class Export extends Component {
                             update={this.update}
                         />
                     ) : null}
-                    {this.attachFT ? (
+                    {attachFT ? (
                         <>
                             <TextInput
                                 label="Token address"
@@ -330,6 +382,29 @@ export class Export extends Component {
                             />
                         </>
                     ) : null}
+                    <FormControl>
+                        <FormLabel id="demo-radio-buttons-group-label">Execution:</FormLabel>
+                        <RadioGroup
+                            aria-labelledby="demo-radio-buttons-group-label"
+                            defaultValue="immediate"
+                            name="radio-buttons-group"
+                            onChange={(event, value) => {
+                                if (value === "immediate") this.setState({ useJobs: false });
+                                else if (value === "scheduled") this.setState({ useJobs: true });
+                            }}
+                        >
+                            <FormControlLabel
+                                value="immediate"
+                                control={<Radio />}
+                                label="Immediate"
+                            />
+                            <FormControlLabel
+                                value="scheduled"
+                                control={<Radio />}
+                                label="Scheduled"
+                            />
+                        </RadioGroup>
+                    </FormControl>
                 </div>
                 {/* Display cards' errors */}
                 {allErrors.length > 0 && (
@@ -361,12 +436,12 @@ export class Export extends Component {
                         <Icon
                             className="icon collapse"
                             onClick={() => this.toggleShowArgs()}
-                            collapsed={this.showArgs ? "no" : "yes"}
+                            collapsed={showArgs ? "no" : "yes"}
                         >
                             expand_more
                         </Icon>
                         <h3 onClick={() => this.toggleShowArgs()}>Multicall args</h3>
-                        {this.showArgs ? (
+                        {showArgs ? (
                             <Icon
                                 className="icon copy"
                                 onClick={(e) => {
@@ -380,7 +455,7 @@ export class Export extends Component {
                             <></>
                         )}
                     </div>
-                    {this.showArgs ? (
+                    {showArgs ? (
                         <div className="value">
                             <pre className="code">{multicallArgsText}</pre>
                         </div>

@@ -1,7 +1,8 @@
-import { viewAccount, viewState, view, tx } from "../wallet";
+import { viewAccount, viewState, view } from "../wallet";
 import { Big, toGas, dateToCron } from "../converter";
 
 import type { FunctionCallAction as daoFunctionCallAction } from "./sputnik-dao";
+import type { Tx } from "../wallet";
 
 const FACTORY_ADDRESS_SELECTOR: Record<string, string> = {
     mainnet: "v1.multicall.near",
@@ -18,6 +19,7 @@ const CONTRACT_CODE_HASHES_SELECTOR: Record<string, string[]> = {
     ],
 };
 
+// Storage key of job count used by the contract
 const KEY_JOB_COUNT: string = "g";
 
 // Schema for Multicall jobs
@@ -232,29 +234,31 @@ class Multicall {
      * @param totalBudget Total fee to be paid to Croncat agents.
      * @returns
      */
-    async addJob(
-        multicalls: MulticallArgs[],
-        triggerDate: Date,
-        triggerGas: string,
-        totalBudget: string
-    ): Promise<void> {
+    async addJob(multicalls: MulticallArgs[], triggerDate: Date, triggerGas: string, totalBudget: string): Promise<Tx> {
         // crontab in CronCat format. See: https://github.com/CronCats/Schedule
         const cadence: string = dateToCron(triggerDate);
         // timestamp as required by NEAR chain (UTC, in nanoseconds)
         const startAt: string = Big(triggerDate.getTime()).times("1000000").toFixed();
-        return tx(
-            this.address,
-            "job_add",
-            {
-                job_multicalls: multicalls,
-                job_cadence: cadence,
-                job_trigger_gas: triggerGas,
-                job_total_budget: totalBudget,
-                job_start_at: startAt,
-            },
-            toGas("25"),
-            this.jobBond
-        );
+        return {
+            receiverId: this.address,
+            actions: [
+                {
+                    type: "FunctionCall",
+                    params: {
+                        methodName: "job_add",
+                        args: {
+                            job_multicalls: multicalls,
+                            job_cadence: cadence,
+                            job_trigger_gas: triggerGas,
+                            job_total_budget: totalBudget,
+                            job_start_at: startAt,
+                        },
+                        gas: toGas("25"),
+                        deposit: this.jobBond,
+                    },
+                },
+            ],
+        };
     }
 }
 
