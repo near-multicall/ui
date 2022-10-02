@@ -1,0 +1,140 @@
+@use "sass/mixin";
+@use "sass/size";
+@use "sass/color";
+@use "sass/font";
+@use "sass/animation";
+
+.DaoPage {
+    @include mixin.page-wrapper;
+    display: flex;
+    flex-flow: column nowrap;
+
+    &-header {
+        @include mixin.center-items(space-between);
+        flex-flow: row nowrap;
+        flex-basis: calc(2 * size.$gap + 0.5 * size.$large-text);
+        flex-shrink: 0;
+        max-width: 120rem;
+        margin: 0 auto;
+
+        .DaoSearch {
+            @include mixin.center-items;
+            flex-flow: row nowrap;
+            width: auto;
+            height: 100%;
+
+            .MuiTextField-root {
+                width: calc(100% - 2 * size.$gap);
+                max-width: 100ch;
+                text-align: left;
+                margin: 0 size.$gap;
+
+                .MuiInputBase-root {
+                    font-size: size.$large-text;
+                    color: color.$darkish;
+
+                    input {
+                        padding: 0;
+                        padding-left: 0.5 * size.$gap;
+                    }
+
+                    &.Mui-error {
+                        color: darken(color.$red, 10%);
+                    }
+                }
+
+                fieldset {
+                    border: none;
+                    border-bottom: 2px solid currentColor;
+                    border-radius: 0;
+                }
+
+                p {
+                    display: none;
+                }
+            }
+
+            .MuiInputAdornment-root {
+                width: fit-content;
+
+                p {
+                    display: block !important;
+                    font-size: size.$large-text !important;
+                    color: color.$darkish;
+                }
+            }
+        }
+        form {
+            z-index: 1;
+        }
+    }
+
+    &::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: calc(2 * size.$gap + 0.5 * size.$large-text);
+        min-width: 100%;
+        background-color: color.$light;
+    }
+
+    &-body {
+        @include mixin.full;
+        gap: size.$gap;
+        padding: size.$gap;
+        max-width: 120rem;
+        max-height: calc(100% - 2 * size.$gap);
+
+        &.error {
+            display: flex;
+            flex-flow: column;
+            align-self: center;
+            justify-content: center;
+            align-items: center;
+            font-size: size.$text;
+
+            p.red {
+                color: color.$red;
+            }
+
+            p.green {
+                color: color.$green;
+            }
+
+            .Alert {
+                font-size: size.$text;
+                color: color.$dark;
+                max-width: 40em;
+
+                a {
+                    color: darken(color.$blue, 20%) !important;
+                }
+            }
+
+            .create-multicall {
+                width: fit-content;
+                align-self: center;
+                font-size: size.$text;
+                padding: 0.25em 0.75em;
+                border-radius: 0.5em;
+                background-color: color.$green;
+
+                &.proposal-exists {
+                    background-color: color.$blue !important;
+                }
+            }
+        }
+    }
+}
+
+.DaoPage-tabs-buttonsPanel {
+    justify-content: flex-start;
+    max-width: 120rem;
+    margin: size.$gap auto 0 auto;
+    padding: 0 size.$gap;
+}
+
+.DaoPage-tabs-contentSpace {
+    height: calc(100% - size.$gap - size.$Tabs-layout-buttonsPanel-height);
+}

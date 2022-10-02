@@ -1,8 +1,8 @@
-import { ArgsAccount, ArgsBig, ArgsJSON, ArgsString, ArgsError } from "../../utils/args-old";
-import Call from "../../utils/call";
-import { STORAGE } from "../../utils/persistent";
-import { toGas } from "../../utils/converter";
-import { errorMsg } from "../../utils/errors";
+import { ArgsAccount, ArgsBig, ArgsJSON, ArgsString, ArgsError } from "../../shared/lib/args-old";
+import Call from "../../shared/lib/call";
+import { STORAGE } from "../../shared/lib/persistent";
+import { toGas } from "../../shared/lib/converter";
+import { errorMsg } from "../../shared/lib/errors";
 import { BaseTask } from "../base";
 import "./ref-finance.scss";
 

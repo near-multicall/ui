@@ -3,18 +3,18 @@ import React from "react";
 
 import "./layout.scss";
 
-const NAMESPACE = "Tabs-layout";
+const _TabsLayout = "Tabs-layout";
 
 interface TabsLayoutButtonsPanelProps extends React.PropsWithChildren, React.HTMLAttributes<HTMLDivElement> {}
 
 const TabsLayoutButtonsPanel = ({ children, className }: TabsLayoutButtonsPanelProps) => (
-    <div className={clsx(`${NAMESPACE}-buttonsPanel`, className)}>{children}</div>
+    <div className={clsx(`${_TabsLayout}-buttonsPanel`, className)}>{children}</div>
 );
 
 interface TabsLayoutContentSpaceProps extends React.PropsWithChildren, React.HTMLAttributes<HTMLDivElement> {}
 
 const TabsLayoutContentSpace = ({ children, className }: TabsLayoutContentSpaceProps) => (
-    <div className={clsx(`${NAMESPACE}-contentSpace`, className)}>{children}</div>
+    <div className={clsx(`${_TabsLayout}-contentSpace`, className)}>{children}</div>
 );
 
 export interface TabsLayoutProps extends React.PropsWithChildren {
@@ -23,7 +23,7 @@ export interface TabsLayoutProps extends React.PropsWithChildren {
 }
 
 export const TabsLayout = ({ buttons, children, classes }: TabsLayoutProps) => (
-    <div className={clsx(`${NAMESPACE}-root`, classes?.root)}>
+    <div className={clsx(`${_TabsLayout}`, classes?.root)}>
         <TabsLayoutButtonsPanel className={classes?.buttonsPanel}>{buttons}</TabsLayoutButtonsPanel>
         <TabsLayoutContentSpace className={classes?.contentSpace}>{children}</TabsLayoutContentSpace>
     </div>

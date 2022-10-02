@@ -1,0 +1,7 @@
+@use "sass/size";
+
+.Tooltip {
+    &-title {
+        font-size: size.$small-text;
+    }
+}
