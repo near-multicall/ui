@@ -12,7 +12,7 @@ export interface TableRowProps {
 export const TableRow = ({ cells, headerCells }: TableRowProps) => (
     <>
         <MuiTableRow className={_TableRow}>
-            {(cells || headerCells).map((cell, index) => (
+            {(cells ?? headerCells).map((cell, index) => (
                 <TableCell key={index}>{cells ? cell : "No data"}</TableCell>
             ))}
         </MuiTableRow>
