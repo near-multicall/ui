@@ -9,9 +9,7 @@ import { PropsWithChildren } from "react";
 
 import "./dialog.scss";
 
-const _Dialog = "Dialog";
-
-interface DialogProps extends PropsWithChildren {
+export interface DialogProps extends PropsWithChildren {
     cancelRename?: string;
     className?: string;
     doneRename?: string;
@@ -23,6 +21,8 @@ interface DialogProps extends PropsWithChildren {
     open: boolean;
     title: string;
 }
+
+const _Dialog = "Dialog";
 
 export const Dialog = ({
     cancelRename,

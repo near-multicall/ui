@@ -13,9 +13,9 @@ import { ProposalStatus, SputnikDAO, SputnikUI } from "../../shared/lib/contract
 import { Big, toNEAR, toYocto } from "../../shared/lib/converter";
 import { STORAGE } from "../../shared/lib/persistent";
 import { view } from "../../shared/lib/wallet";
-import { Facet, Scrollable, Tabs } from "../../shared/ui/components";
-import { TextInput } from "../../widgets/editor/elements";
+import { Facet, Scrollable, Tabs, TextInput } from "../../shared/ui/components";
 import { TokensBalances } from "../../widgets/tokens-balances";
+
 import "./config/config.scss";
 import "./funds/funds.scss";
 import "./dao.scss";
@@ -489,7 +489,7 @@ export class DaoPage extends Component<Props, State> {
                             <div className={clsx("FundsTab", "DaoPage-body")}>
                                 <TokensBalances
                                     className="balances"
-                                    daoContracts={{ dao, multicall }}
+                                    contracts={{ dao, multicall }}
                                 />
                             </div>
                         ),
