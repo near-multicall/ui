@@ -13,7 +13,7 @@ export const TokensBalances = ({ className, daoContracts }: TokensBalancesProps)
 
     return (
         <Facet {...{ className }}>
-            <h1 className="title">Token Balances</h1>
+            <h1 className="title">Tokens balances</h1>
 
             {!nativeTokenBalance ?? !fungibleTokensBalances ? (
                 <div className="loader" />
