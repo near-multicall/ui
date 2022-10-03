@@ -2,7 +2,7 @@ import * as nearAPI from "near-api-js";
 import type { NetworkId } from "@near-wallet-selector/core";
 import { Component } from "react";
 
-import { Task, Layout } from "../../widgets";
+import { Task, Layout, Sidebar } from "../../widgets";
 
 type CardInfo = {
     call: object;
@@ -27,13 +27,10 @@ declare global {
         EXPORT: Component;
 
         LAYOUT: Layout;
-        SIDEBAR: Component;
+        SIDEBAR: Sidebar;
 
         // List of all mounted tasks
         TASKS: Array<Task>;
-
-        // Indicates what page is opened
-        PAGE: "app" | "dao";
 
         // Temporary storage for moving and cloning cards
         TEMP: CardInfo | null;

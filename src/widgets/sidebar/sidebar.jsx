@@ -36,6 +36,7 @@ export class Sidebar extends Component {
                 loadFromProposal: false,
                 clearAll: false,
             },
+            page: "app",
         };
     }
 
@@ -74,6 +75,14 @@ export class Sidebar extends Component {
     componentDidMount() {
         window.SIDEBAR = this;
         document.addEventListener("onaddressesupdated", () => this.featureFlagsCalc());
+    }
+
+    switchPage(to) {
+        this.setState({ page: to });
+    }
+
+    getPage() {
+        return this.state.page;
     }
 
     openDialog(name) {
@@ -154,7 +163,7 @@ export class Sidebar extends Component {
                     />
                     <hr />
 
-                    {window.PAGE === "app" ? (
+                    {this.state.page === "app" ? (
                         <>
                             <PopupMenu
                                 icon={<FileDownloadOutlined />}

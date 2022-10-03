@@ -474,7 +474,7 @@ export class AppPage extends Component {
     }
 
     componentDidMount() {
-        window.PAGE = "app";
+        window.SIDEBAR.switchPage("app");
         window.LAYOUT = this;
         STORAGE.load();
     }
