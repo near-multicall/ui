@@ -1,11 +1,12 @@
+import "@near-wallet-selector/modal-ui/styles.css";
 import ReactDOM from "react-dom";
 import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
+
 import { AppPage } from "./pages/app";
 import { DaoPage } from "./pages/dao/dao";
 import { Wallet } from "./entities";
+import { DialogsLayer, Sidebar } from "./widgets";
 import "./shared/lib/persistent";
-import "@near-wallet-selector/modal-ui/styles.css";
-import { Sidebar } from "./widgets";
 
 window.PAGE = "app";
 
@@ -29,6 +30,7 @@ ReactDOM.render(
                         <>
                             <Sidebar full={true} />
                             <AppPage />
+                            <DialogsLayer />
                         </>
                     }
                 />
@@ -39,6 +41,7 @@ ReactDOM.render(
                         <>
                             <Sidebar full={true} />
                             <DaoPage />
+                            <DialogsLayer />
                         </>
                     }
                 />

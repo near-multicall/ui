@@ -10,12 +10,12 @@ import { JobSchema, Multicall } from "../../shared/lib/contracts/multicall";
 import { toYocto, Big, toGas } from "../../shared/lib/converter";
 import { STORAGE } from "../../shared/lib/persistent";
 import type { ProposalOutput } from "../../shared/lib/contracts/sputnik-dao";
-import { Tabs } from "../../shared/ui/components";
-import { TextInput } from "../../widgets/editor";
+import { Tabs, TextInput } from "../../shared/ui/components";
 
 import { DaoFundsTab } from "./funds/funds";
 import { DaoJobsTab } from "./jobs/jobs";
 import { DaoConfigTab } from "./config/config";
+
 import "./dao.scss";
 
 // minimum balance a multicall instance needs for storage + state.

@@ -277,7 +277,7 @@ class ArgsError {
         return valid ? value : null;
     }
 
-    static useInstance = (message: string, validator?: (value: unknown) => boolean, isBad: boolean = true) => {
+    static useInstance = (message: string, validator?: (value: Args["value"]) => boolean, isBad: boolean = true) => {
         const [$detected, detected] = useReducer(
             (_currentValue: boolean, value: Error | boolean): boolean => Boolean(value),
             isBad
