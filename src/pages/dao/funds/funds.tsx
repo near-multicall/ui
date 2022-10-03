@@ -2,7 +2,7 @@ import clsx from "clsx";
 
 import { TokensBalances, type TokensBalancesProps } from "../../../widgets/tokens-balances";
 
-import "./tab.scss";
+import "./funds.scss";
 
 interface DaoFundsTabComponentProps extends TokensBalancesProps {}
 

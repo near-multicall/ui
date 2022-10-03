@@ -55,7 +55,7 @@ export class Column extends Component {
                                     {...provided.droppableProps}
                                 >
                                     {this.props.tasks.map((task, index) => (
-                                        <Task.Card
+                                        <Task
                                             key={hash(task, { algorithm: "md5", encoding: "base64" })}
                                             task={task}
                                             index={index}

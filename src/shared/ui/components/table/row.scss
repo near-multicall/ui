@@ -29,28 +29,32 @@
         background-color: color.$lightest;
     }
 
-    &--card {
+    &--mobile {
         display: flex;
         flex-direction: column;
-        gap: size.$gap;
-        border-radius: 16px;
-        padding: 16px;
+        gap: 0.25 * size.$gap;
+        border-radius: size.$task-radius;
+        padding: size.$gap;
         background-color: color.$light;
 
-        &-content {
+        & > div {
             display: flex;
             justify-content: space-between;
-            grid-template-columns: auto 100%;
-
-            > div:first-of-type {
-                white-space: nowrap;
+            align-items: center;
+            font-size: size.$text;
+            span:first-of-type {
+                font-weight: 800;
             }
-
-            > div:last-child {
-                width: 100%;
-                display: flex;
-                justify-content: flex-end;
-                align-items: center;
+            &:first-of-type {
+                margin-bottom: 0.5 * size.$gap;
+                & > span {
+                    &:first-of-type {
+                        display: none;
+                    }
+                    &:last-child {
+                        font-size: size.$large-text;
+                    }
+                }
             }
         }
     }

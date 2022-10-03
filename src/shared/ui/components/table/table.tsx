@@ -22,7 +22,7 @@ export const Table = ({ header, rows }: TableProps) => {
     return (
         <>
             {matches ? (
-                <div className="Table-column">
+                <div className="Table--mobile">
                     {rows &&
                         rows.map((cells, index) => (
                             <TableRowCard
@@ -44,7 +44,7 @@ export const Table = ({ header, rows }: TableProps) => {
                         </TableHead>
 
                         <TableBody>
-                            {(rows || header).map((cells, index) => (
+                            {(rows ?? header).map((cells, index) => (
                                 <TableRow
                                     headerCells={header}
                                     key={`row-${index}`}

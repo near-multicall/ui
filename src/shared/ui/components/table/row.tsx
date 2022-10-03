@@ -12,14 +12,14 @@ export interface TableRowProps {
 export const TableRow = ({ cells, headerCells }: TableRowProps) => (
     <>
         <MuiTableRow className={_TableRow}>
-            {(cells || headerCells).map((cell, index) => (
+            {(cells ?? headerCells).map((cell, index) => (
                 <TableCell key={index}>{cells ? cell : "No data"}</TableCell>
             ))}
         </MuiTableRow>
     </>
 );
 
-const _TableRowCard = `${_TableRow}--card`;
+const _TableRowCard = `${_TableRow}--mobile`;
 
 export const TableRowCard = ({ cells, headerCells }: TableRowProps) => (
     <div className={_TableRowCard}>
@@ -28,33 +28,9 @@ export const TableRowCard = ({ cells, headerCells }: TableRowProps) => (
                 className={`${_TableRowCard}-content`}
                 key={headerCellIndex}
             >
-                <Typography
-                    variant="inherit"
-                    component="div"
-                    fontSize="2rem"
-                    color="#000000"
-                >
-                    {headerCell}
-                </Typography>
-
-                <Typography
-                    component="div"
-                    fontSize="2rem"
-                >
-                    {cells ? cells[headerCellIndex] : "No data"}
-                </Typography>
+                <span>{headerCell}</span>
+                <span>{cells ? cells[headerCellIndex] : "No data"}</span>
             </div>
         ))}
     </div>
 );
-
-/*
-export interface TableRowProps extends TableRowDefaultProps, TableRowCardProps {}
-
-export const TableRow = (props: TableRowProps) => (
-    <>
-        <TableRow {...props} />
-        <TableRowCard {...props} />
-    </>
-);
-*/

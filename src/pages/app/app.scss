@@ -30,14 +30,14 @@
             @include tutorial;
             width: 28%;
             left: 15%;
-            background-image: url("../../shared/ui/components/icons/sequence.svg");
+            background-image: url("../../app/static/sequence.svg");
             background-position: left;
         }
         &[tutorial="no"]::before {
             @include tutorial;
             width: 28%;
             left: 15%;
-            background-image: url("../../shared/ui/components/icons/sequence.svg");
+            background-image: url("../../app/static/sequence.svg");
             background-position: left;
             opacity: 0;
             filter: blur(5px);
@@ -46,14 +46,14 @@
             @include tutorial;
             width: 35%;
             right: 15%;
-            background-image: url("../../shared/ui/components/icons/parallel.svg");
+            background-image: url("../../app/static/parallel.svg");
             background-position: right;
         }
         &[tutorial="no"]::after {
             @include tutorial;
             width: 35%;
             right: 15%;
-            background-image: url("../../shared/ui/components/icons/parallel.svg");
+            background-image: url("../../app/static/parallel.svg");
             background-position: right;
             opacity: 0;
             filter: blur(5px);

@@ -3,9 +3,9 @@ import clsx from "clsx";
 import type { HTMLProps } from "react";
 
 import { JobSchema } from "../../../shared/lib/contracts/multicall";
-import { Card, Scrollable } from "../../../shared/ui/components";
+import { Facet, Scrollable } from "../../../shared/ui/components";
 
-import "./tab.scss";
+import "./jobs.scss";
 
 const Job = ({ data: { croncat_hash, is_active, ...data } }: { data: JobSchema }) => (
     <div
@@ -27,7 +27,7 @@ const _DaoJobsTab = "DaoJobsTab";
 
 const DaoJobsTabComponent = ({ className, jobs }: DaoJobsTabComponentProps) => (
     <div className={clsx(_DaoJobsTab, className)}>
-        <Card className="JobsList">
+        <Facet className="JobsList">
             <AddOutlined />
             <h1 className="title">Jobs</h1>
             <Scrollable>
@@ -38,7 +38,7 @@ const DaoJobsTabComponent = ({ className, jobs }: DaoJobsTabComponentProps) => (
                     />
                 ))}
             </Scrollable>
-        </Card>
+        </Facet>
     </div>
 );
 

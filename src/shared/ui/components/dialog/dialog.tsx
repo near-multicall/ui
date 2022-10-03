@@ -53,7 +53,7 @@ export const Dialog = ({
                         onClose?.();
                     }}
                 >
-                    {cancelRename || "Cancel"}
+                    {cancelRename ?? "Cancel"}
                 </button>
             ) : null}
 
@@ -65,7 +65,7 @@ export const Dialog = ({
                     onClose?.();
                 }}
             >
-                {doneRename || "Done"}
+                {doneRename ?? "Done"}
             </button>
         </MUIDialogActions>
     </MUIDialog>

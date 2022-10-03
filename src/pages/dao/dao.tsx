@@ -3,8 +3,6 @@ import { Base64 } from "js-base64";
 import debounce from "lodash.debounce";
 import { Component, ContextType } from "react";
 
-import { Sidebar } from "../../widgets";
-import { TextInput } from "../../widgets/editor/elements";
 import { Wallet } from "../../entities";
 import { ArgsAccount, ArgsError } from "../../shared/lib/args";
 import { SputnikDAO, SputnikUI, ProposalStatus } from "../../shared/lib/contracts/sputnik-dao";
@@ -13,11 +11,12 @@ import { toYocto, Big, toGas } from "../../shared/lib/converter";
 import { STORAGE } from "../../shared/lib/persistent";
 import type { ProposalOutput } from "../../shared/lib/contracts/sputnik-dao";
 import { Tabs } from "../../shared/ui/components";
+import { TextInput } from "../../widgets/editor";
 
-import { DaoFundsTab } from "./funds/tab";
-import { DaoJobsTab } from "./jobs/tab";
-import { DaoConfigTab } from "./config/tab";
-import "./page.scss";
+import { DaoFundsTab } from "./funds/funds";
+import { DaoJobsTab } from "./jobs/jobs";
+import { DaoConfigTab } from "./config/config";
+import "./dao.scss";
 
 // minimum balance a multicall instance needs for storage + state.
 const MIN_INSTANCE_BALANCE = toYocto(1); // 1 NEAR
@@ -66,13 +65,14 @@ export class DaoPage extends Component<Props, State> {
     static contextType = Ctx;
     declare context: ContextType<typeof Ctx>;
 
-    fee;
-    lastAddr;
+    lastAddr: string = "";
+    // Multicall factory fee.
+    fee: string = "";
 
     errors: { [key: string]: ArgsError } = {
         address: new ArgsError(
             "Invalid NEAR address",
-            (value) => ArgsAccount.isValid(value),
+            (input) => ArgsAccount.isValid(`${input.value}.${SputnikDAO.FACTORY_ADDRESS}`),
             !ArgsAccount.isValid(STORAGE.addresses.dao)
         ),
         noDao: new ArgsError("Sputnik DAO not found on given address", (value) => this.errors.noDao.isBad),
@@ -367,7 +367,7 @@ export class DaoPage extends Component<Props, State> {
             return <div className="DaoPage-content error">Please sign in to continue</div>;
         }
 
-        const displayErrorsList = ["name", "noDao", "noContract"];
+        const displayErrorsList = ["address", "noDao", "noContract"];
 
         const displayErrors = Object.keys(this.errors)
             .filter((e) => this.errors[e].isBad && displayErrorsList.includes(e))
@@ -432,45 +432,40 @@ export class DaoPage extends Component<Props, State> {
     }
 
     componentDidMount(): void {
+        window.PAGE = "dao";
         document.addEventListener("onaddressesupdated", () => this.onAddressesUpdated());
     }
 
     render() {
-        window.PAGE = "dao";
-
         const { name } = this.state;
 
         return (
-            <>
-                <Sidebar full={true} />
-
-                <div className="DaoPage">
-                    <div className="DaoPage-header">
-                        <div className="DaoSearch">
-                            <TextInput
-                                placeholder="Insert DAO name here"
-                                value={name}
-                                error={this.errors.address}
-                                update={() => {
-                                    const fullDaoAddr = `${name.value}.${SputnikDAO.FACTORY_ADDRESS}`;
-                                    const daoAccount = new ArgsAccount(fullDaoAddr);
-                                    if (daoAccount.isValid()) {
-                                        this.loadInfoDebounced();
-                                    }
-                                    this.forceUpdate();
-                                }}
-                                InputProps={{
-                                    endAdornment: (
-                                        <InputAdornment position="end">{`.${SputnikDAO.FACTORY_ADDRESS}`}</InputAdornment>
-                                    ),
-                                }}
-                            />
-                        </div>
+            <div className="DaoPage">
+                <div className="DaoPage-header">
+                    <div className="DaoSearch">
+                        <TextInput
+                            placeholder="Insert DAO name here"
+                            value={name}
+                            error={this.errors.address}
+                            update={() => {
+                                const fullDaoAddr = `${name.value}.${SputnikDAO.FACTORY_ADDRESS}`;
+                                const daoAccount = new ArgsAccount(fullDaoAddr);
+                                if (daoAccount.isValid()) {
+                                    this.loadInfoDebounced();
+                                }
+                                this.forceUpdate();
+                            }}
+                            InputProps={{
+                                endAdornment: (
+                                    <InputAdornment position="end">{`.${SputnikDAO.FACTORY_ADDRESS}`}</InputAdornment>
+                                ),
+                            }}
+                        />
                     </div>
-
-                    {this.getContent()}
                 </div>
-            </>
+
+                {this.getContent()}
+            </div>
         );
     }
 }

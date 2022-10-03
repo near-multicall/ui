@@ -40,7 +40,7 @@ button {
 
 .disabled {
     background-color: color.$darkest !important;
-    color: rgba(232, 230, 227, 0.3);
+    color: rgba(color.$light-text, 0.3);
     cursor: not-allowed !important;
 }
 

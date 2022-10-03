@@ -1,4 +1,4 @@
-import { fungibleTokensBalancesRender } from "./ui/balances";
+import { fungibleTokensBalancesRender } from "./ui/ft-balances";
 
 export class FungibleToken {
     static allBalancesRender = fungibleTokensBalancesRender;

@@ -10,9 +10,9 @@ import { Icon } from "@mui/material";
 import { Component } from "react";
 import { NavLink } from "react-router-dom";
 
-import Discord from "../../shared/ui/components/icons/discord.svg";
-import Github from "../../shared/ui/components/icons/github.svg";
-import Twitter from "../../shared/ui/components/icons/twitter.svg";
+import Discord from "../../app/static/discord.svg";
+import Github from "../../app/static/github.svg";
+import Twitter from "../../app/static/twitter.svg";
 import { Wallet } from "../../entities/wallet";
 import { STORAGE } from "../../shared/lib/persistent";
 import { viewAccount } from "../../shared/lib/wallet";
@@ -56,7 +56,6 @@ export class Sidebar extends Component {
 
     componentDidMount() {
         window.SIDEBAR = this;
-
         document.addEventListener("onaddressesupdated", () => this.forceUpdate());
     }
 

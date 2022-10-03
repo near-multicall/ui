@@ -5,9 +5,9 @@ import type { HTMLProps } from "react";
 import { ArgsAccount } from "../../../shared/lib/args";
 import { Multicall } from "../../../shared/lib/contracts/multicall";
 import { toNEAR } from "../../../shared/lib/converter";
-import { Card } from "../../../shared/ui/components";
+import { Facet } from "../../../shared/ui/components";
 
-import "./tab.scss";
+import "./config.scss";
 
 const Link = ({ address, deleteIcon = false }: { address: string; deleteIcon?: boolean }) => {
     const addr = new ArgsAccount(address);
@@ -36,7 +36,7 @@ const _DaoConfigTab = "DaoConfigTab";
 
 const DaoConfigTabComponent = ({ className, contracts: { multicall } }: DaoConfigTabComponentProps) => (
     <div className={clsx(_DaoConfigTab, className)}>
-        <Card className="AdminsList">
+        <Facet className="AdminsList">
             <AddOutlined />
             <h1 className="title">Admins</h1>
 
@@ -47,9 +47,9 @@ const DaoConfigTabComponent = ({ className, contracts: { multicall } }: DaoConfi
                     </li>
                 ))}
             </ul>
-        </Card>
+        </Facet>
 
-        <Card className="TokenWhitelist">
+        <Facet className="TokenWhitelist">
             <h1 className="title">Whitelisted Tokens</h1>
 
             <ul className="list">
@@ -59,14 +59,14 @@ const DaoConfigTabComponent = ({ className, contracts: { multicall } }: DaoConfi
                     </li>
                 ))}
             </ul>
-        </Card>
+        </Facet>
 
-        <Card className="JobBond">
+        <Facet className="JobBond">
             <h1 className="JobBond-title title">
                 Job Bond
                 <span>{`${multicall.jobBond !== "" ? toNEAR(multicall.jobBond) : "..."} Ⓝ`}</span>
             </h1>
-        </Card>
+        </Facet>
     </div>
 );
 
