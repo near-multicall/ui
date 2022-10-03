@@ -52,7 +52,7 @@ export class AppPage extends Component {
 
     deleteTask = (taskId) => {
         const layout = STORAGE.layout;
-        const { columnId, taskIndex } = Layout.findTaskCoordinates(taskId);
+        const { columnId, taskIndex } = AppPage.findTaskCoordinates(taskId);
 
         if (columnId == undefined || taskIndex == undefined) {
             console.error("Task not found");
@@ -80,7 +80,7 @@ export class AppPage extends Component {
 
     duplicateTask = (taskId) => {
         const layout = STORAGE.layout;
-        const { columnId, taskIndex } = Layout.findTaskCoordinates(taskId);
+        const { columnId, taskIndex } = AppPage.findTaskCoordinates(taskId);
 
         if (columnId == undefined || taskIndex == undefined) {
             console.error("Task not found");
