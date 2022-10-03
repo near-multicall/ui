@@ -6,6 +6,7 @@ import debounce from "lodash.debounce";
 import { Component, ContextType } from "react";
 
 import { args } from "../../../shared/lib/args/args";
+import { fields } from "../../../shared/lib/args/args-types/args-object";
 import { SputnikDAO } from "../../../shared/lib/contracts/sputnik-dao";
 import { Big, toGas } from "../../../shared/lib/converter";
 import { STORAGE } from "../../../shared/lib/persistent";
@@ -22,10 +23,6 @@ enum Color {
 interface Props {}
 
 interface State {
-    formData: {
-        user: string;
-        dao: string;
-    };
     currentDao: SputnikDAO;
     expanded: {
         user: boolean;
@@ -81,17 +78,13 @@ export class WalletComponent extends Component<Props, State> {
         400
     );
 
-    constructor(props: Props) {
+    constructor(props: Props, context: ContextType<typeof WalletComponent.contextType>) {
         super(props);
 
-        const { accountId } = this.context!;
+        const { accountId } = context!;
         STORAGE.setAddresses({ user: accountId ?? "" });
 
         this.state = {
-            formData: {
-                user: accountId ?? "",
-                dao: STORAGE.addresses.dao,
-            },
             currentDao: new SputnikDAO(STORAGE.addresses.dao),
             expanded: {
                 user: false,
@@ -100,7 +93,10 @@ export class WalletComponent extends Component<Props, State> {
             color: Color.WHITE,
         };
 
-        this.schema.check(this.state.formData);
+        this.schema.check({
+            user: accountId,
+            dao: STORAGE.addresses.dao,
+        });
 
         window.WALLET_COMPONENT = this;
         if (accountId) {
@@ -114,20 +110,13 @@ export class WalletComponent extends Component<Props, State> {
         }
     }
 
-    setFormData(newFormData: State["formData"], callback?: () => void | undefined) {
-        this.setState(
-            {
-                formData: {
-                    ...this.state.formData,
-                    ...newFormData,
-                },
-            },
-            callback
-        );
-    }
-
     toMulticallAddress(addr: string): string {
-        return args.string().ensure().intoBaseAddress().append(window.nearConfig.MULTICALL_FACTORY_ADDRESS).cast(addr);
+        return args
+            .string()
+            .ensure()
+            .intoBaseAddress()
+            .append("." + window.nearConfig.MULTICALL_FACTORY_ADDRESS)
+            .cast(addr);
     }
 
     signIn() {
@@ -239,60 +228,33 @@ export class WalletComponent extends Component<Props, State> {
         tx(dao, "add_proposal", args, toGas("15"), proposal_bond);
     }
 
-    connectDao(dao: SputnikDAO["address"]) {
+    connectDao(dao: string) {
         const { accountId } = this.context!;
-
-        const { noDao, noRights, noContract } = this.errors;
-
-        noRights.isBad = false;
-        noDao.isBad = false;
-        noContract.isBad = false;
-
-        const multicall = dao.replace(SputnikDAO.FACTORY_ADDRESS, window.nearConfig.MULTICALL_FACTORY_ADDRESS);
+        const { noDao, noMulticall } = fields(this.schema, "dao");
 
         Promise.all([
             SputnikDAO.init(dao).catch(() => {
                 // return non-initialized DAO obj as ready = false per default.
                 return new SputnikDAO(dao);
             }),
-            view(multicall, "get_admins", {}).catch((e) => {
-                if (
-                    (e.type === "AccountDoesNotExist" && e.toString().includes(` ${multicall} `)) ||
-                    (e.type === "CodeDoesNotExist" && e.toString().includes(`${multicall}`)) ||
-                    e.toString().includes("MethodNotFound")
-                )
-                    noContract.isBad = true;
-                else console.error(e, { ...e });
-
-                window.MENU?.forceUpdate();
-            }),
+            this.schema.check({ dao }),
         ])
-            .then(([initializedDAO, admins]) => {
-                if (!initializedDAO?.ready) {
-                    noDao.isBad = true;
-                    window.MENU?.forceUpdate();
-                    return;
-                }
+            .then(([newDao]) => {
+                if (!newDao?.ready) return;
 
                 this.setState({
-                    currentDao: initializedDAO,
+                    currentDao: newDao,
                 });
 
-                // can user propose FunctionCall to DAO?
-                const canPropose = initializedDAO.checkUserPermission(accountId, "AddProposal", "FunctionCall");
-
-                if (!canPropose) noRights.isBad = true; // no add proposal rights
-
-                window.MENU?.forceUpdate();
+                this.schema.check({ user: accountId });
             })
             .finally(() => {
                 let color = Color.RED;
+                if (!noDao.isBad()) color = Color.YELLOW;
+                if (!noMulticall.isBad()) color = Color.WHITE;
 
-                if (ArgsAccount.isValid(dao) && !noDao.isBad) color = Color.YELLOW;
-
-                if (!noContract.isBad) color = Color.WHITE;
-
-                this.setState({ color: color });
+                this.setState({ color });
+                window.MENU?.forceUpdate();
             });
     }
 
@@ -318,18 +280,24 @@ export class WalletComponent extends Component<Props, State> {
         });
     }
 
-    daoSearch(newValue) {
+    daoSearch(newDao: string) {
         STORAGE.setAddresses({}); // hack: empty setAddresses call to invoke callbacks
-        if (newValue !== undefined && ArgsAccount.isValid(newValue)) {
-            this.connectDao(newValue);
+        if (args.string().address().isValidSync(newDao)) {
+            this.connectDao(newDao);
         } else {
-            this.setState({ color: newValue === "" ? Color.WHITE : Color.RED });
+            this.setState({ color: newDao === "" ? Color.WHITE : Color.RED });
         }
     }
 
     render() {
         const { selector: walletSelector, accountId } = this.context!;
-        const { expanded, color } = this.state;
+        const { expanded, color: enumColor } = this.state;
+
+        const color = {
+            [`${Color.WHITE}`]: "",
+            [`${Color.YELLOW}`]: "yellow",
+            [`${Color.RED}`]: "red",
+        }[enumColor];
 
         if (!walletSelector) return null;
 
@@ -392,11 +360,8 @@ export class WalletComponent extends Component<Props, State> {
                             )}
                             onInputChange={(e, newValue) => {
                                 // set STORAGE.addresses to have no delay, thus no rubber banding
-                                STORAGE.addresses.dao = newValue ?? "";
-                                STORAGE.addresses.multicall = newValue?.replace(
-                                    SputnikDAO.FACTORY_ADDRESS,
-                                    window.nearConfig.MULTICALL_FACTORY_ADDRESS
-                                );
+                                STORAGE.addresses.dao = newValue;
+                                STORAGE.addresses.multicall = this.toMulticallAddress(newValue);
                                 this.daoSearchDebounced(newValue);
                             }}
                         />

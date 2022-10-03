@@ -125,7 +125,12 @@ export class DaoPage extends Component<Props, State> {
     }
 
     toMulticallAddress(addr: string): string {
-        return args.string().ensure().intoBaseAddress().append(window.nearConfig.MULTICALL_FACTORY_ADDRESS).cast(addr);
+        return args
+            .string()
+            .ensure()
+            .intoBaseAddress()
+            .append("." + window.nearConfig.MULTICALL_FACTORY_ADDRESS)
+            .cast(addr);
     }
 
     /**
@@ -396,8 +401,7 @@ export class DaoPage extends Component<Props, State> {
     confidentlyLoadOnlyDaoInfo() {
         const { addr } = this.state.formData;
 
-        const baseAddresss = args.string().intoBaseAddress().cast(addr);
-        const multicallAddress = `${baseAddresss}.${window.nearConfig.MULTICALL_FACTORY_ADDRESS}`;
+        const multicallAddress = this.toMulticallAddress(addr);
 
         this.setState({ loading: true });
 
@@ -433,8 +437,7 @@ export class DaoPage extends Component<Props, State> {
     confidentlyLoadInfo() {
         const { addr } = this.state.formData;
 
-        const baseAddresss = args.string().ensure().intoBaseAddress().cast(addr);
-        const multicallAddress = `${baseAddresss}.${window.nearConfig.MULTICALL_FACTORY_ADDRESS}`;
+        const multicallAddress = this.toMulticallAddress(addr);
 
         this.setState({ loading: true });
 
