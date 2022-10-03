@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Draggable } from "react-beautiful-dnd";
 
-import { Family } from "../../../families/index.js";
+import { Family } from "../../../families";
 import "./task.scss";
 
 /* TODO: Decompose model and view */

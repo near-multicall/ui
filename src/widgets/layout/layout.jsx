@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import { Column } from "../column/column.jsx";
 import { Menu } from "../menu/menu.jsx";
-import { initialData } from "../../initial-data.js";
+import { initialData } from "../../initial-data";
 import { Base64 } from "js-base64";
 import { STORAGE } from "../../shared/lib/persistent";
 import "./layout.scss";
