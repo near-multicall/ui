@@ -1,27 +1,74 @@
 import { Icon } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
+import { Base64 } from "js-base64";
 import debounce from "lodash.debounce";
-import { Component } from "react";
+import { Component, ContextType } from "react";
 
-import { ArgsAccount, ArgsError } from "../../../shared/lib/args-old";
+import { args } from "../../../shared/lib/args/args";
 import { SputnikDAO } from "../../../shared/lib/contracts/sputnik-dao";
 import { Big, toGas } from "../../../shared/lib/converter";
-import { errorMsg } from "../../../shared/lib/errors";
 import { STORAGE } from "../../../shared/lib/persistent";
 import { tx, view } from "../../../shared/lib/wallet";
 import { useWalletSelector } from "./providers";
 import "./wallet.scss";
 
-/* TODO: Decompose code */
-export class WalletComponent extends Component {
-    static contextType = useWalletSelector();
+enum Color {
+    WHITE,
+    YELLOW,
+    RED,
+}
 
-    errors = {
-        noDao: new ArgsError(errorMsg.ERR_NO_DAO_ON_ADDR, (value) => this.errors.noDao.isBad),
-        noRights: new ArgsError(errorMsg.ERR_CANNOT_PROPOSE_TO_DAO, (value) => this.errors.noRights),
-        noContract: new ArgsError(errorMsg.ERR_DAO_HAS_NO_MTCL, (value) => this.errors.noContract.isBad),
+interface Props {}
+
+interface State {
+    formData: {
+        user: string;
+        dao: string;
     };
+    currentDao: SputnikDAO;
+    expanded: {
+        user: boolean;
+        dao: boolean;
+    };
+    color: Color;
+}
+
+/* TODO: Decompose code */
+export class WalletComponent extends Component<Props, State> {
+    static contextType = useWalletSelector();
+    declare context: ContextType<typeof WalletComponent.contextType>;
+
+    schema = args
+        .object()
+        .shape({
+            user: args
+                .string()
+                .address()
+                .test({
+                    name: "hasPermission",
+                    message: "User does not have required permissions on this dao",
+                    test: (value) =>
+                        value == null ||
+                        this.state.currentDao.checkUserPermission(value, "AddProposal", "FunctionCall"),
+                })
+                .retain(),
+            dao: args
+                .object()
+                .shape({
+                    noDao: args.string().sputnikDao().retain({ initial: true }),
+                    noMulticall: args.string().multicall().retain({
+                        customMessage: "DAO does not have a multicall instance",
+                        initial: true,
+                    }),
+                })
+                .transform((_, addr) => ({
+                    noAddress: addr,
+                    noMulticall: this.toMulticallAddress(addr),
+                }))
+                .retain(),
+        })
+        .retain();
 
     daoList = [];
 
@@ -34,19 +81,27 @@ export class WalletComponent extends Component {
         400
     );
 
-    constructor(props, context) {
-        super(props, context);
+    constructor(props: Props) {
+        super(props);
+
+        const { accountId } = this.context!;
+        STORAGE.setAddresses({ user: accountId ?? "" });
 
         this.state = {
-            currentDAO: new SputnikDAO(STORAGE.addresses.dao),
+            formData: {
+                user: accountId ?? "",
+                dao: STORAGE.addresses.dao,
+            },
+            currentDao: new SputnikDAO(STORAGE.addresses.dao),
             expanded: {
                 user: false,
                 dao: false || STORAGE.addresses.dao === "",
             },
+            color: Color.WHITE,
         };
 
-        const { accountId } = context;
-        STORAGE.setAddresses({ user: accountId });
+        this.schema.check(this.state.formData);
+
         window.WALLET_COMPONENT = this;
         if (accountId) {
             const URL = `https://api.${
@@ -54,18 +109,34 @@ export class WalletComponent extends Component {
             }app.astrodao.com/api/v1/daos/account-daos/${accountId}`;
             fetch(URL)
                 .then((response) => response.json())
-                .then((data) => (this.daoList = data.map((dao) => dao.id)))
+                .then((data) => (this.daoList = data.map((dao: { id: number }) => dao.id)))
                 .then(() => this.forceUpdate());
         }
     }
 
+    setFormData(newFormData: State["formData"], callback?: () => void | undefined) {
+        this.setState(
+            {
+                formData: {
+                    ...this.state.formData,
+                    ...newFormData,
+                },
+            },
+            callback
+        );
+    }
+
+    toMulticallAddress(addr: string): string {
+        return args.string().ensure().intoBaseAddress().append(window.nearConfig.MULTICALL_FACTORY_ADDRESS).cast(addr);
+    }
+
     signIn() {
-        const { modal } = this.context;
+        const { modal } = this.context!;
         modal.show();
     }
 
     async signOut() {
-        const { selector } = this.context;
+        const { selector } = this.context!;
         const wallet = await selector.wallet();
 
         wallet.signOut().catch((err) => {
@@ -74,7 +145,7 @@ export class WalletComponent extends Component {
         });
     }
 
-    propose(desc, depo, gas) {
+    propose(desc: string, depo: string, gas: string) {
         const { multicall, dao } = STORAGE.addresses;
 
         const args = {
@@ -86,7 +157,7 @@ export class WalletComponent extends Component {
                         actions: [
                             {
                                 method_name: "multicall",
-                                args: Base64.encode(JSON.stringify({ calls: LAYOUT.toBase64() })),
+                                args: Base64.encode(JSON.stringify({ calls: window.LAYOUT.toBase64() })),
                                 deposit: `${depo}`,
                                 gas: `${gas}`,
                             },
@@ -96,7 +167,7 @@ export class WalletComponent extends Component {
             },
         };
 
-        const { proposal_bond } = this.state.currentDAO.policy;
+        const { proposal_bond } = this.state.currentDao.policy;
 
         tx(dao, "add_proposal", args, toGas("15"), proposal_bond);
     }
@@ -109,7 +180,7 @@ export class WalletComponent extends Component {
      * @param {string} token attached FT address
      * @param {string} amount attached FT amount
      */
-    async proposeFT(desc, gas, token, amount) {
+    async proposeFT(desc: string, gas: string, token: string, amount: string) {
         const { multicall, dao } = STORAGE.addresses;
 
         const args = {
@@ -128,7 +199,7 @@ export class WalletComponent extends Component {
                                         msg: JSON.stringify({
                                             function_id: "multicall",
                                             args: Base64.encode(
-                                                JSON.stringify({ calls: LAYOUT.toBase64() }).toString()
+                                                JSON.stringify({ calls: window.LAYOUT.toBase64() }).toString()
                                             ),
                                         }).toString(),
                                     })
@@ -163,13 +234,13 @@ export class WalletComponent extends Component {
             });
         }
 
-        const { proposal_bond } = this.state.currentDAO.policy;
+        const { proposal_bond } = this.state.currentDao.policy;
 
         tx(dao, "add_proposal", args, toGas("15"), proposal_bond);
     }
 
     connectDao(dao: SputnikDAO["address"]) {
-        const { accountId } = this.context;
+        const { accountId } = this.context!;
 
         const { noDao, noRights, noContract } = this.errors;
 
@@ -204,7 +275,7 @@ export class WalletComponent extends Component {
                 }
 
                 this.setState({
-                    currentDAO: initializedDAO,
+                    currentDao: initializedDAO,
                 });
 
                 // can user propose FunctionCall to DAO?
@@ -215,11 +286,11 @@ export class WalletComponent extends Component {
                 window.MENU?.forceUpdate();
             })
             .finally(() => {
-                let color = "red";
+                let color = Color.RED;
 
-                if (ArgsAccount.isValid(dao) && !noDao.isBad) color = "yellow";
+                if (ArgsAccount.isValid(dao) && !noDao.isBad) color = Color.YELLOW;
 
-                if (!noContract.isBad) color = "";
+                if (!noContract.isBad) color = Color.WHITE;
 
                 this.setState({ color: color });
             });
@@ -252,12 +323,12 @@ export class WalletComponent extends Component {
         if (newValue !== undefined && ArgsAccount.isValid(newValue)) {
             this.connectDao(newValue);
         } else {
-            this.setState({ color: newValue === "" ? "" : "red" });
+            this.setState({ color: newValue === "" ? Color.WHITE : Color.RED });
         }
     }
 
     render() {
-        const { selector: walletSelector, accountId } = this.context;
+        const { selector: walletSelector, accountId } = this.context!;
         const { expanded, color } = this.state;
 
         if (!walletSelector) return null;

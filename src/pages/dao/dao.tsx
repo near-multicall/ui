@@ -63,7 +63,7 @@ export class DaoPage extends Component<Props, State> {
                 .transform((_, addr) => ({
                     noAddress: addr,
                     noDao: addr,
-                    noMulticall: `${this.getBaseAddress(addr)}.${window.nearConfig.MULTICALL_FACTORY_ADDRESS}`,
+                    noMulticall: this.toMulticallAddress(addr),
                 }))
                 .retain(),
         })
@@ -86,7 +86,7 @@ export class DaoPage extends Component<Props, State> {
             },
 
             dao: new SputnikDAO(addr),
-            multicall: new Multicall(`${this.getBaseAddress(addr)}.${window.nearConfig.MULTICALL_FACTORY_ADDRESS}`),
+            multicall: new Multicall(this.toMulticallAddress(addr)),
 
             loading: false,
             proposed: -1,
@@ -122,6 +122,10 @@ export class DaoPage extends Component<Props, State> {
             },
             callback
         );
+    }
+
+    toMulticallAddress(addr: string): string {
+        return args.string().ensure().intoBaseAddress().append(window.nearConfig.MULTICALL_FACTORY_ADDRESS).cast(addr);
     }
 
     /**
@@ -163,29 +167,10 @@ export class DaoPage extends Component<Props, State> {
     onAddressesUpdated(e: CustomEvent<{ dao: string }>) {
         if (e.detail.dao !== this.state.formData.addr) {
             this.setState({
-                multicall: new Multicall(
-                    `${this.getBaseAddress(e.detail.dao)}.${window.nearConfig.MULTICALL_FACTORY_ADDRESS}`
-                ),
+                multicall: new Multicall(this.toMulticallAddress(e.detail.dao)),
             });
             this.formikSetValues?.({ addr: e.detail.dao });
         }
-    }
-
-    getBaseAddress(address: string) {
-        return args
-            .string()
-            .address()
-            .transform((value) => {
-                let base;
-                if (value.endsWith("." + SputnikDAO.FACTORY_ADDRESS))
-                    base = value.split("." + SputnikDAO.FACTORY_ADDRESS)[0];
-                else if (value.endsWith("." + window.nearConfig.MULTICALL_FACTORY_ADDRESS))
-                    base = value.split("." + window.nearConfig.MULTICALL_FACTORY_ADDRESS)[0];
-                else base = value;
-
-                return base;
-            })
-            .cast(address);
     }
 
     createMulticall() {
@@ -411,7 +396,7 @@ export class DaoPage extends Component<Props, State> {
     confidentlyLoadOnlyDaoInfo() {
         const { addr } = this.state.formData;
 
-        const baseAddresss = this.getBaseAddress(addr);
+        const baseAddresss = args.string().intoBaseAddress().cast(addr);
         const multicallAddress = `${baseAddresss}.${window.nearConfig.MULTICALL_FACTORY_ADDRESS}`;
 
         this.setState({ loading: true });
@@ -448,7 +433,7 @@ export class DaoPage extends Component<Props, State> {
     confidentlyLoadInfo() {
         const { addr } = this.state.formData;
 
-        const baseAddresss = this.getBaseAddress(addr);
+        const baseAddresss = args.string().ensure().intoBaseAddress().cast(addr);
         const multicallAddress = `${baseAddresss}.${window.nearConfig.MULTICALL_FACTORY_ADDRESS}`;
 
         this.setState({ loading: true });

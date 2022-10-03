@@ -12,6 +12,8 @@ declare module "yup" {
         sputnikDao(message?: string): this;
         multicall(message?: string): this;
         intoUrl(): this;
+        intoBaseAddress(prefixes?: string[]): this;
+        append(appendStr: string): this;
     }
 }
 
@@ -100,6 +102,32 @@ addMethod(_StringSchema, "multicall", function multicall(message = locale.string
 // transfrom address into URL
 addMethod(_StringSchema, "intoUrl", function intoUrl() {
     return this.address().transform((value) => `https://explorer.${window.NEAR_ENV}.near.org/accounts/${value}`);
+});
+
+// transform address into base address
+addMethod(
+    _StringSchema,
+    "intoBaseAddress",
+    function intoBaseAddress(
+        postfixes: string[] = [SputnikDAO.FACTORY_ADDRESS, window.nearConfig.MULTICALL_FACTORY_ADDRESS]
+    ) {
+        return this.address().transform((value) => {
+            let res = value;
+            for (let pf of postfixes) {
+                if (value.endsWith("." + pf)) {
+                    const base = value.split("." + pf)[0];
+                    if (base.length < res.length) res = base;
+                }
+            }
+            return res;
+        });
+    }
+);
+
+// !!! although not starting with "into", this is a mutating function !!!
+// append string
+addMethod(_StringSchema, "append", function append(appendStr: string) {
+    return this.transform((value) => `${value}${appendStr}`);
 });
 
 addErrorMethods(_StringSchema);
