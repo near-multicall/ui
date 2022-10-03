@@ -8,20 +8,20 @@ interface TokensBalancesProps {
 }
 
 export const TokensBalances = ({ className, daoContracts }: TokensBalancesProps) => {
-    const nativeTokenBalance = NativeToken.balancesRender({ daoContracts }),
+    const nativeTokenBalances = NativeToken.balancesRender({ daoContracts }),
         fungibleTokensBalances = FungibleToken.allBalancesRender({ daoContracts });
 
     return (
         <Facet {...{ className }}>
             <h1 className="title">Tokens balances</h1>
 
-            {!nativeTokenBalance ?? !fungibleTokensBalances ? (
+            {!nativeTokenBalances ?? !fungibleTokensBalances ? (
                 <div className="loader" />
             ) : (
                 <Scrollable>
                     <Table
                         header={["Token", "Multicall", "DAO", "Total"]}
-                        rows={[nativeTokenBalance].concat(fungibleTokensBalances)}
+                        rows={[nativeTokenBalances].concat(fungibleTokensBalances)}
                     />
                 </Scrollable>
             )}
