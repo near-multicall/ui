@@ -1,7 +1,7 @@
 import { TokenLabel } from "../../../shared/ui/components";
 import type { DaoContracts } from "../../types";
 import { FungibleTokenFormat } from "../lib/format";
-import { FungibleTokenBalancesModel } from "../model/fungible-token";
+import { FungibleTokenBalancesModel } from "../model/fungible-token-balances";
 
 interface FungibleTokensBalancesRenderProps {
     daoContracts: DaoContracts;
