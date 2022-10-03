@@ -30,10 +30,10 @@ const nearTokenDataFx = async ({ dao, multicall }: DaoContracts, callback: (data
     });
 };
 
-const useNearTokenData = (daoContracts: DaoContracts) => {
+const useNearTokenData = (contracts: DaoContracts) => {
     const [state, stateUpdate] = useState<NearTokenData>({ data: null, loading: true });
 
-    useEffect(() => void nearTokenDataFx(daoContracts, stateUpdate), []);
+    useEffect(() => void nearTokenDataFx(contracts, stateUpdate), []);
 
     return state;
 };

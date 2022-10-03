@@ -1,11 +1,4 @@
-import {
-    DeleteForeverOutlined,
-    FileDownloadOutlined,
-    FileUploadOutlined,
-    PreviewOutlined,
-    ScienceOutlined,
-} from "@mui/icons-material";
-
+import { DeleteForeverOutlined, FileDownloadOutlined, FileUploadOutlined, ScienceOutlined } from "@mui/icons-material";
 import { Icon } from "@mui/material";
 import { Component } from "react";
 import { NavLink } from "react-router-dom";

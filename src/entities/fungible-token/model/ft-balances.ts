@@ -50,10 +50,10 @@ const fungibleTokensDataFx = async ({ dao, multicall }: DaoContracts, callback: 
     });
 };
 
-const useFungibleTokensData = (daoContracts: DaoContracts) => {
+const useFungibleTokensData = (contracts: DaoContracts) => {
     const [state, stateUpdate] = useState<FungibleTokensData>({ data: null, loading: true });
 
-    useEffect(() => void fungibleTokensDataFx(daoContracts, stateUpdate), []);
+    useEffect(() => void fungibleTokensDataFx(contracts, stateUpdate), []);
 
     return state;
 };

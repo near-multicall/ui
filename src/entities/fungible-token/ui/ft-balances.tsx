@@ -4,11 +4,11 @@ import { FungibleTokenFormat } from "../lib/ft-format";
 import { FungibleTokenBalancesModel } from "../model/ft-balances";
 
 interface FungibleTokensBalancesRenderProps {
-    daoContracts: DaoContracts;
+    contracts: DaoContracts;
 }
 
-export const fungibleTokensBalancesRender = ({ daoContracts }: FungibleTokensBalancesRenderProps) => {
-    const { data } = FungibleTokenBalancesModel.useAllData(daoContracts);
+export const fungibleTokensBalancesRender = ({ contracts }: FungibleTokensBalancesRenderProps) => {
+    const { data } = FungibleTokenBalancesModel.useAllData(contracts);
 
     return !data
         ? null

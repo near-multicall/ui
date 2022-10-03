@@ -4,12 +4,12 @@ import { FungibleToken, NearToken } from "../../../entities";
 
 interface TokensBalancesProps {
     className?: string;
-    daoContracts: DaoContracts;
+    contracts: DaoContracts;
 }
 
-export const TokensBalances = ({ className, daoContracts }: TokensBalancesProps) => {
-    const nearTokenBalances = NearToken.balancesRender({ daoContracts }),
-        fungibleTokensBalances = FungibleToken.allBalancesRender({ daoContracts });
+export const TokensBalances = ({ className, contracts }: TokensBalancesProps) => {
+    const nearTokenBalances = NearToken.balancesRender({ contracts }),
+        fungibleTokensBalances = FungibleToken.allBalancesRender({ contracts });
 
     return (
         <Facet {...{ className }}>
