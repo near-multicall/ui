@@ -598,7 +598,10 @@ export class DaoPage extends Component<Props, State> {
 
                                 return (
                                     <Form>
-                                        <Field name="addr" />
+                                        <Field
+                                            name="addr"
+                                            placeholder="Search for DAOs"
+                                        />
                                     </Form>
                                 );
                             }}

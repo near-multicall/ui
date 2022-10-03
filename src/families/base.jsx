@@ -5,6 +5,7 @@ import { Component } from "react";
 import { Tooltip } from "../shared/ui/components";
 import { TextInput, TextInputWithUnits } from "../widgets/editor/elements";
 import { ArgsAccount, ArgsBig, ArgsError, ArgsJSON, ArgsString } from "../shared/lib/args-old";
+import { args } from "../shared/lib/args/args";
 import Call from "../shared/lib/call";
 import { toGas, toYocto, formatTokenAmount, unitToDecimals } from "../shared/lib/converter";
 import { errorMsg } from "../shared/lib/errors";
@@ -13,17 +14,31 @@ import "./base.scss";
 
 export class BaseTask extends Component {
     uniqueClassName = "base-task";
-    call;
+    schema = args
+        .object()
+        .call()
+        .shape({
+            address: args.string().contract(),
+            actions: args.array().of({
+                func: args.string(),
+                args: args.string().json(),
+                gas: args.gas(),
+                depo: args.token(),
+            }),
+        })
+        .transform((formData) => ({
+            address: formData.addr,
+            actions: [
+                {
+                    func: formData.func,
+                    args: formData.args,
+                    gas: formData.gas,
+                    depo: formData.depo,
+                },
+            ],
+        }))
+        .retain();
     loadErrors;
-    baseErrors = {
-        addr: new ArgsError(errorMsg.ERR_INVALID_ADDR, (value) => ArgsAccount.isValid(value), true),
-        func: new ArgsError(errorMsg.ERR_INVALID_FUNC, (value) => value.value != "", true),
-        args: new ArgsError(errorMsg.ERR_INVALID_ARGS, (value) => JSON.parse(value.value)),
-        gas: new ArgsError(errorMsg.ERR_INVALID_GAS_AMOUNT, (value) => ArgsBig.isValid(value), true),
-        depo: new ArgsError(errorMsg.ERR_INVALID_DEPO_AMOUNT, (value) => ArgsBig.isValid(value) && value.value !== ""),
-        noContract: new ArgsError("Address is not a smart contract", (value) => this.errors.noContract),
-    };
-    errors = this.baseErrors;
     options = {};
 
     updateContractDebounced = debounce(() => this.updateContract(), 500);
@@ -32,23 +47,32 @@ export class BaseTask extends Component {
         super(props);
 
         this.state = {
+            formData: {
+                name: "Custom",
+                addr: "",
+                func: "",
+                args: "{}",
+                gas: "0",
+                gasUnit: "",
+                depo: "0",
+            },
             showArgs: false,
             isEdited: false,
         };
 
         if (window.TEMP) {
-            this.call = TEMP.call;
+            this.formData = TEMP.formData;
             this.state.showArgs = TEMP.showArgs;
             this.state.isEdited = TEMP.isEdited;
             this.options = TEMP.options;
-            this.errors = TEMP.errors;
+            this.schema = TEMP.schema;
         } else if (window.COPY?.payload) {
             const optionsDeepCopy = JSON.parse(JSON.stringify(COPY.payload.options));
 
             this.init({
-                name: COPY.payload.call?.name?.toString(),
-                ...COPY.payload.call.toJSON(),
-                units: COPY.payload.call.toUnits(),
+                name: COPY.payload.formData?.name?.toString(),
+                ...COPY.payload.formData.toJSON(),
+                units: COPY.payload.schema.toUnits(),
                 options: optionsDeepCopy,
             });
             this.state.showArgs = COPY.payload.showArgs;
