@@ -1,13 +1,14 @@
 import { InputAdornment } from "@mui/material";
-import React from "react";
-import { TextInput, TextInputWithUnits } from "../../components/editor/elements";
-import { ArgsAccount, ArgsBig, ArgsError, ArgsObject, ArgsString } from "../../utils/args";
-import Call from "../../utils/call";
-import { toGas, formatTokenAmount, unitToDecimals } from "../../utils/converter";
-import { view } from "../../utils/wallet";
-import { errorMsg } from "../../utils/errors";
-import { BaseTask } from "../base";
 import debounce from "lodash.debounce";
+
+import { TextInput, TextInputWithUnits } from "../../shared/ui/components";
+import { ArgsAccount, ArgsBig, ArgsError, ArgsObject, ArgsString } from "../../shared/lib/args";
+import Call from "../../shared/lib/call";
+import { toGas, formatTokenAmount, unitToDecimals } from "../../shared/lib/converter";
+import { view } from "../../shared/lib/wallet";
+import { errorMsg } from "../../shared/lib/errors";
+import { BaseTask } from "../base";
+
 import "./near.scss";
 
 export class Transfer extends BaseTask {

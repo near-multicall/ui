@@ -1,14 +1,15 @@
 import Checkbox from "@mui/material/Checkbox";
-import React from "react";
-import { ArgsAccount, ArgsBig, ArgsString, ArgsObject, ArgsError } from "../../utils/args";
-import Call from "../../utils/call";
-import { errorMsg } from "../../utils/errors";
-import { STORAGE } from "../../utils/persistent";
-import { toGas, toYocto, formatTokenAmount, unitToDecimals } from "../../utils/converter";
+
+import { ArgsAccount, ArgsBig, ArgsString, ArgsObject, ArgsError } from "../../shared/lib/args";
+import Call from "../../shared/lib/call";
+import { errorMsg } from "../../shared/lib/errors";
+import { STORAGE } from "../../shared/lib/persistent";
+import { toGas, toYocto, formatTokenAmount, unitToDecimals } from "../../shared/lib/converter";
+import { Multicall } from "../../shared/lib/contracts/multicall";
+import { TextInput, TextInputWithUnits } from "../../shared/ui/components";
 import { BaseTask } from "../base";
-import { Multicall } from "../../utils/contracts/multicall";
+
 import "./multicall.scss";
-import { TextInput, TextInputWithUnits } from "../../components/editor/elements";
 
 export class Transfer extends BaseTask {
     uniqueClassName = "multicall-transfer-task";

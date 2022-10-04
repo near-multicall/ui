@@ -2,13 +2,12 @@ import { DeleteOutline, MoveDown, EditOutlined } from "@mui/icons-material";
 import debounce from "lodash.debounce";
 import { Component } from "react";
 
-import { Tooltip } from "../shared/ui/components";
-import { TextInput, TextInputWithUnits } from "../components/editor/elements";
-import { ArgsAccount, ArgsBig, ArgsError, ArgsJSON, ArgsString } from "../utils/args";
-import Call from "../utils/call";
-import { toGas, toYocto, formatTokenAmount, unitToDecimals } from "../utils/converter";
-import { errorMsg } from "../utils/errors";
-import { hasContract } from "../utils/contracts/generic";
+import { TextInput, TextInputWithUnits, Tooltip } from "../shared/ui/components";
+import { ArgsAccount, ArgsBig, ArgsError, ArgsJSON, ArgsString } from "../shared/lib/args";
+import Call from "../shared/lib/call";
+import { toGas, toYocto, formatTokenAmount, unitToDecimals } from "../shared/lib/converter";
+import { errorMsg } from "../shared/lib/errors";
+import { hasContract } from "../shared/lib/contracts/generic";
 import "./base.scss";
 
 export class BaseTask extends Component {

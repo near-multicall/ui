@@ -38,6 +38,12 @@ button {
     cursor: pointer;
 }
 
+.disabled {
+    background-color: color.$darkest !important;
+    color: rgba(color.$light-text, 0.3);
+    cursor: not-allowed !important;
+}
+
 .hidden {
     display: none;
 }

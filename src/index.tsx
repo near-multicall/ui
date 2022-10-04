@@ -1,15 +1,15 @@
+import "@near-wallet-selector/modal-ui/styles.css";
 import ReactDOM from "react-dom";
 import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AppPage } from "./pages/app";
-import { DaoPage } from "./pages/dao";
-import { WalletSelectorContextProvider } from "./contexts/walletSelectorContext";
-import "./utils/persistent";
-import "@near-wallet-selector/modal-ui/styles.css";
 
-window.PAGE = "app";
+import { AppPage } from "./pages/app";
+import { DaoPage } from "./pages/dao/dao";
+import { Wallet } from "./entities";
+import { DialogsLayer, Sidebar } from "./widgets";
+import "./shared/lib/persistent";
 
 ReactDOM.render(
-    <WalletSelectorContextProvider>
+    <Wallet.SelectorContextProvider>
         <HashRouter>
             <Routes>
                 <Route
@@ -21,16 +21,31 @@ ReactDOM.render(
                         />
                     }
                 />
+
                 <Route
                     path="/app"
-                    element={<AppPage />}
+                    element={
+                        <>
+                            <Sidebar full={true} />
+                            <AppPage />
+                            <DialogsLayer />
+                        </>
+                    }
                 />
+
                 <Route
                     path="/dao"
-                    element={<DaoPage />}
+                    element={
+                        <>
+                            <Sidebar full={true} />
+                            <DaoPage />
+                            <DialogsLayer />
+                        </>
+                    }
                 />
             </Routes>
         </HashRouter>
-    </WalletSelectorContextProvider>,
+    </Wallet.SelectorContextProvider>,
+
     document.querySelector("#root")
 );

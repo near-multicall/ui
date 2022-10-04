@@ -1,56 +1,36 @@
 import { TableCell, TableRow as MuiTableRow, Typography } from "@mui/material";
-import React from "react";
 
 import "./row.scss";
 
-interface TableRowDefaultProps {
+const _TableRow = "Table-row";
+
+export interface TableRowProps {
     cells?: (string | number | JSX.Element)[] | null;
+    headerCells: string[];
 }
 
-export const TableRowDefault = ({ cells }: TableRowDefaultProps) => (
+export const TableRow = ({ cells, headerCells }: TableRowProps) => (
     <>
-        <MuiTableRow className="table-row-default">
-            {cells && cells.map((cell, index) => <TableCell key={index}>{cell}</TableCell>)}
+        <MuiTableRow className={_TableRow}>
+            {(cells ?? headerCells).map((cell, index) => (
+                <TableCell key={index}>{cells ? cell : "No data"}</TableCell>
+            ))}
         </MuiTableRow>
     </>
 );
 
-interface TableRowCardProps extends TableRowDefaultProps {
-    headerCells: string[];
-}
+const _TableRowCard = `${_TableRow}--compact`;
 
-export const TableRowCard = ({ cells, headerCells }: TableRowCardProps) => (
-    <div className="table-row-card">
+export const TableRowCard = ({ cells, headerCells }: TableRowProps) => (
+    <div className={_TableRowCard}>
         {headerCells.map((headerCell, headerCellIndex) => (
             <div
-                className="content"
+                className={`${_TableRowCard}-content`}
                 key={headerCellIndex}
             >
-                <Typography
-                    variant="inherit"
-                    component="div"
-                    fontSize="2rem"
-                    color="#000000"
-                >
-                    {headerCell}
-                </Typography>
-
-                <Typography
-                    component="div"
-                    fontSize="2rem"
-                >
-                    {cells && cells[headerCellIndex]}
-                </Typography>
+                <span>{headerCell}</span>
+                <span>{cells ? cells[headerCellIndex] : "No data"}</span>
             </div>
         ))}
     </div>
-);
-
-export interface TableRowProps extends TableRowDefaultProps, TableRowCardProps {}
-
-export const TableRow = (props: TableRowProps) => (
-    <>
-        <TableRowDefault {...props} />
-        <TableRowCard {...props} />
-    </>
 );
