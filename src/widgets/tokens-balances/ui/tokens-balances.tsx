@@ -15,16 +15,16 @@ export const TokensBalances = ({ className, contracts }: TokensBalancesProps) =>
         <Facet {...{ className }}>
             <h1 className="title">Tokens balances</h1>
 
-            {!nearTokenBalances ?? !fungibleTokensBalances ? (
-                <div className="loader" />
-            ) : (
+            {(nearTokenBalances ?? fungibleTokensBalances) && (
                 <Scrollable>
                     <Table
                         header={["Token", "Multicall", "DAO", "Total"]}
-                        rows={[nearTokenBalances].concat(fungibleTokensBalances)}
+                        rows={[...(nearTokenBalances ? [nearTokenBalances] : []), ...(fungibleTokensBalances ?? [])]}
                     />
                 </Scrollable>
             )}
+
+            {(!nearTokenBalances || !fungibleTokensBalances) && <div className="loader" />}
         </Facet>
     );
 };
