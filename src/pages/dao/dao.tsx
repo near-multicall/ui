@@ -13,7 +13,7 @@ import { ProposalStatus, SputnikDAO, SputnikUI } from "../../shared/lib/contract
 import { Big, toNEAR, toYocto } from "../../shared/lib/converter";
 import { STORAGE } from "../../shared/lib/persistent";
 import { view } from "../../shared/lib/wallet";
-import { Facet, Scrollable, Tabs, TextInput } from "../../shared/ui/components";
+import { Tile, Scrollable, Tabs, TextInput } from "../../shared/ui/components";
 import { TokensBalances } from "../../widgets/tokens-balances";
 
 import "./config/config.scss";
@@ -445,7 +445,7 @@ export class DaoPage extends Component<Props, State> {
 
                         content: (
                             <div className={clsx("ConfigTab", "DaoPage-body")}>
-                                <Facet className="AdminsList">
+                                <Tile className="AdminsList">
                                     <AddOutlined />
                                     <h1 className="title">Admins</h1>
 
@@ -454,9 +454,9 @@ export class DaoPage extends Component<Props, State> {
                                             <li key={admin}>{this.toLink(admin)}</li>
                                         ))}
                                     </ul>
-                                </Facet>
+                                </Tile>
 
-                                <Facet className="TokenWhitelist">
+                                <Tile className="TokenWhitelist">
                                     <h1 className="title">Whitelisted Tokens</h1>
 
                                     <ul className="list">
@@ -464,20 +464,20 @@ export class DaoPage extends Component<Props, State> {
                                             <li key={token}>{this.toLink(token)}</li>
                                         ))}
                                     </ul>
-                                </Facet>
+                                </Tile>
 
-                                <Facet className="JobsList">
+                                <Tile className="JobsList">
                                     <AddOutlined />
                                     <h1 className="title">Jobs</h1>
                                     <Scrollable>{info.jobs.map((j) => this.job(j))}</Scrollable>
-                                </Facet>
+                                </Tile>
 
-                                <Facet className="JobBond">
+                                <Tile className="JobBond">
                                     <h1 className="JobBond-title title">
                                         Job Bond
                                         <span>{`${info.jobBond !== "..." ? toNEAR(info.jobBond) : "..."} Ⓝ`}</span>
                                     </h1>
-                                </Facet>
+                                </Tile>
                             </div>
                         ),
                     },

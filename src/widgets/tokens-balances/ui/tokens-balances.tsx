@@ -1,4 +1,4 @@
-import { Facet, Scrollable, Table } from "../../../shared/ui/components";
+import { Tile, Scrollable, Table } from "../../../shared/ui/components";
 import { type DaoContracts } from "../../../entities/types";
 import { FungibleToken, NearToken } from "../../../entities";
 
@@ -12,7 +12,7 @@ export const TokensBalances = ({ className, contracts }: TokensBalancesProps) =>
         fungibleTokensBalances = FungibleToken.allBalancesRender({ contracts });
 
     return (
-        <Facet {...{ className }}>
+        <Tile {...{ className }}>
             <h1 className="title">Tokens balances</h1>
 
             {(nearTokenBalances ?? fungibleTokensBalances) && (
@@ -25,6 +25,6 @@ export const TokensBalances = ({ className, contracts }: TokensBalancesProps) =>
             )}
 
             {(!nearTokenBalances || !fungibleTokensBalances) && <div className="loader" />}
-        </Facet>
+        </Tile>
     );
 };

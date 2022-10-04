@@ -1,4 +1,4 @@
-export { Facet } from "./facet/facet";
+export { Tile } from "./facet/facet";
 export { Dialog, type DialogProps } from "./dialog/dialog";
 export { NearIcons } from "./icons";
 export { PopupMenu, type PopupMenuProps } from "./popup-menu/popup-menu";
