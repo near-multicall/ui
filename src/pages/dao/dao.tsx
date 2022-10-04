@@ -14,8 +14,9 @@ import { SputnikDAO, SputnikUI } from "../../shared/lib/contracts/sputnik-dao";
 import { Big, toNEAR, toYocto } from "../../shared/lib/converter";
 import { STORAGE } from "../../shared/lib/persistent";
 import { view } from "../../shared/lib/wallet";
-import { Facet, Scrollable, Tabs } from "../../shared/ui/components";
+import { Tile, Scrollable, Tabs } from "../../shared/ui/components";
 import { TokensBalances } from "../../widgets/tokens-balances";
+
 import "./config/config.scss";
 import "./funds/funds.scss";
 import "./dao.scss";
@@ -110,6 +111,11 @@ export class DaoPage extends Component<Props, State> {
         document.addEventListener("onaddressesupdated", (e) => this.onAddressesUpdated(e as CustomEvent));
 
         this.lastAddr = this.state.formData.addr;
+    }
+
+    componentDidMount(): void {
+        window.SIDEBAR.switchPage("dao");
+        document.addEventListener("onaddressesupdated", () => this.onAddressesUpdated());
     }
 
     setFormData(newFormData: State["formData"], callback?: () => void | undefined) {
@@ -526,7 +532,7 @@ export class DaoPage extends Component<Props, State> {
 
                         content: (
                             <div className={clsx("ConfigTab", "DaoPage-body")}>
-                                <Facet className="AdminsList">
+                                <Tile className="AdminsList">
                                     <AddOutlined />
                                     <h1 className="title">Admins</h1>
 
@@ -535,9 +541,9 @@ export class DaoPage extends Component<Props, State> {
                                             <li key={admin}>{this.toLink(admin)}</li>
                                         ))}
                                     </ul>
-                                </Facet>
+                                </Tile>
 
-                                <Facet className="TokenWhitelist">
+                                <Tile className="TokenWhitelist">
                                     <h1 className="title">Whitelisted Tokens</h1>
 
                                     <ul className="list">
@@ -545,20 +551,20 @@ export class DaoPage extends Component<Props, State> {
                                             <li key={token}>{this.toLink(token)}</li>
                                         ))}
                                     </ul>
-                                </Facet>
+                                </Tile>
 
-                                <Facet className="JobsList">
+                                <Tile className="JobsList">
                                     <AddOutlined />
                                     <h1 className="title">Jobs</h1>
                                     <Scrollable>{info.jobs.map((j) => this.job(j))}</Scrollable>
-                                </Facet>
+                                </Tile>
 
-                                <Facet className="JobBond">
+                                <Tile className="JobBond">
                                     <h1 className="JobBond-title title">
                                         Job Bond
                                         <span>{`${info.jobBond !== "..." ? toNEAR(info.jobBond) : "..."} Ⓝ`}</span>
                                     </h1>
-                                </Facet>
+                                </Tile>
                             </div>
                         ),
                     },
@@ -570,7 +576,7 @@ export class DaoPage extends Component<Props, State> {
                             <div className={clsx("FundsTab", "DaoPage-body")}>
                                 <TokensBalances
                                     className="balances"
-                                    daoContracts={{ dao, multicall }}
+                                    contracts={{ dao, multicall }}
                                 />
                             </div>
                         ),

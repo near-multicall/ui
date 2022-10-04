@@ -4,9 +4,9 @@ import { ReactNode } from "react";
 
 import "./popup-menu.scss";
 
-interface PopupMenuProps {
+export interface PopupMenuProps {
     icon: ReactNode;
-    items: { disabled?: boolean; label: string; onClick?: VoidFunction; title: string }[];
+    items: { disabled?: boolean; label?: string; onClick?: VoidFunction; title: string }[];
     triggerClassName: string;
 }
 

@@ -1,13 +1,13 @@
 import { InputAdornment } from "@mui/material";
 import React from "react";
-import { TextInput, TextInputWithUnits } from "../../widgets/editor/elements";
+import { TextInput, TextInputWithUnits } from "../../shared/ui/components";
 import { ArgsAccount, ArgsBig, ArgsError, ArgsObject, ArgsString } from "../../shared/lib/args-old";
 import Call from "../../shared/lib/call";
 import { toGas, formatTokenAmount, unitToDecimals } from "../../shared/lib/converter";
 import { view } from "../../shared/lib/wallet";
 import { errorMsg } from "../../shared/lib/errors";
 import { BaseTask } from "../base";
-import debounce from "lodash.debounce";
+
 import "./near.scss";
 
 export class Transfer extends BaseTask {

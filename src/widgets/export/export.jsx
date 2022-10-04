@@ -13,7 +13,7 @@ import { STORAGE } from "../../shared/lib/persistent";
 import { convert, toGas, toNEAR } from "../../shared/lib/converter";
 import { view } from "../../shared/lib/wallet";
 import { Wallet } from "../../entities";
-import { TextInput, TextInputWithUnits } from "../editor/elements";
+import { TextInput, TextInputWithUnits } from "../../shared/ui/components";
 import "./export.scss";
 
 export class Export extends Component {

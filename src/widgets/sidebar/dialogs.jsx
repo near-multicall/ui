@@ -1,102 +1,18 @@
-import { InfoOutlined } from "@mui/icons-material";
 import { TextField } from "@mui/material";
 import { Base64 } from "js-base64";
-import { useMemo, useReducer, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { ArgsError, ArgsString } from "../../shared/lib/args-old";
 import { SputnikDAO } from "../../shared/lib/contracts/sputnik-dao";
 import { readFile, saveFile } from "../../shared/lib/loader";
-import { STORAGE } from "../../shared/lib/persistent";
 import { Validation } from "../../shared/lib/validation";
-import { TextInput } from "../editor/elements";
-import { Dialog, Tooltip } from "../../shared/ui/components";
-import "./dialogs.scss";
-
-const DAPP_LOGIN_INSTRUCTIONS = [
-    {
-        text: "Open the dApp in another browser tab",
-    },
-    {
-        text: "Log out your account on the dApp",
-        hint: "You should not be logged in with any wallet on the other dApp, otherwise this won't work.",
-    },
-    {
-        text: "Copy the dApp's URL",
-    },
-    {
-        text: "Paste the URL in the input field below",
-    },
-    {
-        text: 'Click "Proceed"',
-        hint: 'This opens the dApp in a new tab, with a "watch-only" mode. Meaning you cannot sign transactions with it',
-    },
-];
-
-export const DappLoginDialog = ({ actorType, onClose, open, title }) => {
-    const dAppURL = useMemo(() => new ArgsString(""), []);
-
-    const URLInvalid = ArgsError.useInstance("Invalid URL", Validation.isUrl, true);
-
-    const [requestURL, requestURLUpdate] = useReducer((currentValue, value) => {
-        if (URLInvalid.$detected) {
-            return currentValue;
-        } else {
-            const url = new URL(value);
-            url.searchParams.set("account_id", STORAGE.addresses[actorType]);
-            url.searchParams.set("public_key", "ed25519%3ADEaoD65LomNHAMzhNZva15LC85ntwBHdcTbCnZRXciZH");
-            url.searchParams.set("all_keys", "ed25519%3A9jeqkc8ybv7aYSA7uLNFUEn8cgKo759yue4771bBWsSr");
-            return url.toString();
-        }
-    });
-
-    return (
-        <Dialog
-            className="modal-dialog"
-            doneRename="Proceed"
-            noSubmit={URLInvalid.$detected}
-            onSubmit={() => window.open(requestURL, "_blank")}
-            {...{ onClose, open, title }}
-        >
-            <ul className="dapp-login-steps">
-                {DAPP_LOGIN_INSTRUCTIONS.map(({ text, hint }) => (
-                    <li
-                        className="item"
-                        key={text}
-                    >
-                        <span className="content">
-                            {text}
-
-                            {hint && (
-                                <Tooltip
-                                    placement="right"
-                                    title={hint}
-                                >
-                                    <InfoOutlined className="icon" />
-                                </Tooltip>
-                            )}
-                        </span>
-                    </li>
-                ))}
-            </ul>
-
-            <TextInput
-                className="light-textfield"
-                error={URLInvalid.instance}
-                label="dApp URL"
-                update={({ target }) => requestURLUpdate(target.value)}
-                value={dAppURL}
-                variant="filled"
-            />
-        </Dialog>
-    );
-};
+import { Dialog, TextInput } from "../../shared/ui/components";
 
 export const SaveAsJsonDialog = ({ onClose, open }) => {
     const [fileName, fileNameUpdate] = useState("my-multicall");
 
     return (
         <Dialog
-            className="modal-dialog"
             doneRename="Download"
             onSubmit={() => saveFile(`${fileName}.json`, [JSON.stringify(LAYOUT.toBase64(), null, 2)])}
             title="Save As JSON"
@@ -124,7 +40,6 @@ export const LoadFromJsonDialog = ({ open, ...props }) => {
 
     return (
         <Dialog
-            className="modal-dialog"
             doneRename="Load"
             noSubmit={uploadedFile === null}
             onSubmit={() => readFile(uploadedFile, (json) => LAYOUT.fromBase64(json))}
@@ -193,7 +108,6 @@ export const LoadFromProposalDialog = ({ onClose, open }) => {
 
     return (
         <Dialog
-            className="modal-dialog"
             doneRename="Load"
             onSubmit={() => window.LAYOUT.fromBase64(argsFromProposal)}
             noSubmit={URLInvalid.$detected || proposalURLInvalid.$detected || proposalNonCompatible.$detected}
@@ -218,7 +132,6 @@ export const LoadFromProposalDialog = ({ onClose, open }) => {
 
 export const ClearAllDialog = ({ onClose, open }) => (
     <Dialog
-        className="modal-dialog"
         doneRename="Yes, clear all"
         onSubmit={() => LAYOUT.clear()}
         title="Clear All"

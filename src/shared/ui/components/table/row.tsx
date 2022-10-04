@@ -12,14 +12,14 @@ export interface TableRowProps {
 export const TableRow = ({ cells, headerCells }: TableRowProps) => (
     <>
         <MuiTableRow className={_TableRow}>
-            {(cells || headerCells).map((cell, index) => (
+            {(cells ?? headerCells).map((cell, index) => (
                 <TableCell key={index}>{cells ? cell : "No data"}</TableCell>
             ))}
         </MuiTableRow>
     </>
 );
 
-const _TableRowCard = `${_TableRow}--mobile`;
+const _TableRowCard = `${_TableRow}--compact`;
 
 export const TableRowCard = ({ cells, headerCells }: TableRowProps) => (
     <div className={_TableRowCard}>

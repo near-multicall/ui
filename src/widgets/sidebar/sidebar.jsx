@@ -1,11 +1,4 @@
-import {
-    DeleteForeverOutlined,
-    FileDownloadOutlined,
-    FileUploadOutlined,
-    PreviewOutlined,
-    ScienceOutlined,
-} from "@mui/icons-material";
-
+import { DeleteForeverOutlined, FileDownloadOutlined, FileUploadOutlined, ScienceOutlined } from "@mui/icons-material";
 import { Icon } from "@mui/material";
 import { Component } from "react";
 import { NavLink } from "react-router-dom";
@@ -14,33 +7,27 @@ import Discord from "../../app/static/discord.svg";
 import Github from "../../app/static/github.svg";
 import Twitter from "../../app/static/twitter.svg";
 import { Wallet } from "../../entities/wallet";
+import { DappLogin } from "../../features";
 import { STORAGE } from "../../shared/lib/persistent";
 import { viewAccount } from "../../shared/lib/wallet";
 import { PopupMenu, Tooltip } from "../../shared/ui/components";
 
-import {
-    DappLoginDialog,
-    LoadFromJsonDialog,
-    LoadFromProposalDialog,
-    SaveAsJsonDialog,
-    ClearAllDialog,
-} from "./dialogs.jsx";
+import { LoadFromJsonDialog, LoadFromProposalDialog, SaveAsJsonDialog, ClearAllDialog } from "./dialogs.jsx";
 
 import "./sidebar.scss";
-
-const DAPP_LOGIN_METHODS = {
-    dao: { actorType: "dao", key: "daoDappLogin", title: "Login in dApps as DAO" },
-    multicall: { actorType: "multicall", key: "multicallDappLogin", title: "Login in dApps as Multicall" },
-};
 
 export class Sidebar extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            featureFlags: {
-                daoDappLogin: true,
-                multicallDappLogin: false,
+            FeatureFlags: {
+                initialized: false,
+
+                DappLogin: {
+                    [DappLogin.METHODS.dao.type]: true,
+                    [DappLogin.METHODS.multicall.type]: false,
+                },
             },
 
             dialogs: {
@@ -48,25 +35,54 @@ export class Sidebar extends Component {
                 loadFromJSON: false,
                 loadFromProposal: false,
                 clearAll: false,
-                daoDappLogin: false,
-                multicallDappLogin: false,
             },
+            page: "app",
         };
+    }
+
+    static walletContext = Wallet.useSelector();
+
+    featureFlagsCalc() {
+        viewAccount(STORAGE.addresses.multicall)
+            .then(() =>
+                this.setState({
+                    FeatureFlags: {
+                        ...this.state.FeatureFlags,
+                        initialized: true,
+
+                        DappLogin: {
+                            ...this.state.FeatureFlags.DappLogin,
+                            [DappLogin.METHODS.multicall.type]: true,
+                        },
+                    },
+                })
+            )
+            .catch(() =>
+                this.setState({
+                    FeatureFlags: {
+                        ...this.state.FeatureFlags,
+                        initialized: true,
+
+                        DappLogin: {
+                            ...this.state.FeatureFlags.DappLogin,
+                            [DappLogin.METHODS.multicall.type]: false,
+                        },
+                    },
+                })
+            );
     }
 
     componentDidMount() {
         window.SIDEBAR = this;
-        document.addEventListener("onaddressesupdated", () => this.forceUpdate());
+        document.addEventListener("onaddressesupdated", () => this.featureFlagsCalc());
     }
 
-    componentDidUpdate(_, previousState) {
-        if (this.state !== previousState) {
-            viewAccount(STORAGE.addresses.multicall)
-                .then(() => this.setState({ featureFlags: { ...this.state.featureFlags, multicallDappLogin: true } }))
-                .catch(() =>
-                    this.setState({ featureFlags: { ...this.state.featureFlags, multicallDappLogin: false } })
-                );
-        }
+    switchPage(to) {
+        this.setState({ page: to });
+    }
+
+    getPage() {
+        return this.state.page;
     }
 
     openDialog(name) {
@@ -82,14 +98,6 @@ export class Sidebar extends Component {
         const { dialogs } = this.state;
 
         return [
-            ...Object.values(DAPP_LOGIN_METHODS).map((props) => (
-                <DappLoginDialog
-                    onClose={() => this.closeDialog(props.key)}
-                    open={dialogs[props.key]}
-                    {...props}
-                />
-            )),
-
             <SaveAsJsonDialog
                 key="saveAsJSON"
                 onClose={() => this.closeDialog("saveAsJSON")}
@@ -149,19 +157,13 @@ export class Sidebar extends Component {
                     </nav>
                     <hr />
 
-                    <PopupMenu
-                        icon={<PreviewOutlined />}
-                        items={Object.values(DAPP_LOGIN_METHODS).map(({ key, title }) => ({
-                            disabled: !this.state.featureFlags[key],
-                            key,
-                            onClick: () => this.openDialog(key),
-                            title,
-                        }))}
+                    <DappLogin.Menu
+                        FeatureFlags={this.state.FeatureFlags}
                         triggerClassName="sidebar-button"
                     />
                     <hr />
 
-                    {window.PAGE === "app" ? (
+                    {this.state.page === "app" ? (
                         <>
                             <PopupMenu
                                 icon={<FileDownloadOutlined />}
@@ -171,6 +173,7 @@ export class Sidebar extends Component {
                                         title: "Save as JSON",
                                     },
                                     {
+                                        disabled: true,
                                         title: "Share as Link",
                                         label: "coming soon!",
                                     },

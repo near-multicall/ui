@@ -3,8 +3,8 @@ import { HTMLAttributes, PropsWithChildren } from "react";
 
 import "./facet.scss";
 
-const _Facet = "Facet";
+const _Tile = "Tile";
 
-export interface FacetProps extends PropsWithChildren, HTMLAttributes<HTMLDivElement> {}
+export interface TileProps extends PropsWithChildren, HTMLAttributes<HTMLDivElement> {}
 
-export const Facet = ({ children, className }: FacetProps) => <div className={clsx(_Facet, className)}>{children}</div>;
+export const Tile = ({ children, className }: TileProps) => <div className={clsx(_Tile, className)}>{children}</div>;

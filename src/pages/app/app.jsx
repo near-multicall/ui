@@ -1,13 +1,15 @@
-import React, { Component } from "react";
-import { DragDropContext, Droppable } from "react-beautiful-dnd";
-import { Column } from "../column/column.jsx";
-import { Menu } from "../menu/menu.jsx";
-import { initialData } from "../../initial-data.js";
 import { Base64 } from "js-base64";
-import { STORAGE } from "../../shared/lib/persistent";
-import "./layout.scss";
+import { Component } from "react";
+import { DragDropContext, Droppable } from "react-beautiful-dnd";
 
-export class Layout extends Component {
+import { Column } from "../../widgets/column/column.jsx";
+import { Menu } from "../../widgets/menu/menu.jsx";
+import { initialData } from "../../initial-data";
+import { STORAGE } from "../../shared/lib/persistent";
+
+import "./app.scss";
+
+export class AppPage extends Component {
     taskID = 0;
     columnID = 1;
 
@@ -19,11 +21,6 @@ export class Layout extends Component {
         this.clear();
 
         document.addEventListener("onlayoutupdated", () => this.forceUpdate());
-    }
-
-    componentDidMount() {
-        window.LAYOUT = this;
-        STORAGE.load();
     }
 
     getTaskID = () => this.taskID;
@@ -55,7 +52,7 @@ export class Layout extends Component {
 
     deleteTask = (taskId) => {
         const layout = STORAGE.layout;
-        const { columnId, taskIndex } = Layout.findTaskCoordinates(taskId);
+        const { columnId, taskIndex } = AppPage.findTaskCoordinates(taskId);
 
         if (columnId == undefined || taskIndex == undefined) {
             console.error("Task not found");
@@ -83,7 +80,7 @@ export class Layout extends Component {
 
     duplicateTask = (taskId) => {
         const layout = STORAGE.layout;
-        const { columnId, taskIndex } = Layout.findTaskCoordinates(taskId);
+        const { columnId, taskIndex } = AppPage.findTaskCoordinates(taskId);
 
         if (columnId == undefined || taskIndex == undefined) {
             console.error("Task not found");
@@ -474,6 +471,12 @@ export class Layout extends Component {
         this.expanded = expanded;
         this.forceUpdate();
         SIDEBAR.forceUpdate();
+    }
+
+    componentDidMount() {
+        window.SIDEBAR.switchPage("app");
+        window.LAYOUT = this;
+        STORAGE.load();
     }
 
     render() {

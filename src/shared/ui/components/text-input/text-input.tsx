@@ -1,7 +1,15 @@
-import React, { Component } from "react";
-import { MenuItem, TextField } from "@mui/material";
+import { ChangeEvent, Component } from "react";
+import { MenuItem, TextField, TextFieldProps } from "@mui/material";
 
-class TextInput extends Component {
+import { ArgsError, ArgsString } from "../../../lib/args";
+
+export interface TextInputProps extends Pick<TextFieldProps, "className" | "label" | "variant"> {
+    error: ArgsError;
+    update: (event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>, component: Component) => void;
+    value: ArgsString;
+}
+
+export class TextInput extends Component<TextInputProps> {
     render() {
         const { label, value, error, update, ...props } = this.props;
 
@@ -28,7 +36,11 @@ class TextInput extends Component {
     }
 }
 
-class TextInputWithUnits extends Component {
+export interface TextInputWithUnitsProps extends TextInputProps {
+    // TODO!: Extend the interface
+}
+
+export class TextInputWithUnits extends Component<TextInputWithUnitsProps> {
     render() {
         const { label, value, error, options, update, textProps, unitProps, ...props } = this.props;
 
@@ -85,5 +97,3 @@ class TextInputWithUnits extends Component {
         );
     }
 }
-
-export { TextInput, TextInputWithUnits };

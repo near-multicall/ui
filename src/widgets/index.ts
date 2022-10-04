@@ -1,5 +1,5 @@
-export { Layout } from "./layout/layout.jsx";
 export { Column } from "./column/column.jsx";
+export { DialogsLayer } from "./dialogs-layer";
 export { Menu } from "./menu/menu.jsx";
 export { Builder } from "./builder/builder.jsx";
 export { Editor } from "./editor/editor.jsx";

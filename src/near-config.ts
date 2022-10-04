@@ -1,4 +1,4 @@
-function getConfig(env) {
+function getConfig(env: string) {
     switch (env) {
         case "production":
         case "mainnet":

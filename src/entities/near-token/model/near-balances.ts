@@ -5,12 +5,12 @@ import { viewAccount } from "../../../shared/lib/wallet";
 import { DaoContracts } from "../../types";
 import { FRACTIONAL_PART_LENGTH } from "../config";
 
-type NativeTokenData = {
+type NearTokenData = {
     data: { dao: string; multicall: string; total: string } | null;
     loading: boolean;
 };
 
-const nativeTokenDataFx = async ({ dao, multicall }: DaoContracts, callback: (data: NativeTokenData) => void) => {
+const nearTokenDataFx = async ({ dao, multicall }: DaoContracts, callback: (data: NearTokenData) => void) => {
     const [daoAccInfo, multicallAccInfo] = await Promise.all([
         viewAccount(dao.address),
         viewAccount(multicall.address),
@@ -30,14 +30,14 @@ const nativeTokenDataFx = async ({ dao, multicall }: DaoContracts, callback: (da
     });
 };
 
-const useNativeTokenData = (daoContracts: DaoContracts) => {
-    const [state, stateUpdate] = useState<NativeTokenData>({ data: null, loading: true });
+const useNearTokenData = (contracts: DaoContracts) => {
+    const [state, stateUpdate] = useState<NearTokenData>({ data: null, loading: true });
 
-    useEffect(() => void nativeTokenDataFx(daoContracts, stateUpdate), []);
+    useEffect(() => void nearTokenDataFx(contracts, stateUpdate), []);
 
     return state;
 };
 
-export class NativeTokenBalancesModel {
-    static useData = useNativeTokenData;
+export class NearTokenBalancesModel {
+    static useData = useNearTokenData;
 }

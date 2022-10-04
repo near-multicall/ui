@@ -1,9 +1,10 @@
-export { Facet } from "./facet/facet";
-export { Dialog } from "./dialog/dialog";
-export * from "./icons";
-export { PopupMenu } from "./popup-menu/popup-menu";
+export { Tile } from "./facet/facet";
+export { Dialog, type DialogProps } from "./dialog/dialog";
+export { NearIcons } from "./icons";
+export { PopupMenu, type PopupMenuProps } from "./popup-menu/popup-menu";
 export { Scrollable } from "./scrollable/scrollable";
 export { Table } from "./table/table";
 export { Tabs } from "./tabs/tabs";
+export { TextInput, type TextInputProps, TextInputWithUnits, type TextInputWithUnitsProps } from "./text-input";
 export { TokenLabel } from "./token-label/token-label";
 export { Tooltip } from "./tooltip/tooltip";

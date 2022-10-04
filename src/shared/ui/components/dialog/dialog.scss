@@ -5,6 +5,7 @@
 
 .Dialog {
     .MuiPaper-root {
+        min-width: size.$task-width;
         background-color: color.$black;
         color: color.$light-text;
         border-radius: size.$task-radius;

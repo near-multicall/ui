@@ -1,6 +1,6 @@
 import { TextField } from "@mui/material";
 import React from "react";
-import { TextInput, TextInputWithUnits } from "../../widgets/editor/elements";
+import { TextInput, TextInputWithUnits } from "../../shared/ui/components";
 import {
     ArgsAccount,
     ArgsBig,
@@ -14,6 +14,7 @@ import Call from "../../shared/lib/call";
 import { errorMsg } from "../../shared/lib/errors";
 import { toGas } from "../../shared/lib/converter";
 import { BaseTask } from "../base";
+
 import "./ref-finance.scss";
 
 export class Swap extends BaseTask {

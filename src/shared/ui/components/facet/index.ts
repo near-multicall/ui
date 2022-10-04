@@ -1,1 +1,1 @@
-export { Facet } from "./facet";
+export { Tile } from "./facet";

@@ -2,8 +2,7 @@ import { DeleteOutline, MoveDown, EditOutlined } from "@mui/icons-material";
 import debounce from "lodash.debounce";
 import { Component } from "react";
 
-import { Tooltip } from "../shared/ui/components";
-import { TextInput, TextInputWithUnits } from "../widgets/editor/elements";
+import { TextInput, TextInputWithUnits, Tooltip } from "../shared/ui/components";
 import { ArgsAccount, ArgsBig, ArgsError, ArgsJSON, ArgsString } from "../shared/lib/args-old";
 import { args } from "../shared/lib/args/args";
 import Call from "../shared/lib/call";
