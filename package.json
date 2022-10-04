@@ -10,7 +10,7 @@
         "build:mainnet": "NEAR_ENV=mainnet yarn build",
         "deploy:pages": "echo 'testnet.multicall.app' > ./dist/CNAME && gh-pages -d dist/",
         "deploy": "yarn build && yarn deploy:pages",
-        "start": "rm -rf .parcel-cache && echo 'The app is starting! It will automatically open in your browser when ready' && parcel src/index.html --open",
+        "start": "rm -rf .parcel-cache && yarn && echo 'The app is starting! It will automatically open in your browser when ready' && parcel src/index.html --open",
         "start:testnet": "NEAR_ENV=testnet yarn start",
         "start:mainnet": "NEAR_ENV=mainnet yarn start",
         "test": "jest test --runInBand",
