@@ -432,7 +432,7 @@ export class DaoPage extends Component<Props, State> {
     }
 
     componentDidMount(): void {
-        window.PAGE = "dao";
+        window.SIDEBAR.switchPage("dao");
         document.addEventListener("onaddressesupdated", () => this.onAddressesUpdated());
     }
 

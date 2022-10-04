@@ -8,8 +8,6 @@ import { Wallet } from "./entities";
 import { DialogsLayer, Sidebar } from "./widgets";
 import "./shared/lib/persistent";
 
-window.PAGE = "app";
-
 ReactDOM.render(
     <Wallet.SelectorContextProvider>
         <HashRouter>

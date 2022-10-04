@@ -53,7 +53,7 @@ class Persistent {
     }
 
     save() {
-        if (window.PAGE !== "app") return;
+        if (window.SIDEBAR.getPage() !== "app") return;
 
         localStorage.setItem(STORAGE_KEY_ADDRESSES, JSON.stringify(this.addresses));
         localStorage.setItem(STORAGE_KEY_JSON, JSON.stringify(window.LAYOUT.toBase64()));
