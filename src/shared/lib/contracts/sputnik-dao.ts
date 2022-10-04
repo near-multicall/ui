@@ -146,21 +146,6 @@ enum ProposalStatus {
     Failed = "Failed",
 }
 
-enum ProposalStatus {
-    InProgress = "InProgress",
-    Approves = "Approved",
-    Rejected = "Rejected",
-    Removed = "Removed",
-    Expired = "Expired",
-    Moved = "Moved",
-    Failed = "Failed",
-}
-
-enum VoteStatus {
-    Active = "Active",
-    Expired = "Expired",
-}
-
 class SputnikDAO {
     static FACTORY_ADDRESS: string = FACTORY_ADDRESS_SELECTOR[window.NEAR_ENV];
     static REFERENCE_UI_BASE_URL: string = REFERENCE_UI_URL_SELECTOR[window.NEAR_ENV];

@@ -190,7 +190,7 @@ export class DaoPage extends Component<Props, State> {
         const { noMulticall, noDao } = fields(this.schema, "addr");
 
         if (
-            this.fee === undefined ||
+            this.fee === "" ||
             // wallet not logged in or DAO object not initialized yet
             dao?.ready !== true
         ) {
@@ -587,6 +587,8 @@ export class DaoPage extends Component<Props, State> {
     }
 
     render() {
+        const { name } = this.state;
+
         return (
             <div className="DaoPage">
                 <div className="DaoPage-header">
