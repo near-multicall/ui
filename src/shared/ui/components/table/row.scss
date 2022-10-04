@@ -29,7 +29,7 @@
         background-color: color.$lightest;
     }
 
-    &--mobile {
+    &--compact {
         display: flex;
         flex-direction: column;
         gap: 0.25 * size.$gap;

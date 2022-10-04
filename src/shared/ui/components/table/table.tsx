@@ -22,7 +22,7 @@ export const Table = ({ header, rows }: TableProps) => {
     return (
         <>
             {matches ? (
-                <div className="Table--mobile">
+                <div className="Table--compact">
                     {rows &&
                         rows.map((cells, index) => (
                             <TableRowCard

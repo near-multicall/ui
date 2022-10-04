@@ -19,7 +19,7 @@ export const TableRow = ({ cells, headerCells }: TableRowProps) => (
     </>
 );
 
-const _TableRowCard = `${_TableRow}--mobile`;
+const _TableRowCard = `${_TableRow}--compact`;
 
 export const TableRowCard = ({ cells, headerCells }: TableRowProps) => (
     <div className={_TableRowCard}>
