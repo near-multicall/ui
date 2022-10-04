@@ -5,7 +5,7 @@ import type { HTMLProps } from "react";
 import { ArgsAccount } from "../../../shared/lib/args";
 import { Multicall } from "../../../shared/lib/contracts/multicall";
 import { toNEAR } from "../../../shared/lib/converter";
-import { Facet } from "../../../shared/ui/components";
+import { Tile } from "../../../shared/ui/components";
 
 import "./config.scss";
 
@@ -36,7 +36,7 @@ const _DaoConfigTab = "DaoConfigTab";
 
 const DaoConfigTabComponent = ({ className, contracts: { multicall } }: DaoConfigTabComponentProps) => (
     <div className={clsx(_DaoConfigTab, className)}>
-        <Facet className="AdminsList">
+        <Tile className="AdminsList">
             <AddOutlined />
             <h1 className="title">Admins</h1>
 
@@ -47,9 +47,9 @@ const DaoConfigTabComponent = ({ className, contracts: { multicall } }: DaoConfi
                     </li>
                 ))}
             </ul>
-        </Facet>
+        </Tile>
 
-        <Facet className="TokenWhitelist">
+        <Tile className="TokenWhitelist">
             <h1 className="title">Whitelisted Tokens</h1>
 
             <ul className="list">
@@ -59,14 +59,14 @@ const DaoConfigTabComponent = ({ className, contracts: { multicall } }: DaoConfi
                     </li>
                 ))}
             </ul>
-        </Facet>
+        </Tile>
 
-        <Facet className="JobBond">
+        <Tile className="JobBond">
             <h1 className="JobBond-title title">
                 Job Bond
                 <span>{`${multicall.jobBond !== "" ? toNEAR(multicall.jobBond) : "..."} Ⓝ`}</span>
             </h1>
-        </Facet>
+        </Tile>
     </div>
 );
 
