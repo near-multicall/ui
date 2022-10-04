@@ -1,4 +1,4 @@
-import { Facet, Scrollable, Table } from "../../../shared/ui/components";
+import { Tile, Scrollable, Table } from "../../../shared/ui/components";
 import { type DaoContracts } from "../../../entities/types";
 import { FungibleToken, NearToken } from "../../../entities";
 
@@ -12,19 +12,19 @@ export const TokensBalances = ({ className, contracts }: TokensBalancesProps) =>
         fungibleTokensBalances = FungibleToken.allBalancesRender({ contracts });
 
     return (
-        <Facet {...{ className }}>
+        <Tile {...{ className }}>
             <h1 className="title">Tokens balances</h1>
 
-            {!nearTokenBalances ?? !fungibleTokensBalances ? (
-                <div className="loader" />
-            ) : (
+            {(nearTokenBalances ?? fungibleTokensBalances) && (
                 <Scrollable>
                     <Table
                         header={["Token", "Multicall", "DAO", "Total"]}
-                        rows={[nearTokenBalances].concat(fungibleTokensBalances)}
+                        rows={[...(nearTokenBalances ? [nearTokenBalances] : []), ...(fungibleTokensBalances ?? [])]}
                     />
                 </Scrollable>
             )}
-        </Facet>
+
+            {(!nearTokenBalances || !fungibleTokensBalances) && <div className="loader" />}
+        </Tile>
     );
 };
