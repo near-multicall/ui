@@ -15,7 +15,6 @@ import { Tabs, TextInput } from "../../shared/ui/components";
 import { DaoFundsTab } from "./funds/funds";
 import { DaoJobsTab } from "./jobs/jobs";
 import { DaoConfigTab } from "./config/config";
-
 import "./dao.scss";
 
 // minimum balance a multicall instance needs for storage + state.

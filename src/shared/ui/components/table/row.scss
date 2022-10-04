@@ -17,11 +17,11 @@
         &:first-of-type {
             text-align: left;
             font-family: font.$text;
-            padding-left: 1.25 * size.$gap;
+            padding-left: calc(1.25 * size.$gap);
         }
 
         &:last-of-type {
-            padding-right: 1.25 * size.$gap;
+            padding-right: calc(1.25 * size.$gap);
         }
     }
 
@@ -29,28 +29,34 @@
         background-color: color.$lightest;
     }
 
-    &--mobile {
+    &--compact {
         display: flex;
         flex-direction: column;
-        gap: 0.25 * size.$gap;
+        gap: calc(0.5 * size.$gap);
         border-radius: size.$task-radius;
         padding: size.$gap;
         background-color: color.$light;
+    }
 
-        & > div {
+    &-content {
+        &--compact {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: size.$text;
+            font-size: calc(1.1 * size.$text);
+
             span:first-of-type {
                 font-weight: 800;
             }
+
             &:first-of-type {
-                margin-bottom: 0.5 * size.$gap;
+                margin-bottom: calc(0.5 * size.$gap);
+
                 & > span {
                     &:first-of-type {
                         display: none;
                     }
+
                     &:last-child {
                         font-size: size.$large-text;
                     }
