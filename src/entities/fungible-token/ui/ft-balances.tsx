@@ -1,14 +1,12 @@
 import { TokenLabel } from "../../../shared/ui/components";
-import type { DaoContracts } from "../../types";
 import { FungibleTokenFormat } from "../lib/ft-format";
 import { FungibleTokenBalancesModel } from "../model/ft-balances";
+import { Dependencies } from "../config";
 
-interface FungibleTokensBalancesRenderProps {
-    contracts: DaoContracts;
-}
+interface FungibleTokensBalancesRenderProps extends Dependencies {}
 
 export const fungibleTokensBalancesRender = ({ contracts }: FungibleTokensBalancesRenderProps) => {
-    const { data } = FungibleTokenBalancesModel.useAllData(contracts);
+    const { data } = FungibleTokenBalancesModel.useAllTokensFrom(contracts);
 
     return !data
         ? null

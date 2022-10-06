@@ -20,18 +20,21 @@ const CONTRACT_CODE_HASHES_SELECTOR: Record<string, string[]> = {
 
 const KEY_JOB_COUNT: string = "g";
 
-// Schema for Multicall jobs
-type JobSchema = {
-    croncat_hash: string;
-    creator: string;
-    bond: string; // string encoded number (u128)
-    cadence: string;
-    trigger_gas: string; // string encoded number (u64)
-    croncat_budget: string; // string encoded number (u128)
-    start_at: string; // string encoded number (u64)
-    run_count: number;
-    is_active: boolean;
-    multicalls: MulticallArgs[];
+type JobData = {
+    id: number;
+
+    job: {
+        croncat_hash: string;
+        creator: string;
+        bond: string; // string encoded number (u128)
+        cadence: string;
+        trigger_gas: string; // string encoded number (u64)
+        croncat_budget: string; // string encoded number (u128)
+        start_at: string; // string encoded number (u64)
+        run_count: number;
+        is_active: boolean;
+        multicalls: MulticallArgs[];
+    };
 };
 
 type FunctionCall = {
@@ -209,7 +212,7 @@ class Multicall {
     /**
      * list all currently registered jobs
      */
-    async getJobs(): Promise<{ id: number; job: JobSchema }[]> {
+    async getJobs(): Promise<JobData[]> {
         return view(this.address, "get_jobs", {});
     }
 
@@ -259,4 +262,4 @@ class Multicall {
 }
 
 export { Multicall };
-export type { JobSchema, MulticallArgs };
+export type { JobData, MulticallArgs };

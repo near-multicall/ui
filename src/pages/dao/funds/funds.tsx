@@ -1,10 +1,10 @@
 import clsx from "clsx";
 
-import { TokensBalances, type TokensBalancesProps } from "../../../widgets/tokens-balances";
+import { TokensBalances, type TokensBalancesDependencies } from "../../../widgets";
 
 import "./funds.scss";
 
-interface DaoFundsTabComponentProps extends TokensBalancesProps {}
+interface DaoFundsTabComponentProps extends TokensBalancesDependencies {}
 
 const _DaoFundsTab = "DaoFundsTab";
 

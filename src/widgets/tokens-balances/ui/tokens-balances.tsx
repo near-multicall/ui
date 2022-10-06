@@ -1,13 +1,9 @@
 import { Tile, Scrollable, Table } from "../../../shared/ui/components";
-import { type DaoContracts } from "../../../entities/types";
 import { FungibleToken, NearToken } from "../../../entities";
 
-export interface TokensBalancesProps {
-    className?: string;
-    contracts: DaoContracts;
-}
+import { Dependencies } from "../config";
 
-export const TokensBalances = ({ className, contracts }: TokensBalancesProps) => {
+export const TokensBalances = ({ className, contracts }: Dependencies) => {
     const nearTokenBalances = NearToken.balancesRender({ contracts }),
         fungibleTokensBalances = FungibleToken.allBalancesRender({ contracts });
 
