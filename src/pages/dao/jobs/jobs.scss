@@ -1,0 +1,15 @@
+@use "sass/color";
+@use "sass/font";
+@use "sass/size";
+
+.DaoJobsTab {
+    display: grid;
+    grid-template: "jobsList" auto;
+
+    &-jobsList {
+        grid-area: jobsList;
+        padding-bottom: size.$gap;
+        position: relative;
+        overflow: hidden;
+    }
+}

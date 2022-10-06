@@ -1,0 +1,16 @@
+@use "sass/color";
+@use "sass/font";
+@use "sass/mixin";
+@use "sass/size";
+
+.DaoFundsTab {
+    display: grid;
+    grid-template: "tokenBalances" 1fr / 1fr;
+
+    &-tokenBalances {
+        grid-area: tokenBalances;
+        padding-bottom: size.$gap;
+        position: relative;
+        overflow: hidden;
+    }
+}

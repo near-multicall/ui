@@ -1,0 +1,30 @@
+@use "sass/color";
+@use "sass/font";
+@use "sass/mixin";
+@use "sass/size";
+
+.DaoConfigTab {
+    display: grid;
+
+    grid-template:
+        "AdminsList ." 6fr
+        "TokenWhitelist ." 5fr
+        "TokenWhitelist JobBond" 1fr / 1fr 1fr;
+
+    .AdminsList {
+        grid-area: AdminsList;
+    }
+
+    .TokenWhitelist {
+        grid-area: TokenWhitelist;
+    }
+
+    .JobBond {
+        grid-area: JobBond;
+
+        &-title {
+            @include mixin.center-items(space-between, center);
+            height: 100%;
+        }
+    }
+}

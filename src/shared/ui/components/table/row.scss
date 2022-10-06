@@ -2,7 +2,7 @@
 @use "sass/size";
 @use "sass/font";
 
-.table-row-default {
+.Table-row {
     overflow: hidden;
     position: relative;
     white-space: pre;
@@ -17,41 +17,51 @@
         &:first-of-type {
             text-align: left;
             font-family: font.$text;
-            padding-left: 1.25 * size.$gap;
+            padding-left: calc(1.25 * size.$gap);
         }
 
         &:last-of-type {
-            padding-right: 1.25 * size.$gap;
+            padding-right: calc(1.25 * size.$gap);
         }
     }
 
     &:hover {
         background-color: color.$lightest;
     }
-}
 
-.table-row-card {
-    display: flex;
-    flex-direction: column;
-    gap: size.$gap;
-    border-radius: 16px;
-    padding: 16px;
-    background-color: color.$light;
-
-    .content {
+    &--compact {
         display: flex;
-        justify-content: space-between;
-        grid-template-columns: auto 100%;
+        flex-direction: column;
+        gap: calc(0.5 * size.$gap);
+        border-radius: size.$task-radius;
+        padding: size.$gap;
+        background-color: color.$light;
+    }
 
-        > div:first-of-type {
-            white-space: nowrap;
-        }
-
-        > div:last-child {
-            width: 100%;
+    &-content {
+        &--compact {
             display: flex;
-            justify-content: flex-end;
+            justify-content: space-between;
             align-items: center;
+            font-size: calc(1.1 * size.$text);
+
+            span:first-of-type {
+                font-weight: 800;
+            }
+
+            &:first-of-type {
+                margin-bottom: calc(0.5 * size.$gap);
+
+                & > span {
+                    &:first-of-type {
+                        display: none;
+                    }
+
+                    &:last-child {
+                        font-size: size.$large-text;
+                    }
+                }
+            }
         }
     }
 }

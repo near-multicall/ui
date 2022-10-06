@@ -1,11 +1,41 @@
-## Website
-Try our UI at https://multicall.app
-Use it to build your [multicalls](https://github.com/near-multicall/contracts).
+# NEAR Multicall
 
-## Quickstart
-1. Install dependencies: `yarn`
-2. Run: `yarn start`
+Multicall is a tool for DAOs that allows proposal creators to bundle multiple cross-contract calls in one proposal.
+You may find more information on the project [here](https://github.com/near-multicall/contracts).
 
-## What is multicall?
-It's a tool for DAOs that allows for bundling multiple cross-contract calls in one proposal.
-You may find more information on the multicall project [here](https://github.com/near-multicall/contracts).
+---
+
+## Multicall UI
+
+This repository contains graphical user interface application for building [multicalls](https://github.com/near-multicall/contracts).
+Try it out at [NEAR Mainnet](https://multicall.app) or [NEAR Testnet](https://testnet.multicall.app)
+
+---
+
+### Development
+
+#### Quick start
+
+##### Install dependencies
+
+```sh
+yarn
+```
+
+##### Run development server
+
+For **NEAR Testnet**:
+
+```sh
+yarn start:testnet
+```
+
+For **NEAR Mainnet**:
+
+```sh
+yarn start:mainnet
+```
+
+#### Architectural specification
+
+This application's architecture applies [Feature-Sliced Design](https://Feature-Sliced.Design/) principles.
