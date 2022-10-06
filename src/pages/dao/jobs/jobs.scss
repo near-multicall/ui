@@ -4,26 +4,12 @@
 
 .DaoJobsTab {
     display: grid;
+    grid-template: "jobsList" auto;
 
-    grid-template: "JobsList" auto;
-
-    .JobsList {
-        grid-area: JobsList;
+    &-jobsList {
+        grid-area: jobsList;
+        padding-bottom: size.$gap;
         position: relative;
-
-        &-item {
-            position: relative;
-            margin: size.$gap;
-            margin-top: 0;
-            border-radius: size.$task-radius;
-            background-color: color.$lightest;
-
-            pre {
-                padding: 0.5 * size.$gap;
-                font-family: font.$code;
-                font-size: size.$small-text;
-                overflow: hidden;
-            }
-        }
+        overflow: hidden;
     }
 }

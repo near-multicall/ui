@@ -6,7 +6,7 @@ import { Component, ContextType } from "react";
 import { Wallet } from "../../entities";
 import { ArgsAccount, ArgsError } from "../../shared/lib/args";
 import { SputnikDAO, SputnikUI, ProposalStatus } from "../../shared/lib/contracts/sputnik-dao";
-import { JobSchema, Multicall } from "../../shared/lib/contracts/multicall";
+import { Multicall } from "../../shared/lib/contracts/multicall";
 import { toYocto, Big, toGas } from "../../shared/lib/converter";
 import { STORAGE } from "../../shared/lib/persistent";
 import type { ProposalOutput } from "../../shared/lib/contracts/sputnik-dao";
@@ -30,7 +30,6 @@ interface State {
     loading: boolean;
     proposed: number;
     proposedInfo: ProposalOutput | null;
-    jobs: JobSchema[];
 }
 
 const _DaoPage = "DaoPage";
@@ -49,7 +48,6 @@ export class DaoPage extends Component<Props, State> {
             loading: false,
             proposed: -1,
             proposedInfo: null,
-            jobs: [],
         };
 
         this.fee = "";
@@ -340,14 +338,10 @@ export class DaoPage extends Component<Props, State> {
                 return;
             } else {
                 // DAO correctly initialized, try to fetch multicall info
-                Promise.all([
-                    multicall.getJobs().catch(console.error),
-                    this.proposalAlreadyExists(dao).catch(console.error),
-                ]).then(([jobs, proposalData]) =>
+                Promise.all([this.proposalAlreadyExists(dao).catch(console.error)]).then(([proposalData]) =>
                     this.setState(({ proposed }) => ({
                         dao,
                         multicall,
-                        jobs: jobs || [],
                         loading: false,
                         proposed: proposalData?.proposal_id || proposed,
                         proposedInfo: proposalData?.proposal_info || null,
@@ -359,7 +353,7 @@ export class DaoPage extends Component<Props, State> {
 
     getContent() {
         const { selector: walletSelector } = this.context!;
-        const { dao, jobs, loading, multicall } = this.state;
+        const { dao, loading, multicall } = this.state;
 
         // TODO: only require signIn when DAO has no multicall instance (to know if user can propose or vote on existing proposal to create multicall)
         if (!walletSelector.isSignedIn()) {
@@ -404,7 +398,7 @@ export class DaoPage extends Component<Props, State> {
                 items={[
                     DaoConfigTab.connect({ className: `${_DaoPage}-content`, contracts: { multicall } }),
                     DaoFundsTab.connect({ className: `${_DaoPage}-content`, contracts: { dao, multicall } }),
-                    DaoJobsTab.connect({ className: `${_DaoPage}-content`, jobs }),
+                    DaoJobsTab.connect({ className: `${_DaoPage}-content`, contracts: { multicall } }),
                 ]}
             />
         );
