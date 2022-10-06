@@ -4,10 +4,10 @@
 
 .DaoJobsTab {
     display: grid;
-    grid-template: "jobsList jobInfo" auto / 50%;
+    grid-template: "jobsList jobDetails" auto / 50%;
 
-    &-jobInfo {
-        grid-area: jobInfo;
+    &-jobDetails {
+        grid-area: jobDetails;
         padding-bottom: size.$gap;
         position: relative;
         overflow: hidden;

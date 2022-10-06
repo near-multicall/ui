@@ -22,8 +22,8 @@ const DaoJobsTabComponent = ({ className, contracts }: DaoJobsTabComponentProps)
                 {...{ contracts }}
             />
 
-            <Job.Info
-                className={`${_DaoJobsTab}-jobInfo`}
+            <Job.Details
+                className={`${_DaoJobsTab}-jobDetails`}
                 id={selectedJobId}
             />
         </div>

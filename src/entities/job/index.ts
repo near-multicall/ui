@@ -1,8 +1,8 @@
-import { JobInfo } from "./ui/job-info";
+import { JobDetails } from "./ui/job-details";
 import { JobsList } from "./ui/jobs-list";
 
 export class Job {
-    static Info = JobInfo;
+    static Details = JobDetails;
     static ListOfAll = JobsList;
 }
 

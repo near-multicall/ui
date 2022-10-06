@@ -4,15 +4,15 @@ import { JobData } from "../../../shared/lib/contracts/multicall";
 import { Tile } from "../../../shared/ui/components";
 import { Dependencies } from "../config";
 
-interface JobInfoProps extends Pick<Dependencies, "className"> {
+interface JobDetailsProps extends Pick<Dependencies, "className"> {
     id: JobData["id"] | null;
 }
 
-const _JobInfo = "JobInfo";
+const _JobDetails = "JobDetails";
 
-export const JobInfo = ({ className, id }: JobInfoProps) => {
+export const JobDetails = ({ className, id }: JobDetailsProps) => {
     return (
-        <Tile className={clsx(_JobInfo, className)}>
+        <Tile className={clsx(_JobDetails, className)}>
             <h1 className="title">Job details</h1>
         </Tile>
     );
