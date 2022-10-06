@@ -3,11 +3,9 @@ import { Tile, Scrollable, Table } from "../../../shared/ui/components";
 import { JobDataModel } from "../model/job-data";
 import { Dependencies } from "../config";
 
-interface JobsListProps extends Dependencies {
-    elementClickHandler: (id: number) => void;
-}
+interface JobsListProps extends Dependencies {}
 
-export const JobsList = ({ className, contracts, elementClickHandler }: JobsListProps) => {
+export const JobsList = ({ className, contracts }: JobsListProps) => {
     const { data, loading } = JobDataModel.useAllJobsFrom(contracts);
 
     return (
