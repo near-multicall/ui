@@ -1,4 +1,4 @@
-import { cronToDate } from "../../../shared/lib/converter";
+import { cronToDate, toTGas } from "../../../shared/lib/converter";
 import { Tile, Scrollable, Table } from "../../../shared/ui/components";
 import { JobDataModel } from "../model/job-data";
 import { Dependencies } from "../config";
@@ -30,7 +30,7 @@ export const JobsList = ({ className, contracts }: JobsListProps) => {
                             cronToDate(job.cadence).toLocaleString(),
                             job.croncat_hash,
                             job.creator,
-                            job.trigger_gas,
+                            `${toTGas(job.trigger_gas)} Tgas`,
                             job.run_count,
                             <pre>{JSON.stringify(job.multicalls, null, " ")}</pre>,
                         ])}
