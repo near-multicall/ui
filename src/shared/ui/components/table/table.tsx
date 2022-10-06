@@ -7,11 +7,13 @@ import {
     useMediaQuery,
     useTheme,
 } from "@mui/material";
+import clsx from "clsx";
+import { HTMLAttributes } from "react";
 
 import { TableRowCard, TableRow, type TableRowProps } from "./row";
 import "./table.scss";
 
-interface TableProps {
+interface TableProps extends HTMLAttributes<HTMLDivElement> {
     /**
      * `"classic"` mode is a classic table view.
      *
@@ -30,7 +32,7 @@ interface TableProps {
 
 const _Table = "Table";
 
-export const Table = ({ displayMode = "default", header, rows }: TableProps) => {
+export const Table = ({ className, displayMode = "default", header, rows }: TableProps) => {
     const mediumOrSmallScreen = useMediaQuery(useTheme().breakpoints.down("md")),
         classicModeRequired = (!mediumOrSmallScreen && displayMode === "default") || displayMode === "classic",
         compactModeRequired = (mediumOrSmallScreen && displayMode === "default") || displayMode === "compact";
@@ -38,7 +40,7 @@ export const Table = ({ displayMode = "default", header, rows }: TableProps) => 
     return (
         <>
             {classicModeRequired && (
-                <TableContainer className={_Table}>
+                <TableContainer className={clsx(_Table, className)}>
                     <table>
                         <TableHead className={`${_Table}-head`}>
                             <MuiTableRow>
@@ -62,7 +64,7 @@ export const Table = ({ displayMode = "default", header, rows }: TableProps) => 
             )}
 
             {compactModeRequired && (
-                <div className={`${_Table}--compact`}>
+                <div className={clsx(`${_Table}--compact`, className)}>
                     {rows &&
                         rows.map((cells, index) => (
                             <TableRowCard
