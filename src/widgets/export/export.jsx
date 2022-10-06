@@ -233,7 +233,14 @@ export class Export extends Component {
                                     Multicall.init(STORAGE.addresses.multicall),
                                 ]);
                                 const [addJobTx, proposeJobTx] = await Promise.all([
-                                    multicall.addJob([], new Date(), toGas("100"), toYocto("1")),
+                                    multicall.addJob(
+                                        // TODO: support jobs with multiple multicalls
+                                        [multicallArgs],
+                                        // trigger date
+                                        new Date(),
+                                        convert(gas.value, gas.unit),
+                                        toYocto("1")
+                                    ),
                                     dao.proposeJobActivation("test job activation", jobCount, toYocto("1")),
                                 ]);
                                 signAndSendTxs([addJobTx, proposeJobTx]);
