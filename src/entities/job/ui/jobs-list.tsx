@@ -2,16 +2,6 @@ import { Tile, Scrollable, Table } from "../../../shared/ui/components";
 import { Dependencies } from "../config";
 import { JobDataModel } from "../model/job-data";
 
-const _Job = ({ data: { croncat_hash, is_active, ...data } }: { data: JobData }) => (
-    <div
-        className="JobsList-item"
-        key={croncat_hash}
-    >
-        {is_active ? <PauseOutlined /> : <PlayArrowOutlined />}
-        <pre>{JSON.stringify(data, null, "  ")}</pre>
-    </div>
-);
-
 interface JobsListProps extends Dependencies {}
 
 export const JobsList = ({ className, contracts }: JobsListProps) => {
@@ -32,7 +22,7 @@ export const JobsList = ({ className, contracts }: JobsListProps) => {
                             job.creator,
                             job.trigger_gas,
                             job.run_count,
-                            JSON.stringify(job.multicalls, null, "  "),
+                            <pre>{JSON.stringify(job.multicalls, null, " ")}</pre>,
                         ])}
                     />
                 </Scrollable>
