@@ -1,44 +1,19 @@
-import { AddOutlined, DeleteOutline, EditOutlined, PauseOutlined, PlayArrowOutlined } from "@mui/icons-material";
 import clsx from "clsx";
-import type { HTMLProps } from "react";
 
-import { JobSchema } from "../../../shared/lib/contracts/multicall";
-import { Tile, Scrollable } from "../../../shared/ui/components";
+import { Job, type JobDependencies } from "../../../entities";
 
 import "./jobs.scss";
 
-const Job = ({ data: { croncat_hash, is_active, ...data } }: { data: JobSchema }) => (
-    <div
-        className="JobsList-item"
-        key={croncat_hash}
-    >
-        <EditOutlined />
-        <DeleteOutline />
-        {is_active ? <PauseOutlined /> : <PlayArrowOutlined />}
-        <pre>{JSON.stringify(data, null, "  ")}</pre>
-    </div>
-);
-
-interface DaoJobsTabComponentProps extends HTMLProps<HTMLDivElement> {
-    jobs: JobSchema[];
-}
+interface DaoJobsTabComponentProps extends JobDependencies {}
 
 const _DaoJobsTab = "DaoJobsTab";
 
-const DaoJobsTabComponent = ({ className, jobs }: DaoJobsTabComponentProps) => (
+const DaoJobsTabComponent = ({ className, contracts }: DaoJobsTabComponentProps) => (
     <div className={clsx(_DaoJobsTab, className)}>
-        <Tile className="JobsList">
-            <AddOutlined />
-            <h1 className="title">Jobs</h1>
-            <Scrollable>
-                {jobs.map((data) => (
-                    <Job
-                        key={data.croncat_hash}
-                        {...{ data }}
-                    />
-                ))}
-            </Scrollable>
-        </Tile>
+        <Job.ListOfAll
+            className={`${_DaoJobsTab}-jobsList`}
+            {...{ contracts }}
+        />
     </div>
 );
 
