@@ -12,8 +12,8 @@ type FungibleTokensData = {
 const fungibleTokensDataFx = async ({ dao, multicall }: DaoContracts, callback: (data: FungibleTokensData) => void) => {
     /* Get LikelyTokens list on DAO and its Multicall instance */
     const [daoLikelyTokensList, multicallLikelyTokensList] = await Promise.all([
-        FungibleToken.getLikelyTokenContracts(multicall.address),
         FungibleToken.getLikelyTokenContracts(dao.address),
+        FungibleToken.getLikelyTokenContracts(multicall.address),
     ]);
 
     /* Merge and de-duplicate both token lists */

@@ -14,8 +14,8 @@ export const fungibleTokensBalancesRender = ({ contracts }: FungibleTokensBalanc
         ? null
         : data.map(({ dao, metadata, multicall, total }) => [
               <TokenLabel {...metadata} />,
-              FungibleTokenFormat.amountToDisplayAmount(dao, metadata.decimals),
               FungibleTokenFormat.amountToDisplayAmount(multicall, metadata.decimals),
+              FungibleTokenFormat.amountToDisplayAmount(dao, metadata.decimals),
               FungibleTokenFormat.amountToDisplayAmount(total, metadata.decimals),
           ]);
 };
