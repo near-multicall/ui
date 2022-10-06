@@ -3,14 +3,16 @@ import { Tile, Scrollable, Table } from "../../../shared/ui/components";
 import { JobDataModel } from "../model/job-data";
 import { Dependencies } from "../config";
 
-interface JobsListProps extends Dependencies {}
+interface JobsListProps extends Dependencies {
+    elementClickHandler: (id: number) => void;
+}
 
-export const JobsList = ({ className, contracts }: JobsListProps) => {
+export const JobsList = ({ className, contracts, elementClickHandler }: JobsListProps) => {
     const { data, loading } = JobDataModel.useAllJobsFrom(contracts);
 
     return (
         <Tile {...{ className }}>
-            <h1 className="title">Jobs</h1>
+            <h1 className="title">All jobs</h1>
 
             {data && (
                 <Scrollable>
@@ -18,6 +20,7 @@ export const JobsList = ({ className, contracts }: JobsListProps) => {
                         displayMode="compact"
                         header={[
                             "Active status",
+                            "ID",
                             "Start at",
                             "Croncat hash",
                             "Creator",
@@ -25,8 +28,9 @@ export const JobsList = ({ className, contracts }: JobsListProps) => {
                             "Run count",
                             "Multicalls",
                         ]}
-                        rows={data.map(({ job }) => [
+                        rows={Object.values(data).map(({ id, job }) => [
                             job.is_active ? "Active" : "Inactive",
+                            id,
                             cronToDate(job.cadence).toLocaleString(),
                             job.croncat_hash,
                             job.creator,

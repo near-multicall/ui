@@ -4,7 +4,7 @@ import { JobData } from "../../../shared/lib/contracts/multicall";
 import { Dependencies } from "../config";
 
 type JobsDataFxResponse = {
-    data: JobData[] | null;
+    data: Record<JobData["id"], JobData> | null;
     error?: Error | null;
     loading: boolean;
 };
@@ -13,7 +13,10 @@ const jobsDataFx = async ({ multicall }: Dependencies["contracts"], callback: (r
     callback(
         await multicall
             .getJobs()
-            .then((data) => ({ data, loading: false }))
+            .then((data) => ({
+                data: data.reduce((jobsRegistry, { id, job }) => ({ ...jobsRegistry, [id]: { id, job } }), {}),
+                loading: false,
+            }))
             .catch((error) => ({ data: null, error: new Error(error), loading: false }))
     );
 
