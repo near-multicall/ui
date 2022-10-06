@@ -3,7 +3,11 @@ import { Tile, Scrollable, Table } from "../../../shared/ui/components";
 import { JobDataModel } from "../model/job-data";
 import { Dependencies } from "../config";
 
+import "./jobs-list.scss";
+
 interface JobsListProps extends Dependencies {}
+
+const _JobsList = "JobsList";
 
 export const JobsList = ({ className, contracts }: JobsListProps) => {
     const { data, loading } = JobDataModel.useAllJobsFrom(contracts);
@@ -15,6 +19,7 @@ export const JobsList = ({ className, contracts }: JobsListProps) => {
             {data && (
                 <Scrollable>
                     <Table
+                        className={_JobsList}
                         displayMode="compact"
                         header={[
                             "Active status",
@@ -34,7 +39,11 @@ export const JobsList = ({ className, contracts }: JobsListProps) => {
                             job.creator,
                             `${toTGas(job.trigger_gas)} Tgas`,
                             job.run_count,
-                            <pre>{JSON.stringify(job.multicalls, null, " ")}</pre>,
+
+                            <details>
+                                <summary>Multicalls</summary>
+                                <pre>{JSON.stringify(job.multicalls, null, " ")}</pre>
+                            </details>,
                         ])}
                     />
                 </Scrollable>
