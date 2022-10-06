@@ -1,2 +1,9 @@
 .JobsList {
+    .Table-row-content--compact:last-of-type {
+        & > span {
+            &:first-of-type {
+                display: none;
+            }
+        }
+    }
 }
