@@ -1,10 +1,10 @@
-import { MixedSchema } from "yup";
+import { MixedSchema as _MixedSchema } from "yup";
 import { addErrorMethods, ErrorMethods } from "../args-error";
 
 declare module "yup" {
     interface MixedSchema extends ErrorMethods {}
 }
 
-addErrorMethods(MixedSchema);
+addErrorMethods(_MixedSchema);
 
-export { MixedSchema };
+export { _MixedSchema as MixedSchema };

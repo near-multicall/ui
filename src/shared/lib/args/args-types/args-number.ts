@@ -1,10 +1,10 @@
-import { NumberSchema } from "yup";
+import { NumberSchema as _NumberSchema } from "yup";
 import { addErrorMethods, ErrorMethods } from "../args-error";
 
 declare module "yup" {
     interface NumberSchema extends ErrorMethods {}
 }
 
-addErrorMethods(NumberSchema);
+addErrorMethods(_NumberSchema);
 
-export { NumberSchema };
+export { _NumberSchema as NumberSchema };
