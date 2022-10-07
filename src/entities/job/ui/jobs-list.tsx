@@ -32,7 +32,7 @@ export const JobsList = ({ className, contracts }: JobsListProps) => {
                             "Multicalls",
                         ]}
                         rows={Object.values(data).map(({ id, job }) => [
-                            job.is_active ? "Active" : "Inactive",
+                            job.status,
                             id,
                             cronToDate(job.cadence).toLocaleString(),
                             job.croncat_hash,
