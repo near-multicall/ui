@@ -15,11 +15,12 @@ import { Link } from "react-router-dom";
 import { ArgsAccount, ArgsBig, ArgsError, ArgsString } from "../../shared/lib/args";
 import { errorMsg } from "../../shared/lib/errors";
 import { STORAGE } from "../../shared/lib/persistent";
-import { convert, toGas, toNEAR, toYocto } from "../../shared/lib/converter";
+import { Big, convert, toGas, toNEAR, toYocto } from "../../shared/lib/converter";
 import { Multicall } from "../../shared/lib/contracts/multicall";
 import { signAndSendTxs, view } from "../../shared/lib/wallet";
 import { Wallet } from "../../entities";
 import { TextInput, TextInputWithUnits } from "../../shared/ui/components";
+import { DateTimePicker } from "../../shared/ui/components/date-time-picker";
 import "./export.scss";
 
 export class Export extends Component {
@@ -64,7 +65,8 @@ export class Export extends Component {
             attachNEAR: false,
             attachFT: false,
             showArgs: false,
-            useJobs: false,
+            isJob: false,
+            jobDateTime: new Date(),
         };
 
         this.update = this.update.bind(this);
@@ -161,7 +163,7 @@ export class Export extends Component {
         }
         // normal propose multicall to DAO functionality
         else {
-            const { attachNEAR, attachFT, useJobs } = this.state;
+            const { attachNEAR, attachFT, isJob, jobDateTime } = this.state;
             const { gas, depo, desc } = this.total;
             const { token, amount } = this.ft;
             const errors = this.errors;
@@ -186,7 +188,7 @@ export class Export extends Component {
                     onClick={async () => {
                         const { currentDAO: dao } = WALLET_COMPONENT.state;
                         // case 1: immediate execution => basic multicall
-                        if (!useJobs) {
+                        if (!isJob) {
                             // multicall with attached FT
                             if (attachFT) {
                                 const tx = await dao.proposeMulticallFT(
@@ -227,6 +229,9 @@ export class Export extends Component {
                             //    );
                             // multicall with attached NEAR
                             else {
+                                const jobCost = attachNEAR
+                                    ? Big(convert(depo.value, depo.unit)).add(Multicall.CRONCAT_FEE).toFixed()
+                                    : Multicall.CRONCAT_FEE;
                                 console.log("multicall job with attached NEAR");
                                 const [jobCount, multicall] = await Promise.all([
                                     temporary.getJobCount(),
@@ -236,12 +241,10 @@ export class Export extends Component {
                                     multicall.addJob(
                                         // TODO: support jobs with multiple multicalls
                                         [multicallArgs],
-                                        // trigger date
-                                        new Date(),
-                                        convert(gas.value, gas.unit),
-                                        toYocto("1")
+                                        jobDateTime,
+                                        convert(gas.value, gas.unit)
                                     ),
-                                    dao.proposeJobActivation("test job activation", jobCount, toYocto("1")),
+                                    dao.proposeJobActivation(desc.value, jobCount, jobCost),
                                 ]);
                                 signAndSendTxs([addJobTx, proposeJobTx]);
                             }
@@ -264,9 +267,13 @@ export class Export extends Component {
 
     render() {
         const LAYOUT = this.props.layout; // ususally global parameter
-        const { attachNEAR, attachFT, showArgs } = this.state;
+        const { attachNEAR, attachFT, showArgs, isJob, jobDateTime } = this.state;
         const { gas, depo, desc } = this.total;
         const { amount, token } = this.ft;
+        // do not schedule jobs in the past
+        const currentDate = new Date();
+        // limit job scheduling to one year from now
+        const maxDate = new Date(new Date().setFullYear(currentDate.getFullYear() + 1));
 
         const allErrors = LAYOUT.toErrors();
         const errors = this.errors;
@@ -396,8 +403,8 @@ export class Export extends Component {
                             defaultValue="immediate"
                             name="radio-buttons-group"
                             onChange={(event, value) => {
-                                if (value === "immediate") this.setState({ useJobs: false });
-                                else if (value === "scheduled") this.setState({ useJobs: true });
+                                if (value === "immediate") this.setState({ isJob: false });
+                                else if (value === "scheduled") this.setState({ isJob: true });
                             }}
                         >
                             <FormControlLabel
@@ -412,6 +419,17 @@ export class Export extends Component {
                             />
                         </RadioGroup>
                     </FormControl>
+                    {isJob ? (
+                        <DateTimePicker
+                            label="Execution date"
+                            value={jobDateTime}
+                            minDateTime={currentDate}
+                            maxDateTime={maxDate}
+                            handleChange={(value) => {
+                                this.setState({ jobDateTime: value.toJSDate() });
+                            }}
+                        />
+                    ) : null}
                 </div>
                 {/* Display cards' errors */}
                 {allErrors.length > 0 && (
