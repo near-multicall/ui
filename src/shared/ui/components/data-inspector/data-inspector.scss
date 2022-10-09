@@ -11,12 +11,12 @@
     }
 
     &-body {
-        border-radius: size.$task-radius;
+        margin-top: calc(size.$gap / 2);
+        border-radius: calc(size.$task-radius / 2);
         padding: calc(size.$gap / 2);
-        background-color: color.$lightest;
 
         & * {
-            font-size: size.$text;
+            font-size: size.$large-text;
         }
     }
 }
