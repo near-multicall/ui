@@ -38,7 +38,7 @@
         position: absolute;
         left: calc(0.7 * size.$sidebar-width + 2px);
         top: calc(-0.125 * size.$gap - 1px);
-        padding: 0.25 * size.$gap size.$gap;
+        padding: calc(0.25 * size.$gap) 0 calc(0.25 * size.$gap) size.$gap;
         color: rgba(color.$text, 0.25);
         font-size: size.$text;
         white-space: nowrap;

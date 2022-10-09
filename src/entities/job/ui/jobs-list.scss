@@ -1,8 +1,20 @@
 .JobsList {
+    &-dataInspector {
+        &-label {
+            text-align: right;
+        }
+    }
+
     .Table-row-content--compact:last-of-type {
+        align-items: flex-start;
+
         & > span {
             &:first-of-type {
-                display: none;
+                position: absolute;
+            }
+
+            &:last-of-type {
+                width: 100%;
             }
         }
     }

@@ -1,11 +1,11 @@
 import { cronToDate, toTGas } from "../../../shared/lib/converter";
-import { Tile, Scrollable, Table } from "../../../shared/ui/components";
+import { DataInspector, Scrollable, Table, Tile } from "../../../shared/ui/components";
 import { JobDataModel } from "../model/job-data";
-import { Dependencies } from "../config";
+import { JobEntity } from "../config";
 
 import "./jobs-list.scss";
 
-interface JobsListProps extends Dependencies {}
+interface JobsListProps extends JobEntity.dependencies {}
 
 const _JobsList = "JobsList";
 
@@ -32,18 +32,19 @@ export const JobsList = ({ className, contracts }: JobsListProps) => {
                             "Multicalls",
                         ]}
                         rows={Object.values(data).map(({ id, job }) => [
-                            job.is_active ? "Active" : "Inactive",
+                            job.status,
                             id,
                             cronToDate(job.cadence).toLocaleString(),
-                            job.croncat_hash,
+                            job.croncat_hash.length === 0 ? <i>none</i> : job.croncat_hash,
                             job.creator,
                             `${toTGas(job.trigger_gas)} Tgas`,
                             job.run_count,
 
-                            <details>
-                                <summary>Multicalls</summary>
-                                <pre>{JSON.stringify(job.multicalls, null, " ")}</pre>
-                            </details>,
+                            <DataInspector
+                                classes={{ label: `${_JobsList}-dataInspector-label` }}
+                                data={job.multicalls}
+                                expandLevel={1}
+                            />,
                         ])}
                     />
                 </Scrollable>

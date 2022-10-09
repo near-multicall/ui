@@ -86,6 +86,7 @@
         "react": "^18.0.0",
         "react-beautiful-dnd": "^13.1.0",
         "react-dom": "^18.0.0",
+        "react-inspector": "^6.0.1",
         "react-router-dom": "6",
         "regenerator-runtime": "^0.13.9",
         "rxjs": "^7.5.6"

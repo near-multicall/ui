@@ -1,11 +1,10 @@
 import clsx from "clsx";
-import { useMemo, useState } from "react";
 
-import { Job, type JobDependencies } from "../../../entities";
+import { Job, type JobEntity } from "../../../entities";
 
 import "./jobs.scss";
 
-interface DaoJobsTabComponentProps extends JobDependencies {}
+interface DaoJobsTabComponentProps extends JobEntity.dependencies {}
 
 const _DaoJobsTab = "DaoJobsTab";
 
