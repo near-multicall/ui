@@ -4,6 +4,10 @@
 .DataInspector {
     &-label {
         color: darken(color.$blue, 30%);
+
+        & > span {
+            cursor: pointer;
+        }
     }
 
     &-body {

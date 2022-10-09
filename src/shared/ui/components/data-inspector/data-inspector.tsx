@@ -32,10 +32,11 @@ export const DataInspector = ({ classes, expanded = false, expandLevel = 1, labe
     return (
         <details
             className={clsx(_DataInspector, classes?.root)}
-            onClick={rootExpansionToggle}
             open={rootExpanded}
         >
-            <summary className={clsx(`${_DataInspector}-label`, classes?.label)}>{label ?? dynamicLabel}</summary>
+            <summary className={clsx(`${_DataInspector}-label`, classes?.label)}>
+                <span onClick={rootExpansionToggle}>{label ?? dynamicLabel}</span>
+            </summary>
 
             <div className={clsx(`${_DataInspector}-body`, classes?.body)}>
                 <ObjectInspector
