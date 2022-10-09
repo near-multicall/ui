@@ -40,6 +40,10 @@ const useJobsData = (contracts: JobEntity.dependencies["contracts"]) => {
 
     useEffect(() => void jobsDataFx(contracts, stateUpdate), []);
 
+    useEffect(() => {
+        state.error !== null && void console.error(state.error);
+    }, [state]);
+
     return state;
 };
 
