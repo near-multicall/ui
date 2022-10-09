@@ -28,7 +28,6 @@ export const JobsList = ({ className, contracts }: JobsListProps) => {
                             "Croncat hash",
                             "Creator",
                             "Trigger gas",
-                            "Run count",
                             "Multicalls",
                         ]}
                         rows={Object.values(data).map(({ id, job }) => [
@@ -38,7 +37,6 @@ export const JobsList = ({ className, contracts }: JobsListProps) => {
                             job.croncat_hash.length === 0 ? <i>none</i> : job.croncat_hash,
                             job.creator,
                             `${toTGas(job.trigger_gas)} Tgas`,
-                            job.run_count,
 
                             <DataInspector
                                 classes={{ label: `${_JobsList}-dataInspector-label` }}
