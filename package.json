@@ -73,8 +73,8 @@
         "@near-wallet-selector/sender": "^5.0.0",
         "@types/react": "^18.0.0",
         "big.js": "^6.2.1",
-        "cron-parser": "^4.6.0",
         "clsx": "^1.2.1",
+        "cron-parser": "^4.6.0",
         "js-base64": "^3.7.2",
         "lodash.debounce": "^4.0.8",
         "near-api-js": "^0.45.1",
@@ -83,6 +83,7 @@
         "react": "^18.0.0",
         "react-beautiful-dnd": "^13.1.0",
         "react-dom": "^18.0.0",
+        "react-inspector": "^6.0.1",
         "react-router-dom": "6",
         "regenerator-runtime": "^0.13.9",
         "rxjs": "^7.5.6"

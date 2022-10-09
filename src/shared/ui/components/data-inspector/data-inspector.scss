@@ -1,0 +1,14 @@
+@use "sass/color";
+@use "sass/size";
+
+.DataInspector {
+    &-body {
+        border-radius: size.$task-radius;
+        padding: calc(size.$gap / 2);
+        background-color: color.$lightest;
+
+        & * {
+            font-size: size.$text;
+        }
+    }
+}
