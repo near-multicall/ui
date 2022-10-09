@@ -2,6 +2,10 @@
 @use "sass/size";
 
 .DataInspector {
+    &-label {
+        color: darken(color.$blue, 30%);
+    }
+
     &-body {
         border-radius: size.$task-radius;
         padding: calc(size.$gap / 2);
