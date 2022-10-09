@@ -29,9 +29,9 @@ addMethod(_StringSchema, "json", function json(message = locale.string.json) {
         test: (value) => {
             if (value == null || value == "") return true;
             try {
-                if (JSON.parse(value)) return false;
+                if (JSON.parse(value)) return true;
             } catch (e) {}
-            return true;
+            return false;
         },
     });
 });

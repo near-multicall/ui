@@ -1,77 +1,65 @@
-import { DeleteOutline, MoveDown, EditOutlined } from "@mui/icons-material";
-import debounce from "lodash.debounce";
+import { DeleteOutline, EditOutlined, MoveDown } from "@mui/icons-material";
 import { Component } from "react";
 
+import clsx from "clsx";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import { args as arx } from "../shared/lib/args/args";
+import { fields } from "../shared/lib/args/args-types/args-object";
 import { TextInput, TextInputWithUnits, Tooltip } from "../shared/ui/components";
-import { ArgsAccount, ArgsBig, ArgsError, ArgsJSON, ArgsString } from "../shared/lib/args-old";
-import { args } from "../shared/lib/args/args";
-import Call from "../shared/lib/call";
-import { toGas, toYocto, formatTokenAmount, unitToDecimals } from "../shared/lib/converter";
-import { errorMsg } from "../shared/lib/errors";
-import { hasContract } from "../shared/lib/contracts/generic";
 import "./base.scss";
+import debounce from "lodash.debounce";
 
 export class BaseTask extends Component {
     uniqueClassName = "base-task";
-    schema = args
+    schema = arx
         .object()
-        .call()
         .shape({
-            address: args.string().contract(),
-            actions: args.array().of({
-                func: args.string(),
-                args: args.string().json(),
-                gas: args.gas(),
-                depo: args.token(),
-            }),
+            addr: arx.string().contract(),
+            func: arx.string(),
+            args: arx.string().json(),
+            gas: arx.big().gas(),
+            depo: arx.big().token("NEAR"),
         })
-        .transform((formData) => ({
-            address: formData.addr,
-            actions: [
-                {
-                    func: formData.func,
-                    args: formData.args,
-                    gas: formData.gas,
-                    depo: formData.depo,
-                },
-            ],
-        }))
-        .retain();
-    loadErrors;
+        .requireAll()
+        .retainAll();
+
+    initialValues = {
+        name: "Custom",
+        addr: "",
+        func: "",
+        args: "{}",
+        gas: "0",
+        gasUnit: "Tgas",
+        depo: "0",
+        depoUnit: "NEAR",
+    };
+
     options = {};
 
-    updateContractDebounced = debounce(() => this.updateContract(), 500);
+    resolveDebounced = debounce((resolve) => resolve(), 400);
 
     constructor(props) {
         super(props);
 
         this.state = {
-            formData: {
-                name: "Custom",
-                addr: "",
-                func: "",
-                args: "{}",
-                gas: "0",
-                gasUnit: "",
-                depo: "0",
-            },
+            formData: this.initialValues,
             showArgs: false,
             isEdited: false,
         };
 
         if (window.TEMP) {
-            this.formData = TEMP.formData;
+            this.state.formData = JSON.parse(JSON.stringify(TEMP.formData));
             this.state.showArgs = TEMP.showArgs;
             this.state.isEdited = TEMP.isEdited;
             this.options = TEMP.options;
             this.schema = TEMP.schema;
         } else if (window.COPY?.payload) {
             const optionsDeepCopy = JSON.parse(JSON.stringify(COPY.payload.options));
+            const formDataDeepCopy = JSON.parse(JSON.stringify(COPY.payload.formData));
 
             this.init({
                 name: COPY.payload.formData?.name?.toString(),
-                ...COPY.payload.formData.toJSON(),
-                units: COPY.payload.schema.toUnits(),
+                ...formDataDeepCopy,
                 options: optionsDeepCopy,
             });
             this.state.showArgs = COPY.payload.showArgs;
@@ -83,71 +71,35 @@ export class BaseTask extends Component {
         this.updateCard = this.updateCard.bind(this);
 
         document.addEventListener("onaddressesupdated", (e) => this.onAddressesUpdated(e));
-
-        this.updateContract();
     }
 
     init(json = null) {
-        const actions = json?.actions?.[0];
-        const units = json?.units?.actions?.[0];
-
-        this.call = new Call({
-            name: new ArgsString(json?.name ?? "Custom"),
-            addr: new ArgsAccount(json?.address ?? ""),
-            func: new ArgsString(actions?.func ?? ""),
-            args: new ArgsJSON(actions?.args ? JSON.stringify(actions?.args, null, "  ") : "{}"),
-            gas: new ArgsBig(
-                formatTokenAmount(actions?.gas ?? toGas("0"), units?.gas.decimals ?? unitToDecimals["Tgas"]),
-                "1",
-                toGas("300"),
-                units?.gas?.unit ?? "Tgas",
-                units?.gas?.decimals
-            ),
-            depo: new ArgsBig(
-                formatTokenAmount(actions?.depo ?? toYocto("0"), units?.depo.decimals ?? unitToDecimals["NEAR"]),
-                toYocto("0"),
-                null,
-                units?.depo?.unit ?? "NEAR",
-                units?.depo?.decimals
-            ),
+        Object.entries(json ?? {}).forEach(([k, v]) => {
+            if (v !== undefined && v !== null && this.initialValues[k] !== undefined) this.initialValues[k] = v;
         });
 
-        this.loadErrors = (() => {
-            for (let e in this.errors) {
-                this.errors[e].validOrNull(this.call[e]);
-            }
-            this.updateContract();
-        }).bind(this);
+        this.state.formData = this.initialValues;
+        this.schema.check(this.state.formData);
     }
 
     static inferOwnType(json) {
         return false;
     }
 
-    updateContract() {
-        const { addr } = this.call;
-        this.errors.noContract.isBad = false;
-
-        if (this.errors.addr.isBad) return;
-
-        // on failure set result to false
-        hasContract(addr.value)
-            .catch((e) => {
-                return false;
-            })
-            .then((res) => {
-                this.errors.noContract.isBad = !res;
-                this.updateCard();
-            });
-
-        // TODO: add methods to extract contract functions.
-        // TODO: add autocomplete for "func" input using fetched contract method names.
-        // might need to move logic for custom card to seaparate class that inherits from this.
+    setFormData(newFormData, callback) {
+        this.setState(
+            {
+                formData: {
+                    ...this.state.formData,
+                    ...newFormData,
+                },
+            },
+            callback
+        );
     }
 
     componentDidMount() {
-        this.loadErrors?.();
-        this.forceUpdate();
+        this.schema.check(this.state.formData).then(() => this.updateCard());
     }
 
     onAddressesUpdated() {}
@@ -156,81 +108,71 @@ export class BaseTask extends Component {
         this.setState({ isEdited: taskID === this.props.id });
     }
 
+    // TODO remove
     updateCard() {
         this.forceUpdate();
         EDITOR.forceUpdate();
     }
 
     renderEditor() {
-        const { name, addr, func, args, gas, depo } = this.call;
-
-        const errors = this.errors;
-
+        let init = true;
         return (
-            <div className="edit">
-                <TextInput
-                    value={name}
-                    variant="standard"
-                    margin="normal"
-                    autoFocus
-                    update={this.updateCard}
-                />
-                <TextInput
-                    label="Contract address"
-                    value={addr}
-                    error={[errors.addr, errors.noContract]}
-                    update={() => {
-                        this.updateCard();
-                        this.updateContractDebounced();
-                    }}
-                />
-                <TextInput
-                    label="Function name"
-                    value={func}
-                    error={errors.func}
-                    update={this.updateCard}
-                />
-                <TextInput
-                    label="Function arguments"
-                    value={args}
-                    error={errors.args}
-                    update={this.updateCard}
-                    multiline
-                />
-                <TextInputWithUnits
-                    label="Allocated gas"
-                    value={gas}
-                    error={errors.gas}
-                    options={["Tgas", "gas"]}
-                    update={this.updateCard}
-                />
-                <TextInputWithUnits
-                    label="Attached deposit"
-                    value={depo}
-                    error={errors.depo}
-                    options={["NEAR", "yocto"]}
-                    update={this.updateCard}
-                />
-            </div>
+            <Formik
+                initialValues={this.state.formData}
+                enableReinitialize={true}
+                validate={async (values) => {
+                    this.setFormData(values);
+                    await new Promise((resolve) => this.resolveDebounced(resolve));
+                    await this.schema.check(values);
+                    return Object.fromEntries(
+                        Object.entries(fields(this.schema))
+                            .map(([k, v]) => [k, v?.message() ?? ""])
+                            .filter(([_, v]) => v !== "")
+                    );
+                }}
+                onSubmit={() => {}}
+            >
+                {({ resetForm }) => {
+                    if (init) {
+                        resetForm(this.state.formData);
+                        init = false;
+                    }
+                    return (
+                        <Form>
+                            <Field name="name" />
+                            <ErrorMessage name="name" />
+                            <Field name="addr" />
+                            <ErrorMessage name="addr" />
+                            <Field name="func" />
+                            <ErrorMessage name="func" />
+                            <Field name="args" />
+                            <ErrorMessage name="args" />
+                            <Field name="gas" />
+                            <ErrorMessage name="gas" />
+                            <Field name="depo" />
+                            <ErrorMessage name="depo" />
+                        </Form>
+                    );
+                }}
+            </Formik>
         );
     }
 
     render() {
-        const { name, addr, func, args, gas, depo } = this.call;
+        const { showArgs, isEdited, formData } = this.state;
 
-        const errors = this.errors;
+        const { name, addr, func, args, gas, gasUnit, depo, depoUnit } = formData;
 
-        const hasErrors = Object.entries(errors).filter(([k, v]) => v.isBad).length > 0;
-
-        const { showArgs, isEdited } = this.state;
+        const hasErrors = this.schema.isBad();
 
         const { id } = this.props;
 
         return (
             <div
-                className={`task-container ${this.uniqueClassName} ${hasErrors ? "has-errors" : ""} ${
-                    isEdited ? "is-edited" : ""
-                }`}
+                className={clsx("task-container", this.uniqueClassName, {
+                    "has-errors": hasErrors,
+                    "is-edited": isEdited,
+                })}
             >
                 <div className="name">
                     <Tooltip
@@ -241,6 +183,7 @@ export class BaseTask extends Component {
                             className="edit icon"
                             onClick={() => {
                                 EDITOR.edit(id);
+                                EDITOR.forceUpdate();
                                 MENU.activeTabSwitch(1);
                             }}
                         />
@@ -258,7 +201,7 @@ export class BaseTask extends Component {
                         />
                     </Tooltip>
                     <div className="duplicate-pseudo"></div>
-                    <h3>{name.toString()}</h3>
+                    <h3>{name}</h3>
                     <Tooltip
                         title={"Delete"}
                         disableInteractive
@@ -277,16 +220,16 @@ export class BaseTask extends Component {
                         <span>Contract address</span>
                         <a
                             className="code"
-                            href={addr.toUrl()}
+                            href={arx.string().intoUrl().cast(addr)}
                             target="_blank"
                             rel="noopener noreferrer"
                         >
-                            {addr.toString()}
+                            {addr}
                         </a>
                     </p>
                     <p>
                         <span>Function name</span>
-                        <span className="code">{func.toString()}</span>
+                        <span className="code">{func}</span>
                     </p>
                     <p className="expandable">
                         <span>Function arguments</span>
@@ -296,22 +239,23 @@ export class BaseTask extends Component {
                             <a onClick={() => this.setState({ showArgs: true })}>show</a>
                         )}
                     </p>
-                    {showArgs &&
-                        (errors.args.validOrNull(args) ? (
-                            <pre className="code">{JSON.stringify(args.toString(), null, "  ")}</pre>
-                        ) : (
-                            <pre className="code">{errors.args.intermediate}</pre>
-                        ))}
+                    {showArgs && (
+                        <pre className="code">
+                            {arx.string().json().isValidSync(args)
+                                ? JSON.stringify(JSON.parse(args), null, "  ")
+                                : args}
+                        </pre>
+                    )}
                     <p>
                         <span>Allocated gas</span>
                         <span className="code">
-                            {gas.toString()} <span>{gas.unit}</span>
+                            {gas} <span>{gasUnit}</span>
                         </span>
                     </p>
                     <p>
                         <span>Attached deposit</span>
                         <span className="code">
-                            {depo.toString()} <span>{depo.unit}</span>
+                            {depo} <span>{depoUnit}</span>
                         </span>
                     </p>
                 </div>

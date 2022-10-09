@@ -25,10 +25,10 @@ export class Task extends Component {
 
             if (from) {
                 COPY.payload = {
-                    call: from.call,
+                    formData: from.state.formData,
                     showArgs: from.state.showArgs,
                     options: from.options,
-                    errors: from.errors,
+                    schema: from.schema,
                 };
             }
         }
@@ -40,11 +40,11 @@ export class Task extends Component {
             this.child = existent.child;
 
             window.TEMP = {
-                call: this.instance.current.call,
+                formData: this.instance.current.state.formData,
                 showArgs: this.instance.current.state.showArgs,
                 isEdited: this.instance.current.state.isEdited,
                 options: this.instance.current.options,
-                errors: this.instance.current.errors,
+                schema: this.instance.current.schema,
             };
         } else {
             this.instance = React.createRef();
@@ -156,7 +156,7 @@ export class Task extends Component {
                             zIndex: snapshot.isDragging ? 10 : 1,
                         }}
                     >
-                        {/* <h1 style={{paddingLeft: "20px"}}>{this.id}</h1> */}
+                        {/* <h1 style={{ paddingLeft: "20px" }}>{this.id}</h1> */}
                         {this.child}
                     </div>
                 )}

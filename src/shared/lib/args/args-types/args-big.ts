@@ -14,6 +14,11 @@ class BigSchema extends MixedSchema<Big> {
         };
     }
 
+    // override default yup method (disallow for empty string)
+    _isPresent(value: any): boolean {
+        return super._isPresent(value) && value !== "";
+    }
+
     // ensure value is greater equal than a minimum
     min(min: BigSource, message: string = locale.big.min) {
         return this.test({
@@ -63,17 +68,53 @@ class BigSchema extends MixedSchema<Big> {
 
     // transform value to human readable value
     // decimals can be determined from direct input, unit input or from memory (via this.decimals)
-    intoFormatted(decimalsOrUnit: number | unit = this.spec.meta.decimals) {
+    intoFormatted(decimalsOrUnit: number | unit = this.spec.meta.decimals, message: string = locale.big.format) {
         const decimals = typeof decimalsOrUnit === "number" ? decimalsOrUnit : unitToDecimals[decimalsOrUnit];
-        return this.transform((value) => new Big(formatTokenAmount(value, decimals))).meta({ decimals });
+        let formatFailed = false;
+        return this.transform((value) => {
+            if (value == null) return null;
+            try {
+                return new Big(formatTokenAmount(value, decimals));
+            } catch (e) {
+                formatFailed = true;
+                return null;
+            }
+        })
+            .test({
+                name: "format",
+                message,
+                test: (value) => !(formatFailed && value == null),
+            })
+            .meta({ decimals });
     }
 
     // transform value to indivisbile units
     // decimals can be determined from direct input, unit input or from memory (via this.decimals)
-    intoParsed(decimalsOrUnit: number | unit = this.spec.meta.decimals) {
+    intoParsed(decimalsOrUnit: number | unit = this.spec.meta.decimals, message: string = locale.big.parse) {
         const decimals = typeof decimalsOrUnit === "number" ? decimalsOrUnit : unitToDecimals[decimalsOrUnit];
-        return this.transform((value) => new Big(parseTokenAmount(value, decimals))).meta({ decimals });
+        let parseFailed = false;
+        return this.transform((value) => {
+            if (value == null) return null;
+            try {
+                return new Big(parseTokenAmount(value, decimals));
+            } catch (e) {
+                parseFailed = true;
+                return null;
+            }
+        })
+            .test({
+                name: "parse",
+                message,
+                test: (value) => !(parseFailed && value == null),
+            })
+            .meta({ decimals });
     }
+
+    // // !!! although not starting with "into", this is a mutating function !!!
+    // // transform value into another if original value is empty
+    // ifEmpty(replace: BigSource) {
+    //     return this.transform((_, value) => (value === "" ? replace : value));
+    // }
 }
 
 addErrorMethods(BigSchema);

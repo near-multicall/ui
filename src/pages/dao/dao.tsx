@@ -73,7 +73,7 @@ export class DaoPage extends Component<Props, State> {
     tryLoadInfoDebounced = debounce(() => this.tryLoadInfo(), 400);
 
     lastAddr: string;
-    fee?: string;
+    fee: string = "";
     formikSetValues?: (fields: State["formData"], shouldValidate?: boolean) => void;
 
     constructor(props: Props) {
@@ -587,8 +587,6 @@ export class DaoPage extends Component<Props, State> {
     }
 
     render() {
-        const { name } = this.state;
-
         return (
             <div className="DaoPage">
                 <div className="DaoPage-header">

@@ -1,11 +1,12 @@
 import { InputAdornment } from "@mui/material";
-import React from "react";
-import { TextInput, TextInputWithUnits } from "../../shared/ui/components";
+import debounce from "lodash.debounce";
 import { ArgsAccount, ArgsBig, ArgsError, ArgsObject, ArgsString } from "../../shared/lib/args-old";
 import Call from "../../shared/lib/call";
-import { toGas, formatTokenAmount, unitToDecimals } from "../../shared/lib/converter";
-import { view } from "../../shared/lib/wallet";
+import { formatTokenAmount, toGas, unitToDecimals } from "../../shared/lib/converter";
 import { errorMsg } from "../../shared/lib/errors";
+import { view } from "../../shared/lib/wallet";
+import { TextInput, TextInputWithUnits } from "../../shared/ui/components";
+
 import { BaseTask } from "../base";
 
 import "./near.scss";
