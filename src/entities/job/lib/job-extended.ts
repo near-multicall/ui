@@ -28,8 +28,7 @@ const getDisplayStatus = ({ job }: JobData): string => {
  * @returns Extended job data structure.
  */
 const jobExtendedWithStatus = (job: JobData) => ({
-    ...job,
-
+    id: job.id,
     job: {
         ...job.job,
         status: getDisplayStatus(job),

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Base64 } from "js-base64";
 
 import { JobData } from "../../../shared/lib/contracts/multicall";
 import { type JobEntity } from "../config";
@@ -26,7 +27,20 @@ const jobsDataFx = async (
             .then((data) => ({
                 data: data.reduce(
                     /** Jobs indexed by ID for easy access to each particular job */
-                    (jobsIndexedById, job) => ({ ...jobsIndexedById, [job.id]: JobExtended.withStatus(job) }),
+                    (jobsIndexedById, job) => {
+                        const jobWithStatus = JobExtended.withStatus(job);
+                        // base64 decode FunctionCall args
+                        jobWithStatus.job.multicalls.forEach((mtclArgs) =>
+                            mtclArgs.calls.forEach((callArray) =>
+                                callArray.forEach((batchCall) =>
+                                    batchCall.actions.forEach(
+                                        (action) => (action.args = JSON.parse(Base64.decode(action.args)))
+                                    )
+                                )
+                            )
+                        );
+                        return { ...jobsIndexedById, [job.id]: jobWithStatus };
+                    },
                     {}
                 ),
 
