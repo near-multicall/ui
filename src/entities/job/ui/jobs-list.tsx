@@ -21,15 +21,7 @@ export const JobsList = ({ className, contracts }: JobsListProps) => {
                     <Table
                         className={_JobsList}
                         displayMode="compact"
-                        header={[
-                            "Active status",
-                            "ID",
-                            "Start at",
-                            "Croncat hash",
-                            "Creator",
-                            "Trigger gas",
-                            "Multicalls",
-                        ]}
+                        header={["Status", "ID", "Start at", "Croncat hash", "Creator", "Trigger gas", "Multicalls"]}
                         rows={Object.values(data).map(({ id, job }) => [
                             job.status,
                             id,
