@@ -25,6 +25,9 @@ const KEY_JOB_COUNT: string = "g";
 type JobData = {
     id: number;
 
+    /**
+     * Job properties
+     */
     job: {
         croncat_hash: string;
         creator: string;

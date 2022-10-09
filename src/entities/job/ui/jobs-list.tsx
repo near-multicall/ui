@@ -1,11 +1,11 @@
 import { cronToDate, toTGas } from "../../../shared/lib/converter";
 import { DataInspector, Scrollable, Table, Tile } from "../../../shared/ui/components";
 import { JobDataModel } from "../model/job-data";
-import { Dependencies } from "../config";
+import { JobEntity } from "../config";
 
 import "./jobs-list.scss";
 
-interface JobsListProps extends Dependencies {}
+interface JobsListProps extends JobEntity.dependencies {}
 
 const _JobsList = "JobsList";
 
