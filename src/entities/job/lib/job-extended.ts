@@ -43,7 +43,7 @@ const jobExtendedWithStatus = (job: JobData) => ({
 
     job: {
         ...job.job,
-        status: activeOrRunning(job) || inactiveOrExpired(job),
+        status: activeOrRunning(job) || inactiveOrExpired(job) || Config.Status.Unknown,
     },
 });
 
