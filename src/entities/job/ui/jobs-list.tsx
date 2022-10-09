@@ -35,7 +35,7 @@ export const JobsList = ({ className, contracts }: JobsListProps) => {
                             job.status,
                             id,
                             cronToDate(job.cadence).toLocaleString(),
-                            job.croncat_hash,
+                            job.croncat_hash.length === 0 ? <i>none</i> : job.croncat_hash,
                             job.creator,
                             `${toTGas(job.trigger_gas)} Tgas`,
                             job.run_count,

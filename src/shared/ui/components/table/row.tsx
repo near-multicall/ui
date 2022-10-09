@@ -22,15 +22,13 @@ export const TableRow = ({ cells, headerCells }: TableRowProps) => (
 export const TableRowCard = ({ cells, headerCells }: TableRowProps) => (
     <div className={`${_TableRow}--compact`}>
         {headerCells.map((headerCell, headerCellIndex) => (
-            <>
-                <div
-                    className={`${_TableRow}-content--compact`}
-                    key={headerCellIndex}
-                >
-                    <span>{headerCell}</span>
-                    <span>{cells ? cells[headerCellIndex] : "No data"}</span>
-                </div>
-            </>
+            <div
+                className={`${_TableRow}-content--compact`}
+                key={headerCellIndex}
+            >
+                <span>{headerCell}</span>
+                <span>{cells ? cells[headerCellIndex] : "No data"}</span>
+            </div>
         ))}
     </div>
 );
