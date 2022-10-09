@@ -15,8 +15,8 @@ const fungibleTokensDataFx = async (
 ) => {
     /* Get LikelyTokens list on DAO and its Multicall instance */
     const [daoLikelyTokensList, multicallLikelyTokensList] = await Promise.all([
-        FungibleToken.getLikelyTokenContracts(multicall.address),
         FungibleToken.getLikelyTokenContracts(dao.address),
+        FungibleToken.getLikelyTokenContracts(multicall.address),
     ]);
 
     /* Merge and de-duplicate both token lists */
