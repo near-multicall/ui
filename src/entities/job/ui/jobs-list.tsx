@@ -1,5 +1,5 @@
 import { cronToDate, toTGas } from "../../../shared/lib/converter";
-import { Tile, Scrollable, Table } from "../../../shared/ui/components";
+import { DataInspector, Scrollable, Table, Tile } from "../../../shared/ui/components";
 import { JobDataModel } from "../model/job-data";
 import { Dependencies } from "../config";
 
@@ -40,10 +40,12 @@ export const JobsList = ({ className, contracts }: JobsListProps) => {
                             `${toTGas(job.trigger_gas)} Tgas`,
                             job.run_count,
 
-                            <details>
-                                <summary>Multicalls</summary>
-                                <pre>{JSON.stringify(job.multicalls, null, " ")}</pre>
-                            </details>,
+                            <DataInspector
+                                classes={{ label: `${_JobsList}-dataInspector-label` }}
+                                data={job.multicalls}
+                                expandLevel={1}
+                                label="details"
+                            />,
                         ])}
                     />
                 </Scrollable>

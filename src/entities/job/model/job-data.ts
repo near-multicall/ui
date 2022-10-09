@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { JobData } from "../../../shared/lib/contracts/multicall";
 
+import { JobData } from "../../../shared/lib/contracts/multicall";
 import { Dependencies } from "../config";
 
 type JobDataWithStats = {
