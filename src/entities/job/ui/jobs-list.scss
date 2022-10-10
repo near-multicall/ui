@@ -1,7 +1,8 @@
 .JobsList {
     &-dataInspector {
         &-label {
-            text-align: right;
+            width: fit-content;
+            margin-left: auto;
         }
     }
 

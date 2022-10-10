@@ -33,7 +33,7 @@ export const JobsList = ({ className, contracts }: JobsListProps) => {
                             <DataInspector
                                 classes={{ label: `${_JobsList}-dataInspector-label` }}
                                 data={job.multicalls}
-                                expandLevel={1}
+                                expandLevel={5}
                             />,
                         ])}
                     />
