@@ -38,7 +38,7 @@ export const DataInspector = ({ classes, expanded = false, expandLevel = 1, labe
                 className={clsx(`${_DataInspector}-label`, classes?.label)}
                 onClick={rootExpansionToggle}
             >
-                <span onClick={rootExpansionToggle}>{label ?? dynamicLabel}</span>
+                <span>{label ?? dynamicLabel}</span>
             </summary>
 
             <div className={clsx(`${_DataInspector}-body`, classes?.body)}>

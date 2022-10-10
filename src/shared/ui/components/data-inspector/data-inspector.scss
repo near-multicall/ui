@@ -3,6 +3,8 @@
 
 .DataInspector {
     &-label {
+        width: fit-content;
+        margin-left: auto;
         color: darken(color.$blue, 30%);
         cursor: pointer;
     }
