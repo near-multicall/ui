@@ -186,8 +186,8 @@ export class Export extends Component {
                     className="propose button"
                     disabled={isProposeDisabled}
                     onClick={async () => {
-                        const { currentDAO: dao } = WALLET_COMPONENT.state;
-                        // case 1: immediate execution => basic multicall
+                        const { currentDAO: dao, currentMulticall: multicall } = WALLET_COMPONENT.state;
+                        // Case 1: immediate execution => basic multicall
                         if (!isJob) {
                             // multicall with attached FT
                             if (attachFT) {
@@ -212,31 +212,33 @@ export class Export extends Component {
                                 signAndSendTxs([tx]);
                             }
                         }
-                        // case2: scheduled execution => use jobs
+                        // Case2: scheduled execution => use jobs
                         else {
-                            const multicallAddress = STORAGE.addresses.multicall;
-                            const temporary = new Multicall(multicallAddress);
-                            // multicall with attached FT
+                            // Job with attached FT
                             if (attachFT) {
-                                console.log("multicall job with attached FT");
+                                const jobCount = await multicall.getJobCount();
+                                const [addJobTx, proposeJobTx] = await Promise.all([
+                                    multicall.addJob(
+                                        // TODO: support jobs with multiple multicalls
+                                        [multicallArgs],
+                                        jobDateTime,
+                                        convert(gas.value, gas.unit)
+                                    ),
+                                    dao.proposeJobActivationFT(
+                                        desc.value,
+                                        jobCount,
+                                        token.value,
+                                        convert(amount.value, amount.unit, amount.decimals)
+                                    ),
+                                ]);
+                                signAndSendTxs([addJobTx, proposeJobTx]);
                             }
-                            //    WALLET_COMPONENT.state.currentDAO.proposeMulticallFT(
-                            //        desc.value,
-                            //        multicallArgs,
-                            //        convert(gas.value, gas.unit),
-                            //        token.value,
-                            //        convert(amount.value, amount.unit, amount.decimals)
-                            //    );
-                            // multicall with attached NEAR
+                            // Job with attached NEAR
                             else {
                                 const jobCost = attachNEAR
                                     ? Big(convert(depo.value, depo.unit)).add(Multicall.CRONCAT_FEE).toFixed()
                                     : Multicall.CRONCAT_FEE;
-                                console.log("multicall job with attached NEAR");
-                                const [jobCount, multicall] = await Promise.all([
-                                    temporary.getJobCount(),
-                                    Multicall.init(STORAGE.addresses.multicall),
-                                ]);
+                                const jobCount = await multicall.getJobCount();
                                 const [addJobTx, proposeJobTx] = await Promise.all([
                                     multicall.addJob(
                                         // TODO: support jobs with multiple multicalls

@@ -240,6 +240,7 @@ class Multicall {
      * @param triggerGas Gas amount. Will be allocated for every tx in this job.
      * @returns
      */
+    // TODO: currenty budget is hard-coded for jobs with 1 multicall
     async addJob(multicalls: MulticallArgs[], triggerDate: Date, triggerGas: string): Promise<Tx> {
         // crontab in CronCat format. See: https://github.com/CronCats/Schedule
         const cadence: string = dateToCron(triggerDate);
