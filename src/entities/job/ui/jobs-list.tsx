@@ -2,6 +2,7 @@ import { cronToDate, toTGas } from "../../../shared/lib/converter";
 import { DataInspector, Scrollable, Table, Tile } from "../../../shared/ui/components";
 import { JobDataModel } from "../model/job-data";
 import { JobEntity } from "../config";
+import { NavLink } from "react-router-dom";
 
 import "./jobs-list.scss";
 
@@ -30,11 +31,20 @@ export const JobsList = ({ className, contracts }: JobsListProps) => {
                             job.creator,
                             `${toTGas(job.trigger_gas)} Tgas`,
 
-                            <DataInspector
-                                classes={{ label: `${_JobsList}-dataInspector-label` }}
-                                data={job.multicalls}
-                                expandLevel={5}
-                            />,
+                            <>
+                                <DataInspector
+                                    classes={{ label: `${_JobsList}-dataInspector-label` }}
+                                    data={job.multicalls}
+                                    expandLevel={5}
+                                />
+                                <NavLink
+                                    to="/app"
+                                    className={`${_JobsList}-viewInEditor`}
+                                    onClick={() => setTimeout(() => window.LAYOUT.fromJSON(job.multicalls[0].calls), 0)}
+                                >
+                                    View in Editor
+                                </NavLink>
+                            </>,
                         ])}
                     />
                 </Scrollable>

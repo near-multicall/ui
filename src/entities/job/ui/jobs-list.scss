@@ -1,8 +1,26 @@
+@use "sass/color";
+@use "sass/size";
+
 .JobsList {
     &-dataInspector {
         &-label {
             width: fit-content;
             margin-left: auto;
+        }
+    }
+
+    &-viewInEditor {
+        margin-top: 0.5 * size.$gap;
+        padding: 0 1em;
+        border-radius: size.$task-radius;
+        border: 2px solid color.$blue;
+        font-size: size.$text;
+        font-weight: 800;
+        color: darken(color.$blue, 30%) !important;
+        background-color: rgba(color.$blue, 0.2);
+        float: right;
+        &:hover {
+            background-color: color.$blue;
         }
     }
 
