@@ -4,19 +4,19 @@
 .DataInspector {
     &-label {
         color: darken(color.$blue, 30%);
-
-        & > span {
-            cursor: pointer;
-        }
+        cursor: pointer;
     }
 
     &-body {
-        margin-top: calc(size.$gap / 2);
-        border-radius: calc(size.$task-radius / 2);
-        padding: calc(size.$gap / 2);
+        margin-top: 0.5 * size.$gap;
+        padding: 0.5 * size.$gap;
 
         & * {
             font-size: size.$large-text;
+        }
+
+        div > span {
+            cursor: pointer;
         }
     }
 }
