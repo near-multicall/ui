@@ -1,0 +1,11 @@
+@use "sass/size";
+
+.Placeholder {
+    display: flex;
+    flex: 1;
+    align-self: center;
+    align-items: center;
+    justify-content: center;
+    width: 100px;
+    height: 100px;
+}

@@ -1,0 +1,9 @@
+@use "sass/size";
+
+.Placeholder-content {
+    white-space: nowrap;
+
+    &--noData {
+        font-size: calc(size.$large-text * 2);
+    }
+}
