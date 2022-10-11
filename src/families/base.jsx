@@ -8,6 +8,7 @@ import { fields } from "../shared/lib/args/args-types/args-object";
 import { TextInput, TextInputWithUnits, Tooltip } from "../shared/ui/components";
 import "./base.scss";
 import debounce from "lodash.debounce";
+import { TextField, UnitField } from "../shared/ui/form-fields";
 
 export class BaseTask extends Component {
     uniqueClassName = "base-task";
@@ -138,19 +139,40 @@ export class BaseTask extends Component {
                         init = false;
                     }
                     return (
-                        <Form>
-                            <Field name="name" />
-                            <ErrorMessage name="name" />
-                            <Field name="addr" />
-                            <ErrorMessage name="addr" />
-                            <Field name="func" />
-                            <ErrorMessage name="func" />
-                            <Field name="args" />
-                            <ErrorMessage name="args" />
-                            <Field name="gas" />
-                            <ErrorMessage name="gas" />
-                            <Field name="depo" />
-                            <ErrorMessage name="depo" />
+                        <Form className="edit">
+                            <TextField
+                                name="name"
+                                label="Card Name"
+                                variant="standard"
+                                autoFocus="true"
+                            />
+                            <div className="empty-line" />
+                            <TextField
+                                name="addr"
+                                label="Contract Address"
+                                roundTop
+                            />
+                            <TextField
+                                name="func"
+                                label="Function"
+                            />
+                            <TextField
+                                name="args"
+                                label="Function Arguments"
+                            />
+                            <UnitField
+                                name="gas"
+                                unit="gasUnit"
+                                options={["Tgas", "gas"]}
+                                label="Allocated gas"
+                            />
+                            <UnitField
+                                name="depo"
+                                unit="depoUnit"
+                                options={["NEAR", "yocto"]}
+                                label="Allocated deposit"
+                                roundBottom
+                            />
                         </Form>
                     );
                 }}

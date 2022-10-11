@@ -1,0 +1,35 @@
+@use "sass/size";
+@use "sass/mixin";
+
+.UnitField {
+    @include mixin.center-items(center, flex-start);
+    flex-flow: row nowrap;
+    width: 100%;
+    gap: 0.5 * size.$gap;
+    &-text {
+        flex: 2 1 auto;
+    }
+    &-unit {
+        flex: 1 0 25%;
+        .MuiTextField-root,
+        .MuiInputBase-root {
+            width: 100% !important;
+        }
+    }
+    &.roundTop {
+        .UnitField-text fieldset {
+            border-top-left-radius: 0.75 * size.$task-radius !important;
+        }
+        .UnitField-unit fieldset {
+            border-top-right-radius: 0.75 * size.$task-radius !important;
+        }
+    }
+    &.roundBottom {
+        .UnitField-text fieldset {
+            border-bottom-left-radius: 0.75 * size.$task-radius !important;
+        }
+        .UnitField-unit fieldset {
+            border-bottom-right-radius: 0.75 * size.$task-radius !important;
+        }
+    }
+}
