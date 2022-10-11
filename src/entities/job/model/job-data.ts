@@ -30,9 +30,9 @@ const jobsDataFx = async (
                     (jobsIndexedById, job) => {
                         const jobWithStatus = JobExtended.withStatus(job);
                         // base64 decode FunctionCall args
-                        jobWithStatus.job.multicalls.forEach((mtclArgs) =>
-                            mtclArgs.calls.forEach((callArray) =>
-                                callArray.forEach((batchCall) =>
+                        jobWithStatus.job.multicalls.forEach((multicallArgs) =>
+                            multicallArgs.calls.forEach((call) =>
+                                call.forEach((batchCall) =>
                                     batchCall.actions.forEach(
                                         (action) => (action.args = JSON.parse(Base64.decode(action.args)))
                                     )
