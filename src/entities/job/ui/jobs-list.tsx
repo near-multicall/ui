@@ -37,13 +37,18 @@ export const JobsList = ({ className, contracts }: JobsListProps) => {
                                     data={job.multicalls}
                                     expandLevel={5}
                                 />
-                                <NavLink
-                                    to="/app"
-                                    className={`${_JobsList}-viewInEditor`}
-                                    onClick={() => setTimeout(() => window.LAYOUT.fromJSON(job.multicalls[0].calls), 0)}
-                                >
-                                    View in Editor
-                                </NavLink>
+
+                                {job.multicalls.length > 0 && (
+                                    <NavLink
+                                        to="/app"
+                                        className={`${_JobsList}-viewInEditor`}
+                                        onClick={() =>
+                                            setTimeout(() => window.LAYOUT.fromJSON(job.multicalls[0].calls), 0)
+                                        }
+                                    >
+                                        View in Editor
+                                    </NavLink>
+                                )}
                             </>,
                         ])}
                     />
