@@ -1,12 +1,12 @@
-import { cronToDate, toTGas } from "../../../shared/lib/converter";
-import { DataInspector, Scrollable, Table, Tile } from "../../../shared/ui/components";
-import { JobDataModel } from "../model/job-data";
-import { JobEntity } from "../config";
-import { NavLink } from "react-router-dom";
+import clsx from "clsx";
+import { Scrollable, Table, Tile } from "../../../shared/ui/components";
 
+import { type JobEntity } from "../config";
+import { JobDataModel } from "../model/job-data";
+import { jobDetailsTableRowRender } from "./job-details";
 import "./jobs-list.scss";
 
-interface JobsListProps extends JobEntity.dependencies {}
+interface JobsListProps extends JobEntity.Dependencies {}
 
 const _JobsList = "JobsList";
 
@@ -14,43 +14,16 @@ export const JobsList = ({ className, contracts }: JobsListProps) => {
     const { data, loading } = JobDataModel.useAllJobsFrom(contracts);
 
     return (
-        <Tile {...{ className }}>
+        <Tile className={clsx(_JobsList, className)}>
             <h1 className="title">All jobs</h1>
 
             {data && (
                 <Scrollable>
                     <Table
-                        className={_JobsList}
+                        className={`${_JobsList}-body`}
                         displayMode="compact"
                         header={["Status", "ID", "Start at", "Croncat hash", "Creator", "Trigger gas", "Multicalls"]}
-                        rows={Object.values(data).map(({ id, job }) => [
-                            job.status,
-                            id,
-                            cronToDate(job.cadence).toLocaleString(),
-                            job.croncat_hash.length === 0 ? <i>none</i> : job.croncat_hash,
-                            job.creator,
-                            `${toTGas(job.trigger_gas)} Tgas`,
-
-                            <>
-                                <DataInspector
-                                    classes={{ label: `${_JobsList}-dataInspector-label` }}
-                                    data={job.multicalls}
-                                    expandLevel={5}
-                                />
-
-                                {job.multicalls.length > 0 && (
-                                    <NavLink
-                                        to="/app"
-                                        className={`${_JobsList}-viewInEditor`}
-                                        onClick={() =>
-                                            setTimeout(() => window.LAYOUT.fromJSON(job.multicalls[0].calls), 0)
-                                        }
-                                    >
-                                        View in Editor
-                                    </NavLink>
-                                )}
-                            </>,
-                        ])}
+                        rows={Object.values(data).map(jobDetailsTableRowRender)}
                     />
                 </Scrollable>
             )}

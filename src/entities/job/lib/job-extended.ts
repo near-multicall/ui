@@ -1,6 +1,7 @@
 import { JobData } from "../../../shared/lib/contracts/multicall";
 import { cronToDate } from "../../../shared/lib/converter";
-import { JobConfig as Config } from "../config";
+
+import { JobConfig } from "../config";
 
 /**
  * Job status is:
@@ -9,13 +10,13 @@ import { JobConfig as Config } from "../config";
  * - Expired: job not active, and execution moment is in the past.
  * - Inactive: job not active, but execution moment in the future.
  */
-const getDisplayStatus = ({ job }: JobData): string => {
+const jobToStatus = ({ job }: JobData): string => {
     if (job.is_active) {
-        if (job.run_count > -1) return `Running: ${job.run_count + 1}/${job.multicalls.length}`;
-        else return Config.Status.Active;
+        if (job.run_count > -1) return JobConfig.Status.Running;
+        else return JobConfig.Status.Active;
     } else {
-        if (cronToDate(job.cadence).getTime() < new Date().getTime()) return Config.Status.Expired;
-        else return Config.Status.Inactive;
+        if (cronToDate(job.cadence).getTime() < new Date().getTime()) return JobConfig.Status.Expired;
+        else return JobConfig.Status.Inactive;
     }
 };
 
@@ -31,7 +32,7 @@ const jobExtendedWithStatus = (job: JobData) => ({
     id: job.id,
     job: {
         ...job.job,
-        status: getDisplayStatus(job),
+        status: jobToStatus(job),
     },
 });
 

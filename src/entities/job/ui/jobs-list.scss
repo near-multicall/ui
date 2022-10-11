@@ -2,38 +2,18 @@
 @use "sass/size";
 
 .JobsList {
-    &-dataInspector {
-        &-label {
-            width: fit-content;
-            margin-left: auto;
-        }
-    }
+    &-body {
+        .Table-row-content--compact:last-of-type {
+            align-items: flex-start;
 
-    &-viewInEditor {
-        margin-top: 0.5 * size.$gap;
-        padding: 0 1em;
-        border-radius: size.$task-radius;
-        border: 2px solid color.$blue;
-        font-size: size.$text;
-        font-weight: 800;
-        color: darken(color.$blue, 30%) !important;
-        background-color: rgba(color.$blue, 0.2);
-        float: right;
-        &:hover {
-            background-color: color.$blue;
-        }
-    }
+            & > span {
+                &:first-of-type {
+                    position: absolute;
+                }
 
-    .Table-row-content--compact:last-of-type {
-        align-items: flex-start;
-
-        & > span {
-            &:first-of-type {
-                position: absolute;
-            }
-
-            &:last-of-type {
-                width: 100%;
+                &:last-of-type {
+                    width: 100%;
+                }
             }
         }
     }
