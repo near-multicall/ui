@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 
 import { Big, formatTokenAmount } from "../../../shared/lib/converter";
 import { viewAccount } from "../../../shared/lib/wallet";
-import { FRACTIONAL_PART_LENGTH, type Dependencies } from "../config";
+
+import { NearTokenConfig, type NearTokenEntity } from "../config";
 
 type NearTokenDataFxResponse = {
     data: { dao: string; multicall: string; total: string } | null;
@@ -10,7 +11,7 @@ type NearTokenDataFxResponse = {
 };
 
 const nearTokenDataFx = async (
-    { dao, multicall }: Dependencies["contracts"],
+    { dao, multicall }: NearTokenEntity.Dependencies["contracts"],
     callback: (result: NearTokenDataFxResponse) => void
 ) => {
     const [daoAccInfo, multicallAccInfo] = await Promise.all([
@@ -23,16 +24,21 @@ const nearTokenDataFx = async (
 
     return callback({
         data: {
-            dao: formatTokenAmount(daoRawBalance, 24, FRACTIONAL_PART_LENGTH),
-            multicall: formatTokenAmount(multicallRawBalance, 24, FRACTIONAL_PART_LENGTH),
-            total: formatTokenAmount(Big(daoRawBalance).add(multicallRawBalance).toFixed(), 24, FRACTIONAL_PART_LENGTH),
+            dao: formatTokenAmount(daoRawBalance, 24, NearTokenConfig.FRACTIONAL_PART_LENGTH),
+            multicall: formatTokenAmount(multicallRawBalance, 24, NearTokenConfig.FRACTIONAL_PART_LENGTH),
+
+            total: formatTokenAmount(
+                Big(daoRawBalance).add(multicallRawBalance).toFixed(),
+                24,
+                NearTokenConfig.FRACTIONAL_PART_LENGTH
+            ),
         },
 
         loading: false,
     });
 };
 
-const useNearTokenData = (contracts: Dependencies["contracts"]) => {
+const useNearTokenData = (contracts: NearTokenEntity.Dependencies["contracts"]) => {
     const [state, stateUpdate] = useState<NearTokenDataFxResponse>({ data: null, loading: true });
 
     useEffect(() => void nearTokenDataFx(contracts, stateUpdate), []);

@@ -1,7 +1,7 @@
 @use "sass/mixin";
 @use "sass/size";
 
-.TokenLabel {
+.IconLabel {
     display: flex;
     align-items: center;
     gap: size.$gap;
@@ -12,9 +12,14 @@
         cursor: default !important;
         border-radius: 50%;
         box-shadow: 0px 5px 11px -3px rgba(0, 0, 0, 0.1);
+
+        & > * {
+            width: inherit;
+            height: inherit;
+        }
     }
 
-    &-symbol {
+    &-label {
         font-weight: bold;
     }
 }

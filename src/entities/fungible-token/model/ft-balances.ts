@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 
 import { Big } from "../../../shared/lib/converter";
 import { FungibleToken } from "../../../shared/lib/standards/fungibleToken";
-import { Dependencies } from "../config";
+
+import { type FungibleTokenEntity } from "../config";
 
 type FungibleTokensDataFxResponse = {
     data: { metadata: FungibleToken["metadata"]; dao: string; multicall: string; total: string }[] | null;
@@ -10,7 +11,7 @@ type FungibleTokensDataFxResponse = {
 };
 
 const fungibleTokensDataFx = async (
-    { dao, multicall }: Dependencies["contracts"],
+    { dao, multicall }: FungibleTokenEntity.Dependencies["contracts"],
     callback: (result: FungibleTokensDataFxResponse) => void
 ) => {
     /* Get LikelyTokens list on DAO and its Multicall instance */
@@ -53,7 +54,7 @@ const fungibleTokensDataFx = async (
     });
 };
 
-const useAllFungibleTokensData = (contracts: Dependencies["contracts"]) => {
+const useAllFungibleTokensData = (contracts: FungibleTokenEntity.Dependencies["contracts"]) => {
     const [state, stateUpdate] = useState<FungibleTokensDataFxResponse>({ data: null, loading: true });
 
     useEffect(() => void fungibleTokensDataFx(contracts, stateUpdate), []);

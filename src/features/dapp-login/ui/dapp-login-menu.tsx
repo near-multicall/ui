@@ -1,10 +1,11 @@
 import { PreviewOutlined } from "@mui/icons-material";
+import { ComponentProps } from "react";
 
-import { PopupMenu, PopupMenuProps } from "../../../shared/ui/components";
+import { PopupMenu } from "../../../shared/ui/components";
 import { DappLoginConfig as Config } from "../config";
 import { DappLoginDialogsModel } from "../model/dapp-login-dialogs";
 
-interface DappLoginMenuProps extends Pick<PopupMenuProps, "triggerClassName"> {
+interface DappLoginMenuProps extends Pick<ComponentProps<typeof PopupMenu>, "triggerClassName"> {
     FeatureFlags: {
         DappLogin: Record<keyof typeof Config.METHODS, boolean>;
     };

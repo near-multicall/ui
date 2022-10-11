@@ -1,2 +1,4 @@
-export { TokensBalances } from "./ui/tokens-balances";
-export { type Dependencies as TokensBalancesDependencies } from "./config";
+import { TokensBalances } from "./ui/tokens-balances";
+import { type TokensBalancesWidget } from "./config";
+
+export { TokensBalances, type TokensBalancesWidget };

@@ -1,9 +1,10 @@
-import { TokenLabel } from "../../../shared/ui/components";
+import { IconLabel, NearIcons } from "../../../shared/ui/components";
+
 import { FungibleTokenFormat } from "../lib/ft-format";
 import { FungibleTokenBalancesModel } from "../model/ft-balances";
-import { Dependencies } from "../config";
+import { type FungibleTokenEntity } from "../config";
 
-interface FungibleTokensBalancesRenderProps extends Dependencies {}
+interface FungibleTokensBalancesRenderProps extends FungibleTokenEntity.Dependencies {}
 
 export const fungibleTokensBalancesRender = ({ contracts }: FungibleTokensBalancesRenderProps) => {
     const { data } = FungibleTokenBalancesModel.useAllTokensFrom(contracts);
@@ -11,7 +12,11 @@ export const fungibleTokensBalancesRender = ({ contracts }: FungibleTokensBalanc
     return !data
         ? null
         : data.map(({ dao, metadata, multicall, total }) => [
-              <TokenLabel {...metadata} />,
+              <IconLabel
+                  icon={metadata.icon ?? <NearIcons.GenericTokenFilled />}
+                  label={metadata.symbol}
+              />,
+
               FungibleTokenFormat.amountToDisplayAmount(multicall, metadata.decimals),
               FungibleTokenFormat.amountToDisplayAmount(dao, metadata.decimals),
               FungibleTokenFormat.amountToDisplayAmount(total, metadata.decimals),

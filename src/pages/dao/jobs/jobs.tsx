@@ -1,10 +1,11 @@
 import clsx from "clsx";
+import { ComponentProps, HTMLProps } from "react";
 
-import { Job, type JobEntity } from "../../../entities";
+import { Job } from "../../../entities";
 
 import "./jobs.scss";
 
-interface DaoJobsTabComponentProps extends JobEntity.dependencies {}
+interface DaoJobsTabComponentProps extends HTMLProps<HTMLDivElement>, ComponentProps<typeof Job.ListOfAll> {}
 
 const _DaoJobsTab = "DaoJobsTab";
 
