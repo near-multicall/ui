@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { Scrollable, Table, Tile } from "../../../shared/ui/components";
+import { Placeholder, Scrollable, Table, Tile } from "../../../shared/ui/components";
 
 import { type JobEntity } from "../config";
 import { JobDataModel } from "../model/job-data";
@@ -11,13 +11,25 @@ interface JobsListProps extends JobEntity.Dependencies {}
 const _JobsList = "JobsList";
 
 export const JobsList = ({ className, contracts }: JobsListProps) => {
-    const { data, loading } = JobDataModel.useAllJobsFrom(contracts);
+    const { data, error, loading } = JobDataModel.useAllJobsFrom(contracts),
+        dataIsAvailable = data !== null && Object.values(data).length > 0,
+        noData = data !== null && Object.values(data).length === 0;
 
     return (
         <Tile className={clsx(_JobsList, className)}>
             <h1 className="title">All jobs</h1>
 
-            {data && (
+            {loading && <div className="loader" />}
+            {noData && <Placeholder type="noData" />}
+
+            {error && (
+                <Placeholder
+                    payload={{ error }}
+                    type="unknownError"
+                />
+            )}
+
+            {dataIsAvailable && (
                 <Scrollable>
                     <Table
                         className={`${_JobsList}-body`}
@@ -27,8 +39,6 @@ export const JobsList = ({ className, contracts }: JobsListProps) => {
                     />
                 </Scrollable>
             )}
-
-            {loading && <div className="loader" />}
         </Tile>
     );
 };

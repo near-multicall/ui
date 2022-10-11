@@ -1,6 +1,7 @@
 export { DataInspector } from "./data-inspector";
 export { Dialog } from "./dialog";
 export { NearIcons } from "./icons";
+export { Placeholder } from "./placeholder";
 export { PopupMenu } from "./popup-menu";
 export { Scrollable } from "./scrollable";
 export { Table } from "./table";
