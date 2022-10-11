@@ -44,6 +44,7 @@ const jobsDataFx = async (
                     {}
                 ),
 
+                error: null,
                 loading: false,
             }))
             .catch((error) => ({ data: null, error: new Error(error), loading: false }))
@@ -55,7 +56,7 @@ const useJobsData = (contracts: JobEntity.dependencies["contracts"]) => {
     useEffect(() => void jobsDataFx(contracts, stateUpdate), []);
 
     useEffect(() => {
-        state.error !== null && void console.error(state.error);
+        state.error instanceof Error && void console.error(state.error);
     }, [state]);
 
     return state;
