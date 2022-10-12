@@ -13,8 +13,8 @@ const _JobsList = "JobsList";
 
 export const JobsList = ({ className, contracts }: JobsListProps) => {
     const { data, error, loading } = JobDataModel.useAllJobsFrom(contracts),
-        dataIsAvailable = data !== null && Object.values(data).length > 0,
-        noData = data !== null && Object.values(data).length === 0;
+        dataIsAvailable = data !== null && !loading && Object.values(data).length > 0,
+        noData = data !== null && !loading && Object.values(data).length === 0;
 
     return (
         <Tile className={clsx(_JobsList, className)}>

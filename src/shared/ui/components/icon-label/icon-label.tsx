@@ -1,3 +1,5 @@
+import { Validation } from "../../../lib/validation";
+
 import "./icon-label.scss";
 
 const _IconLabel = "IconLabel";
@@ -10,7 +12,7 @@ interface IconLabelProps {
 export const IconLabel = ({ icon, label }: IconLabelProps) => (
     <span className={_IconLabel}>
         <span className={`${_IconLabel}-icon`}>
-            {typeof icon === "string" ? (
+            {typeof icon === "string" && Validation.isUrl(icon) ? (
                 <img
                     loading="lazy"
                     src={icon}
