@@ -4,10 +4,11 @@ import { cronToDate, toTGas } from "../../../shared/lib/converter";
 import { DataInspector, IconLabel } from "../../../shared/ui/components";
 
 import { JobConfig, type JobEntity } from "../config";
+import "./job-details.scss";
 
 interface JobDetailsTableRowRenderProps extends JobEntity.DataWithStatus {}
 
-const _Job = "_Job";
+const _Job = "Job";
 
 const JobDisplayStatus = ({ job }: Pick<JobEntity.DataWithStatus, "job">) => {
     const statusTextByStatus = {
