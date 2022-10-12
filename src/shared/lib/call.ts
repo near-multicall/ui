@@ -35,7 +35,13 @@ const toJson = (call: Call): object => JSON.parse(JSON.stringify(call));
  * transform a Call into JSON, with the args field encoded as base64 string
  * @param call
  */
-const toBase64 = (call: Call): string => Base64.encode(JSON.stringify(call));
+const toBase64 = (call: Call): object => ({
+    address: call.address,
+    actions: call.actions.map((action) => ({
+        ...action,
+        args: Base64.encode(JSON.stringify(action.args)),
+    })),
+});
 
 export const fromCall = {
     toString,

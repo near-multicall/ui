@@ -81,7 +81,9 @@ export class BaseTask extends Component {
     }
 
     init(json = null) {
-        Object.entries(json ?? {}).forEach(([k, v]) => {
+        let entries = [];
+        if (!!json) entries = Object.entries({ addr: json.address, ...json.actions[0] });
+        entries.forEach(([k, v]) => {
             if (v !== undefined && v !== null && this.initialValues[k] !== undefined) this.initialValues[k] = v;
         });
 
