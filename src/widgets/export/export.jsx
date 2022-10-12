@@ -1,12 +1,16 @@
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import { InputAdornment } from "@mui/material";
-import Icon from "@mui/material/Icon";
-import TextField from "@mui/material/TextField";
-import Radio from "@mui/material/Radio";
-import RadioGroup from "@mui/material/RadioGroup";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import FormControl from "@mui/material/FormControl";
-import FormLabel from "@mui/material/FormLabel";
+import { EditOutlined as EditOutlinedIcon } from "@mui/icons-material";
+
+import {
+    FormControl,
+    FormControlLabel,
+    FormLabel,
+    Icon,
+    InputAdornment,
+    Radio,
+    RadioGroup,
+    TextField,
+} from "@mui/material";
+
 import { Base64 } from "js-base64";
 import debounce from "lodash.debounce";
 import { Component } from "react";
@@ -21,6 +25,7 @@ import { signAndSendTxs, view } from "../../shared/lib/wallet";
 import { Wallet } from "../../entities";
 import { TextInput, TextInputWithUnits } from "../../shared/ui/components";
 import { DateTimePicker } from "../../shared/ui/components/date-time-picker";
+
 import "./export.scss";
 
 export class Export extends Component {
@@ -326,6 +331,7 @@ export class Export extends Component {
                         multiline
                         update={this.update}
                     />
+
                     <TextInputWithUnits
                         label="Total allocated gas"
                         value={gas}
@@ -333,8 +339,10 @@ export class Export extends Component {
                         options={["Tgas", "gas"]}
                         update={this.update}
                     />
+
                     <div className="attachment">
                         <p>Attach</p>
+
                         <button
                             className={attachNEAR ? "selected" : ""}
                             onClick={() => {
@@ -346,7 +354,9 @@ export class Export extends Component {
                         >
                             NEAR
                         </button>
+
                         <p>or</p>
+
                         <button
                             className={attachFT ? "selected" : ""}
                             onClick={() => {
@@ -359,6 +369,7 @@ export class Export extends Component {
                             fungible token
                         </button>
                     </div>
+
                     {attachNEAR ? (
                         <TextInputWithUnits
                             label="Total attached deposit"
@@ -368,6 +379,7 @@ export class Export extends Component {
                             update={this.update}
                         />
                     ) : null}
+
                     {attachFT ? (
                         <>
                             <TextInput
@@ -379,6 +391,7 @@ export class Export extends Component {
                                     this.updateFTDebounced();
                                 }}
                             />
+
                             <TextField
                                 label="Amount"
                                 value={errors.amount.validOrNull(amount) || errors.amount.intermediate}
@@ -398,8 +411,10 @@ export class Export extends Component {
                             />
                         </>
                     ) : null}
+
                     <FormControl>
                         <FormLabel id="demo-radio-buttons-group-label">Execution:</FormLabel>
+
                         <RadioGroup
                             aria-labelledby="demo-radio-buttons-group-label"
                             defaultValue="immediate"
@@ -414,6 +429,7 @@ export class Export extends Component {
                                 control={<Radio />}
                                 label="Immediate"
                             />
+
                             <FormControlLabel
                                 value="scheduled"
                                 control={<Radio />}
@@ -421,24 +437,26 @@ export class Export extends Component {
                             />
                         </RadioGroup>
                     </FormControl>
+
                     {isJob ? (
                         <DateTimePicker
                             label="Execution date"
                             value={jobDateTime}
                             minDateTime={currentDate}
                             maxDateTime={maxDate}
-                            handleChange={(value) => {
-                                this.setState({ jobDateTime: value.toJSDate() });
-                            }}
+                            handleChange={(value) => this.setState({ jobDateTime: value.toJSDate() })}
                         />
                     ) : null}
                 </div>
+
                 {/* Display cards' errors */}
+
                 {allErrors.length > 0 && (
                     <div className="error-container">
                         <div className="header">
                             <h3>{`Card errors (${allErrors.length})`}</h3>
                         </div>
+
                         <div className="error-list">
                             {allErrors.map((e, i) => (
                                 <div
@@ -446,6 +464,7 @@ export class Export extends Component {
                                     key={`error-${i}`}
                                 >
                                     <p className="msg">{`[${e.task.call.name}] Error: ${e.message}`}</p>
+
                                     <EditOutlinedIcon
                                         className="icon"
                                         onClick={() => {
@@ -458,6 +477,7 @@ export class Export extends Component {
                         </div>
                     </div>
                 )}
+
                 <div className="section">
                     <div className="sidebar">
                         <Icon
@@ -467,7 +487,9 @@ export class Export extends Component {
                         >
                             expand_more
                         </Icon>
+
                         <h3 onClick={() => this.toggleShowArgs()}>Multicall args</h3>
+
                         {showArgs ? (
                             <Icon
                                 className="icon copy"
@@ -482,6 +504,7 @@ export class Export extends Component {
                             <></>
                         )}
                     </div>
+
                     {showArgs ? (
                         <div className="value">
                             <pre className="code">{multicallArgsText}</pre>
@@ -490,6 +513,7 @@ export class Export extends Component {
                         <></>
                     )}
                 </div>
+
                 <div className="spacer"></div>
                 {this.renderProposeButton(multicallArgs)}
             </div>

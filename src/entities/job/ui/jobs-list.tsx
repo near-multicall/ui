@@ -1,4 +1,5 @@
 import clsx from "clsx";
+
 import { Placeholder, Scrollable, Table, Tile } from "../../../shared/ui/components";
 
 import { type JobEntity } from "../config";
