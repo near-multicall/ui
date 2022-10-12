@@ -229,7 +229,9 @@ class Multicall {
      */
     async getJobCount(): Promise<number> {
         const state = await viewState(this.address, KEY_JOB_COUNT);
-        return parseInt(state[0].value);
+        // The counter is added to storage when the 1st job is created.
+        const jobCount = state.length > 0 ? parseInt(state[0].value) : 0;
+        return jobCount;
     }
 
     /**
