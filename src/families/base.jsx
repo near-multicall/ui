@@ -2,13 +2,14 @@ import { DeleteOutline, EditOutlined, MoveDown } from "@mui/icons-material";
 import { Component } from "react";
 
 import clsx from "clsx";
-import { Formik, Form, Field, ErrorMessage } from "formik";
+import { Form, Formik } from "formik";
+import debounce from "lodash.debounce";
 import { args as arx } from "../shared/lib/args/args";
 import { fields } from "../shared/lib/args/args-types/args-object";
-import { TextInput, TextInputWithUnits, Tooltip } from "../shared/ui/components";
-import "./base.scss";
-import debounce from "lodash.debounce";
+import { CallError } from "../shared/lib/call";
+import { Tooltip } from "../shared/ui/components";
 import { TextField, UnitField } from "../shared/ui/form-fields";
+import "./base.scss";
 
 export class BaseTask extends Component {
     uniqueClassName = "base-task";
@@ -19,8 +20,13 @@ export class BaseTask extends Component {
             func: arx.string(),
             args: arx.string().json(),
             gas: arx.big().gas(),
-            depo: arx.big().token("NEAR"),
+            depo: arx.big().token(),
         })
+        .transform(({ gas, gasUnit, depo, depoUnit, ...rest }) => ({
+            ...rest,
+            gas: arx.big().intoParsed(gasUnit).cast(gas),
+            depo: arx.big().intoParsed(depoUnit).cast(depo),
+        }))
         .requireAll()
         .retainAll();
 
@@ -99,6 +105,23 @@ export class BaseTask extends Component {
         );
     }
 
+    toCall() {
+        const { addr, func, args, gas, gasUnit, depo, depoUnit } = this.state.formData;
+        if (!arx.string().json().isValidSync(args))
+            throw new CallError("Failed to parse function arguments", this.props.id);
+        return {
+            address: addr,
+            actions: [
+                {
+                    func,
+                    args: JSON.parse(args),
+                    gas: arx.big().intoParsed(gasUnit).cast(gas),
+                    depo: arx.big().intoParsed(depoUnit).cast(depo),
+                },
+            ],
+        };
+    }
+
     componentDidMount() {
         this.schema.check(this.state.formData).then(() => this.updateCard());
     }
@@ -109,7 +132,6 @@ export class BaseTask extends Component {
         this.setState({ isEdited: taskID === this.props.id });
     }
 
-    // TODO remove
     updateCard() {
         this.forceUpdate();
         EDITOR.forceUpdate();
@@ -144,7 +166,7 @@ export class BaseTask extends Component {
                                 name="name"
                                 label="Card Name"
                                 variant="standard"
-                                autoFocus="true"
+                                autoFocus
                             />
                             <div className="empty-line" />
                             <TextField

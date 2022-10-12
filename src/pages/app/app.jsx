@@ -6,6 +6,7 @@ import { Column } from "../../widgets/column/column.jsx";
 import { Menu } from "../../widgets/menu/menu.jsx";
 import { initialData } from "../../initial-data";
 import { STORAGE } from "../../shared/lib/persistent";
+import { fromCall } from "../../shared/lib/call";
 
 import "./app.scss";
 
@@ -410,7 +411,7 @@ export class AppPage extends Component {
             output.push([]);
             for (let t of layout.columns[c].taskIds) {
                 const task = TASKS.find((task) => task.id === t);
-                if (task) output[output.length - 1].push(task.instance.current.call.toJSON());
+                if (task) output[output.length - 1].push(task.instance.current.toCall());
                 else console.warn(`no task with id ${t}`);
             }
         }
@@ -427,7 +428,7 @@ export class AppPage extends Component {
             output.push([]);
             for (let t of layout.columns[c].taskIds) {
                 const task = TASKS.find((task) => task.id === t);
-                if (task) output[output.length - 1].push(task.instance.current.call.toBase64());
+                if (task) output[output.length - 1].push(fromCall.toBase64(task.instance.current.toCall()));
                 else console.warn(`no task with id ${t}`);
             }
         }
@@ -446,12 +447,11 @@ export class AppPage extends Component {
         );
 
         for (let t of tasks)
-            for (let e in t.errors)
-                if (t.errors[e].isBad)
-                    output.push({
-                        task: t,
-                        message: t.errors[e].message,
-                    });
+            for (let e of t.schema.errors())
+                output.push({
+                    task: t,
+                    message: e.message,
+                });
 
         return output;
     }

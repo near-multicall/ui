@@ -1,92 +1,44 @@
 import { Base64 } from "js-base64";
-import { convert } from "./converter";
 
-import { ArgsString, ArgsAccount, ArgsBig, ArgsObject, ArgsJSON } from "./args-old";
+export type Call = {
+    address: string;
+    actions: Array<{
+        func: string;
+        args: object;
+        gas: string;
+        depo: string;
+    }>;
+};
 
-export default class Call {
-    name: ArgsString;
-    addr: ArgsAccount;
-    func: ArgsString;
-    args: ArgsObject | ArgsJSON;
-    gas: ArgsBig;
-    depo: ArgsBig;
+export class CallError extends Error {
+    taskId: string;
 
-    constructor({
-        name,
-        addr,
-        func,
-        args,
-        gas,
-        depo,
-    }: {
-        name: ArgsString;
-        addr: ArgsAccount;
-        func: ArgsString;
-        args: ArgsObject | ArgsJSON;
-        gas: ArgsBig;
-        depo: ArgsBig;
-    }) {
-        this.name = name;
-        this.addr = addr;
-        this.func = func;
-        this.args = args;
-        this.gas = gas;
-        this.depo = depo;
-    }
-
-    toString() {
-        return JSON.stringify({
-            address: this.addr.toString(),
-            actions: [
-                {
-                    func: this.func.toString(),
-                    args: JSON.stringify(this.args.toString(), null, "  "),
-                    gas: convert(this.gas.value, this.gas.unit).toString(),
-                    depo: convert(this.depo.value, this.depo.unit).toString(),
-                },
-            ],
-        });
-    }
-
-    toJSON() {
-        return {
-            address: this.addr.toString(),
-            actions: [
-                {
-                    func: this.func.toString(),
-                    args: this.args.toString(),
-                    gas: convert(this.gas.value, this.gas.unit).toString(),
-                    depo: convert(this.depo.value, this.depo.unit).toString(),
-                },
-            ],
-        };
-    }
-
-    toBase64() {
-        return {
-            address: this.addr.toString(),
-            actions: [
-                {
-                    func: this.func.toString(),
-                    args: Base64.encode(JSON.stringify(this.args.toString())),
-                    gas: convert(this.gas.value, this.gas.unit).toString(),
-                    depo: convert(this.depo.value, this.depo.unit).toString(),
-                },
-            ],
-        };
-    }
-
-    toUnits() {
-        return {
-            address: this.addr.getUnit(),
-            actions: [
-                {
-                    func: this.func.getUnit(),
-                    args: this.args.getUnit(),
-                    gas: this.gas.getUnit(),
-                    depo: this.depo.getUnit(),
-                },
-            ],
-        };
+    constructor(message: string, taskId: string) {
+        super(message);
+        this.taskId = taskId;
     }
 }
+
+/**
+ * transform a Call into a string
+ * @param call
+ */
+const toString = (call: Call): string => JSON.stringify(call, null, "  ");
+
+/**
+ * transform a Call into JSON, produces a deep copy of the Call object
+ * @param call
+ */
+const toJson = (call: Call): object => JSON.parse(JSON.stringify(call));
+
+/**
+ * transform a Call into JSON, with the args field encoded as base64 string
+ * @param call
+ */
+const toBase64 = (call: Call): string => Base64.encode(JSON.stringify(call));
+
+export const fromCall = {
+    toString,
+    toJson,
+    toBase64,
+};

@@ -56,7 +56,11 @@ interface ErrorMethods {
     combine(errors: this[], options?: retainOptions): this;
 }
 
-// store information on last evaluation in meta data
+/**
+ * store information on last evaluation in meta data
+ * @param {retainOptions} options
+ * @returns
+ */
 function retain(this: any, options?: retainOptions) {
     return this.meta({
         retained:
@@ -75,11 +79,16 @@ function retain(this: any, options?: retainOptions) {
     });
 }
 
+/**
+ * synchronously check if value is valid, retain evaluation details in meta data
+ * @param value
+ * @param validateOptions
+ * @returns
+ */
 function checkSync(this: any, value: any, validateOptions?: ValidateOptions): void {
     return this._checkSync(this.cast(value), validateOptions);
 }
 
-// check if value is valid, retain evaluation details in meta data
 function _checkSync(this: any, value: any, validateOptions?: ValidateOptions): void {
     if (this.type === "object" && !this.spec.meta?.retained?.ignoreAll) {
         const ret = this.spec.meta?.retained;
@@ -134,11 +143,16 @@ function _checkSync(this: any, value: any, validateOptions?: ValidateOptions): v
     }
 }
 
+/**
+ * asynchronusly check if value is valid, retain evaluation details in meta data
+ * @param value
+ * @param validateOptions
+ * @returns
+ */
 async function check(this: any, value: any, validateOptions?: ValidateOptions): Promise<void> {
     return await this._check(this.cast(value), validateOptions);
 }
 
-// asynchronusly check if value is valid, retain evaluation details in meta data
 async function _check(this: any, value: any, validateOptions?: ValidateOptions): Promise<void> {
     if (this.type === "object" && !this.spec.meta?.retained?.ignoreAll) {
         const ret = this.spec.meta?.retained;
@@ -193,38 +207,62 @@ async function _check(this: any, value: any, validateOptions?: ValidateOptions):
     }
 }
 
-// see if last evaluation was bad / set isBad property manually
+/**
+ * see if last evaluation was bad / set isBad property manually
+ * @param isBad
+ * @returns
+ */
 function isBad(this: any, isBad?: boolean): boolean | null {
     if (isBad === true || isBad === false) this.spec.meta.retained.isBad = isBad;
     return this.spec.meta?.retained?.isBad ?? null;
 }
 
-// see an errors that occured in last evaluation
+/**
+ * see an errors that occured in last evaluation
+ * @returns
+ */
 function error(this: any): ValidationError | null {
     return this.spec.meta?.retained?.error ?? null;
 }
 
-// see all errors that occured in last evaluation
+/**
+ * see all errors that occured in last evaluation
+ * @returns
+ */
 function errors(this: any): ValidationError[] | null {
     return this.spec.meta?.retained?.errors ?? [];
 }
 
-// get the (custom) error message for this schema
+/**
+ * get the (custom) error message for this schema
+ * @returns
+ */
 function message(this: any): string {
     return this.spec.meta?.retained?.message ?? "";
 }
 
-// get the (custom) error message for this schema
+/**
+ * get the (custom) error message for this schema
+ * @returns
+ */
 function messages(this: any): string[] {
     return this.spec.meta?.retained?.messages ?? [];
 }
 
-// see what value was processed in last evaluation
+/**
+ * see what value was processed in last evaluation
+ * @returns
+ */
 function lastValue(this: any): any {
     return this.spec.meta?.retained?.lastValue ?? null;
 }
 
-// combine other errors
+/**
+ * combine other errors
+ * @param errors
+ * @param options
+ * @returns
+ */
 function combine(this: any, errors: any[], options?: retainOptions) {
     return this.retain(options).meta({
         retained: {
@@ -238,7 +276,11 @@ function combine(this: any, errors: any[], options?: retainOptions) {
     });
 }
 
-// add multiple methods at once
+/**
+ * add multiple methods at once
+ * @param schema
+ * @param fns
+ */
 function addMethods(schema: any, fns: object): void {
     Object.entries(fns).forEach(([k, v]) => addMethod(schema, k, v));
 }

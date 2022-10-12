@@ -17,12 +17,6 @@ type UnitFieldProps = {
 };
 
 export const UnitField = ({ name, unit, label, options, ...props }: UnitFieldProps) => {
-    console.log(
-        clsx(_UnitField, {
-            roundTop: props?.roundTop,
-            roundBottom: props?.roundBottom,
-        })
-    );
     return (
         <div
             className={clsx(_UnitField, {

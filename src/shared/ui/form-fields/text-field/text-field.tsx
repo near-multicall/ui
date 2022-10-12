@@ -13,7 +13,7 @@ export type TextFieldProps = Partial<MuiTextFieldProps> & {
 };
 
 export const TextField = ({ name, className, children, ...props }: TextFieldProps) => {
-    const [field, meta] = useField(name);
+    const [field, meta, helper] = useField(name);
     return (
         <div
             className={clsx(
@@ -34,6 +34,10 @@ export const TextField = ({ name, className, children, ...props }: TextFieldProp
                 error={meta.touched && !!meta.error}
                 helperText={meta.touched && meta.error}
                 {...field}
+                onChange={(e) => {
+                    helper.setTouched(true);
+                    field.onChange(e);
+                }}
                 {...props}
             >
                 {children}

@@ -14,6 +14,7 @@ import { convert, toGas, toNEAR } from "../../shared/lib/converter";
 import { view } from "../../shared/lib/wallet";
 import { Wallet } from "../../entities";
 import { TextInput, TextInputWithUnits } from "../../shared/ui/components";
+import { CallError } from "../../shared/lib/call";
 import "./export.scss";
 
 export class Export extends Component {
@@ -217,27 +218,23 @@ export class Export extends Component {
         // Multicall args to display for copy/paste
         let multicallArgs = "";
         if (this.showArgs) {
-            // Return error message if a card has JSON errors. Faulty JSON breaks toBase64.
-            const hasJsonErrors =
-                errors.hasErrors.isBad && allErrors.some((err) => err.message === errorMsg.ERR_INVALID_ARGS);
-            if (hasJsonErrors) {
-                multicallArgs = "Please fix invalid JSON errors";
-            } else {
-                // toBase64 might throw on failure
-                try {
-                    multicallArgs = !this.attachFT
-                        ? JSON.stringify({ calls: LAYOUT.toBase64() })
-                        : JSON.stringify({
-                              receiver_id: STORAGE.addresses.multicall,
-                              amount: convert(amount.value, amount.unit, amount.decimals),
-                              msg: JSON.stringify({
-                                  function_id: "multicall",
-                                  args: Base64.encode(JSON.stringify({ calls: LAYOUT.toBase64() }).toString()),
-                              }).toString(),
-                          });
-                } catch (e) {
-                    multicallArgs = "ERROR: something went wrong during JSON creation";
-                }
+            // toBase64 might throw on failure
+            try {
+                multicallArgs = !this.attachFT
+                    ? JSON.stringify({ calls: LAYOUT.toBase64() })
+                    : JSON.stringify({
+                          receiver_id: STORAGE.addresses.multicall,
+                          amount: convert(amount.value, amount.unit, amount.decimals),
+                          msg: JSON.stringify({
+                              function_id: "multicall",
+                              args: Base64.encode(JSON.stringify({ calls: LAYOUT.toBase64() }).toString()),
+                          }).toString(),
+                      });
+            } catch (e) {
+                if (e instanceof CallError)
+                    multicallArgs = `Error, could not create multicall arguments: ${e.message} in ${
+                        window.TASKS.find((t) => t.id === e.taskId)?.instance.current.state.formData.name
+                    }`;
             }
         }
 
@@ -334,7 +331,7 @@ export class Export extends Component {
                                     className="error"
                                     key={`error-${i}`}
                                 >
-                                    <p className="msg">{`[${e.task.call.name}] Error: ${e.message}`}</p>
+                                    <p className="msg">{`[${e.task.state.formData.name}] Error: ${e.message}`}</p>
                                     <EditOutlinedIcon
                                         className="icon"
                                         onClick={() => {
