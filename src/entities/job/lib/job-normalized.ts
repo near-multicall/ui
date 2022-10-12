@@ -3,7 +3,7 @@ import { Base64 } from "js-base64";
 import { JobData } from "../../../shared/lib/contracts/multicall";
 import { cronToDate } from "../../../shared/lib/converter";
 
-import { JobConfig } from "../config";
+import { JobConfig, type JobEntity } from "../config";
 
 /**
  * Job status is:
@@ -12,7 +12,7 @@ import { JobConfig } from "../config";
  * - Expired: job not active, and execution moment is in the past.
  * - Inactive: job not active, but execution moment in the future.
  */
-const jobToStatus = ({ job }: JobData): string => {
+const jobToStatus = ({ job }: JobData): JobEntity.Status => {
     if (job.is_active) {
         if (job.run_count > -1) return JobConfig.Status.Running;
         else return JobConfig.Status.Active;
@@ -28,7 +28,7 @@ const jobToStatus = ({ job }: JobData): string => {
  *
  * @returns Updated job data structure.
  */
-const jobToJobWithMulticallsDataDecoded = ({ id, job }: JobData) => ({
+const jobToJobWithMulticallsDataDecoded = ({ id, job }: JobData): JobData => ({
     id,
 
     job: {
@@ -60,7 +60,10 @@ const jobToJobWithMulticallsDataDecoded = ({ id, job }: JobData) => ({
  *
  * @returns Extended job data structure.
  */
-const jobToJobWithStatus = (job: JobData) => ({ ...job, job: { ...job.job, status: jobToStatus(job) } });
+const jobToJobWithStatus = (job: JobData): JobEntity.DataWithStatus => ({
+    ...job,
+    job: { ...job.job, status: JobConfig.Status[jobToStatus(job)] },
+});
 
 export const JobNormalized = {
     withMulticallsDataDecoded: jobToJobWithMulticallsDataDecoded,
