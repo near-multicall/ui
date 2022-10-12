@@ -1,4 +1,5 @@
 export { DataInspector } from "./data-inspector";
+export { DateTimePicker } from "./date-time-picker";
 export { Dialog } from "./dialog";
 export { NearIcons } from "./icons";
 export { Placeholder } from "./placeholder";

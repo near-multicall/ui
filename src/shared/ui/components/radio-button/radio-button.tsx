@@ -4,7 +4,7 @@ import { ComponentProps } from "react";
 
 import "./radio-button.scss";
 
-interface RadioButtonProps extends ComponentProps<typeof FormControlLabel> {}
+interface RadioButtonProps extends Omit<ComponentProps<typeof FormControlLabel>, "control"> {}
 
 const _RadioButton = "RadioButton";
 
