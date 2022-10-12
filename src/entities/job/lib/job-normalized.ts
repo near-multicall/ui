@@ -1,7 +1,7 @@
 import { Base64 } from "js-base64";
 
 import { JobData } from "../../../shared/lib/contracts/multicall";
-import { cronToDate } from "../../../shared/lib/converter";
+import { Big } from "../../../shared/lib/converter";
 
 import { JobConfig, type JobEntity } from "../config";
 
@@ -17,7 +17,10 @@ const jobToStatus = ({ job }: JobData): JobEntity.Status => {
         if (job.run_count > -1) return JobConfig.Status.Running;
         else return JobConfig.Status.Active;
     } else {
-        if (cronToDate(job.cadence).getTime() < new Date().getTime()) return JobConfig.Status.Expired;
+        // Date.now() returns timestamp in milliseconds, we use nanoseconds
+        const currentTime = Big(Date.now()).times("1000000");
+        const jobTime = job.start_at;
+        if (currentTime.gt(jobTime)) return JobConfig.Status.Expired;
         else return JobConfig.Status.Inactive;
     }
 };

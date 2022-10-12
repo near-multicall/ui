@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 
-import { cronToDate, toTGas } from "../../../shared/lib/converter";
+import { Big, toTGas } from "../../../shared/lib/converter";
 import { DataInspector, IconLabel } from "../../../shared/ui/components";
 
 import { JobConfig, type JobEntity } from "../config";
@@ -26,7 +26,8 @@ const JobDisplayStatus = ({ job }: Pick<JobEntity.DataWithStatus, "job">) => {
 export const jobDetailsTableRowRender = ({ id, job }: JobDetailsTableRowRenderProps) => [
     <JobDisplayStatus {...{ job }} />,
     id,
-    cronToDate(job.cadence).toLocaleString(),
+    // Multicall returns timestamp in nanoseconds, JS Date uses milliseconds
+    new Date(parseInt(Big(job.start_at).div("1000000").toFixed())).toLocaleString(),
     job.croncat_hash.length === 0 ? <i>none</i> : job.croncat_hash,
     job.creator,
     `${toTGas(job.trigger_gas)} Tgas`,
@@ -38,7 +39,7 @@ export const jobDetailsTableRowRender = ({ id, job }: JobDetailsTableRowRenderPr
             expandLevel={5}
         />
 
-        {job.multicalls.length > 0 && (
+        {job.multicalls.length === 1 && (
             <NavLink
                 to="/app"
                 className={`${_Job}-action`}

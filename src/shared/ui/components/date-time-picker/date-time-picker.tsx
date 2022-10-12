@@ -21,6 +21,7 @@ function DateTimePicker({
         <LocalizationProvider dateAdapter={AdapterLuxon}>
             <MaterialUIPicker
                 label={label}
+                ampm={false}
                 minDateTime={DateTime.fromJSDate(minDateTime)}
                 maxDateTime={DateTime.fromJSDate(maxDateTime)}
                 value={DateTime.fromJSDate(value)}
