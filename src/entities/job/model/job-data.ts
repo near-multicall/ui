@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Base64 } from "js-base64";
 
 import { type JobEntity } from "../config";
-import { JobExtended } from "../lib/job-extended";
+import { JobNormalized } from "../lib/job-normalized";
 
 type JobsDataFxResponse = {
     /** Jobs indexed by ID for easy access to each particular job */
@@ -22,17 +22,7 @@ const jobsDataFx = async (
                 data: data.reduce(
                     (jobsIndexedById, job) => ({
                         ...jobsIndexedById,
-
-                        [job.id]: JobExtended.withStatus(job).job.multicalls.forEach((multicallArgs) =>
-                            multicallArgs.calls.forEach((call) =>
-                                call.forEach((batchCall) =>
-                                    batchCall.actions.forEach(
-                                        /** base64 decode FunctionCall args */
-                                        (action) => (action.args = JSON.parse(Base64.decode(action.args)))
-                                    )
-                                )
-                            )
-                        ),
+                        [job.id]: JobNormalized.withMulticallsDataDecoded(JobNormalized.withStatus(job)),
                     }),
 
                     {}
