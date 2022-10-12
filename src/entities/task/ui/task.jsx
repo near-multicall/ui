@@ -28,7 +28,6 @@ export class Task extends Component {
                     formData: from.state.formData,
                     showArgs: from.state.showArgs,
                     options: from.options,
-                    schema: from.schema,
                 };
             }
         }
@@ -44,7 +43,6 @@ export class Task extends Component {
                 showArgs: this.instance.current.state.showArgs,
                 isEdited: this.instance.current.state.isEdited,
                 options: this.instance.current.options,
-                schema: this.instance.current.schema,
             };
         } else {
             this.instance = React.createRef();
@@ -156,7 +154,7 @@ export class Task extends Component {
                             zIndex: snapshot.isDragging ? 10 : 1,
                         }}
                     >
-                        {/* <h1 style={{ paddingLeft: "20px" }}>{this.id}</h1> */}
+                        {/* <h1 style={{paddingLeft: "20px"}}>{this.id}</h1> */}
                         {this.child}
                     </div>
                 )}

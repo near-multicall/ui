@@ -55,22 +55,17 @@ export class BaseTask extends Component {
         };
 
         if (window.TEMP) {
-            this.state.formData = JSON.parse(JSON.stringify(TEMP.formData));
+            this.initialValues = JSON.parse(JSON.stringify(TEMP.formData));
             this.state.showArgs = TEMP.showArgs;
             this.state.isEdited = TEMP.isEdited;
             this.options = TEMP.options;
-            this.schema = TEMP.schema;
+            this.init();
         } else if (window.COPY?.payload) {
-            const optionsDeepCopy = JSON.parse(JSON.stringify(COPY.payload.options));
-            const formDataDeepCopy = JSON.parse(JSON.stringify(COPY.payload.formData));
-
-            this.init({
-                name: COPY.payload.formData?.name?.toString(),
-                ...formDataDeepCopy,
-                options: optionsDeepCopy,
-            });
+            this.initialValues = JSON.parse(JSON.stringify(COPY.payload.formData));
             this.state.showArgs = COPY.payload.showArgs;
+            this.options = JSON.parse(JSON.stringify(COPY.payload.options));
             COPY = null;
+            this.init();
         } else {
             this.init(this.props.json);
         }
@@ -81,9 +76,16 @@ export class BaseTask extends Component {
     }
 
     init(json = null) {
-        let entries = [];
-        if (!!json) entries = Object.entries({ addr: json.address, ...json.actions[0] });
-        entries.forEach(([k, v]) => {
+        (!!json
+            ? Object.entries({
+                  addr: json.address,
+                  func: json.actions[0].func,
+                  args: JSON.stringify(json.actions[0].args),
+                  gas: arx.big().intoFormatted(this.initialValues.gasUnit).cast(json.actions[0].gas).toFixed(),
+                  depo: arx.big().intoFormatted(this.initialValues.depoUnit).cast(json.actions[0].depo).toFixed(),
+              })
+            : []
+        ).forEach(([k, v]) => {
             if (v !== undefined && v !== null && this.initialValues[k] !== undefined) this.initialValues[k] = v;
         });
 
