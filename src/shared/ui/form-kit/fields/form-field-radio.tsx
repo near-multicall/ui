@@ -10,8 +10,8 @@ const _FormFieldRadio = "FormFieldRadio";
 
 export const FormFieldRadio = ({ className, ...props }: FormFieldRadioProps) => (
     <FormControlLabel
-        className={clsx(_FormFieldRadio, className)}
-        control={<Radio />}
+        classes={{ root: clsx(_FormFieldRadio, className), label: `${_FormFieldRadio}-label` }}
+        control={<Radio classes={{ root: `${_FormFieldRadio}-button` }} />}
         {...props}
     />
 );
