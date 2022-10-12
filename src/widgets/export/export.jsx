@@ -12,8 +12,8 @@ import { Big, convert, toGas, toNEAR } from "../../shared/lib/converter";
 import { Multicall } from "../../shared/lib/contracts/multicall";
 import { signAndSendTxs, view } from "../../shared/lib/wallet";
 import { Wallet } from "../../entities";
-import { DateTimePicker, RadioButton, TextInput, TextInputWithUnits } from "../../shared/ui/components";
-import { FormControl, FormLabel } from "../../shared/ui/forms";
+import { DateTimePicker, TextInput, TextInputWithUnits } from "../../shared/ui/components";
+import { FormControl, FormLabel, FormFieldRadio } from "../../shared/ui/form-kit";
 
 import "./export.scss";
 
@@ -416,12 +416,12 @@ export class Export extends Component {
                                 else if (value === "scheduled") this.setState({ isJob: true });
                             }}
                         >
-                            <RadioButton
+                            <FormFieldRadio
                                 value="immediate"
                                 label="Immediate"
                             />
 
-                            <RadioButton
+                            <FormFieldRadio
                                 value="scheduled"
                                 label="Scheduled"
                             />

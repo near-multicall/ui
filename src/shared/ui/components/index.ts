@@ -4,7 +4,6 @@ export { Dialog } from "./dialog";
 export { NearIcons } from "./icons";
 export { Placeholder } from "./placeholder";
 export { PopupMenu } from "./popup-menu";
-export { RadioButton } from "./radio-button";
 export { Scrollable } from "./scrollable";
 export { Table } from "./table";
 export { Tabs } from "./tabs";
