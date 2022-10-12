@@ -13,7 +13,7 @@ import { Multicall } from "../../shared/lib/contracts/multicall";
 import { signAndSendTxs, view } from "../../shared/lib/wallet";
 import { Wallet } from "../../entities";
 import { DateTimePicker, TextInput, TextInputWithUnits } from "../../shared/ui/components";
-import { FormControl, FormLabel, FormFieldRadio } from "../../shared/ui/form-kit";
+import { FormControl, FormLabel, FormRadio } from "../../shared/ui/form-kit";
 
 import "./export.scss";
 
@@ -416,12 +416,12 @@ export class Export extends Component {
                                 else if (value === "scheduled") this.setState({ isJob: true });
                             }}
                         >
-                            <FormFieldRadio
+                            <FormRadio
                                 value="immediate"
                                 label="Immediate"
                             />
 
-                            <FormFieldRadio
+                            <FormRadio
                                 value="scheduled"
                                 label="Scheduled"
                             />
