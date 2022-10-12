@@ -341,8 +341,6 @@ export class AppPage extends Component {
     }
 
     fromBase64(json) {
-        console.log(json);
-
         this.clear();
 
         const layout = STORAGE.layout;
@@ -381,7 +379,6 @@ export class AppPage extends Component {
             this.columnID++;
 
             for (let t in json[c]) {
-                console.log(json[c]);
                 const { address: jsonAddress, actions: jsonActions } = json[c][t];
                 let task = {
                     id: `task-${this.taskID++}`,

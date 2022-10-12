@@ -108,14 +108,12 @@ export class DaoPage extends Component<Props, State> {
             this.tryLoadInfo();
         });
 
-        document.addEventListener("onaddressesupdated", (e) => this.onAddressesUpdated(e as CustomEvent));
-
         this.lastAddr = this.state.formData.addr;
     }
 
-    componentDidMount(): void {
+    componentDidMount() {
         window.SIDEBAR.switchPage("dao");
-        document.addEventListener("onaddressesupdated", () => this.onAddressesUpdated());
+        document.addEventListener("onaddressesupdated", (e) => this.onAddressesUpdated(e as CustomEvent));
     }
 
     setFormData(newFormData: State["formData"], callback?: () => void | undefined) {
