@@ -6,5 +6,5 @@ interface FormLabelProps extends GenericFromLabelProps {
 }
 
 export const FormLabel = ({ content, ...props }: FormLabelProps) => (
-    <GenericFormLabel {...{ props }}>{content}</GenericFormLabel>
+    <GenericFormLabel {...props}>{content}</GenericFormLabel>
 );

@@ -8,10 +8,10 @@ export interface FormFieldRadioProps extends Omit<ComponentProps<typeof FormCont
 
 const _FormFieldRadio = "FormFieldRadio";
 
-export const FormFieldRadio = ({ className, label, value }: FormFieldRadioProps) => (
+export const FormFieldRadio = ({ className, ...props }: FormFieldRadioProps) => (
     <FormControlLabel
         className={clsx(_FormFieldRadio, className)}
         control={<Radio />}
-        {...{ label, value }}
+        {...props}
     />
 );
