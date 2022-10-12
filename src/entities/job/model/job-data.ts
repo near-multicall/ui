@@ -27,10 +27,13 @@ const jobsDataFx = async (
                 ...jobsDataInitialState,
                 loading: false,
 
-                data: data.reduce((jobsIndexedById, job) => ({
-                    ...jobsIndexedById,
-                    [job.id]: JobNormalized.withMulticallsDataDecoded(JobNormalized.withStatus(job)),
-                })),
+                data: data.reduce(
+                    (jobsIndexedById, job) => ({
+                        ...jobsIndexedById,
+                        [job.id]: JobNormalized.withMulticallsDataDecoded(JobNormalized.withStatus(job)),
+                    }),
+                    {}
+                ),
             }))
             .catch((error) => ({ ...jobsDataInitialState, error: new Error(error), loading: false }))
     );
