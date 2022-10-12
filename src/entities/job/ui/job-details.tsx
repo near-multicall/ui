@@ -4,10 +4,11 @@ import { Big, toTGas } from "../../../shared/lib/converter";
 import { DataInspector, IconLabel } from "../../../shared/ui/components";
 
 import { JobConfig, type JobEntity } from "../config";
+import "./job-details.scss";
 
 interface JobDetailsTableRowRenderProps extends JobEntity.DataWithStatus {}
 
-const _Job = "_Job";
+const _Job = "Job";
 
 const JobDisplayStatus = ({ job }: Pick<JobEntity.DataWithStatus, "job">) => {
     const statusTextByStatus = {
@@ -45,7 +46,7 @@ export const jobDetailsTableRowRender = ({ id, job }: JobDetailsTableRowRenderPr
                 className={`${_Job}-action`}
                 onClick={() => setTimeout(() => window.LAYOUT.fromJSON(job.multicalls[0].calls), 0)}
             >
-                View in Editor
+                Open in Editor
             </NavLink>
         )}
     </>,
