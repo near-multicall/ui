@@ -4,18 +4,20 @@
 .IconLabel {
     display: flex;
     align-items: center;
-    gap: size.$gap;
+    gap: calc(size.$gap * 0.6);
+    line-height: 1;
 
     &-icon {
-        width: 1.5 * size.$gap;
-        height: 1.5 * size.$gap;
+        width: fit-content;
+        height: fit-content;
         cursor: default !important;
         border-radius: 50%;
         box-shadow: 0px 5px 11px -3px rgba(0, 0, 0, 0.1);
 
-        & > * {
-            width: inherit;
-            height: inherit;
+        & > img,
+        & > svg {
+            width: 1.5 * size.$gap;
+            height: 1.5 * size.$gap;
         }
     }
 
