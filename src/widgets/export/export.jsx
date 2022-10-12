@@ -401,7 +401,7 @@ export class Export extends Component {
                         </>
                     ) : null}
 
-                    <FormControl>
+                    <FormControl className="ExecutionSettings-modeSelector">
                         <FormLabel
                             content="Execution:"
                             id="multicall-export-radio-buttons-group-label"
@@ -430,6 +430,7 @@ export class Export extends Component {
 
                     {isJob ? (
                         <DateTimePicker
+                            className="ExecutionSettings-dateTimePicker"
                             label="Execution date"
                             value={jobDateTime}
                             minDateTime={currentDate}

@@ -13,6 +13,13 @@
     overflow-y: scroll;
 }
 
+.ExecutionSettings {
+    &-modeSelector.MuiFormControl-root {
+        width: 100%;
+        padding: size.$gap 0;
+    }
+}
+
 .section {
     flex: 1;
     position: relative;
