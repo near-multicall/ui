@@ -6,4 +6,8 @@
         font-size: size.$text;
         color: color.$white;
     }
+
+    &.is-focused.Mui-focused {
+        color: color.$white;
+    }
 }

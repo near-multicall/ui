@@ -10,7 +10,7 @@ const _FormLabel = "FormLabel";
 
 export const FormLabel = ({ content, ...props }: FormLabelProps) => (
     <GenericFormLabel
-        classes={{ root: _FormLabel }}
+        classes={{ root: _FormLabel, focused: "is-focused" }}
         {...props}
     >
         {content}
