@@ -45,7 +45,7 @@ export const jobDetailsTableRowRender = ({ id, job }: JobDetailsTableRowRenderPr
                 className={`${_Job}-action`}
                 onClick={() => setTimeout(() => window.LAYOUT.fromJSON(job.multicalls[0].calls), 0)}
             >
-                View in Editor
+                Open in Editor
             </NavLink>
         )}
     </>,
