@@ -1,8 +1,13 @@
 import { useEffect, useState } from "react";
-import { Base64 } from "js-base64";
 
 import { type JobEntity } from "../config";
 import { JobNormalized } from "../lib/job-normalized";
+
+const jobsDataInitialState = {
+    data: null,
+    error: null,
+    loading: true,
+};
 
 type JobsDataFxResponse = {
     /** Jobs indexed by ID for easy access to each particular job */
@@ -19,23 +24,19 @@ const jobsDataFx = async (
         await multicall
             .getJobs()
             .then((data) => ({
-                data: data.reduce(
-                    (jobsIndexedById, job) => ({
-                        ...jobsIndexedById,
-                        [job.id]: JobNormalized.withMulticallsDataDecoded(JobNormalized.withStatus(job)),
-                    }),
-
-                    {}
-                ),
-
-                error: null,
+                ...jobsDataInitialState,
                 loading: false,
+
+                data: data.reduce((jobsIndexedById, job) => ({
+                    ...jobsIndexedById,
+                    [job.id]: JobNormalized.withMulticallsDataDecoded(JobNormalized.withStatus(job)),
+                })),
             }))
-            .catch((error) => ({ data: null, error: new Error(error), loading: false }))
+            .catch((error) => ({ ...jobsDataInitialState, error: new Error(error), loading: false }))
     );
 
 const useJobsData = (contracts: JobEntity.Dependencies["contracts"]) => {
-    const [state, stateUpdate] = useState<JobsDataFxResponse>({ data: null, error: null, loading: true });
+    const [state, stateUpdate] = useState<JobsDataFxResponse>(jobsDataInitialState);
 
     useEffect(() => void jobsDataFx(contracts, stateUpdate), []);
 
