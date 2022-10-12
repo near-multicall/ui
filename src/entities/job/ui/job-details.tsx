@@ -1,7 +1,7 @@
 import { NavLink } from "react-router-dom";
 
 import { cronToDate, toTGas } from "../../../shared/lib/converter";
-import { DataInspector } from "../../../shared/ui/components";
+import { DataInspector, IconLabel } from "../../../shared/ui/components";
 
 import { JobConfig, type JobEntity } from "../config";
 
@@ -16,10 +16,10 @@ const JobDisplayStatus = ({ job }: Pick<JobEntity.DataWithStatus, "job">) => {
     };
 
     return (
-        <span>
-            <span>{JobConfig.StatusIcons[job.status]}</span>
-            <span> {statusTextByStatus[job.status]}</span>
-        </span>
+        <IconLabel
+            icon={JobConfig.StatusIcons[job.status]}
+            label={statusTextByStatus[job.status]}
+        />
     );
 };
 
