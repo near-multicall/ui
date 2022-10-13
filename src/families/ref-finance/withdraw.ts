@@ -1,5 +1,5 @@
 import { ArgsAccount, ArgsBig, ArgsJSON, ArgsString, ArgsError } from "../../shared/lib/args-old";
-import Call from "../../shared/lib/call";
+import { Call } from "../../shared/lib/call";
 import { STORAGE } from "../../shared/lib/persistent";
 import { toGas } from "../../shared/lib/converter";
 import { errorMsg } from "../../shared/lib/errors";

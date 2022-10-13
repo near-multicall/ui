@@ -1,7 +1,7 @@
 import { InputAdornment } from "@mui/material";
 import debounce from "lodash.debounce";
 import { ArgsAccount, ArgsBig, ArgsError, ArgsObject, ArgsString } from "../../shared/lib/args-old";
-import Call from "../../shared/lib/call";
+import { Call } from "../../shared/lib/call";
 import { formatTokenAmount, toGas, unitToDecimals } from "../../shared/lib/converter";
 import { errorMsg } from "../../shared/lib/errors";
 import { view } from "../../shared/lib/wallet";

@@ -1,7 +1,7 @@
 import Checkbox from "@mui/material/Checkbox";
 import React from "react";
 import { ArgsAccount, ArgsBig, ArgsString, ArgsObject, ArgsError } from "../../shared/lib/args-old";
-import Call from "../../shared/lib/call";
+import { Call } from "../../shared/lib/call";
 import { errorMsg } from "../../shared/lib/errors";
 import { STORAGE } from "../../shared/lib/persistent";
 import { toGas, toYocto, formatTokenAmount, unitToDecimals } from "../../shared/lib/converter";

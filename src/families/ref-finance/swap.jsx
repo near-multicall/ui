@@ -10,7 +10,7 @@ import {
     ArgsObject,
     ArgsArray,
 } from "../../shared/lib/args-old";
-import Call from "../../shared/lib/call";
+import { Call } from "../../shared/lib/call";
 import { errorMsg } from "../../shared/lib/errors";
 import { toGas } from "../../shared/lib/converter";
 import { BaseTask } from "../base";
