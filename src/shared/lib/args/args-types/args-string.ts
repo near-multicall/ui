@@ -2,6 +2,7 @@ import { addMethod, StringSchema as _StringSchema } from "yup";
 import { hasContract } from "../../contracts/generic";
 import { Multicall } from "../../contracts/multicall";
 import { SputnikDAO } from "../../contracts/sputnik-dao";
+import { FungibleToken } from "../../standards/fungibleToken";
 import { locale, addErrorMethods, ErrorMethods } from "../args-error";
 
 declare module "yup" {
@@ -47,7 +48,7 @@ addMethod(_StringSchema, "address", function address(message = locale.string.add
 
 // ensure string is a valid NEAR address with a contract
 addMethod(_StringSchema, "contract", function contract(message = locale.string.contract) {
-    return this.test({
+    return this.address().test({
         name: "contract",
         message,
         test: async (value) => {
@@ -65,7 +66,7 @@ addMethod(_StringSchema, "contract", function contract(message = locale.string.c
 
 // ensure string is a valid NEAR address with a SputnikDAO contract
 addMethod(_StringSchema, "sputnikDao", function sputnikDao(message = locale.string.sputnikDao) {
-    return this.test({
+    return this.address().test({
         name: "sputnikDao",
         message,
         test: async (value) => {
@@ -83,13 +84,32 @@ addMethod(_StringSchema, "sputnikDao", function sputnikDao(message = locale.stri
 
 // ensure string is a valid NEAR address with a multicall contract
 addMethod(_StringSchema, "multicall", function multicall(message = locale.string.multicall) {
-    return this.test({
+    return this.address().test({
         name: "multicall",
         message,
         test: async (value) => {
             if (value == null) return true;
             try {
                 return !!(await Multicall.isMulticall(value));
+            } catch (e) {
+                // TODO check reason for error
+                // console.warn("error occured while checking for multicall instance at", value);
+                return false;
+            }
+        },
+    });
+});
+
+// ensure string is a valid NEAR address with a token contract
+addMethod(_StringSchema, "tokenContract", function tokenContract(message = locale.string.tokenContract) {
+    return this.address().test({
+        name: "tokenContract",
+        message,
+        test: async (value) => {
+            if (value == null) return true;
+            try {
+                const fungibleToken = await FungibleToken.init(value);
+                return fungibleToken.ready;
             } catch (e) {
                 // TODO check reason for error
                 // console.warn("error occured while checking for multicall instance at", value);

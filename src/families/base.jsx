@@ -119,8 +119,8 @@ export class BaseTask extends Component {
                 {
                     func,
                     args: JSON.parse(args),
-                    gas: arx.big().intoParsed(gasUnit).cast(gas),
-                    depo: arx.big().intoParsed(depoUnit).cast(depo),
+                    gas: arx.big().intoParsed(gasUnit).cast(gas).toFixed(),
+                    depo: arx.big().intoParsed(depoUnit).cast(depo).toFixed(),
                 },
             ],
         };
