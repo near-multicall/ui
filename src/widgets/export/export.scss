@@ -4,16 +4,43 @@
 @use "sass/mixin";
 @use "sass/font";
 
-.export-container {
+.Editor-menu-exportTab {
     @include mixin.full;
     @include mixin.no-scrollbar;
     display: flex;
     flex-flow: column nowrap;
     gap: size.$gap;
     overflow-y: scroll;
+
+    &-action {
+        margin-top: auto;
+        padding: 0.25 * size.$gap 0.5 * size.$gap;
+        position: sticky;
+        bottom: 0;
+        border-radius: size.$task-radius;
+        z-index: 1;
+
+        &--propose {
+            background-color: color.$green;
+
+            &:disabled {
+                background-color: color.$darkish;
+                cursor: not-allowed;
+            }
+
+            p {
+                font-size: size.$smaller-text;
+                color: color.$red;
+            }
+        }
+
+        &--login {
+            background-color: color.$light;
+        }
+    }
 }
 
-.ExecutionSettings {
+.SchedulingSettings {
     &-modeSelector.MuiFormControl-root {
         width: 100%;
     }
@@ -320,32 +347,5 @@
                 font-size: size.$large-text;
             }
         }
-    }
-}
-
-.button {
-    margin-top: auto;
-    padding: 0.25 * size.$gap 0.5 * size.$gap;
-    position: sticky;
-    bottom: 0;
-    border-radius: size.$task-radius;
-    z-index: 1;
-
-    &.propose {
-        background-color: color.$green;
-
-        &:disabled {
-            background-color: color.$darkish;
-            cursor: not-allowed;
-        }
-
-        p {
-            font-size: size.$smaller-text;
-            color: color.$red;
-        }
-    }
-
-    &.login {
-        background-color: color.$light;
     }
 }

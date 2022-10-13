@@ -1,5 +1,6 @@
 import { EditOutlined as EditOutlinedIcon } from "@mui/icons-material";
 import { Icon, InputAdornment, RadioGroup, TextField } from "@mui/material";
+import clsx from "clsx";
 import { Base64 } from "js-base64";
 import debounce from "lodash.debounce";
 import { Component } from "react";
@@ -16,6 +17,17 @@ import { DateTimePicker, TextInput, TextInputWithUnits } from "../../shared/ui/c
 import { FormControl, FormLabel, FormRadio } from "../../shared/ui/form-kit";
 
 import "./export.scss";
+
+class config {
+    static #rootClass = "Editor-menu-exportTab";
+
+    static classes = {
+        root: config.#rootClass,
+        action: config.#rootClass + "-action",
+        action__login: config.#rootClass + "-action--login",
+        action__propose: config.#rootClass + "-action--propose",
+    };
+}
 
 export class Export extends Component {
     static contextType = Wallet.useSelector();
@@ -137,7 +149,7 @@ export class Export extends Component {
         if (!walletSelector.isSignedIn()) {
             return (
                 <button
-                    className="login button"
+                    className={clsx(config.classes.action, config.classes.action__login)}
                     onClick={() => WALLET_COMPONENT.signIn()}
                 >
                     Connect to Wallet
@@ -177,7 +189,7 @@ export class Export extends Component {
 
             return (
                 <button
-                    className="propose button"
+                    className={clsx(config.classes.action, config.classes.action__propose)}
                     disabled={isProposeDisabled}
                     onClick={async () => {
                         const { currentDAO: dao, currentMulticall: multicall } = WALLET_COMPONENT.state;
@@ -311,7 +323,7 @@ export class Export extends Component {
         }
 
         return (
-            <div className="export-container">
+            <div className={config.classes.root}>
                 <div className="input-container">
                     <TextInput
                         label="Proposal description"
@@ -401,7 +413,7 @@ export class Export extends Component {
                         </>
                     ) : null}
 
-                    <FormControl className="ExecutionSettings-modeSelector">
+                    <FormControl className="SchedulingSettings-modeSelector">
                         <FormLabel
                             content="Execution:"
                             id="multicall-export-radio-buttons-group-label"
@@ -430,7 +442,7 @@ export class Export extends Component {
 
                     {isJob ? (
                         <DateTimePicker
-                            className="ExecutionSettings-dateTimePicker"
+                            className="SchedulingSettings-dateTimePicker"
                             label="Execution date"
                             value={jobDateTime}
                             minDateTime={currentDate}
