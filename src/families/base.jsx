@@ -146,6 +146,7 @@ export class BaseTask extends Component {
         return (
             <Formik
                 initialValues={this.state.formData}
+                initialTouched={Object.keys(this.state.formData).reduce((acc, k) => ({ ...acc, [k]: true }), {})}
                 enableReinitialize={true}
                 validate={async (values) => {
                     this.setFormData(values);
@@ -159,9 +160,10 @@ export class BaseTask extends Component {
                 }}
                 onSubmit={() => {}}
             >
-                {({ resetForm }) => {
+                {({ resetForm, validateForm }) => {
                     if (init) {
                         resetForm(this.state.formData);
+                        validateForm(this.state.formData);
                         init = false;
                     }
                     return (
