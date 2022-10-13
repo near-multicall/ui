@@ -16,7 +16,6 @@
 .ExecutionSettings {
     &-modeSelector.MuiFormControl-root {
         width: 100%;
-        padding: size.$gap 0;
     }
 }
 
@@ -80,6 +79,9 @@
 }
 
 .input-container {
+    display: flex;
+    flex-direction: column;
+    gap: size.$gap;
     padding-top: size.$smaller-text;
 
     .unitInput {
@@ -322,6 +324,7 @@
 }
 
 .button {
+    margin-top: auto;
     padding: 0.25 * size.$gap 0.5 * size.$gap;
     position: sticky;
     bottom: 0;

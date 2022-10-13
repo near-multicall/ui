@@ -505,7 +505,6 @@ export class Export extends Component {
                     )}
                 </div>
 
-                <div className="spacer"></div>
                 {this.renderProposeButton(multicallArgs)}
             </div>
         );
