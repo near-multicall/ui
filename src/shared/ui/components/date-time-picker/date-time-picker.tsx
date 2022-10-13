@@ -1,35 +1,37 @@
-import { DateTime } from "luxon";
-import TextField from "@mui/material/TextField";
+import { TextField } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
-import { DateTimePicker as MaterialUIPicker } from "@mui/x-date-pickers/DateTimePicker";
 
-function DateTimePicker({
-    label,
-    value,
-    minDateTime,
-    maxDateTime,
-    handleChange,
-}: {
-    label: string;
-    value: Date;
-    minDateTime: Date;
-    maxDateTime: Date;
+import {
+    DateTimePicker as GenericDateTimePicker,
+    type DateTimePickerProps as GenericDateTimePickerProps,
+} from "@mui/x-date-pickers/DateTimePicker";
+
+import { DateTime } from "luxon";
+
+import "./date-time-picker.scss";
+
+export interface DateTimePickerProps
+    extends Omit<
+        GenericDateTimePickerProps<DateTime, DateTime>,
+        "onChange" | "maxDateTime" | "minDateTime" | "renderInput" | "value"
+    > {
     handleChange: (value: DateTime | null, keyboardInputValue: string | undefined) => void;
-}) {
-    return (
-        <LocalizationProvider dateAdapter={AdapterLuxon}>
-            <MaterialUIPicker
-                label={label}
-                ampm={false}
-                minDateTime={DateTime.fromJSDate(minDateTime)}
-                maxDateTime={DateTime.fromJSDate(maxDateTime)}
-                value={DateTime.fromJSDate(value)}
-                onChange={handleChange}
-                renderInput={(params) => <TextField {...params} />}
-            />
-        </LocalizationProvider>
-    );
+    maxDateTime: Date;
+    minDateTime: Date;
+    value: Date;
 }
 
-export { DateTimePicker };
+export const DateTimePicker = ({ value, minDateTime, maxDateTime, handleChange, ...props }: DateTimePickerProps) => (
+    <LocalizationProvider dateAdapter={AdapterLuxon}>
+        <GenericDateTimePicker
+            ampm={false}
+            minDateTime={DateTime.fromJSDate(minDateTime)}
+            maxDateTime={DateTime.fromJSDate(maxDateTime)}
+            value={DateTime.fromJSDate(value)}
+            onChange={handleChange}
+            renderInput={(params) => <TextField {...params} />}
+            {...props}
+        />
+    </LocalizationProvider>
+);
