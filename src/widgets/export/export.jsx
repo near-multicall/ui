@@ -26,6 +26,8 @@ class config {
         action: config.#rootClass + "-action",
         action__login: config.#rootClass + "-action--login",
         action__propose: config.#rootClass + "-action--propose",
+        scheduler: config.#rootClass + "-scheduler",
+        scheduler_timeSelector: config.#rootClass + "-scheduler-timeSelector",
     };
 }
 
@@ -413,7 +415,7 @@ export class Export extends Component {
                         </>
                     ) : null}
 
-                    <FormControl className="SchedulingSettings-modeSelector">
+                    <FormControl className={config.classes.scheduler}>
                         <FormLabel
                             content="Execution:"
                             id="multicall-export-radio-buttons-group-label"
@@ -442,7 +444,7 @@ export class Export extends Component {
 
                     {isJob ? (
                         <DateTimePicker
-                            className="SchedulingSettings-dateTimePicker"
+                            className={config.classes.scheduler_timeSelector}
                             label="Execution date"
                             value={jobDateTime}
                             minDateTime={currentDate}

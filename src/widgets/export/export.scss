@@ -12,6 +12,12 @@
     gap: size.$gap;
     overflow-y: scroll;
 
+    &-scheduler {
+        &-modeSelector.MuiFormControl-root {
+            width: 100%;
+        }
+    }
+
     &-action {
         margin-top: auto;
         padding: 0.25 * size.$gap 0.5 * size.$gap;
@@ -37,12 +43,6 @@
         &--login {
             background-color: color.$light;
         }
-    }
-}
-
-.SchedulingSettings {
-    &-modeSelector.MuiFormControl-root {
-        width: 100%;
     }
 }
 
