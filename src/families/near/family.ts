@@ -1,1 +1,1 @@
-export { Transfer } from "./ft-transfer";
+export { FtTransfer } from "./ft-transfer";

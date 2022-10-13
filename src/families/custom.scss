@@ -1,0 +1,17 @@
+@use "sass/color";
+
+.custom-task {
+    background: color.$lightest;
+    .name {
+        color: color.$text !important;
+        h3 {
+            color: color.$text;
+        }
+        .icon {
+            fill: color.$text !important;
+        }
+    }
+    * > a {
+        color: darken(color.$blue, 20%) !important;
+    }
+}

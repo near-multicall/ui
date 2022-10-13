@@ -10,7 +10,7 @@ import { BaseTask } from "../base";
 
 import "./near.scss";
 
-export class Transfer extends BaseTask {
+export class FtTransfer extends BaseTask {
     uniqueClassName = "near-ft-transfer-task";
     schema = arx
         .object()
@@ -47,7 +47,7 @@ export class Transfer extends BaseTask {
             token: new FungibleToken(this.initialValues.tokenAddress),
         };
 
-        this.tryUpdateFT();
+        this.tryUpdateFt();
     }
 
     init(json = null) {
@@ -69,7 +69,7 @@ export class Transfer extends BaseTask {
         });
 
         this.state.formData = this.initialValues;
-        this.tryUpdateFT(
+        this.tryUpdateFt(
             () =>
                 (this.state.formData.args.amount = arx
                     .big()
@@ -104,24 +104,25 @@ export class Transfer extends BaseTask {
         return !!json && arx.string().address().isValidSync(json.address) && json.actions[0].func === "ft_transfer";
     }
 
-    tryUpdateFT(cb) {
+    tryUpdateFt(cb) {
         this.schema.check(this.state.formData).then(() => {
             const { tokenAddress } = fields(this.schema);
             if (!tokenAddress.isBad()) {
-                this.confidentlyUpdateFT(cb);
+                this.confidentlyUpdateFt(cb);
             } else {
                 this.setState({ token: new FungibleToken(this.state.formData.tokenAddress) }); // will be invalid
             }
         });
     }
 
-    confidentlyUpdateFT(cb) {
+    confidentlyUpdateFt(cb) {
         const { tokenAddress } = this.state.formData;
         FungibleToken.init(tokenAddress).then((newToken) => {
             if (!newToken.ready) return;
-            this.setState({ token: newToken }, () => {
-                cb();
-            });
+            cb();
+            // this.setState({ token: newToken }, () => {
+            //     cb();
+            // });
         });
     }
 
@@ -135,7 +136,7 @@ export class Transfer extends BaseTask {
                 validate={async (values) => {
                     this.setFormData(values);
                     await new Promise((resolve) => this.resolveDebounced(resolve));
-                    await new Promise((resolve) => this.tryUpdateFT(resolve));
+                    await new Promise((resolve) => this.tryUpdateFt(resolve));
                     return Object.fromEntries(
                         Object.entries(fields(this.schema))
                             .map(([k, v]) => [k, v?.message() ?? ""])

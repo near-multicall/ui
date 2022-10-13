@@ -2,19 +2,19 @@ import * as nearAPI from "near-api-js";
 import type { NetworkId } from "@near-wallet-selector/core";
 import { Component } from "react";
 
-import { Task, Layout, Sidebar } from "../../widgets";
+import { Task, Layout, Sidebar, Menu, Editor } from "../../widgets";
 
 type CardInfo = {
-    call: object;
+    formData: object;
     showArgs: boolean;
+    isEdited: boolean;
     options: object;
-    errors: object;
 };
 
 type CardCopy = {
     from: string;
     to: string;
-    payload?: CardInfo;
+    payload?: Omit<CardInfo, "isEdited">;
 };
 
 declare global {
@@ -22,8 +22,8 @@ declare global {
         // Page components
         DAO_COMPONENT: Component;
 
-        MENU: Component;
-        EDITOR: Component;
+        MENU: Menu;
+        EDITOR: Editor;
         EXPORT: Component;
 
         LAYOUT: Layout;

@@ -26,22 +26,6 @@
     transform-origin: center center; /* Standard Property */
 }
 
-.base-task {
-    background: color.$lightest;
-    .name {
-        color: color.$text !important;
-        h3 {
-            color: color.$text;
-        }
-        .icon {
-            fill: color.$text !important;
-        }
-    }
-    * > a {
-        color: darken(color.$blue, 20%) !important;
-    }
-}
-
 .task-container {
     position: relative;
     display: flex;

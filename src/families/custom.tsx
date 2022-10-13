@@ -6,13 +6,26 @@ import { Form, Formik } from "formik";
 import debounce from "lodash.debounce";
 import { args as arx } from "../shared/lib/args/args";
 import { fields } from "../shared/lib/args/args-types/args-object";
-import { CallError } from "../shared/lib/call";
+import { Call, CallError } from "../shared/lib/call";
 import { Tooltip } from "../shared/ui/components";
 import { TextField, UnitField } from "../shared/ui/form-fields";
-import "./base.scss";
+import "./custom.scss";
+import { BaseTask } from "./base";
+import { unit } from "../shared/lib/converter";
 
-export class BaseTask extends Component {
-    uniqueClassName = "base-task";
+type FormData = {
+    name: string;
+    addr: string;
+    func: string;
+    args: string;
+    gas: string;
+    gasUnit: number | unit;
+    depo: string;
+    depoUnit: number | unit;
+};
+
+export class CustomTask extends BaseTask<FormData> {
+    uniqueClassName = "custom-task";
     schema = arx
         .object()
         .shape({
@@ -30,7 +43,7 @@ export class BaseTask extends Component {
         .requireAll()
         .retainAll();
 
-    initialValues = {
+    initialValues: FormData = {
         name: "Custom",
         addr: "",
         func: "",
@@ -41,41 +54,8 @@ export class BaseTask extends Component {
         depoUnit: "NEAR",
     };
 
-    options = {};
-
-    resolveDebounced = debounce((resolve) => resolve(), 400);
-
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            formData: this.initialValues,
-            showArgs: false,
-            isEdited: false,
-        };
-
-        if (window.TEMP) {
-            this.initialValues = JSON.parse(JSON.stringify(TEMP.formData));
-            this.state.showArgs = TEMP.showArgs;
-            this.state.isEdited = TEMP.isEdited;
-            this.options = TEMP.options;
-            this.init();
-        } else if (window.COPY?.payload) {
-            this.initialValues = JSON.parse(JSON.stringify(COPY.payload.formData));
-            this.state.showArgs = COPY.payload.showArgs;
-            this.options = JSON.parse(JSON.stringify(COPY.payload.options));
-            COPY = null;
-            this.init();
-        } else {
-            this.init(this.props.json);
-        }
-
-        this.updateCard = this.updateCard.bind(this);
-
-        document.addEventListener("onaddressesupdated", (e) => this.onAddressesUpdated(e));
-    }
-
-    init(json = null) {
+    init(call: Call | null) {
+        /*
         (!!json
             ? Object.entries({
                   addr: json.address,
@@ -86,8 +66,70 @@ export class BaseTask extends Component {
               })
             : []
         ).forEach(([k, v]) => {
-            if (v !== undefined && v !== null && this.initialValues[k] !== undefined) this.initialValues[k] = v;
+            if (v !== undefined && v !== null && this.initialValues[k as keyof FormData] !== undefined) {
+                this.initialValues[k as keyof FormData] = v;
+            }
         });
+        */
+
+        // that's better lol
+        // okay, i'll try to begin with smth simple
+
+        // me too, yours makes more sense
+
+        // hmm, `this.initialValues[k as keyof FormData] !== undefined` looks weird, is this really needed?
+        // (v !== undefined && v !== null && this.initialValues[k as keyof FormData] !== undefined)
+
+        // what part of it? i think with the code below, no
+        // yeah, just have a thought that key is always non-nullable
+
+        // well, intialValues has more fields than this
+        // ah, get it
+
+        // if say call.address is undefined or null, does it still override whatever is in initialValues?
+        // I'm gonna make a function-predicate to check it before override
+        // but i think it will not override anything, so were good
+        // hm, if you pass undefined to it, it'll
+        // oh lol, I've forgotten about nullish coalescing again
+        // so I don't need a function here
+        // okay, stupid way first
+        //
+
+        // ywa, makes sense, but do you have a better solution?
+        // yep, kinda
+
+        // do you have a shorter solution?
+        // I should make a swalow of my energy drink lol
+
+        // what? :joy: yes, energy drink good!
+        // hmm, im moving from stupid solutions to smarter ones, it's good at least :D
+
+        // is it done?
+        // hmm, gimme some time to clean it up a little
+
+        if (call !== null) {
+            const fromCall = {
+                addr: call.address,
+                func: call.actions[0].func,
+                args: JSON.stringify(call.actions[0].args),
+                gas: arx.big().intoFormatted(this.initialValues.gasUnit).cast(call.actions[0].gas).toFixed(),
+                depo: arx.big().intoFormatted(this.initialValues.depoUnit).cast(call.actions[0].depo).toFixed(),
+            };
+
+            // OMG i remembered a function from Ramda which can make it in one turn
+            // see Ramda.evolve
+
+            // hmm, at least now it's better
+            this.initialValues = Object.keys(this.initialValues).reduce(
+                (result, key) =>
+                    fromCall[key as keyof typeof fromCall] !== null &&
+                    fromCall[key as keyof typeof fromCall] !== undefined
+                        ? { ...result, [key as keyof FormData]: fromCall[key as keyof typeof fromCall] }
+                        : result,
+
+                this.initialValues
+            );
+        }
 
         this.state.formData = this.initialValues;
         this.schema.check(this.state.formData);

@@ -91,7 +91,7 @@ export class Task extends Component {
                 switch (func) {
                     case "ft_transfer":
                         return (
-                            <Family.Near.Transfer
+                            <Family.Near.FtTransfer
                                 ref={this.instance}
                                 id={this.id}
                                 json={json}
@@ -128,7 +128,7 @@ export class Task extends Component {
                 }
 
                 return (
-                    <Family.BaseTask
+                    <Family.CustomTask
                         ref={this.instance}
                         id={this.id}
                         json={json}
