@@ -1,0 +1,32 @@
+@use "sass/size";
+
+.DateTimePicker {
+    &-modal {
+        svg {
+            width: calc(size.$large-text * 1.5);
+            height: calc(size.$large-text * 1.5);
+        }
+
+        .MuiPickersCalendarHeader-root {
+            * {
+                font-size: size.$large-text;
+            }
+        }
+
+        [role="grid"],
+        .MuiYearPicker-root,
+        .MuiCalendarOrClockPicker-root {
+            * {
+                font-size: size.$text !important;
+            }
+        }
+
+        .MuiYearPicker-root {
+            button {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+    }
+}

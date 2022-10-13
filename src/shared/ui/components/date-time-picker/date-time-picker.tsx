@@ -7,8 +7,10 @@ import {
     type DateTimePickerProps as GenericDateTimePickerProps,
 } from "@mui/x-date-pickers/DateTimePicker";
 
+import clsx from "clsx";
 import { DateTime } from "luxon";
 
+import { DateTimePickerConfig as Config } from "./config";
 import "./date-time-picker.scss";
 
 export interface DateTimePickerProps
@@ -16,15 +18,25 @@ export interface DateTimePickerProps
         GenericDateTimePickerProps<DateTime, DateTime>,
         "onChange" | "maxDateTime" | "minDateTime" | "renderInput" | "value"
     > {
+    classes?: Record<keyof typeof Config.classes, string>;
     handleChange: (value: DateTime | null, keyboardInputValue: string | undefined) => void;
     maxDateTime: Date;
     minDateTime: Date;
     value: Date;
 }
 
-export const DateTimePicker = ({ value, minDateTime, maxDateTime, handleChange, ...props }: DateTimePickerProps) => (
+export const DateTimePicker = ({
+    classes,
+    handleChange,
+    maxDateTime,
+    minDateTime,
+    value,
+    ...props
+}: DateTimePickerProps) => (
     <LocalizationProvider dateAdapter={AdapterLuxon}>
         <GenericDateTimePicker
+            PaperProps={{ classes: { root: clsx(Config.classes.modal, classes?.modal) } }}
+            className={clsx(Config.classes.root, classes?.root)}
             ampm={false}
             minDateTime={DateTime.fromJSDate(minDateTime)}
             maxDateTime={DateTime.fromJSDate(maxDateTime)}
