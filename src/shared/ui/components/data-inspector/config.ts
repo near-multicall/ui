@@ -1,8 +1,8 @@
 import { chromeLight } from "react-inspector";
 
-export const UiKitConfig = {
-    OBJECT_INSPECTOR_THEME: {
+export class DataInspectorConfig {
+    static readonly theme = {
         ...chromeLight,
         BASE_BACKGROUND_COLOR: "transparent",
-    },
-};
+    };
+}

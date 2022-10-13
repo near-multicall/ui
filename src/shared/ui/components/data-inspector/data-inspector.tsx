@@ -2,8 +2,7 @@ import clsx from "clsx";
 import { MouseEvent, useCallback, useState, type ComponentProps } from "react";
 import { ObjectInspector } from "react-inspector";
 
-import { UiKitConfig } from "../config";
-
+import { DataInspectorConfig as Config } from "./config";
 import "./data-inspector.scss";
 
 interface DataInspectorProps extends ComponentProps<typeof ObjectInspector> {
@@ -45,7 +44,7 @@ export const DataInspector = ({ classes, expanded = false, expandLevel = 1, labe
                 <ObjectInspector
                     expandLevel={expandLevel < 1 ? 1 : expandLevel}
                     // @ts-ignore Built-in typings seems broken
-                    theme={UiKitConfig.OBJECT_INSPECTOR_THEME}
+                    theme={Config.theme}
                     {...props}
                 />
             </div>
