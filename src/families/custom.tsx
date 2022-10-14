@@ -1,17 +1,11 @@
-import { DeleteOutline, EditOutlined, MoveDown } from "@mui/icons-material";
-import { Component } from "react";
-
-import clsx from "clsx";
 import { Form, Formik } from "formik";
-import debounce from "lodash.debounce";
 import { args as arx } from "../shared/lib/args/args";
 import { fields } from "../shared/lib/args/args-types/args-object";
 import { Call, CallError } from "../shared/lib/call";
-import { Tooltip } from "../shared/ui/components";
-import { TextField, UnitField } from "../shared/ui/form-fields";
-import "./custom.scss";
-import { BaseTask } from "./base";
 import { unit } from "../shared/lib/converter";
+import { TextField, UnitField } from "../shared/ui/form-fields";
+import { BaseTask } from "./base";
+import "./custom.scss";
 
 type FormData = {
     name: string;
@@ -55,58 +49,6 @@ export class CustomTask extends BaseTask<FormData> {
     };
 
     init(call: Call | null) {
-        /*
-        (!!json
-            ? Object.entries({
-                  addr: json.address,
-                  func: json.actions[0].func,
-                  args: JSON.stringify(json.actions[0].args),
-                  gas: arx.big().intoFormatted(this.initialValues.gasUnit).cast(json.actions[0].gas).toFixed(),
-                  depo: arx.big().intoFormatted(this.initialValues.depoUnit).cast(json.actions[0].depo).toFixed(),
-              })
-            : []
-        ).forEach(([k, v]) => {
-            if (v !== undefined && v !== null && this.initialValues[k as keyof FormData] !== undefined) {
-                this.initialValues[k as keyof FormData] = v;
-            }
-        });
-        */
-
-        // that's better lol
-        // okay, i'll try to begin with smth simple
-
-        // me too, yours makes more sense
-
-        // hmm, `this.initialValues[k as keyof FormData] !== undefined` looks weird, is this really needed?
-        // (v !== undefined && v !== null && this.initialValues[k as keyof FormData] !== undefined)
-
-        // what part of it? i think with the code below, no
-        // yeah, just have a thought that key is always non-nullable
-
-        // well, intialValues has more fields than this
-        // ah, get it
-
-        // if say call.address is undefined or null, does it still override whatever is in initialValues?
-        // I'm gonna make a function-predicate to check it before override
-        // but i think it will not override anything, so were good
-        // hm, if you pass undefined to it, it'll
-        // oh lol, I've forgotten about nullish coalescing again
-        // so I don't need a function here
-        // okay, stupid way first
-        //
-
-        // ywa, makes sense, but do you have a better solution?
-        // yep, kinda
-
-        // do you have a shorter solution?
-        // I should make a swalow of my energy drink lol
-
-        // what? :joy: yes, energy drink good!
-        // hmm, im moving from stupid solutions to smarter ones, it's good at least :D
-
-        // is it done?
-        // hmm, gimme some time to clean it up a little
-
         if (call !== null) {
             const fromCall = {
                 addr: call.address,
@@ -116,10 +58,6 @@ export class CustomTask extends BaseTask<FormData> {
                 depo: arx.big().intoFormatted(this.initialValues.depoUnit).cast(call.actions[0].depo).toFixed(),
             };
 
-            // OMG i remembered a function from Ramda which can make it in one turn
-            // see Ramda.evolve
-
-            // hmm, at least now it's better
             this.initialValues = Object.keys(this.initialValues).reduce(
                 (result, key) =>
                     fromCall[key as keyof typeof fromCall] !== null &&
@@ -131,24 +69,12 @@ export class CustomTask extends BaseTask<FormData> {
             );
         }
 
-        this.state.formData = this.initialValues;
+        this.state = { ...this.state, formData: this.initialValues };
         this.schema.check(this.state.formData);
     }
 
-    static inferOwnType(json) {
+    static inferOwnType(json: Call) {
         return false;
-    }
-
-    setFormData(newFormData, callback) {
-        this.setState(
-            {
-                formData: {
-                    ...this.state.formData,
-                    ...newFormData,
-                },
-            },
-            callback
-        );
     }
 
     toCall() {
@@ -168,20 +94,7 @@ export class CustomTask extends BaseTask<FormData> {
         };
     }
 
-    componentDidMount() {
-        this.schema.check(this.state.formData).then(() => this.updateCard());
-    }
-
     onAddressesUpdated() {}
-
-    onEditFocus(taskID) {
-        this.setState({ isEdited: taskID === this.props.id });
-    }
-
-    updateCard() {
-        this.forceUpdate();
-        EDITOR.forceUpdate();
-    }
 
     renderEditor() {
         let init = true;
@@ -204,7 +117,7 @@ export class CustomTask extends BaseTask<FormData> {
             >
                 {({ resetForm, validateForm }) => {
                     if (init) {
-                        resetForm(this.state.formData);
+                        resetForm({ values: this.state.formData });
                         validateForm(this.state.formData);
                         init = false;
                     }
@@ -247,111 +160,6 @@ export class CustomTask extends BaseTask<FormData> {
                     );
                 }}
             </Formik>
-        );
-    }
-
-    render() {
-        const { showArgs, isEdited, formData } = this.state;
-
-        const { name, addr, func, args, gas, gasUnit, depo, depoUnit } = formData;
-
-        const hasErrors = this.schema.isBad();
-
-        const { id } = this.props;
-
-        return (
-            <div
-                className={clsx("task-container", this.uniqueClassName, {
-                    "has-errors": hasErrors,
-                    "is-edited": isEdited,
-                })}
-            >
-                <div className="name">
-                    <Tooltip
-                        title="Edit"
-                        disableInteractive
-                    >
-                        <EditOutlined
-                            className="edit icon"
-                            onClick={() => {
-                                EDITOR.edit(id);
-                                EDITOR.forceUpdate();
-                                MENU.activeTabSwitch(1);
-                            }}
-                        />
-                    </Tooltip>
-                    <div className="edit-pseudo"></div>
-                    <Tooltip
-                        title={"Clone card"}
-                        disableInteractive
-                    >
-                        <MoveDown
-                            className="duplicate icon"
-                            onClick={() => {
-                                LAYOUT.duplicateTask(id);
-                            }}
-                        />
-                    </Tooltip>
-                    <div className="duplicate-pseudo"></div>
-                    <h3>{name}</h3>
-                    <Tooltip
-                        title={"Delete"}
-                        disableInteractive
-                    >
-                        <DeleteOutline
-                            className="delete icon"
-                            onClick={() => {
-                                LAYOUT.deleteTask(id);
-                            }}
-                        />
-                    </Tooltip>
-                    <div className="delete-pseudo"></div>
-                </div>
-                <div className="data-container">
-                    <p>
-                        <span>Contract address</span>
-                        <a
-                            className="code"
-                            href={arx.string().intoUrl().cast(addr)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            {addr}
-                        </a>
-                    </p>
-                    <p>
-                        <span>Function name</span>
-                        <span className="code">{func}</span>
-                    </p>
-                    <p className="expandable">
-                        <span>Function arguments</span>
-                        {showArgs ? (
-                            <a onClick={() => this.setState({ showArgs: false })}>hide</a>
-                        ) : (
-                            <a onClick={() => this.setState({ showArgs: true })}>show</a>
-                        )}
-                    </p>
-                    {showArgs && (
-                        <pre className="code">
-                            {arx.string().json().isValidSync(args)
-                                ? JSON.stringify(JSON.parse(args), null, "  ")
-                                : args}
-                        </pre>
-                    )}
-                    <p>
-                        <span>Allocated gas</span>
-                        <span className="code">
-                            {gas} <span>{gasUnit}</span>
-                        </span>
-                    </p>
-                    <p>
-                        <span>Attached deposit</span>
-                        <span className="code">
-                            {depo} <span>{depoUnit}</span>
-                        </span>
-                    </p>
-                </div>
-            </div>
         );
     }
 }

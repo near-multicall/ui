@@ -9,7 +9,7 @@ export type TextFieldProps = Partial<MuiTextFieldProps> & {
     name: string;
     roundTop?: boolean;
     roundBottom?: boolean;
-    className: string;
+    className?: string;
 };
 
 export const TextField = ({ name, className, children, ...props }: TextFieldProps) => {

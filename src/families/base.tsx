@@ -23,7 +23,7 @@ interface DefaultFormData {
 
 interface Props {
     id: string;
-    json: object;
+    json: Call;
 }
 
 interface State<TFormData> {
@@ -44,20 +44,20 @@ export abstract class BaseTask<TFormData extends DefaultFormData> extends Compon
     constructor(props: Props, initialValues: TFormData) {
         super(props);
 
-        let newState = {
+        this.state = {
             formData: initialValues,
             showArgs: false,
             isEdited: false,
         };
 
         if (window.TEMP) {
-            this.state = { ...newState, ...this.loadFromTemp() };
+            this.loadFromTemp();
             this.init(null);
         } else if (window.COPY?.payload) {
-            this.state = { ...newState, ...this.loadFromCopy() };
+            this.loadFromCopy();
             this.init(null);
         } else {
-            this.init(this.props.json);
+            this.init(this.props?.json ?? null);
         }
 
         this.updateCard = this.updateCard.bind(this);
@@ -65,22 +65,24 @@ export abstract class BaseTask<TFormData extends DefaultFormData> extends Compon
         document.addEventListener("onaddressesupdated", (e) => this.onAddressesUpdated(e as CustomEvent));
     }
 
-    private loadFromTemp(): Partial<State<TFormData>> {
+    private loadFromTemp(): void {
         const TEMP = window.TEMP!;
         this.initialValues = JSON.parse(JSON.stringify(TEMP.formData));
         this.options = TEMP.options;
-        return {
+        this.state = {
+            ...this.state,
             showArgs: TEMP.showArgs,
             isEdited: TEMP.isEdited,
         };
     }
 
-    private loadFromCopy(): Partial<State<TFormData>> {
+    private loadFromCopy(): void {
         const payload = window.COPY!.payload!;
         this.initialValues = JSON.parse(JSON.stringify(payload.formData));
         this.options = JSON.parse(JSON.stringify(payload.options));
         window.COPY = null;
-        return {
+        this.state = {
+            ...this.state,
             showArgs: payload.showArgs,
         };
     }
@@ -91,7 +93,7 @@ export abstract class BaseTask<TFormData extends DefaultFormData> extends Compon
         return false;
     }
 
-    protected setFormData(newFormData: TFormData, callback: () => void) {
+    protected setFormData(newFormData: TFormData, callback?: () => void) {
         this.setState(
             {
                 formData: {
