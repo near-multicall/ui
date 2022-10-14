@@ -413,7 +413,7 @@ export class Export extends Component {
                                 });
                             }}
                         >
-                            immediatly
+                            immediately
                         </button>
 
                         <p>or</p>
