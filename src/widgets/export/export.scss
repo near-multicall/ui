@@ -104,7 +104,7 @@
         }
     }
 
-    &-inputs {
+    &-params {
         display: flex;
         flex-direction: column;
         padding-top: size.$smaller-text;
@@ -186,7 +186,7 @@
             }
         }
 
-        &-dateTimePicker {
+        &-scheduleTime {
             margin-top: 0.25 * size.$gap !important;
         }
 

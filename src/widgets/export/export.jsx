@@ -313,7 +313,7 @@ export class Export extends Component {
 
         return (
             <div className={_Export}>
-                <div className={`${_Export}-inputs`}>
+                <div className={`${_Export}-params`}>
                     <TextInput
                         label="Proposal description"
                         value={desc}
@@ -330,7 +330,7 @@ export class Export extends Component {
                         update={this.update}
                     />
 
-                    <div className={`${_Export}-inputs-choice`}>
+                    <div className={`${_Export}-params-choice`}>
                         <p>Attach</p>
 
                         <button
@@ -402,7 +402,7 @@ export class Export extends Component {
                         </>
                     ) : null}
 
-                    <div className={`${_Export}-inputs-choice`}>
+                    <div className={clsx(`${_Export}-params-choice`, `${_Export}-params-scheduleMode`)}>
                         <p>Execute</p>
 
                         <button
@@ -432,7 +432,7 @@ export class Export extends Component {
 
                     {isJob ? (
                         <DateTimePicker
-                            classes={{ input: `${_Export}-inputs-dateTimePicker` }}
+                            classes={{ input: clsx(`${_Export}-params-scheduleTime`) }}
                             label="Execution date"
                             value={jobDateTime}
                             minDateTime={currentDate}
