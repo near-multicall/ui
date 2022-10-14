@@ -4,6 +4,8 @@
 
 .DateTimePicker {
     &-modal {
+        border-radius: size.$task-radius !important;
+
         * {
             font-family: font.$text !important;
             font-size: size.$text !important;
