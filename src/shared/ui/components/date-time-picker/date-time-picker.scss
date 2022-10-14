@@ -1,31 +1,40 @@
+@use "sass/font";
+@use "sass/color";
 @use "sass/size";
 
 .DateTimePicker {
     &-modal {
-        svg {
-            width: calc(size.$large-text * 1.5);
-            height: calc(size.$large-text * 1.5);
-        }
-
-        .MuiPickersCalendarHeader-root {
-            * {
-                font-size: size.$large-text;
-            }
-        }
-
-        [role="grid"],
-        .MuiYearPicker-root,
-        .MuiCalendarOrClockPicker-root {
-            * {
-                font-size: size.$text !important;
-            }
+        * {
+            font-family: font.$text !important;
+            font-size: size.$text !important;
         }
 
         .MuiYearPicker-root {
             button {
-                display: flex;
-                align-items: center;
-                justify-content: center;
+                padding: 0;
+            }
+        }
+
+        .MuiClock-pin,
+        .MuiClockPointer-root,
+        .MuiClockPointer-thumb,
+        .MuiPickersDay-root.Mui-selected,
+        .PrivatePickersYear-yearButton.Mui-selected {
+            background-color: color.$black !important;
+            border-color: color.$black;
+        }
+    }
+
+    &-input {
+        .MuiInputBase-root {
+            padding: 0;
+        }
+        .MuiInputAdornment-root {
+            position: absolute;
+            right: 0;
+            .MuiIconButton-root {
+                padding: 8px;
+                margin: 6px;
             }
         }
     }

@@ -14,22 +14,9 @@ import { Multicall } from "../../shared/lib/contracts/multicall";
 import { signAndSendTxs, view } from "../../shared/lib/wallet";
 import { Wallet } from "../../entities";
 import { DateTimePicker, TextInput, TextInputWithUnits } from "../../shared/ui/components";
-import { FormControl, FormLabel, FormRadio } from "../../shared/ui/form-kit";
-
 import "./export.scss";
 
-class config {
-    static #rootClass = "Editor-menu-exportTab";
-
-    static classes = {
-        root: config.#rootClass,
-        action: config.#rootClass + "-action",
-        action__login: config.#rootClass + "-action--login",
-        action__propose: config.#rootClass + "-action--propose",
-        scheduler: config.#rootClass + "-scheduler",
-        scheduler_timeSelector: config.#rootClass + "-scheduler-timeSelector",
-    };
-}
+const _Export = "Export";
 
 export class Export extends Component {
     static contextType = Wallet.useSelector();
@@ -151,7 +138,7 @@ export class Export extends Component {
         if (!walletSelector.isSignedIn()) {
             return (
                 <button
-                    className={clsx(config.classes.action, config.classes.action__login)}
+                    className={clsx(`${_Export}-action`, `${_Export}-action--login`)}
                     onClick={() => WALLET_COMPONENT.signIn()}
                 >
                     Connect to Wallet
@@ -162,7 +149,7 @@ export class Export extends Component {
         else if (walletError === errorMsg.ERR_DAO_HAS_NO_MTCL) {
             return (
                 <button
-                    className="propose button"
+                    className={clsx(`${_Export}-action`, `${_Export}-action--propose`)}
                     disabled
                 >
                     {walletError}. <Link to="/dao">Get one now!</Link>
@@ -191,7 +178,7 @@ export class Export extends Component {
 
             return (
                 <button
-                    className={clsx(config.classes.action, config.classes.action__propose)}
+                    className={clsx(`${_Export}-action`, `${_Export}-action--propose`)}
                     disabled={isProposeDisabled}
                     onClick={async () => {
                         const { currentDAO: dao, currentMulticall: multicall } = WALLET_COMPONENT.state;
@@ -325,8 +312,8 @@ export class Export extends Component {
         }
 
         return (
-            <div className={config.classes.root}>
-                <div className="input-container">
+            <div className={_Export}>
+                <div className={`${_Export}-inputs`}>
                     <TextInput
                         label="Proposal description"
                         value={desc}
@@ -343,11 +330,11 @@ export class Export extends Component {
                         update={this.update}
                     />
 
-                    <div className="attachment">
+                    <div className={`${_Export}-inputs-choice`}>
                         <p>Attach</p>
 
                         <button
-                            className={attachNEAR ? "selected" : ""}
+                            className={clsx({ selected: attachNEAR })}
                             onClick={() => {
                                 this.setState({
                                     attachNEAR: !attachNEAR,
@@ -361,7 +348,7 @@ export class Export extends Component {
                         <p>or</p>
 
                         <button
-                            className={attachFT ? "selected" : ""}
+                            className={clsx({ selected: attachFT })}
                             onClick={() => {
                                 this.setState({
                                     attachNEAR: false,
@@ -415,36 +402,37 @@ export class Export extends Component {
                         </>
                     ) : null}
 
-                    <FormControl className={config.classes.scheduler}>
-                        <FormLabel
-                            content="Execution:"
-                            id="multicall-export-radio-buttons-group-label"
-                        />
+                    <div className={`${_Export}-inputs-choice`}>
+                        <p>Execute</p>
 
-                        <RadioGroup
-                            aria-labelledby="multicall-export-radio-buttons-group-label"
-                            defaultValue="immediate"
-                            name="radio-buttons-group"
-                            onChange={(event, value) => {
-                                if (value === "immediate") this.setState({ isJob: false });
-                                else if (value === "scheduled") this.setState({ isJob: true });
+                        <button
+                            className={clsx({ selected: !isJob })}
+                            onClick={() => {
+                                this.setState({
+                                    isJob: false,
+                                });
                             }}
                         >
-                            <FormRadio
-                                value="immediate"
-                                label="Immediate"
-                            />
+                            immediatly
+                        </button>
 
-                            <FormRadio
-                                value="scheduled"
-                                label="Scheduled"
-                            />
-                        </RadioGroup>
-                    </FormControl>
+                        <p>or</p>
+
+                        <button
+                            className={clsx({ selected: isJob })}
+                            onClick={() => {
+                                this.setState({
+                                    isJob: true,
+                                });
+                            }}
+                        >
+                            scheduled
+                        </button>
+                    </div>
 
                     {isJob ? (
                         <DateTimePicker
-                            className={config.classes.scheduler_timeSelector}
+                            classes={{ input: `${_Export}-inputs-dateTimePicker` }}
                             label="Execution date"
                             value={jobDateTime}
                             minDateTime={currentDate}
@@ -457,7 +445,7 @@ export class Export extends Component {
                 {/* Display cards' errors */}
 
                 {allErrors.length > 0 && (
-                    <div className="error-container">
+                    <div className={`${_Export}-errors`}>
                         <div className="header">
                             <h3>{`Card errors (${allErrors.length})`}</h3>
                         </div>
@@ -483,8 +471,8 @@ export class Export extends Component {
                     </div>
                 )}
 
-                <div className="section">
-                    <div className="sidebar">
+                <div className={`${_Export}-section`}>
+                    <div className="header">
                         <Icon
                             className="icon collapse"
                             onClick={() => this.toggleShowArgs()}

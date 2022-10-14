@@ -1,24 +1,23 @@
 import { TextField } from "@mui/material";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
-
 import {
     DateTimePicker as GenericDateTimePicker,
     type DateTimePickerProps as GenericDateTimePickerProps,
 } from "@mui/x-date-pickers/DateTimePicker";
-
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import clsx from "clsx";
 import { DateTime } from "luxon";
 
-import { DateTimePickerConfig as Config } from "./config";
 import "./date-time-picker.scss";
+
+const _DateTimePicker = "DateTimePicker";
 
 export interface DateTimePickerProps
     extends Omit<
         GenericDateTimePickerProps<DateTime, DateTime>,
         "onChange" | "maxDateTime" | "minDateTime" | "renderInput" | "value"
     > {
-    classes?: Record<keyof typeof Config.classes, string>;
+    classes?: { root?: string; modal?: string; input?: string };
     handleChange: (value: DateTime | null, keyboardInputValue: string | undefined) => void;
     maxDateTime: Date;
     minDateTime: Date;
@@ -35,14 +34,19 @@ export const DateTimePicker = ({
 }: DateTimePickerProps) => (
     <LocalizationProvider dateAdapter={AdapterLuxon}>
         <GenericDateTimePicker
-            PaperProps={{ classes: { root: clsx(Config.classes.modal, classes?.modal) } }}
-            className={clsx(Config.classes.root, classes?.root)}
+            PaperProps={{ classes: { root: clsx(`${_DateTimePicker}-modal`, classes?.modal) } }}
+            className={clsx(`${_DateTimePicker}`, classes?.root)}
             ampm={false}
             minDateTime={DateTime.fromJSDate(minDateTime)}
             maxDateTime={DateTime.fromJSDate(maxDateTime)}
             value={DateTime.fromJSDate(value)}
             onChange={handleChange}
-            renderInput={(params) => <TextField {...params} />}
+            renderInput={(params) => (
+                <TextField
+                    {...params}
+                    className={clsx(`${_DateTimePicker}-input`, classes?.input)}
+                />
+            )}
             {...props}
         />
     </LocalizationProvider>
