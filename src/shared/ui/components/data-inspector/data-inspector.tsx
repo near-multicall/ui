@@ -1,35 +1,12 @@
 import clsx from "clsx";
 import { MouseEvent, useCallback, useState, type ComponentProps } from "react";
-import { ObjectInspector, ObjectLabel, ObjectRootLabel } from "react-inspector";
+import { ObjectInspector } from "react-inspector";
 
 import { DataInspectorConfig as Config } from "./config";
+import { DataInspectorNode } from "./data-inspector-node";
 import "./data-inspector.scss";
 
 const _DataInspector = "DataInspector";
-
-interface DataInspectorNodeProps {
-    data: unknown;
-    depth: number;
-    expanded: boolean;
-    isNonenumerable: boolean;
-    name: string;
-}
-
-const DataInspectorNode = ({ depth, name, data, isNonenumerable, expanded }: DataInspectorNodeProps) => {
-    const displayData = data && typeof data === "object" && Object.keys(data).length === 0 ? "{}" : data;
-
-    return depth === 0 ? (
-        <ObjectRootLabel
-            data={displayData}
-            {...{ name }}
-        />
-    ) : (
-        <ObjectLabel
-            data={displayData}
-            {...{ isNonenumerable, name }}
-        />
-    );
-};
 
 interface DataInspectorProps extends ComponentProps<typeof ObjectInspector> {
     classes?: { root?: string; body?: string; label?: string };
