@@ -24,6 +24,10 @@ const Ctx = Wallet.useSelector();
 
 interface Props {}
 
+enum Mode {
+    view = "VIEW",
+    edit = "EDIT",
+}
 interface State {
     name: ArgsAccount;
     dao: SputnikDAO;
@@ -31,6 +35,7 @@ interface State {
     loading: boolean;
     proposed: number;
     proposedInfo: ProposalOutput | null;
+    mode?: Mode;
 }
 
 const _DaoPage = "DaoPage";

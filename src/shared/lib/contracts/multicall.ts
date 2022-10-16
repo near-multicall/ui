@@ -68,6 +68,7 @@ class Multicall {
 
     address: string;
     admins: string[] = [];
+    croncatManager: string = "";
     // only whitelisted tokens can be attached to multicalls or job activations.
     tokensWhitelist: string[] = [];
     // job bond amount must be attached as deposit when adding new jobs.
@@ -84,7 +85,7 @@ class Multicall {
     static async init(multicallAddress: string): Promise<Multicall> {
         // verify address is a Multicall instance, fetch its info and mark it ready
         const newMulticall = new Multicall(multicallAddress);
-        const [isMulticall, admins, tokensWhitelist, jobBond] = await Promise.all([
+        const [isMulticall, admins, croncatManager, tokensWhitelist, jobBond] = await Promise.all([
             // on failure set isMulticall to false
             Multicall.isMulticall(multicallAddress).catch((err) => {
                 return false;
@@ -92,6 +93,10 @@ class Multicall {
             // on failure set admins list to be empty
             newMulticall.getAdmins().catch((err) => {
                 return [];
+            }),
+            //on failure set manager list to be empty
+            newMulticall.getCroncatManager().catch((err) => {
+                return "";
             }),
             // on failure set tokens whitelist to be empty
             newMulticall.getWhitelistedTokens().catch((err) => {
@@ -103,6 +108,7 @@ class Multicall {
             }),
         ]);
         newMulticall.admins = admins;
+        newMulticall.croncatManager = croncatManager;
         newMulticall.tokensWhitelist = tokensWhitelist;
         newMulticall.jobBond = jobBond;
         // set ready to true if address is a Multicall instance and it has at least 1 admin.

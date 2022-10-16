@@ -6,13 +6,19 @@
 .DaoConfigTab {
     display: grid;
 
-    grid-template:
-        "AdminsList ." 6fr
-        "TokenWhitelist ." 5fr
-        "TokenWhitelist JobBond" 1fr / 1fr 1fr;
-
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    gap: 0px 0px;
+    grid-template-areas:
+        "AdminsList TokenWhitelist"
+        "CroncatManager TokenWhitelist"
+        "JobBond TokenWhitelist";
     .AdminsList {
         grid-area: AdminsList;
+    }
+
+    .CroncatManager {
+        grid-area: CroncatManager;
     }
 
     .TokenWhitelist {
