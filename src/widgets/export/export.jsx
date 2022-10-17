@@ -1,12 +1,6 @@
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import { InputAdornment } from "@mui/material";
-import Icon from "@mui/material/Icon";
-import TextField from "@mui/material/TextField";
-import Radio from "@mui/material/Radio";
-import RadioGroup from "@mui/material/RadioGroup";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import FormControl from "@mui/material/FormControl";
-import FormLabel from "@mui/material/FormLabel";
+import { EditOutlined as EditOutlinedIcon } from "@mui/icons-material";
+import { Icon, InputAdornment, RadioGroup, TextField } from "@mui/material";
+import clsx from "clsx";
 import { Base64 } from "js-base64";
 import debounce from "lodash.debounce";
 import { Component } from "react";
@@ -15,12 +9,14 @@ import { Link } from "react-router-dom";
 import { ArgsAccount, ArgsBig, ArgsError, ArgsString } from "../../shared/lib/args";
 import { errorMsg } from "../../shared/lib/errors";
 import { STORAGE } from "../../shared/lib/persistent";
-import { convert, toGas, toNEAR, toYocto } from "../../shared/lib/converter";
+import { Big, convert, toGas, toNEAR } from "../../shared/lib/converter";
 import { Multicall } from "../../shared/lib/contracts/multicall";
 import { signAndSendTxs, view } from "../../shared/lib/wallet";
 import { Wallet } from "../../entities";
-import { TextInput, TextInputWithUnits } from "../../shared/ui/components";
+import { DateTimePicker, TextInput, TextInputWithUnits } from "../../shared/ui/components";
 import "./export.scss";
+
+const _Export = "Export";
 
 export class Export extends Component {
     static contextType = Wallet.useSelector();
@@ -64,7 +60,8 @@ export class Export extends Component {
             attachNEAR: false,
             attachFT: false,
             showArgs: false,
-            useJobs: false,
+            isJob: false,
+            jobDateTime: new Date(),
         };
 
         this.update = this.update.bind(this);
@@ -141,7 +138,7 @@ export class Export extends Component {
         if (!walletSelector.isSignedIn()) {
             return (
                 <button
-                    className="login button"
+                    className={clsx(`${_Export}-action`, `${_Export}-action--login`)}
                     onClick={() => WALLET_COMPONENT.signIn()}
                 >
                     Connect to Wallet
@@ -152,7 +149,7 @@ export class Export extends Component {
         else if (walletError === errorMsg.ERR_DAO_HAS_NO_MTCL) {
             return (
                 <button
-                    className="propose button"
+                    className={clsx(`${_Export}-action`, `${_Export}-action--propose`)}
                     disabled
                 >
                     {walletError}. <Link to="/dao">Get one now!</Link>
@@ -161,7 +158,7 @@ export class Export extends Component {
         }
         // normal propose multicall to DAO functionality
         else {
-            const { attachNEAR, attachFT, useJobs } = this.state;
+            const { attachNEAR, attachFT, isJob, jobDateTime } = this.state;
             const { gas, depo, desc } = this.total;
             const { token, amount } = this.ft;
             const errors = this.errors;
@@ -181,12 +178,12 @@ export class Export extends Component {
 
             return (
                 <button
-                    className="propose button"
+                    className={clsx(`${_Export}-action`, `${_Export}-action--propose`)}
                     disabled={isProposeDisabled}
                     onClick={async () => {
-                        const { currentDAO: dao } = WALLET_COMPONENT.state;
-                        // case 1: immediate execution => basic multicall
-                        if (!useJobs) {
+                        const { currentDAO: dao, currentMulticall: multicall } = WALLET_COMPONENT.state;
+                        // Case 1: immediate execution => basic multicall
+                        if (!isJob) {
                             // multicall with attached FT
                             if (attachFT) {
                                 const tx = await dao.proposeMulticallFT(
@@ -210,31 +207,41 @@ export class Export extends Component {
                                 signAndSendTxs([tx]);
                             }
                         }
-                        // case2: scheduled execution => use jobs
+                        // Case2: scheduled execution => use jobs
                         else {
-                            const multicallAddress = STORAGE.addresses.multicall;
-                            const temporary = new Multicall(multicallAddress);
-                            // multicall with attached FT
+                            // Job with attached FT
                             if (attachFT) {
-                                console.log("multicall job with attached FT");
-                            }
-                            //    WALLET_COMPONENT.state.currentDAO.proposeMulticallFT(
-                            //        desc.value,
-                            //        multicallArgs,
-                            //        convert(gas.value, gas.unit),
-                            //        token.value,
-                            //        convert(amount.value, amount.unit, amount.decimals)
-                            //    );
-                            // multicall with attached NEAR
-                            else {
-                                console.log("multicall job with attached NEAR");
-                                const [jobCount, multicall] = await Promise.all([
-                                    temporary.getJobCount(),
-                                    Multicall.init(STORAGE.addresses.multicall),
-                                ]);
+                                const jobCount = await multicall.getJobCount();
                                 const [addJobTx, proposeJobTx] = await Promise.all([
-                                    multicall.addJob([], new Date(), toGas("100"), toYocto("1")),
-                                    dao.proposeJobActivation("test job activation", jobCount, toYocto("1")),
+                                    multicall.addJob(
+                                        // TODO: support jobs with multiple multicalls
+                                        [multicallArgs],
+                                        jobDateTime,
+                                        convert(gas.value, gas.unit)
+                                    ),
+                                    dao.proposeJobActivationFT(
+                                        desc.value,
+                                        jobCount,
+                                        token.value,
+                                        convert(amount.value, amount.unit, amount.decimals)
+                                    ),
+                                ]);
+                                signAndSendTxs([addJobTx, proposeJobTx]);
+                            }
+                            // Job with attached NEAR
+                            else {
+                                const jobCost = attachNEAR
+                                    ? Big(convert(depo.value, depo.unit)).add(Multicall.CRONCAT_FEE).toFixed()
+                                    : Multicall.CRONCAT_FEE;
+                                const jobCount = await multicall.getJobCount();
+                                const [addJobTx, proposeJobTx] = await Promise.all([
+                                    multicall.addJob(
+                                        // TODO: support jobs with multiple multicalls
+                                        [multicallArgs],
+                                        jobDateTime,
+                                        convert(gas.value, gas.unit)
+                                    ),
+                                    dao.proposeJobActivation(desc.value, jobCount, jobCost),
                                 ]);
                                 signAndSendTxs([addJobTx, proposeJobTx]);
                             }
@@ -257,9 +264,13 @@ export class Export extends Component {
 
     render() {
         const LAYOUT = this.props.layout; // ususally global parameter
-        const { attachNEAR, attachFT, showArgs } = this.state;
+        const { attachNEAR, attachFT, showArgs, isJob, jobDateTime } = this.state;
         const { gas, depo, desc } = this.total;
         const { amount, token } = this.ft;
+        // do not schedule jobs in the past
+        const currentDate = new Date();
+        // limit job scheduling to one year from now
+        const maxDate = new Date(new Date().setFullYear(currentDate.getFullYear() + 1));
 
         const allErrors = LAYOUT.toErrors();
         const errors = this.errors;
@@ -301,8 +312,8 @@ export class Export extends Component {
         }
 
         return (
-            <div className="export-container">
-                <div className="input-container">
+            <div className={_Export}>
+                <div className={`${_Export}-params`}>
                     <TextInput
                         label="Proposal description"
                         value={desc}
@@ -310,6 +321,7 @@ export class Export extends Component {
                         multiline
                         update={this.update}
                     />
+
                     <TextInputWithUnits
                         label="Total allocated gas"
                         value={gas}
@@ -317,10 +329,12 @@ export class Export extends Component {
                         options={["Tgas", "gas"]}
                         update={this.update}
                     />
-                    <div className="attachment">
+
+                    <div className={`${_Export}-params-choice`}>
                         <p>Attach</p>
+
                         <button
-                            className={attachNEAR ? "selected" : ""}
+                            className={clsx({ selected: attachNEAR })}
                             onClick={() => {
                                 this.setState({
                                     attachNEAR: !attachNEAR,
@@ -330,9 +344,11 @@ export class Export extends Component {
                         >
                             NEAR
                         </button>
+
                         <p>or</p>
+
                         <button
-                            className={attachFT ? "selected" : ""}
+                            className={clsx({ selected: attachFT })}
                             onClick={() => {
                                 this.setState({
                                     attachNEAR: false,
@@ -343,6 +359,7 @@ export class Export extends Component {
                             fungible token
                         </button>
                     </div>
+
                     {attachNEAR ? (
                         <TextInputWithUnits
                             label="Total attached deposit"
@@ -352,6 +369,7 @@ export class Export extends Component {
                             update={this.update}
                         />
                     ) : null}
+
                     {attachFT ? (
                         <>
                             <TextInput
@@ -363,6 +381,7 @@ export class Export extends Component {
                                     this.updateFTDebounced();
                                 }}
                             />
+
                             <TextField
                                 label="Amount"
                                 value={errors.amount.validOrNull(amount) || errors.amount.intermediate}
@@ -382,36 +401,55 @@ export class Export extends Component {
                             />
                         </>
                     ) : null}
-                    <FormControl>
-                        <FormLabel id="demo-radio-buttons-group-label">Execution:</FormLabel>
-                        <RadioGroup
-                            aria-labelledby="demo-radio-buttons-group-label"
-                            defaultValue="immediate"
-                            name="radio-buttons-group"
-                            onChange={(event, value) => {
-                                if (value === "immediate") this.setState({ useJobs: false });
-                                else if (value === "scheduled") this.setState({ useJobs: true });
+
+                    <div className={clsx(`${_Export}-params-choice`, `${_Export}-params-scheduleMode`)}>
+                        <p>Execute</p>
+
+                        <button
+                            className={clsx({ selected: !isJob })}
+                            onClick={() => {
+                                this.setState({
+                                    isJob: false,
+                                });
                             }}
                         >
-                            <FormControlLabel
-                                value="immediate"
-                                control={<Radio />}
-                                label="Immediate"
-                            />
-                            <FormControlLabel
-                                value="scheduled"
-                                control={<Radio />}
-                                label="Scheduled"
-                            />
-                        </RadioGroup>
-                    </FormControl>
+                            immediately
+                        </button>
+
+                        <p>or</p>
+
+                        <button
+                            className={clsx({ selected: isJob })}
+                            onClick={() => {
+                                this.setState({
+                                    isJob: true,
+                                });
+                            }}
+                        >
+                            scheduled
+                        </button>
+                    </div>
+
+                    {isJob ? (
+                        <DateTimePicker
+                            classes={{ input: clsx(`${_Export}-params-scheduleTime`) }}
+                            label="Execution date"
+                            value={jobDateTime}
+                            minDateTime={currentDate}
+                            maxDateTime={maxDate}
+                            handleChange={(value) => this.setState({ jobDateTime: value.toJSDate() })}
+                        />
+                    ) : null}
                 </div>
+
                 {/* Display cards' errors */}
+
                 {allErrors.length > 0 && (
-                    <div className="error-container">
+                    <div className={`${_Export}-errors`}>
                         <div className="header">
                             <h3>{`Card errors (${allErrors.length})`}</h3>
                         </div>
+
                         <div className="error-list">
                             {allErrors.map((e, i) => (
                                 <div
@@ -419,6 +457,7 @@ export class Export extends Component {
                                     key={`error-${i}`}
                                 >
                                     <p className="msg">{`[${e.task.call.name}] Error: ${e.message}`}</p>
+
                                     <EditOutlinedIcon
                                         className="icon"
                                         onClick={() => {
@@ -431,8 +470,9 @@ export class Export extends Component {
                         </div>
                     </div>
                 )}
-                <div className="section">
-                    <div className="sidebar">
+
+                <div className={`${_Export}-section`}>
+                    <div className="header">
                         <Icon
                             className="icon collapse"
                             onClick={() => this.toggleShowArgs()}
@@ -440,7 +480,9 @@ export class Export extends Component {
                         >
                             expand_more
                         </Icon>
+
                         <h3 onClick={() => this.toggleShowArgs()}>Multicall args</h3>
+
                         {showArgs ? (
                             <Icon
                                 className="icon copy"
@@ -455,6 +497,7 @@ export class Export extends Component {
                             <></>
                         )}
                     </div>
+
                     {showArgs ? (
                         <div className="value">
                             <pre className="code">{multicallArgsText}</pre>
@@ -463,7 +506,7 @@ export class Export extends Component {
                         <></>
                     )}
                 </div>
-                <div className="spacer"></div>
+
                 {this.renderProposeButton(multicallArgs)}
             </div>
         );

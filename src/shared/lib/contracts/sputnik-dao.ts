@@ -43,6 +43,22 @@ const CONTRACT_CODE_HASHES_SELECTOR: Record<string, string[]> = {
     ],
 };
 
+type AstroApiDaoInfo = {
+    createdAt: string;
+    transactionHash: string;
+    id: string;
+    config: object;
+    numberOfMembers: number;
+    numberOfGroups: number;
+    council: string[];
+    accountIds: string[];
+    status: string;
+    activeProposalCount: number;
+    totalProposalCount: number;
+    totalDaoFunds: number;
+    isCouncil: boolean;
+};
+
 // Define structure of a SputnikDAO policy
 type Policy = {
     // List of roles and permissions for them in the current policy.
@@ -230,6 +246,16 @@ class SputnikDAO {
         const accountInfo = await viewAccount(accountId);
         const codeHash: string = accountInfo.code_hash;
         return SputnikDAO.CONTRACT_CODE_HASHES.includes(codeHash);
+    }
+
+    static async getUserDaosInfo(accountId: string): Promise<AstroApiDaoInfo[]> {
+        const apiURL = `https://api.${
+            window.NEAR_ENV === "mainnet" ? "" : "testnet."
+        }app.astrodao.com/api/v1/daos/account-daos/${accountId}`;
+        const response = await fetch(apiURL);
+        const data: AstroApiDaoInfo[] = await response.json();
+
+        return data;
     }
 
     async addProposal(args: object | Uint8Array): Promise<Tx> {

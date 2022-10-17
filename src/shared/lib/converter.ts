@@ -50,7 +50,8 @@ const dateToCron = (date: Date): string => {
     const months = date.getUTCMonth() + 1; // JS months are 0-11. Cron needs 1-12
     const year = date.getUTCFullYear();
 
-    return `0 ${minutes} ${hours} ${days} ${months} * ${year}`;
+    // TODO: use year when the time is right.
+    return `0 ${minutes} ${hours} ${days} ${months} * *`;
 };
 // Cron expression to JS Date.
 const cronToDate = (cronStr: string): Date => {
@@ -58,10 +59,12 @@ const cronToDate = (cronStr: string): Date => {
     const options: ParserOptions = { utc: true };
     if (fields.length === 7) {
         // remove and save the 7th field (years).
-        const year = fields.pop()!;
-        // restrict cron-parser to chosen year. Format follows ISO 8601.
-        options.currentDate = `${year}-01-01T00:00:00`; // first moment of "year"
-        options.endDate = `${year}-12-31T23:59:59`; // last moment of "year"
+        const year = Number(fields.pop()!);
+        if (Number.isInteger(year)) {
+            // restrict cron-parser to chosen year. Format follows ISO 8601.
+            options.currentDate = `${year}-01-01T00:00:00`; // first moment of "year"
+            options.endDate = `${year}-12-31T23:59:59`; // last moment of "year"
+        }
     }
     const interval = parseExpression(fields.join(" "), options);
     // TODO: check timezone of returned Date (unlcear whether UTC or client time)

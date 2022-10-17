@@ -4,7 +4,7 @@ import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
 import { Icon } from "@mui/material";
 import debounce from "lodash.debounce";
-import { Component } from "react";
+import { Component, ContextType } from "react";
 
 import { ArgsAccount, ArgsError } from "../../../shared/lib/args";
 import { SputnikDAO } from "../../../shared/lib/contracts/sputnik-dao";
@@ -14,17 +14,29 @@ import { errorMsg } from "../../../shared/lib/errors";
 import { useWalletSelector } from "./providers";
 import "./wallet.scss";
 
-/* TODO: Decompose code */
-export class WalletComponent extends Component {
-    static contextType = useWalletSelector();
+const Ctx = useWalletSelector();
 
-    errors = {
+interface Props {}
+
+interface State {
+    currentDAO: SputnikDAO;
+    currentMulticall: Multicall;
+    expanded: { user: boolean; dao: boolean };
+    color: string;
+}
+
+/* TODO: Decompose code */
+export class WalletComponent extends Component<Props, State> {
+    static contextType = Ctx;
+    declare context: ContextType<typeof Ctx>;
+
+    errors: { [key: string]: ArgsError } = {
         noDao: new ArgsError(errorMsg.ERR_NO_DAO_ON_ADDR, (value) => this.errors.noDao.isBad),
-        noRights: new ArgsError(errorMsg.ERR_CANNOT_PROPOSE_TO_DAO, (value) => this.errors.noRights),
+        noRights: new ArgsError(errorMsg.ERR_CANNOT_PROPOSE_TO_DAO, (value) => this.errors.noRights.isBad),
         noContract: new ArgsError(errorMsg.ERR_DAO_HAS_NO_MTCL, (value) => this.errors.noContract.isBad),
     };
 
-    daoList = [];
+    daoList: string[] = [];
 
     daoSearchDebounced = debounce(
         // debounced function
@@ -35,38 +47,36 @@ export class WalletComponent extends Component {
         400
     );
 
-    constructor(props, context) {
+    constructor(props: Props, context: ContextType<typeof Ctx>) {
         super(props, context);
 
         this.state = {
             currentDAO: new SputnikDAO(STORAGE.addresses.dao),
+            currentMulticall: new Multicall(STORAGE.addresses.multicall),
             expanded: {
                 user: false,
                 dao: false || STORAGE.addresses.dao === "",
             },
+            color: "",
         };
 
-        const { accountId } = context;
-        STORAGE.setAddresses({ user: accountId });
+        const { accountId } = context!;
+        STORAGE.setAddresses({ user: accountId! });
         window.WALLET_COMPONENT = this;
         if (accountId) {
-            const URL = `https://api.${
-                window.NEAR_ENV === "mainnet" ? "" : "testnet."
-            }app.astrodao.com/api/v1/daos/account-daos/${accountId}`;
-            fetch(URL)
-                .then((response) => response.json())
+            SputnikDAO.getUserDaosInfo(accountId)
                 .then((data) => (this.daoList = data.map((dao) => dao.id)))
                 .then(() => this.forceUpdate());
         }
     }
 
     signIn() {
-        const { modal } = this.context;
+        const { modal } = this.context!;
         modal.show();
     }
 
     async signOut() {
-        const { selector } = this.context;
+        const { selector } = this.context!;
         const wallet = await selector.wallet();
 
         wallet.signOut().catch((err) => {
@@ -76,7 +86,7 @@ export class WalletComponent extends Component {
     }
 
     connectDao(daoAddress: SputnikDAO["address"]) {
-        const { accountId } = this.context;
+        const { accountId } = this.context!;
 
         const { noDao, noRights, noContract } = this.errors;
 
@@ -89,22 +99,23 @@ export class WalletComponent extends Component {
         Promise.all([
             // on failure return non-initialized DAO instance (per default: ready = false)
             SputnikDAO.init(daoAddress).catch((e) => new SputnikDAO(daoAddress)),
-            Multicall.isMulticall(multicallAddress).catch((e) => false),
+            Multicall.init(multicallAddress).catch((e) => new Multicall(multicallAddress)),
         ])
-            .then(([initializedDAO, hasMulticall]) => {
-                if (!initializedDAO.ready || !hasMulticall) {
-                    noDao.isBad = !initializedDAO.ready;
-                    noContract.isBad = !hasMulticall;
+            .then(([daoInstance, multicallInstance]) => {
+                if (!daoInstance.ready || !multicallInstance.ready) {
+                    noDao.isBad = !daoInstance.ready;
+                    noContract.isBad = !multicallInstance.ready;
                     window.MENU?.forceUpdate();
                     return;
                 }
 
                 this.setState({
-                    currentDAO: initializedDAO,
+                    currentDAO: daoInstance,
+                    currentMulticall: multicallInstance,
                 });
 
                 // can user propose FunctionCall to DAO?
-                const canPropose = initializedDAO.checkUserPermission(accountId, "AddProposal", "FunctionCall");
+                const canPropose = daoInstance.checkUserPermission(accountId!, "AddProposal", "FunctionCall");
 
                 if (!canPropose) noRights.isBad = true; // no add proposal rights
 
@@ -143,7 +154,7 @@ export class WalletComponent extends Component {
         });
     }
 
-    daoSearch(newValue) {
+    daoSearch(newValue: string) {
         STORAGE.setAddresses({}); // hack: empty setAddresses call to invoke callbacks
         if (newValue !== undefined && ArgsAccount.isValid(newValue)) {
             this.connectDao(newValue);
@@ -153,7 +164,7 @@ export class WalletComponent extends Component {
     }
 
     render() {
-        const { selector: walletSelector, accountId } = this.context;
+        const { selector: walletSelector, accountId } = this.context!;
         const { expanded, color } = this.state;
 
         if (!walletSelector) return null;

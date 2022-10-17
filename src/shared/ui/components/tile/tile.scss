@@ -6,8 +6,8 @@
     flex-flow: column nowrap;
     position: relative;
     padding: calc(0.25 * size.$gap);
-    background-color: rgba(color.$lightest, 0.25);
     border-radius: size.$task-radius;
+    background-color: color.$lightest;
     font-size: size.$small-text;
 
     .title {

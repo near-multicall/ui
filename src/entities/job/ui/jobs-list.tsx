@@ -1,55 +1,45 @@
-import { cronToDate, toTGas } from "../../../shared/lib/converter";
-import { Tile, Scrollable, Table } from "../../../shared/ui/components";
-import { JobDataModel } from "../model/job-data";
-import { Dependencies } from "../config";
+import clsx from "clsx";
 
+import { Placeholder, Scrollable, Table, Tile } from "../../../shared/ui/components";
+
+import { type JobEntity } from "../config";
+import { JobDataModel } from "../model/job-data";
+import { jobDetailsTableRowRender } from "./job-details";
 import "./jobs-list.scss";
 
-interface JobsListProps extends Dependencies {}
+interface JobsListProps extends JobEntity.Dependencies {}
 
 const _JobsList = "JobsList";
 
 export const JobsList = ({ className, contracts }: JobsListProps) => {
-    const { data, loading } = JobDataModel.useAllJobsFrom(contracts);
+    const { data, error, loading } = JobDataModel.useAllJobsFrom(contracts),
+        dataIsAvailable = data !== null && !loading && Object.values(data).length > 0,
+        noData = data !== null && !loading && Object.values(data).length === 0;
 
     return (
-        <Tile {...{ className }}>
+        <Tile className={clsx(_JobsList, className)}>
             <h1 className="title">All jobs</h1>
 
-            {data && (
+            {loading && <div className="loader" />}
+            {noData && <Placeholder type="noData" />}
+
+            {error && (
+                <Placeholder
+                    payload={{ error }}
+                    type="unknownError"
+                />
+            )}
+
+            {dataIsAvailable && (
                 <Scrollable>
                     <Table
-                        className={_JobsList}
+                        className={`${_JobsList}-body`}
                         displayMode="compact"
-                        header={[
-                            "Active status",
-                            "ID",
-                            "Start at",
-                            "Croncat hash",
-                            "Creator",
-                            "Trigger gas",
-                            "Run count",
-                            "Multicalls",
-                        ]}
-                        rows={Object.values(data).map(({ id, job }) => [
-                            job.is_active ? "Active" : "Inactive",
-                            id,
-                            cronToDate(job.cadence).toLocaleString(),
-                            job.croncat_hash,
-                            job.creator,
-                            `${toTGas(job.trigger_gas)} Tgas`,
-                            job.run_count,
-
-                            <details>
-                                <summary>Multicalls</summary>
-                                <pre>{JSON.stringify(job.multicalls, null, " ")}</pre>
-                            </details>,
-                        ])}
+                        header={["Status", "ID", "Start at", "Croncat hash", "Creator", "Trigger gas", "Multicalls"]}
+                        rows={Object.values(data).map(jobDetailsTableRowRender)}
                     />
                 </Scrollable>
             )}
-
-            {loading && <div className="loader" />}
         </Tile>
     );
 };

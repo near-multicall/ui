@@ -1,5 +1,5 @@
 import { viewAccount, viewState, view } from "../wallet";
-import { Big, toGas, dateToCron } from "../converter";
+import { Big, toGas, dateToCron, toYocto } from "../converter";
 
 import type { FunctionCallAction as daoFunctionCallAction } from "./sputnik-dao";
 import type { Tx } from "../wallet";
@@ -25,6 +25,9 @@ const KEY_JOB_COUNT: string = "g";
 type JobData = {
     id: number;
 
+    /**
+     * Job properties
+     */
     job: {
         croncat_hash: string;
         creator: string;
@@ -65,6 +68,8 @@ class MulticallConfigChanges {
 class Multicall {
     static FACTORY_ADDRESS: string = FACTORY_ADDRESS_SELECTOR[window.NEAR_ENV];
     static CONTRACT_CODE_HASHES: string[] = CONTRACT_CODE_HASHES_SELECTOR[window.NEAR_ENV];
+    // 0.025 NEAR is the min required by croncat for a non-recurring task. Assume trigger of 270 Tgas and 0 NEAR.
+    static CRONCAT_FEE: string = toYocto("0.0275");
 
     address: string;
     admins: string[] = [];
@@ -230,20 +235,21 @@ class Multicall {
      */
     async getJobCount(): Promise<number> {
         const state = await viewState(this.address, KEY_JOB_COUNT);
-        return parseInt(state[0].value);
+        // The counter is added to storage when the 1st job is created.
+        const jobCount = state.length > 0 ? parseInt(state[0].value) : 0;
+        return jobCount;
     }
 
     /**
      * Register a new job. Has to pay job bond.
-     * TODO: Add logic for estimating totalBudget.
      *
      * @param multicalls Multicalls to execute. 1 multicall per tx.
      * @param triggerDate Execution date, in user's local time.
      * @param triggerGas Gas amount. Will be allocated for every tx in this job.
-     * @param totalBudget Total fee to be paid to Croncat agents.
      * @returns
      */
-    async addJob(multicalls: MulticallArgs[], triggerDate: Date, triggerGas: string, totalBudget: string): Promise<Tx> {
+    // TODO: currenty budget is hard-coded for jobs with 1 multicall
+    async addJob(multicalls: MulticallArgs[], triggerDate: Date, triggerGas: string): Promise<Tx> {
         // crontab in CronCat format. See: https://github.com/CronCats/Schedule
         const cadence: string = dateToCron(triggerDate);
         // timestamp as required by NEAR chain (UTC, in nanoseconds)
@@ -259,7 +265,7 @@ class Multicall {
                             job_multicalls: multicalls,
                             job_cadence: cadence,
                             job_trigger_gas: triggerGas,
-                            job_total_budget: totalBudget,
+                            job_total_budget: Multicall.CRONCAT_FEE,
                             job_start_at: startAt,
                         },
                         gas: toGas("25"),

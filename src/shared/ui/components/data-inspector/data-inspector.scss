@@ -1,0 +1,22 @@
+@use "sass/color";
+@use "sass/size";
+
+.DataInspector {
+    &-label {
+        color: darken(color.$blue, 30%);
+        cursor: pointer;
+    }
+
+    &-body {
+        margin-top: 0.5 * size.$gap;
+        padding: 0.5 * size.$gap;
+
+        & * {
+            font-size: size.$large-text;
+        }
+
+        div > span {
+            cursor: pointer;
+        }
+    }
+}

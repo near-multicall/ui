@@ -1,7 +1,8 @@
+import { JobConfig, type JobEntity } from "./config";
 import { JobsList } from "./ui/jobs-list";
 
-export class Job {
+class Job extends JobConfig {
     static ListOfAll = JobsList;
 }
 
-export { type Dependencies as JobDependencies } from "./config";
+export { Job, type JobEntity };

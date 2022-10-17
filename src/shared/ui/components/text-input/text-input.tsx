@@ -3,7 +3,7 @@ import { MenuItem, TextField, TextFieldProps } from "@mui/material";
 
 import { ArgsError, ArgsString } from "../../../lib/args";
 
-export interface TextInputProps extends Pick<TextFieldProps, "className" | "label" | "variant"> {
+interface TextInputProps extends Pick<TextFieldProps, "className" | "label" | "variant"> {
     error: ArgsError;
     update: (event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>, component: Component) => void;
     value: ArgsString;
@@ -36,7 +36,7 @@ export class TextInput extends Component<TextInputProps> {
     }
 }
 
-export interface TextInputWithUnitsProps extends TextInputProps {
+interface TextInputWithUnitsProps extends TextInputProps {
     // TODO!: Extend the interface
 }
 

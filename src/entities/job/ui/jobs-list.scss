@@ -1,8 +1,19 @@
+@use "sass/color";
+@use "sass/size";
+
 .JobsList {
-    .Table-row-content--compact:last-of-type {
-        & > span {
-            &:first-of-type {
-                display: none;
+    &-body {
+        .Table-row-content--compact:last-of-type {
+            align-items: flex-start;
+
+            & > span {
+                &:first-of-type {
+                    position: absolute;
+                }
+
+                &:last-of-type {
+                    width: 100%;
+                }
             }
         }
     }
