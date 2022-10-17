@@ -100,11 +100,11 @@
             font-size: size.$text;
         }
     }
-    &.roundTop fieldset {
+    &.roundtop fieldset {
         border-top-left-radius: 0.75 * size.$task-radius !important;
         border-top-right-radius: 0.75 * size.$task-radius !important;
     }
-    &.roundBottom fieldset {
+    &.roundbottom fieldset {
         border-bottom-left-radius: 0.75 * size.$task-radius !important;
         border-bottom-right-radius: 0.75 * size.$task-radius !important;
     }

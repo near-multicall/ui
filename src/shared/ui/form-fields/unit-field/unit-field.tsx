@@ -12,16 +12,16 @@ type UnitFieldProps = {
     unit: string;
     label: string;
     options: string[];
-    roundTop?: boolean;
-    roundBottom?: boolean;
+    roundtop?: boolean;
+    roundbottom?: boolean;
 };
 
 export const UnitField = ({ name, unit, label, options, ...props }: UnitFieldProps) => {
     return (
         <div
             className={clsx(_UnitField, {
-                roundTop: props?.roundTop,
-                roundBottom: props?.roundBottom,
+                roundtop: props?.roundtop,
+                roundbottom: props?.roundbottom,
             })}
         >
             <TextField

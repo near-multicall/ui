@@ -16,7 +16,7 @@
             width: 100% !important;
         }
     }
-    &.roundTop {
+    &.roundtop {
         .UnitField-text fieldset {
             border-top-left-radius: 0.75 * size.$task-radius !important;
         }
@@ -24,7 +24,7 @@
             border-top-right-radius: 0.75 * size.$task-radius !important;
         }
     }
-    &.roundBottom {
+    &.roundbottom {
         .UnitField-text fieldset {
             border-bottom-left-radius: 0.75 * size.$task-radius !important;
         }

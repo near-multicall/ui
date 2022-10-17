@@ -7,20 +7,20 @@ const _TextField = "TextField";
 
 export type TextFieldProps = Partial<MuiTextFieldProps> & {
     name: string;
-    roundTop?: boolean;
-    roundBottom?: boolean;
+    roundtop?: boolean;
+    roundbottom?: boolean;
     className?: string;
 };
 
-export const TextField = ({ name, className, children, ...props }: TextFieldProps) => {
+export const TextField = ({ name, roundtop, roundbottom, className, children, ...props }: TextFieldProps) => {
     const [field, meta, helper] = useField(name);
     return (
         <div
             className={clsx(
                 _TextField,
                 {
-                    roundTop: props?.roundTop,
-                    roundBottom: props?.roundBottom,
+                    roundtop: roundtop,
+                    roundbottom: roundbottom,
                 },
                 className
             )}

@@ -89,6 +89,14 @@ class BigSchema extends MixedSchema<Big> {
     }
 
     /**
+     * short hand rule for exact one yocto amount
+     * @returns
+     */
+    oneYocto() {
+        return this.token().max(1);
+    }
+
+    /**
      * transform value to human readable value
      * @param decimalsOrUnit
      * @param message

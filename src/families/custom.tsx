@@ -1,10 +1,11 @@
-import { Form, Formik } from "formik";
+import { Form, Formik, useFormikContext } from "formik";
+import { useEffect } from "react";
 import { args as arx } from "../shared/lib/args/args";
 import { fields } from "../shared/lib/args/args-types/args-object";
 import { Call, CallError } from "../shared/lib/call";
 import { unit } from "../shared/lib/converter";
 import { TextField, UnitField } from "../shared/ui/form-fields";
-import { BaseTask } from "./base";
+import { BaseTask, BaseTaskProps } from "./base";
 import "./custom.scss";
 
 type FormData = {
@@ -19,8 +20,8 @@ type FormData = {
 };
 
 export class CustomTask extends BaseTask<FormData> {
-    uniqueClassName = "custom-task";
-    schema = arx
+    override uniqueClassName = "custom-task";
+    override schema = arx
         .object()
         .shape({
             addr: arx.string().contract(),
@@ -37,7 +38,7 @@ export class CustomTask extends BaseTask<FormData> {
         .requireAll()
         .retainAll();
 
-    initialValues: FormData = {
+    override initialValues: FormData = {
         name: "Custom",
         addr: "",
         func: "",
@@ -48,7 +49,12 @@ export class CustomTask extends BaseTask<FormData> {
         depoUnit: "NEAR",
     };
 
-    init(call: Call | null) {
+    constructor(props: BaseTaskProps) {
+        super(props);
+        this._constructor();
+    }
+
+    protected override init(call: Call | null): void {
         if (call !== null) {
             const fromCall = {
                 addr: call.address,
@@ -58,26 +64,21 @@ export class CustomTask extends BaseTask<FormData> {
                 depo: arx.big().intoFormatted(this.initialValues.depoUnit).cast(call.actions[0].depo).toFixed(),
             };
 
-            this.initialValues = Object.keys(this.initialValues).reduce(
-                (result, key) =>
-                    fromCall[key as keyof typeof fromCall] !== null &&
-                    fromCall[key as keyof typeof fromCall] !== undefined
-                        ? { ...result, [key as keyof FormData]: fromCall[key as keyof typeof fromCall] }
-                        : result,
-
-                this.initialValues
-            );
+            this.initialValues = Object.keys(this.initialValues).reduce((acc, k) => {
+                const v = fromCall[k as keyof typeof fromCall];
+                return v !== null && v !== undefined ? { ...acc, [k as keyof FormData]: v } : acc;
+            }, this.initialValues);
         }
 
         this.state = { ...this.state, formData: this.initialValues };
         this.schema.check(this.state.formData);
     }
 
-    static inferOwnType(json: Call) {
+    static override inferOwnType(json: Call): boolean {
         return false;
     }
 
-    toCall() {
+    public override toCall(): Call {
         const { addr, func, args, gas, gasUnit, depo, depoUnit } = this.state.formData;
         if (!arx.string().json().isValidSync(args))
             throw new CallError("Failed to parse function arguments", this.props.id);
@@ -94,72 +95,53 @@ export class CustomTask extends BaseTask<FormData> {
         };
     }
 
-    onAddressesUpdated() {}
+    public override Editor = (): React.ReactNode => {
+        const { resetForm, validateForm } = useFormikContext();
 
-    renderEditor() {
-        let init = true;
+        useEffect(() => {
+            resetForm({
+                values: this.state.formData,
+                touched: Object.keys(this.state.formData).reduce((acc, k) => ({ ...acc, [k]: true }), {}),
+            });
+            validateForm(this.state.formData);
+        }, []);
+
         return (
-            <Formik
-                initialValues={this.state.formData}
-                initialTouched={Object.keys(this.state.formData).reduce((acc, k) => ({ ...acc, [k]: true }), {})}
-                enableReinitialize={true}
-                validate={async (values) => {
-                    this.setFormData(values);
-                    await new Promise((resolve) => this.resolveDebounced(resolve));
-                    await this.schema.check(values);
-                    return Object.fromEntries(
-                        Object.entries(fields(this.schema))
-                            .map(([k, v]) => [k, v?.message() ?? ""])
-                            .filter(([_, v]) => v !== "")
-                    );
-                }}
-                onSubmit={() => {}}
-            >
-                {({ resetForm, validateForm }) => {
-                    if (init) {
-                        resetForm({ values: this.state.formData });
-                        validateForm(this.state.formData);
-                        init = false;
-                    }
-                    return (
-                        <Form className="edit">
-                            <TextField
-                                name="name"
-                                label="Card Name"
-                                variant="standard"
-                                autoFocus
-                            />
-                            <div className="empty-line" />
-                            <TextField
-                                name="addr"
-                                label="Contract Address"
-                                roundTop
-                            />
-                            <TextField
-                                name="func"
-                                label="Function"
-                            />
-                            <TextField
-                                name="args"
-                                label="Function Arguments"
-                            />
-                            <UnitField
-                                name="gas"
-                                unit="gasUnit"
-                                options={["Tgas", "gas"]}
-                                label="Allocated gas"
-                            />
-                            <UnitField
-                                name="depo"
-                                unit="depoUnit"
-                                options={["NEAR", "yocto"]}
-                                label="Allocated deposit"
-                                roundBottom
-                            />
-                        </Form>
-                    );
-                }}
-            </Formik>
+            <Form className="edit">
+                <TextField
+                    name="name"
+                    label="Card Name"
+                    variant="standard"
+                    autoFocus
+                />
+                <div className="empty-line" />
+                <TextField
+                    name="addr"
+                    label="Contract Address"
+                    roundtop
+                />
+                <TextField
+                    name="func"
+                    label="Function"
+                />
+                <TextField
+                    name="args"
+                    label="Function Arguments"
+                />
+                <UnitField
+                    name="gas"
+                    unit="gasUnit"
+                    options={["Tgas", "gas"]}
+                    label="Allocated gas"
+                />
+                <UnitField
+                    name="depo"
+                    unit="depoUnit"
+                    options={["NEAR", "yocto"]}
+                    label="Allocated deposit"
+                    roundbottom
+                />
+            </Form>
         );
-    }
+    };
 }

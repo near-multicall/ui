@@ -4,35 +4,40 @@ import clsx from "clsx";
 import debounce from "lodash.debounce";
 
 import { args as arx } from "../shared/lib/args/args";
-import { ObjectSchema } from "../shared/lib/args/args-types/args-object";
+import { fields, ObjectSchema } from "../shared/lib/args/args-types/args-object";
 import { Call } from "../shared/lib/call";
 import { unit } from "../shared/lib/converter";
 import { Tooltip } from "../shared/ui/components";
 import "./base.scss";
+import { FormikErrors } from "formik";
 
-interface DefaultFormData {
+export interface DefaultFormData<TArgs extends string | object> {
     name: string;
     addr: string;
     func: string;
-    args: string;
+    args: TArgs;
     gas: string;
     gasUnit: number | unit;
     depo: string;
     depoUnit: number | unit;
 }
 
-interface Props {
+export interface BaseTaskProps {
     id: string;
     json: Call;
 }
 
-interface State<TFormData> {
+export interface BaseTaskState<TFormData> {
     formData: TFormData;
     showArgs: boolean;
     isEdited: boolean;
 }
 
-export abstract class BaseTask<TFormData extends DefaultFormData> extends Component<Props, State<TFormData>> {
+export abstract class BaseTask<
+    TFormData extends DefaultFormData<string | object>,
+    Props extends BaseTaskProps = BaseTaskProps,
+    State extends BaseTaskState<TFormData> = BaseTaskState<TFormData>
+> extends Component<Props, State> {
     abstract uniqueClassName: string;
     abstract schema: ObjectSchema<any>;
     abstract initialValues: TFormData;
@@ -41,11 +46,10 @@ export abstract class BaseTask<TFormData extends DefaultFormData> extends Compon
 
     resolveDebounced = debounce((resolve) => resolve(), 400);
 
-    constructor(props: Props, initialValues: TFormData) {
-        super(props);
+    private initState: any;
 
-        this.state = {
-            formData: initialValues,
+    _constructor() {
+        this.initState = {
             showArgs: false,
             isEdited: false,
         };
@@ -60,6 +64,8 @@ export abstract class BaseTask<TFormData extends DefaultFormData> extends Compon
             this.init(this.props?.json ?? null);
         }
 
+        this.state = { ...(this.initState as State), ...this.state };
+
         this.updateCard = this.updateCard.bind(this);
 
         document.addEventListener("onaddressesupdated", (e) => this.onAddressesUpdated(e as CustomEvent));
@@ -69,8 +75,8 @@ export abstract class BaseTask<TFormData extends DefaultFormData> extends Compon
         const TEMP = window.TEMP!;
         this.initialValues = JSON.parse(JSON.stringify(TEMP.formData));
         this.options = TEMP.options;
-        this.state = {
-            ...this.state,
+        this.initState = {
+            ...this.initState,
             showArgs: TEMP.showArgs,
             isEdited: TEMP.isEdited,
         };
@@ -81,8 +87,8 @@ export abstract class BaseTask<TFormData extends DefaultFormData> extends Compon
         this.initialValues = JSON.parse(JSON.stringify(payload.formData));
         this.options = JSON.parse(JSON.stringify(payload.options));
         window.COPY = null;
-        this.state = {
-            ...this.state,
+        this.initState = {
+            ...this.initState,
             showArgs: payload.showArgs,
         };
     }
@@ -111,7 +117,7 @@ export abstract class BaseTask<TFormData extends DefaultFormData> extends Compon
         this.schema.check(this.state.formData).then(() => this.updateCard());
     }
 
-    protected abstract onAddressesUpdated(e: CustomEvent<{ dao: string; multicall: string; user: string }>): void;
+    protected onAddressesUpdated(e: CustomEvent<{ dao: string; multicall: string; user: string }>): void {}
 
     public onEditFocus(taskId: string) {
         this.setState({ isEdited: taskId === this.props.id });
@@ -122,7 +128,18 @@ export abstract class BaseTask<TFormData extends DefaultFormData> extends Compon
         window.EDITOR?.forceUpdate();
     }
 
-    public abstract renderEditor(): JSX.Element;
+    public async validateForm(values: TFormData): Promise<FormikErrors<TFormData>> {
+        this.setFormData(values);
+        await new Promise((resolve) => this.resolveDebounced(resolve));
+        await this.schema.check(values);
+        return Object.fromEntries(
+            Object.entries(fields(this.schema))
+                .map(([k, v]) => [k, v?.message() ?? ""])
+                .filter(([_, v]) => v !== "")
+        );
+    }
+
+    public abstract Editor: () => React.ReactNode;
 
     render() {
         const { showArgs, isEdited, formData } = this.state;
@@ -207,9 +224,11 @@ export abstract class BaseTask<TFormData extends DefaultFormData> extends Compon
                     </p>
                     {showArgs && (
                         <pre className="code">
-                            {arx.string().json().isValidSync(args)
-                                ? JSON.stringify(JSON.parse(args), null, "  ")
-                                : args}
+                            {typeof args === "string"
+                                ? arx.string().json().isValidSync(args)
+                                    ? JSON.stringify(JSON.parse(args), null, "  ")
+                                    : args
+                                : JSON.stringify(args, null, " ")}
                         </pre>
                     )}
                     <p>

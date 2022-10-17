@@ -12,6 +12,7 @@ declare module "yup" {
         contract(message?: string): this;
         sputnikDao(message?: string): this;
         multicall(message?: string): this;
+        tokenContract(message?: string): this;
         intoUrl(): this;
         intoBaseAddress(prefixes?: string[]): this;
         append(appendStr: string): this;
