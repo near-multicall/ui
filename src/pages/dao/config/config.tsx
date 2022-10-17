@@ -32,6 +32,7 @@ const Link = ({
             >
                 {addr.value}
             </a>
+
             {deleteIcon ? <DeleteOutlined /> : editIcon ? <EditOutlined /> : null}
         </span>
     );
@@ -103,6 +104,7 @@ const DaoConfigTabComponent = ({ className, contracts: { multicall } }: DaoConfi
                         </ul>
                     </Tile>
                 </div>
+
                 <button
                     style={{ alignSelf: "start", borderRadius: "5px" }}
                     onClick={() => setEditMode(true)}
@@ -122,6 +124,7 @@ const DaoConfigTabComponent = ({ className, contracts: { multicall } }: DaoConfi
                         >
                             <AddOutlined />
                         </IconButton>
+
                         <h1 className="title">Admins</h1>
 
                         <ul className="list">
@@ -133,6 +136,7 @@ const DaoConfigTabComponent = ({ className, contracts: { multicall } }: DaoConfi
                                     />
                                 </li>
                             ))}
+
                             {addAdmin ? (
                                 <TextField onBlur={(e) => setAddAdmins((arr) => [...arr, e.target.value])} />
                             ) : null}
@@ -158,6 +162,7 @@ const DaoConfigTabComponent = ({ className, contracts: { multicall } }: DaoConfi
                                     />
                                 </li>
                             ))}
+
                             {addToken ? (
                                 <TextField onBlur={(e) => setAddTokens((arr) => [...arr, e.target.value])} />
                             ) : null}
@@ -184,7 +189,9 @@ const DaoConfigTabComponent = ({ className, contracts: { multicall } }: DaoConfi
                         >
                             <EditOutlined />
                         </IconButton>
+
                         <h1 className="CroncatMng-title title">Croncat Manager</h1>
+
                         <ul className="list">
                             <li>
                                 {editCroncat ? (
@@ -202,6 +209,7 @@ const DaoConfigTabComponent = ({ className, contracts: { multicall } }: DaoConfi
                             </li>
                         </ul>
                     </Tile>
+
                     <button
                         style={{ alignSelf: "start", borderRadius: "5px" }}
                         onClick={() => setEditMode(false)}
