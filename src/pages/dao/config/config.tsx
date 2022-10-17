@@ -62,162 +62,162 @@ const DaoConfigTabComponent = ({ className, contracts: { multicall } }: DaoConfi
 
     if (!editMode) {
         return (
-            <>
-                <div className={clsx(_DaoConfigTab, className)}>
-                    <Tile className="AdminsList">
-                        <h1 className="title">Admins</h1>
+            <div className={clsx(_DaoConfigTab, className)}>
+                <Tile className="AdminsList">
+                    <h1 className="title">Admins</h1>
 
-                        <ul className="list">
-                            {multicall.admins.map((admin) => (
-                                <li key={admin}>
-                                    <Link address={admin} />
-                                </li>
-                            ))}
-                        </ul>
-                    </Tile>
-
-                    <Tile className="TokenWhitelist">
-                        <h1 className="title">Whitelisted Tokens</h1>
-
-                        <ul className="list">
-                            {multicall.tokensWhitelist.map((token) => (
-                                <li key={token}>
-                                    <Link address={token} />
-                                </li>
-                            ))}
-                        </ul>
-                    </Tile>
-
-                    <Tile className="JobBond">
-                        <h1 className="JobBond-title title">
-                            Job Bond
-                            <span>{`${multicall.jobBond !== "" ? toNEAR(multicall.jobBond) : "..."} Ⓝ`}</span>
-                        </h1>
-                    </Tile>
-
-                    <Tile className="CroncatManager">
-                        <h1 className="CroncatMng-title title">Croncat Manager</h1>
-                        <ul className="list">
-                            <li>
-                                <Link address={multicall.croncatManager} />
+                    <ul className="list">
+                        {multicall.admins.map((admin) => (
+                            <li key={admin}>
+                                <Link address={admin} />
                             </li>
-                        </ul>
-                    </Tile>
-                </div>
+                        ))}
+                    </ul>
+                </Tile>
 
-                <button
-                    style={{ alignSelf: "start", borderRadius: "5px" }}
-                    onClick={() => setEditMode(true)}
-                >
-                    Edit
-                </button>
-            </>
+                <Tile className="TokenWhitelist">
+                    <h1 className="title">Whitelisted Tokens</h1>
+
+                    <ul className="list">
+                        {multicall.tokensWhitelist.map((token) => (
+                            <li key={token}>
+                                <Link address={token} />
+                            </li>
+                        ))}
+                    </ul>
+                </Tile>
+
+                <Tile className="JobBond">
+                    <h1 className="JobBond-title title">
+                        Job Bond
+                        <span>{`${multicall.jobBond !== "" ? toNEAR(multicall.jobBond) : "..."} Ⓝ`}</span>
+                    </h1>
+                </Tile>
+
+                <Tile className="CroncatManager">
+                    <h1 className="CroncatMng-title title">Croncat Manager</h1>
+                    <ul className="list">
+                        <li>
+                            <Link address={multicall.croncatManager} />
+                        </li>
+                    </ul>
+                </Tile>
+
+                <div className={`${_DaoConfigTab}-actions`}>
+                    <button
+                        className={`${_DaoConfigTab}-action`}
+                        onClick={() => setEditMode(true)}
+                    >
+                        Edit
+                    </button>
+                </div>
+            </div>
         );
     } else {
         return (
-            <>
-                <div className={clsx(_DaoConfigTab, className)}>
-                    <Tile className="AdminsList">
-                        <IconButton
-                            edge="start"
-                            onClick={() => setAddAdmin(true)}
-                        >
-                            <AddOutlined />
-                        </IconButton>
+            <div className={clsx(_DaoConfigTab, className)}>
+                <Tile className="AdminsList">
+                    <IconButton
+                        edge="start"
+                        onClick={() => setAddAdmin(true)}
+                    >
+                        <AddOutlined />
+                    </IconButton>
 
-                        <h1 className="title">Admins</h1>
+                    <h1 className="title">Admins</h1>
 
-                        <ul className="list">
-                            {addAdmins.map((admin) => (
-                                <li key={admin}>
-                                    <Link
-                                        address={admin}
-                                        deleteIcon
-                                    />
-                                </li>
-                            ))}
-
-                            {addAdmin ? (
-                                <TextField onBlur={(e) => setAddAdmins((arr) => [...arr, e.target.value])} />
-                            ) : null}
-                        </ul>
-                    </Tile>
-
-                    <Tile className="TokenWhitelist">
-                        <IconButton
-                            edge="start"
-                            onClick={() => setAddToken(true)}
-                        >
-                            <AddOutlined />
-                        </IconButton>
-
-                        <h1 className="title">Whitelisted Tokens</h1>
-
-                        <ul className="list">
-                            {addTokens.map((token) => (
-                                <li key={token}>
-                                    <Link
-                                        address={token}
-                                        deleteIcon
-                                    />
-                                </li>
-                            ))}
-
-                            {addToken ? (
-                                <TextField onBlur={(e) => setAddTokens((arr) => [...arr, e.target.value])} />
-                            ) : null}
-                        </ul>
-                    </Tile>
-
-                    <Tile className="JobBond">
-                        <h1 className="JobBond-title title">
-                            Job Bond
-                            <span>
-                                <TextField
-                                    variant="filled"
-                                    defaultValue={multicall.jobBond !== "" ? toNEAR(multicall.jobBond) : "..."}
+                    <ul className="list">
+                        {addAdmins.map((admin) => (
+                            <li key={admin}>
+                                <Link
+                                    address={admin}
+                                    deleteIcon
                                 />
-                                {`Ⓝ`}
-                            </span>
-                        </h1>
-                    </Tile>
-
-                    <Tile className="CroncatManager">
-                        <IconButton
-                            edge="start"
-                            onClick={() => setEditCroncat(true)}
-                        >
-                            <EditOutlined />
-                        </IconButton>
-
-                        <h1 className="CroncatMng-title title">Croncat Manager</h1>
-
-                        <ul className="list">
-                            <li>
-                                {editCroncat ? (
-                                    <TextField
-                                        onBlur={(e) => {
-                                            setCroncatManager(e.target.value);
-                                            setEditCroncat(false);
-                                        }}
-                                        defaultValue={multicall.croncatManager}
-                                        size="small"
-                                    />
-                                ) : (
-                                    <Link address={multicall.croncatManager} />
-                                )}
                             </li>
-                        </ul>
-                    </Tile>
+                        ))}
 
+                        {addAdmin ? (
+                            <TextField onBlur={(e) => setAddAdmins((arr) => [...arr, e.target.value])} />
+                        ) : null}
+                    </ul>
+                </Tile>
+
+                <Tile className="TokenWhitelist">
+                    <IconButton
+                        edge="start"
+                        onClick={() => setAddToken(true)}
+                    >
+                        <AddOutlined />
+                    </IconButton>
+
+                    <h1 className="title">Whitelisted Tokens</h1>
+
+                    <ul className="list">
+                        {addTokens.map((token) => (
+                            <li key={token}>
+                                <Link
+                                    address={token}
+                                    deleteIcon
+                                />
+                            </li>
+                        ))}
+
+                        {addToken ? (
+                            <TextField onBlur={(e) => setAddTokens((arr) => [...arr, e.target.value])} />
+                        ) : null}
+                    </ul>
+                </Tile>
+
+                <Tile className="JobBond">
+                    <h1 className="JobBond-title title">
+                        Job Bond
+                        <span>
+                            <TextField
+                                variant="filled"
+                                defaultValue={multicall.jobBond !== "" ? toNEAR(multicall.jobBond) : "..."}
+                            />
+                            {`Ⓝ`}
+                        </span>
+                    </h1>
+                </Tile>
+
+                <Tile className="CroncatManager">
+                    <IconButton
+                        edge="start"
+                        onClick={() => setEditCroncat(true)}
+                    >
+                        <EditOutlined />
+                    </IconButton>
+
+                    <h1 className="CroncatMng-title title">Croncat Manager</h1>
+
+                    <ul className="list">
+                        <li>
+                            {editCroncat ? (
+                                <TextField
+                                    onBlur={(e) => {
+                                        setCroncatManager(e.target.value);
+                                        setEditCroncat(false);
+                                    }}
+                                    defaultValue={multicall.croncatManager}
+                                    size="small"
+                                />
+                            ) : (
+                                <Link address={multicall.croncatManager} />
+                            )}
+                        </li>
+                    </ul>
+                </Tile>
+
+                <div className={`${_DaoConfigTab}-actions`}>
                     <button
-                        style={{ alignSelf: "start", borderRadius: "5px" }}
+                        className={`${_DaoConfigTab}-action`}
                         onClick={() => setEditMode(false)}
                     >
                         Confirm
                     </button>
                 </div>
-            </>
+            </div>
         );
     }
 };

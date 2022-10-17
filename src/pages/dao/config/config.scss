@@ -5,14 +5,20 @@
 
 .DaoConfigTab {
     display: grid;
-
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr 1fr;
+    grid-template-rows: 3fr 3fr 1fr;
     gap: 0px 0px;
+
     grid-template-areas:
         "AdminsList TokenWhitelist"
         "CroncatManager TokenWhitelist"
-        "JobBond TokenWhitelist";
+        "JobBond actions";
+
+    &-actions {
+        @include mixin.center-items(space-evenly, center);
+        grid-area: actions;
+    }
+
     .AdminsList {
         grid-area: AdminsList;
     }
