@@ -61,16 +61,31 @@ type EvolveValue<V, E> = E extends (value: V) => any
  *
  * @example
  * ```typescript
- * const tomato = { firstName: '  Tomato ', data: { elapsed: 100, remaining: 1400 }, id: 123 };
+ * const decrement = (n) => n - 1,
+ * 	increment = (n) => n + 1,
+ * 	trim = (string) => string.trim();
+ *
+ * const tomato = {
+ * 	firstName: "  Tomato ",
+ * 	data: { elapsed: 100, remaining: 1400 },
+ * 	numbers: [1, 2, 3, 4]
+ * 	id: 123
+ * };
  *
  * const transformations = {
- *   firstName: R.trim,
- *   lastName: R.trim, // Will not get invoked.
- *   data: {elapsed: R.add(1), remaining: R.add(-1)}
+ * 	firstName: trim,
+ * 	lastName: trim, // Will not get invoked for `tomato`.
+ * 	data: { elapsed: increment, remaining: decrement }
+ * 	numbers: (list) => list.map(increment)
  * };
  *
  * Props.evolve(transformations, tomato);
- * //=> { firstName: 'Tomato', data: { elapsed: 101, remaining: 1399 }, id: 123 }
+ * //=>{
+ * //=>	firstName: 'Tomato',
+ * //=>	data: { elapsed: 101, remaining: 1399 },
+ * //=>	numbers: [2, 3, 4, 5],
+ * //=>	id: 123
+ * //=>}
  * ```
  */
 const evolve = <E extends Evolver, V extends Evolvable<E>>(transformations: E, object: V): Evolve<V, E> => {
