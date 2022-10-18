@@ -1,7 +1,9 @@
 import { NearTokenEntity, FungibleTokenEntity } from "../../entities";
 
-export namespace TokensBalancesWidget {
-    export interface Dependencies extends NearTokenEntity.dependencies, FungibleTokenEntity.dependencies {
+namespace TokensBalancesWidget {
+    export interface Dependencies extends NearTokenEntity.Dependencies, FungibleTokenEntity.Dependencies {
         className?: string;
     }
 }
+
+export { type TokensBalancesWidget };

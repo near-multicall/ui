@@ -1,6 +1,6 @@
 import { type JobData, type Multicall } from "../../shared/lib/contracts/multicall";
 
-export namespace JobEntity {
+namespace JobEntity {
     export interface Dependencies {
         className?: string;
         contracts: { multicall: Multicall };
@@ -21,7 +21,7 @@ export namespace JobEntity {
     };
 }
 
-export class JobConfig {
+class JobConfig {
     static readonly Status = JobEntity.Status;
 
     static StatusIcons = {
@@ -32,3 +32,5 @@ export class JobConfig {
         [JobEntity.Status.Unknown]: "❔",
     };
 }
+
+export { JobConfig, type JobEntity };

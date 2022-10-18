@@ -17,9 +17,10 @@ export const JobsList = ({ className, contracts }: JobsListProps) => {
         noData = data !== null && !loading && Object.values(data).length === 0;
 
     return (
-        <Tile className={clsx(_JobsList, className)}>
-            <h1 className="title">All jobs</h1>
-
+        <Tile
+            className={clsx(_JobsList, className)}
+            title="All jobs"
+        >
             {loading && <div className="loader" />}
             {noData && <Placeholder type="noData" />}
 

@@ -1,16 +1,17 @@
 import { Tile, Scrollable, Table } from "../../../shared/ui/components";
 import { FungibleToken, NearToken } from "../../../entities";
 
-import { Dependencies } from "../config";
+import { type TokensBalancesWidget } from "../config";
 
-export const TokensBalances = ({ className, contracts }: Dependencies) => {
+export const TokensBalances = ({ className, contracts }: TokensBalancesWidget.Dependencies) => {
     const nearTokenBalances = NearToken.balancesRender({ contracts }),
         fungibleTokensBalances = FungibleToken.allBalancesRender({ contracts });
 
     return (
-        <Tile {...{ className }}>
-            <h1 className="title">Tokens balances</h1>
-
+        <Tile
+            {...{ className }}
+            title="Tokens balances"
+        >
             {(nearTokenBalances ?? fungibleTokensBalances) && (
                 <Scrollable>
                     <Table
