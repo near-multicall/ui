@@ -97,9 +97,9 @@ const evolve = <E extends Evolver, V extends Evolvable<E>>(transformations: E, o
                 Object.assign(accumulator, {
                     [key]:
                         typeof transformations[key] === "function"
-                            ? transformations[key](object[key])
+                            ? (transformations[key] as (value: keyof V) => keyof V)(object[key]!)
                             : transformations[key] && typeof transformations[key] === "object"
-                            ? evolve(transformations[key], object[key])
+                            ? evolve(transformations[key] as Evolver, object[key]!)
                             : object[key],
                 }),
 
