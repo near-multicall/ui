@@ -12,7 +12,7 @@ declare module "yup" {
         contract(message?: string): this;
         sputnikDao(message?: string): this;
         multicall(message?: string): this;
-        tokenContract(message?: string): this;
+        ft(message?: string): this;
         intoUrl(): this;
         intoBaseAddress(prefixes?: string[]): this;
         append(appendStr: string): this;
@@ -102,9 +102,9 @@ addMethod(_StringSchema, "multicall", function multicall(message = locale.string
 });
 
 // ensure string is a valid NEAR address with a token contract
-addMethod(_StringSchema, "tokenContract", function tokenContract(message = locale.string.tokenContract) {
+addMethod(_StringSchema, "ft", function ft(message = locale.string.ft) {
     return this.address().test({
-        name: "tokenContract",
+        name: "ft",
         message,
         test: async (value) => {
             if (value == null) return true;

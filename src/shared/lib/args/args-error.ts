@@ -17,7 +17,7 @@ const locale = {
         contract: "value must have a contract deployed",
         sputnikDao: "address must belong to a sputnik dao contract",
         multicall: "address must belong to a multicall contract",
-        tokenContract: "address must belong to a token contract",
+        ft: "address must belong to a token contract",
     },
 };
 

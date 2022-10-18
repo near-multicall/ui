@@ -28,7 +28,7 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
     override schema = arx
         .object()
         .shape({
-            addr: arx.string().tokenContract(),
+            addr: arx.string().ft(),
             gas: arx.big().gas().min(toGas("1")).max(toGas("250")),
             receiverId: arx.string().address(),
             amount: arx.big().token().min(0, "amount must be at least ${min}"),
