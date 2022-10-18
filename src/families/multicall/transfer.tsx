@@ -1,21 +1,17 @@
-import Checkbox from "@mui/material/Checkbox";
-import { ArgsAccount, ArgsBig, ArgsError, ArgsObject, ArgsString } from "../../shared/lib/args-old";
-import { Multicall } from "../../shared/lib/contracts/multicall";
-import { formatTokenAmount, toGas, toYocto, unit, unitToDecimals } from "../../shared/lib/converter";
-import { errorMsg } from "../../shared/lib/errors";
-import { STORAGE } from "../../shared/lib/persistent";
-import { args as arx } from "../../shared/lib/args/args";
-import { TextInput, TextInputWithUnits } from "../../shared/ui/components";
-import { BaseTask, BaseTaskProps, DefaultFormData } from "../base";
-import "./multicall.scss";
-import { Call } from "../../shared/lib/call";
-import { BigSchema } from "../../shared/lib/args/args-types/args-big";
 import { Form, useFormikContext } from "formik";
 import { useEffect } from "react";
-import { CheckboxField, SelectField, TextField, UnitField } from "../../shared/ui/form-fields";
+import { args as arx } from "../../shared/lib/args/args";
+import { BigSchema } from "../../shared/lib/args/args-types/args-big";
+import { Call, CallError } from "../../shared/lib/call";
+import { Multicall } from "../../shared/lib/contracts/multicall";
+import { unit } from "../../shared/lib/converter";
+import { STORAGE } from "../../shared/lib/persistent";
+import { CheckboxField, TextField, UnitField } from "../../shared/ui/form-fields";
+import { BaseTask, BaseTaskProps, DefaultFormData } from "../base";
+import "./multicall.scss";
 
 type FormData = DefaultFormData & {
-    receiverId: string;
+    accountId: string;
     amount: string;
     amountUnit: number | unit;
     transferAll: boolean;
@@ -29,18 +25,12 @@ export class Transfer extends BaseTask<FormData> {
             addr: arx.string().multicall(),
             gas: arx.big().gas(),
             accountId: arx.string().address(),
-            amount: arx
-                .big()
-                .token()
-                .when("transferAll", {
-                    is: true,
-                    then: (schema: BigSchema) => schema.nullable(),
-                }),
+            amount: arx.big().token(),
         })
-        .transform(({ gas, gasUnit, amount, amountUnit, ...rest }) => ({
+        .transform(({ gas, gasUnit, amount, amountUnit, transferAll, ...rest }) => ({
             ...rest,
             gas: arx.big().intoParsed(gasUnit).cast(gas),
-            amount: arx.big().intoParsed(amountUnit).cast(amount),
+            amount: transferAll ? 0 : arx.big().intoParsed(amountUnit).cast(amount),
         }))
         .requireAll()
         .retainAll();
@@ -53,7 +43,7 @@ export class Transfer extends BaseTask<FormData> {
         gasUnit: "Tgas",
         depo: "1",
         depoUnit: "yocto",
-        receiverId: "",
+        accountId: "",
         amount: "0",
         amountUnit: "NEAR",
         transferAll: false,
@@ -104,8 +94,11 @@ export class Transfer extends BaseTask<FormData> {
     }
 
     public override toCall(): Call {
-        const { addr, func, gas, gasUnit, depo, depoUnit, receiverId, amount, amountUnit, transferAll } =
+        const { addr, func, gas, gasUnit, depo, depoUnit, accountId, amount, amountUnit, transferAll } =
             this.state.formData;
+
+        if (!arx.big().isValidSync(gas)) throw new CallError("Failed to parse gas input value", this.props.id);
+        if (!arx.big().isValidSync(amount)) throw new CallError("Failed to parse amount input value", this.props.id);
 
         return {
             address: addr,
@@ -114,10 +107,10 @@ export class Transfer extends BaseTask<FormData> {
                     func,
                     args: transferAll
                         ? {
-                              receiver_id: receiverId,
+                              account_id: accountId,
                           }
                         : {
-                              receiver_id: receiverId,
+                              account_id: accountId,
                               amount: arx.big().intoParsed(amountUnit).cast(amount).toFixed(),
                           },
                     gas: arx.big().intoParsed(gasUnit).cast(gas).toFixed(),
@@ -134,7 +127,7 @@ export class Transfer extends BaseTask<FormData> {
     }
 
     public override Editor = (): React.ReactNode => {
-        const { resetForm, validateForm, values } = useFormikContext();
+        const { resetForm, validateForm, values } = useFormikContext<FormData>();
 
         useEffect(() => {
             resetForm({
@@ -154,16 +147,16 @@ export class Transfer extends BaseTask<FormData> {
                 />
                 <div className="empty-line" />
                 <TextField
-                    name="receiverId"
+                    name="accountId"
                     label="Receiver Address"
                     roundtop
                 />
                 <CheckboxField
                     name="transferAll"
                     label="Transfer all available funds"
-                    options={["true", "false"]}
+                    checked={values.transferAll}
                 />
-                {!this.state.formData.transferAll && ( // TODO replace with formik value
+                {!values.transferAll && (
                     <UnitField
                         name="amount"
                         unit="amountUnit"

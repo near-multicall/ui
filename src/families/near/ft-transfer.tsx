@@ -3,7 +3,7 @@ import { Form, useFormikContext } from "formik";
 import { useEffect } from "react";
 import { args as arx } from "../../shared/lib/args/args";
 import { fields } from "../../shared/lib/args/args-types/args-object";
-import { Call } from "../../shared/lib/call";
+import { Call, CallError } from "../../shared/lib/call";
 import { toGas } from "../../shared/lib/converter";
 import { FungibleToken } from "../../shared/lib/standards/fungibleToken";
 import { TextField, UnitField } from "../../shared/ui/form-fields";
@@ -99,6 +99,9 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
     public override toCall(): Call {
         const { addr, gas, gasUnit, receiverId, amount, memo } = this.state.formData;
         const { token } = this.state;
+
+        if (!arx.big().isValidSync(gas)) throw new CallError("Failed to parse gas input value", this.props.id);
+        if (!arx.big().isValidSync(amount)) throw new CallError("Failed to parse amount input value", this.props.id);
 
         return {
             address: addr,

@@ -29,7 +29,7 @@ addMethod(_StringSchema, "json", function json(message = locale.string.json) {
         name: "json",
         message,
         test: (value) => {
-            if (value == null || value == "") return true;
+            if (value == null) return true;
             try {
                 if (JSON.parse(value)) return true;
             } catch (e) {}

@@ -76,6 +76,8 @@ export class CustomTask extends BaseTask<FormData> {
         const { addr, func, args, gas, gasUnit, depo, depoUnit } = this.state.formData;
         if (!arx.string().json().isValidSync(args))
             throw new CallError("Failed to parse function arguments", this.props.id);
+        if (!arx.big().isValidSync(gas)) throw new CallError("Failed to parse gas input value", this.props.id);
+        if (!arx.big().isValidSync(depo)) throw new CallError("Failed to parse deposit input value", this.props.id);
         return {
             address: addr,
             actions: [
