@@ -6,12 +6,12 @@ import "./tile.scss";
 const _Tile = "Tile";
 
 export interface TileProps extends PropsWithChildren, HTMLAttributes<HTMLDivElement> {
-    title: string;
+    title?: string;
 }
 
 export const Tile = ({ children, className, title }: TileProps) => (
     <div className={clsx(_Tile, className)}>
-        <h1 className={`${_Tile}-title`}>{title}</h1>
+        {title && <h1 className={`${_Tile}-title`}>{title}</h1>}
         {children}
     </div>
 );
