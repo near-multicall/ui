@@ -2,7 +2,11 @@
 @use "sass/mixin";
 @use "sass/size";
 
-.near-ft-transfer-task {
+.near-ft-transfer-task,
+.near-ft-transfer-task,
+.near-ft-transfer-call-task,
+.near-mft-transfer-call-task,
+.near-mft-transfer-task {
     background: color.$lightest;
     .name {
         color: color.$text !important;
