@@ -45,7 +45,7 @@ export class Menu extends Component {
                         }}
                         items={[
                             {
-                                title: "Build",
+                                name: "Build",
                                 content: (
                                     <Builder
                                         layout={LAYOUT}
@@ -54,11 +54,11 @@ export class Menu extends Component {
                                 ),
                             },
                             {
-                                title: "Edit",
+                                name: "Edit",
                                 content: <Editor />,
                             },
                             {
-                                title: "Export",
+                                name: "Export",
                                 content: <Export layout={LAYOUT} />,
                             },
                         ]}

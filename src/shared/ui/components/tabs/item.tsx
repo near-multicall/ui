@@ -9,15 +9,15 @@ const _TabsItem = "Tabs-item",
 export interface TabsItemButtonProps extends React.HTMLAttributes<HTMLDivElement> {
     invertedColors?: boolean;
     onClick: VoidFunction;
-    title: string;
+    label: string;
 }
 
-export const TabsItemButton = ({ className, invertedColors = false, onClick, title }: TabsItemButtonProps) => (
+export const TabsItemButton = ({ className, invertedColors = false, label, onClick }: TabsItemButtonProps) => (
     <button
         className={clsx(_TabsItemButton, { [`${_TabsItemButton}--invertedColors`]: invertedColors }, className)}
         {...{ onClick }}
     >
-        {title}
+        {label}
     </button>
 );
 

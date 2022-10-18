@@ -22,6 +22,6 @@ export const DaoJobsTab = {
     connect: (props: DaoJobsTabComponentProps) => ({
         content: <DaoJobsTabComponent {...props} />,
         lazy: true,
-        title: "Jobs",
+        name: "Jobs",
     }),
 };

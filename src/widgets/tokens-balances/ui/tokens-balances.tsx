@@ -10,7 +10,7 @@ export const TokensBalances = ({ className, contracts }: TokensBalancesWidget.De
     return (
         <Tile
             {...{ className }}
-            title="Tokens balances"
+            heading="Tokens balances"
         >
             {(nearTokenBalances ?? fungibleTokensBalances) && (
                 <Scrollable>

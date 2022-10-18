@@ -8,7 +8,7 @@ interface TabsProps extends Pick<TabsItemButtonProps, "invertedColors"> {
     activeItemIndexOverride?: number;
     activeItemSwitchOverride?: Dispatch<SetStateAction<number>>;
     classes?: TabsLayoutProps["classes"] & {};
-    items: { content: JSX.Element; lazy?: boolean; title: string }[];
+    items: { content: JSX.Element; lazy?: boolean; name: string }[];
 }
 
 export const Tabs = ({
@@ -31,12 +31,13 @@ export const Tabs = ({
     return (
         <TabsLayout
             {...{ classes }}
-            buttons={items.map(({ title }, itemIndex) => (
+            buttons={items.map(({ name }, itemIndex) => (
                 <TabsItemButton
                     className={clsx({ "is-active": activeItemIndex === itemIndex })}
                     key={itemIndex}
+                    label={name}
                     onClick={activeItemSwitchBond(itemIndex)}
-                    {...{ invertedColors, title }}
+                    {...{ invertedColors }}
                 />
             ))}
         >
