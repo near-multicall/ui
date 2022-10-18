@@ -6,37 +6,27 @@
 .DaoConfigTab {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 3fr 3fr 1fr;
+    grid-template-rows: 6fr 4fr;
     gap: 0px 0px;
 
     grid-template-areas:
-        "AdminsList TokenWhitelist"
-        "CroncatManager TokenWhitelist"
-        "JobBond actions";
+        "admins tokensWhitelist"
+        "jobsSettings proposalForm";
 
-    &-actions {
+    &-proposalForm {
         @include mixin.center-items(space-evenly, center);
-        grid-area: actions;
+        grid-area: proposalForm;
     }
 
-    .AdminsList {
-        grid-area: AdminsList;
+    &-admins {
+        grid-area: admins;
     }
 
-    .CroncatManager {
-        grid-area: CroncatManager;
+    &-jobsSettings {
+        grid-area: jobsSettings;
     }
 
-    .TokenWhitelist {
-        grid-area: TokenWhitelist;
-    }
-
-    .JobBond {
-        grid-area: JobBond;
-
-        &-title {
-            @include mixin.center-items(space-between, center);
-            height: 100%;
-        }
+    &-tokensWhitelist {
+        grid-area: tokensWhitelist;
     }
 }

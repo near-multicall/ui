@@ -6,7 +6,7 @@ import { HTMLProps, useState } from "react";
 import { ArgsAccount } from "../../../shared/lib/args";
 import { Multicall } from "../../../shared/lib/contracts/multicall";
 import { toNEAR } from "../../../shared/lib/converter";
-import { Tile } from "../../../shared/ui/components";
+import { Button, Tile } from "../../../shared/ui/components";
 
 import "./config.scss";
 
@@ -63,9 +63,10 @@ const DaoConfigTabComponent = ({ className, contracts: { multicall } }: DaoConfi
     if (!editMode) {
         return (
             <div className={clsx(_DaoConfigTab, className)}>
-                <Tile className="AdminsList">
-                    <h1 className="title">Admins</h1>
-
+                <Tile
+                    className={`${_DaoConfigTab}-admins`}
+                    heading="Admins"
+                >
                     <ul className="list">
                         {multicall.admins.map((admin) => (
                             <li key={admin}>
@@ -75,9 +76,10 @@ const DaoConfigTabComponent = ({ className, contracts: { multicall } }: DaoConfi
                     </ul>
                 </Tile>
 
-                <Tile className="TokenWhitelist">
-                    <h1 className="title">Whitelisted Tokens</h1>
-
+                <Tile
+                    className={`${_DaoConfigTab}-tokensWhitelist`}
+                    heading="Tokens whitelist"
+                >
                     <ul className="list">
                         {multicall.tokensWhitelist.map((token) => (
                             <li key={token}>
@@ -87,30 +89,27 @@ const DaoConfigTabComponent = ({ className, contracts: { multicall } }: DaoConfi
                     </ul>
                 </Tile>
 
-                <Tile className="JobBond">
-                    <h1 className="JobBond-title title">
-                        Job Bond
-                        <span>{`${multicall.jobBond !== "" ? toNEAR(multicall.jobBond) : "..."} Ⓝ`}</span>
-                    </h1>
+                <Tile
+                    className={`${_DaoConfigTab}-jobsSettings`}
+                    heading="Jobs settings"
+                >
+                    <h2 className="CroncatMng-heading heading">Croncat Manager</h2>
+                    <Link address={multicall.croncatManager} />
+
+                    <h2 className="JobBond-heading heading">Job Bond</h2>
+                    <span>{`${multicall.jobBond !== "" ? toNEAR(multicall.jobBond) : "..."} Ⓝ`}</span>
                 </Tile>
 
-                <Tile className="CroncatManager">
-                    <h1 className="CroncatMng-title title">Croncat Manager</h1>
-                    <ul className="list">
-                        <li>
-                            <Link address={multicall.croncatManager} />
-                        </li>
-                    </ul>
-                </Tile>
-
-                <div className={`${_DaoConfigTab}-actions`}>
-                    <button
+                <Tile
+                    className={`${_DaoConfigTab}-proposalForm`}
+                    heading={editMode ? "Changes proposal" : null}
+                >
+                    <Button
                         className={`${_DaoConfigTab}-action`}
+                        label="Propose changes"
                         onClick={() => setEditMode(true)}
-                    >
-                        Edit
-                    </button>
-                </div>
+                    />
+                </Tile>
             </div>
         );
     } else {
@@ -124,7 +123,7 @@ const DaoConfigTabComponent = ({ className, contracts: { multicall } }: DaoConfi
                         <AddOutlined />
                     </IconButton>
 
-                    <h1 className="title">Admins</h1>
+                    <h1 className="heading">Admins</h1>
 
                     <ul className="list">
                         {addAdmins.map((admin) => (
@@ -142,7 +141,7 @@ const DaoConfigTabComponent = ({ className, contracts: { multicall } }: DaoConfi
                     </ul>
                 </Tile>
 
-                <Tile className="TokenWhitelist">
+                <Tile className="tokensWhitelist">
                     <IconButton
                         edge="start"
                         onClick={() => setAddToken(true)}
@@ -150,7 +149,7 @@ const DaoConfigTabComponent = ({ className, contracts: { multicall } }: DaoConfi
                         <AddOutlined />
                     </IconButton>
 
-                    <h1 className="title">Whitelisted Tokens</h1>
+                    <h1 className="heading">Whitelisted Tokens</h1>
 
                     <ul className="list">
                         {addTokens.map((token) => (
@@ -169,7 +168,7 @@ const DaoConfigTabComponent = ({ className, contracts: { multicall } }: DaoConfi
                 </Tile>
 
                 <Tile className="JobBond">
-                    <h1 className="JobBond-title title">
+                    <h1 className="JobBond-heading heading">
                         Job Bond
                         <span>
                             <TextField
@@ -189,7 +188,7 @@ const DaoConfigTabComponent = ({ className, contracts: { multicall } }: DaoConfi
                         <EditOutlined />
                     </IconButton>
 
-                    <h1 className="CroncatMng-title title">Croncat Manager</h1>
+                    <h1 className="CroncatMng-heading heading">Croncat Manager</h1>
 
                     <ul className="list">
                         <li>
@@ -225,6 +224,6 @@ const DaoConfigTabComponent = ({ className, contracts: { multicall } }: DaoConfi
 export const DaoConfigTab = {
     connect: (props: DaoConfigTabComponentProps) => ({
         content: <DaoConfigTabComponent {...props} />,
-        title: "Config",
+        name: "Config",
     }),
 };
