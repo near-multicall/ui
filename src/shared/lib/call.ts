@@ -1,10 +1,10 @@
 import { Base64 } from "js-base64";
 
-export type Call = {
+export type Call<TArgs = object> = {
     address: string;
     actions: Array<{
         func: string;
-        args: object;
+        args: TArgs;
         gas: string;
         depo: string;
     }>;

@@ -4,11 +4,12 @@ import { ValidateOptions } from "yup/lib/types";
 // default error messages go here
 const locale = {
     big: {
+        invalid: "invalid value",
         min: "value must be at least ${min}",
         max: "value must be at most ${max}",
         format: "failed to format value",
         parse: "failed to parse value",
-        maxDecimalPlaces: "value must not have more than ${decimals} decimal places",
+        maxDecimalPlaces: "value has too many decimal places",
     },
     string: {
         json: "value must be a valid json string",
@@ -22,14 +23,14 @@ const locale = {
 
 // Type definitions
 
-type retainOptions = {
-    initial?: boolean;
-    dummy?: boolean;
-    customMessage?: string;
-    customValue?: any;
+type RetainOptions = {
+    initial: boolean;
+    dummy: boolean;
+    customMessage: string;
+    customValue: any;
 };
 
-type retainedData = {
+type RetainedData = {
     error: ValidationError | null;
     errors: ValidationError[];
     isBad: boolean;
@@ -45,7 +46,7 @@ type retainedData = {
 };
 
 interface ErrorMethods {
-    retain(options?: retainOptions): this;
+    retain(options?: Partial<RetainOptions>): this;
     checkSync(value: any, validateOptions?: ValidateOptions): void;
     check(value: any, validateOptions?: ValidateOptions): Promise<void>;
     isBad(isBad?: boolean): boolean | null;
@@ -54,19 +55,19 @@ interface ErrorMethods {
     message(): string;
     messages(): string[];
     lastValue(): any;
-    combine(errors: this[], options?: retainOptions): this;
+    combine(errors: this[], options?: Partial<RetainOptions>): this;
 }
 
 /**
  * store information on last evaluation in meta data
- * @param {retainOptions} options
+ * @param {RetainOptions} options
  * @returns
  */
-function retain(this: any, options?: retainOptions) {
+function retain(this: any, options?: Partial<RetainOptions>) {
     return this.meta({
         retained:
             this.spec.meta?.retained ??
-            <retainedData>{
+            <RetainedData>{
                 error: null,
                 errors: [],
                 isBad: false,
@@ -94,7 +95,7 @@ function _checkSync(this: any, value: any, validateOptions?: ValidateOptions): v
     if (this.type === "object" && !this.spec.meta?.retained?.ignoreAll) {
         const ret = this.spec.meta?.retained;
         const fields = Object.entries(this.fields).filter(([k, v]) => !ret?.ignoreFields?.includes(k));
-        fields.forEach(([k, v]) => (v as any).checkSync(value[k], validateOptions));
+        fields.forEach(([k, v]) => (v as any)._checkSync(value[k], validateOptions));
         const errors = fields.map(([k, v]) => (v as any).errors()).flat();
         const messages = fields
             .map(([k, v]) => (v as any).messages())
@@ -264,7 +265,7 @@ function lastValue(this: any): any {
  * @param options
  * @returns
  */
-function combine(this: any, errors: any[], options?: retainOptions) {
+function combine(this: any, errors: any[], options?: Partial<RetainOptions>) {
     return this.retain(options).meta({
         retained: {
             error: errors[0].error(),
@@ -304,4 +305,4 @@ function addErrorMethods(schema: any): void {
 }
 
 export { addMethods, addErrorMethods, locale };
-export type { retainOptions, retainedData, ErrorMethods };
+export type { RetainOptions, RetainedData, ErrorMethods };

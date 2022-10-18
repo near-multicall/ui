@@ -9,15 +9,22 @@ declare module "yup" {
 class BigSchema extends MixedSchema<Big> {
     constructor() {
         super({ type: "big" });
-        this.withMutation(() =>
-            this.transform(function (value) {
+        this.withMutation(() => {
+            let failed = false;
+            const message = locale.big.invalid;
+            return this.transform((value) => {
                 try {
                     return Big(value.toString());
                 } catch (e) {
-                    return value;
+                    failed = true;
+                    return null;
                 }
-            })
-        );
+            }).test({
+                name: "invalid",
+                message,
+                test: (value) => !(failed && value == null),
+            });
+        });
     }
 
     // override default yup method (disallow for empty string)
@@ -36,7 +43,7 @@ class BigSchema extends MixedSchema<Big> {
             name: "min",
             params: { min },
             message,
-            test: (value) => value == null || value.gte(min),
+            test: (value) => value == null || Big(value).gte(min),
         });
     }
 
@@ -51,7 +58,7 @@ class BigSchema extends MixedSchema<Big> {
             name: "max",
             params: { max },
             message,
-            test: (value) => value == null || value.lte(max),
+            test: (value) => value == null || Big(value).lte(max),
         });
     }
 

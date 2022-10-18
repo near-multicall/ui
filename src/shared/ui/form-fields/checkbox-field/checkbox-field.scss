@@ -1,0 +1,55 @@
+@use "sass/color";
+@use "sass/size";
+@use "sass/font";
+@use "sass/mixin";
+
+.CheckboxField {
+    @include mixin.center-items(flex-start);
+    flex-flow: row wrap;
+    width: 100%;
+
+    box-shadow: inset 0px 0px 30px 0px rgba(color.$white, 0.1);
+    border-radius: 0.25 * size.$task-radius;
+
+    // match Mui values
+    margin-top: 8px;
+    margin-bottom: 4px;
+
+    &-checkbox {
+        color: color.$light;
+        &.Mui-checked {
+            color: color.$green !important;
+        }
+        .MuiSvgIcon-root {
+            font-size: size.$text;
+        }
+    }
+
+    &-label > span {
+        color: color.$white;
+        font-family: font.$text;
+        font-size: size.$small-text !important;
+        line-height: size.$text !important;
+        padding-top: 8.5px;
+        padding-bottom: 8.5px;
+    }
+
+    &-formGroup {
+        width: 100%;
+        margin-left: 14px;
+    }
+
+    &.roundtop fieldset {
+        border-top-left-radius: 0.75 * size.$task-radius !important;
+        border-top-right-radius: 0.75 * size.$task-radius !important;
+    }
+    &.roundbottom fieldset {
+        border-bottom-left-radius: 0.75 * size.$task-radius !important;
+        border-bottom-right-radius: 0.75 * size.$task-radius !important;
+    }
+
+    &:hover,
+    &:focus {
+        border-color: color.$white;
+    }
+}

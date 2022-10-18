@@ -1,26 +1,28 @@
 import { addMethod, AnySchema, array, BaseSchema, object, ObjectSchema as _ObjectSchema, reach } from "yup";
-import { StringSchema } from "./args-string";
-import { BigSchema } from "./args-big";
-import { Base64 } from "js-base64";
-import { addErrorMethods, ErrorMethods } from "../args-error";
+import { addErrorMethods, ErrorMethods, RetainOptions } from "../args-error";
 
 declare module "yup" {
     interface ObjectSchema<TShape, TContext, TIn, TOut> extends BaseSchema<TIn, TContext, TOut>, ErrorMethods {
-        requireAll(): this;
-        retainAll(): this;
+        requireAll(options?: Partial<ApplyToAllOptions>): this;
+        retainAll(options?: Partial<ApplyToAllOptions>, retainOptions?: Partial<RetainOptions>): this;
     }
+}
+
+interface ApplyToAllOptions {
+    ignore: string[];
 }
 
 /**
  * call .require() on all children
  */
-addMethod(_ObjectSchema, "requireAll", function requireAll() {
-    Object.entries(this.fields).forEach(
-        ([key, field]) =>
-            (this.fields[key] =
-                (field as AnySchema).type === "object"
-                    ? (this.fields[key] as any).requireAll()
-                    : (this.fields[key] as AnySchema).required())
+addMethod(_ObjectSchema, "requireAll", function requireAll(options?: Partial<ApplyToAllOptions>) {
+    Object.entries(this.fields).forEach(([key, field]) =>
+        !options?.ignore?.includes(key)
+            ? (this.fields[key] =
+                  (field as AnySchema).type === "object"
+                      ? (this.fields[key] as any).requireAll()
+                      : (this.fields[key] as AnySchema).required())
+            : void 0
     );
     return this.required();
 });
@@ -28,16 +30,21 @@ addMethod(_ObjectSchema, "requireAll", function requireAll() {
 /**
  * call .retain() on all children
  */
-addMethod(_ObjectSchema, "retainAll", function retainAll() {
-    Object.entries(this.fields).forEach(
-        ([key, field]) =>
-            (this.fields[key] =
-                (field as AnySchema).type === "object"
-                    ? (this.fields[key] as any).retainAll()
-                    : (this.fields[key] as any).retain())
-    );
-    return this.retain();
-});
+addMethod(
+    _ObjectSchema,
+    "retainAll",
+    function retainAll(options?: Partial<ApplyToAllOptions>, retainOptions?: Partial<RetainOptions>) {
+        Object.entries(this.fields).forEach(([key, field]) =>
+            !options?.ignore?.includes(key)
+                ? (this.fields[key] =
+                      (field as AnySchema).type === "object"
+                          ? (this.fields[key] as any).retainAll()
+                          : (this.fields[key] as any).retain(retainOptions))
+                : void 0
+        );
+        return this.retain();
+    }
+);
 
 addErrorMethods(_ObjectSchema);
 

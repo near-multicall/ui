@@ -18,7 +18,6 @@ export class Editor extends Component {
     }
 
     edit(taskID) {
-        console.log(taskID, "asking for token");
         this.setState({ editingID: taskID });
         window.TASKS.forEach((t) => t.instance.current.onEditFocus(taskID));
     }
@@ -36,9 +35,9 @@ export class Editor extends Component {
             >
                 <>
                     <editing.Editor />
-                    <h1>
+                    {/* <h1>
                         {editing.state.formData.name}, {editingID}
-                    </h1>
+                    </h1> */}
                 </>
             </Formik>
         ) : (

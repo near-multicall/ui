@@ -1,22 +1,16 @@
-import { Form, Formik, useFormikContext } from "formik";
+import { DeleteOutline, EditOutlined, MoveDown } from "@mui/icons-material";
+import clsx from "clsx";
+import { Form, useFormikContext } from "formik";
 import { useEffect } from "react";
 import { args as arx } from "../shared/lib/args/args";
-import { fields } from "../shared/lib/args/args-types/args-object";
 import { Call, CallError } from "../shared/lib/call";
-import { unit } from "../shared/lib/converter";
+import { Tooltip } from "../shared/ui/components";
 import { TextField, UnitField } from "../shared/ui/form-fields";
-import { BaseTask, BaseTaskProps } from "./base";
+import { BaseTask, BaseTaskProps, DefaultFormData, DisplayData } from "./base";
 import "./custom.scss";
 
-type FormData = {
-    name: string;
-    addr: string;
-    func: string;
+type FormData = DefaultFormData & {
     args: string;
-    gas: string;
-    gasUnit: number | unit;
-    depo: string;
-    depoUnit: number | unit;
 };
 
 export class CustomTask extends BaseTask<FormData> {
@@ -42,11 +36,11 @@ export class CustomTask extends BaseTask<FormData> {
         name: "Custom",
         addr: "",
         func: "",
-        args: "{}",
         gas: "0",
         gasUnit: "Tgas",
         depo: "0",
         depoUnit: "NEAR",
+        args: "{}",
     };
 
     constructor(props: BaseTaskProps) {
@@ -59,9 +53,9 @@ export class CustomTask extends BaseTask<FormData> {
             const fromCall = {
                 addr: call.address,
                 func: call.actions[0].func,
-                args: JSON.stringify(call.actions[0].args),
                 gas: arx.big().intoFormatted(this.initialValues.gasUnit).cast(call.actions[0].gas).toFixed(),
                 depo: arx.big().intoFormatted(this.initialValues.depoUnit).cast(call.actions[0].depo).toFixed(),
+                args: JSON.stringify(call.actions[0].args),
             };
 
             this.initialValues = Object.keys(this.initialValues).reduce((acc, k) => {
@@ -144,4 +138,18 @@ export class CustomTask extends BaseTask<FormData> {
             </Form>
         );
     };
+
+    protected override getDisplayData(): DisplayData {
+        const { name, addr, func, gas, gasUnit, depo, depoUnit, args } = this.state.formData;
+        return {
+            name,
+            addr,
+            func,
+            gas,
+            gasUnit: gasUnit.toString(),
+            depo,
+            depoUnit: depoUnit.toString(),
+            args: arx.string().json().isValidSync(args) ? JSON.stringify(JSON.parse(args), null, "  ") : args,
+        };
+    }
 }

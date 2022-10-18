@@ -5,21 +5,26 @@ import debounce from "lodash.debounce";
 
 import { args as arx } from "../shared/lib/args/args";
 import { fields, ObjectSchema } from "../shared/lib/args/args-types/args-object";
-import { Call } from "../shared/lib/call";
+import { Call, CallError } from "../shared/lib/call";
 import { unit } from "../shared/lib/converter";
 import { Tooltip } from "../shared/ui/components";
 import "./base.scss";
 import { FormikErrors } from "formik";
 
-export interface DefaultFormData<TArgs extends string | object> {
+export interface DefaultFormData {
     name: string;
     addr: string;
     func: string;
-    args: TArgs;
     gas: string;
     gasUnit: number | unit;
     depo: string;
     depoUnit: number | unit;
+}
+
+export interface DisplayData extends Omit<DefaultFormData, "gasUnit" | "depoUnit"> {
+    gasUnit: string;
+    depoUnit: string;
+    args: string;
 }
 
 export interface BaseTaskProps {
@@ -34,7 +39,7 @@ export interface BaseTaskState<TFormData> {
 }
 
 export abstract class BaseTask<
-    TFormData extends DefaultFormData<string | object>,
+    TFormData extends DefaultFormData,
     Props extends BaseTaskProps = BaseTaskProps,
     State extends BaseTaskState<TFormData> = BaseTaskState<TFormData>
 > extends Component<Props, State> {
@@ -99,7 +104,7 @@ export abstract class BaseTask<
         return false;
     }
 
-    protected setFormData(newFormData: TFormData, callback?: () => void) {
+    protected setFormData(newFormData: Partial<TFormData>, callback?: () => void) {
         this.setState(
             {
                 formData: {
@@ -141,10 +146,30 @@ export abstract class BaseTask<
 
     public abstract Editor: () => React.ReactNode;
 
-    render() {
-        const { showArgs, isEdited, formData } = this.state;
+    protected getDisplayData(): DisplayData {
+        const { name, addr, func, gas, gasUnit, depo, depoUnit } = this.state.formData;
+        let args = "";
+        try {
+            args = JSON.stringify(this.toCall().actions[0].args, null, " ");
+        } catch (e) {
+            if (e instanceof CallError) args = `Error: ${e.message}`;
+        }
+        return {
+            name,
+            addr,
+            func,
+            gas,
+            gasUnit: gasUnit.toString(),
+            depo,
+            depoUnit: depoUnit.toString(),
+            args,
+        };
+    }
 
-        const { name, addr, func, args, gas, gasUnit, depo, depoUnit } = formData;
+    render() {
+        const { showArgs, isEdited } = this.state;
+
+        const { name, addr, func, gas, gasUnit, depo, depoUnit, args } = this.getDisplayData();
 
         const hasErrors = this.schema.isBad();
 
@@ -222,15 +247,7 @@ export abstract class BaseTask<
                             <a onClick={() => this.setState({ showArgs: true })}>show</a>
                         )}
                     </p>
-                    {showArgs && (
-                        <pre className="code">
-                            {typeof args === "string"
-                                ? arx.string().json().isValidSync(args)
-                                    ? JSON.stringify(JSON.parse(args), null, "  ")
-                                    : args
-                                : JSON.stringify(args, null, " ")}
-                        </pre>
-                    )}
+                    {showArgs && <pre className="code">{args}</pre>}
                     <p>
                         <span>Allocated gas</span>
                         <span className="code">

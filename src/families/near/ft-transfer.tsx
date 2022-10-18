@@ -1,21 +1,21 @@
 import { InputAdornment } from "@mui/material";
+import { Form, useFormikContext } from "formik";
+import { useEffect } from "react";
 import { args as arx } from "../../shared/lib/args/args";
+import { fields } from "../../shared/lib/args/args-types/args-object";
+import { Call } from "../../shared/lib/call";
 import { toGas } from "../../shared/lib/converter";
 import { FungibleToken } from "../../shared/lib/standards/fungibleToken";
-import { fields } from "../../shared/lib/args/args-types/args-object";
-import { Formik, Form, useFormikContext } from "formik";
 import { TextField, UnitField } from "../../shared/ui/form-fields";
-import { BaseTask, BaseTaskProps, BaseTaskState } from "../base";
 import type { DefaultFormData } from "../base";
+import { BaseTask, BaseTaskProps, BaseTaskState } from "../base";
 import "./near.scss";
-import { Call } from "../../shared/lib/call";
-import { useEffect } from "react";
 
-type FormData = DefaultFormData<{
+type FormData = DefaultFormData & {
     receiverId: string;
     amount: string;
     memo: string;
-}>;
+};
 
 type Props = BaseTaskProps;
 
@@ -29,33 +29,29 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
         .object()
         .shape({
             addr: arx.string().tokenContract(),
-            args: arx.object().shape({
-                receiverId: arx.string().address(),
-                amount: arx.big().min("0", "amount must be at least ${min}"),
-                memo: arx.string().optional(),
-            }),
-            gas: arx.big().min(toGas("1")).max(toGas("250")),
+            gas: arx.big().gas().min(toGas("1")).max(toGas("250")),
+            receiverId: arx.string().address(),
+            amount: arx.big().token().min(0, "amount must be at least ${min}"),
+            memo: arx.string().optional(),
         })
         .transform(({ gas, gasUnit, ...rest }) => ({
             ...rest,
             gas: arx.big().intoParsed(gasUnit).cast(gas),
         }))
-        .requireAll()
+        .requireAll({ ignore: ["memo"] })
         .retainAll();
 
     override initialValues: FormData = {
         name: "FT Transfer",
         addr: window.nearConfig.WNEAR_ADDRESS,
         func: "ft_transfer",
-        args: {
-            receiverId: "",
-            amount: "0",
-            memo: "",
-        },
         gas: "10",
         gasUnit: "Tgas",
         depo: "1",
         depoUnit: "yocto",
+        receiverId: "",
+        amount: "0",
+        memo: "",
     };
 
     constructor(props: Props) {
@@ -70,14 +66,21 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
         this.tryUpdateFt().catch(() => {});
     }
 
-    protected override init(call: Call | null): void {
+    protected override init(
+        call: Call<{
+            receiver_id: string;
+            amount: string;
+            memo: string;
+        }> | null
+    ): void {
         if (call !== null) {
             const fromCall = {
                 addr: call.address,
                 func: call.actions[0].func,
-                args: call.actions[0].args as FormData["args"],
                 gas: arx.big().intoFormatted(this.initialValues.gasUnit).cast(call.actions[0].gas).toFixed(),
-                depo: "1",
+                receiverId: call.actions[0].args.receiver_id,
+                amount: call.actions[0].args.amount,
+                memo: call.actions[0].args.memo,
             };
             this.initialValues = Object.keys(this.initialValues).reduce((acc, k) => {
                 const v = fromCall[k as keyof typeof fromCall];
@@ -87,8 +90,6 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
 
         this.state = { ...this.state, formData: this.initialValues };
         this.schema.check(this.state.formData);
-
-        console.log(this.state);
     }
 
     static override inferOwnType(json: Call): boolean {
@@ -96,8 +97,7 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
     }
 
     public override toCall(): Call {
-        const { addr, args, gas, gasUnit } = this.state.formData;
-        const { receiverId, amount, memo } = args;
+        const { addr, gas, gasUnit, receiverId, amount, memo } = this.state.formData;
         const { token } = this.state;
 
         return {
