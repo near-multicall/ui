@@ -10,8 +10,8 @@ export interface TileProps extends PropsWithChildren, HTMLAttributes<HTMLDivElem
 }
 
 export const Tile = ({ children, className, title }: TileProps) => (
-    <div className={clsx(_Tile, className)}>
+    <div className={_Tile}>
         {title && <h1 className={`${_Tile}-title`}>{title}</h1>}
-        <div className={`${_Tile}-content`}>{children}</div>
+        <div className={clsx(`${_Tile}-content`, className)}>{children}</div>
     </div>
 );
