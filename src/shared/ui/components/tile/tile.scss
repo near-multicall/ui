@@ -5,13 +5,13 @@
     display: flex;
     flex-flow: column nowrap;
     position: relative;
-    padding: calc(0.25 * size.$gap);
     border-radius: size.$task-radius;
+    padding: size.$gap;
     background-color: color.$lightest;
     font-size: size.$small-text;
 
     &-heading {
-        padding: 0.5 * size.$gap size.$gap;
+        padding-bottom: calc(size.$gap * 1);
         font-size: size.$large-text;
 
         span {
@@ -20,7 +20,7 @@
     }
 
     &-content {
-        width: 100%;
+        width: auto;
         height: 100%;
     }
 
