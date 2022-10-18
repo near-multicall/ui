@@ -402,7 +402,7 @@ export class AppPage extends Component {
         STORAGE.setLayout(newLayout);
     }
 
-    toJSON() {
+    toJSON(omitOnError = false) {
         const layout = STORAGE.layout;
         let output = [];
 
@@ -411,15 +411,22 @@ export class AppPage extends Component {
             output.push([]);
             for (let t of layout.columns[c].taskIds) {
                 const task = TASKS.find((task) => task.id === t);
-                if (task) output[output.length - 1].push(task.instance.current.toCall());
-                else console.warn(`no task with id ${t}`);
+                if (task) {
+                    if (omitOnError) {
+                        try {
+                            output[output.length - 1].push(task.instance.current.toCall());
+                        } catch (e) {
+                            continue;
+                        }
+                    } else output[output.length - 1].push(task.instance.current.toCall());
+                } else console.warn(`no task with id ${t}`);
             }
         }
 
         return output;
     }
 
-    toBase64() {
+    toBase64(omitOnError = false) {
         const layout = STORAGE.layout;
         let output = [];
 
@@ -428,8 +435,15 @@ export class AppPage extends Component {
             output.push([]);
             for (let t of layout.columns[c].taskIds) {
                 const task = TASKS.find((task) => task.id === t);
-                if (task) output[output.length - 1].push(fromCall.toBase64(task.instance.current.toCall()));
-                else console.warn(`no task with id ${t}`);
+                if (task) {
+                    if (omitOnError) {
+                        try {
+                            output[output.length - 1].push(fromCall.toBase64(task.instance.current.toCall()));
+                        } catch (e) {
+                            continue;
+                        }
+                    } else output[output.length - 1].push(fromCall.toBase64(task.instance.current.toCall()));
+                } else console.warn(`no task with id ${t}`);
             }
         }
 
