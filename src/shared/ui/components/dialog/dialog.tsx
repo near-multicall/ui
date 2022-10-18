@@ -7,6 +7,8 @@ import {
 import { clsx } from "clsx";
 import { PropsWithChildren } from "react";
 
+import { Button } from "../button";
+
 import "./dialog.scss";
 
 interface DialogProps extends PropsWithChildren {
@@ -45,28 +47,26 @@ export const Dialog = ({
         <MUIDialogContent className={`${_Dialog}-content`}>{children}</MUIDialogContent>
 
         <MUIDialogActions className={`${_Dialog}-actions`}>
-            {!noCancel ? (
-                <button
-                    className={clsx(`${_Dialog}-action`, `${_Dialog}-action--cancel`)}
-                    onClick={() => {
-                        onCancel?.();
-                        onClose?.();
-                    }}
-                >
-                    {cancelRename ?? "Cancel"}
-                </button>
-            ) : null}
+            <Button
+                color="error"
+                disabled={noCancel}
+                label={cancelRename ?? "Cancel"}
+                noRender={noCancel}
+                onClick={() => {
+                    onCancel?.();
+                    onClose?.();
+                }}
+            />
 
-            <button
-                className={clsx(`${_Dialog}-action`, `${_Dialog}-action--done`, { disabled: noSubmit })}
+            <Button
+                color="success"
                 disabled={noSubmit}
+                label={doneRename ?? "Done"}
                 onClick={() => {
                     onSubmit?.();
                     onClose?.();
                 }}
-            >
-                {doneRename ?? "Done"}
-            </button>
+            />
         </MUIDialogActions>
     </MUIDialog>
 );

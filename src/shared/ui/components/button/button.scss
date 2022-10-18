@@ -1,0 +1,26 @@
+@use "sass/color";
+@use "sass/size";
+
+.Button {
+    border-radius: size.$task-radius;
+    padding: 0.25 * size.$gap size.$gap;
+    font-size: size.$text;
+    background-color: color.$dark;
+
+    &:disabled {
+        background-color: color.$darkish;
+        cursor: not-allowed;
+    }
+
+    &--success {
+        background-color: color.$green;
+    }
+
+    &--error {
+        background-color: color.$red;
+    }
+
+    &-label {
+        text-transform: uppercase;
+    }
+}
