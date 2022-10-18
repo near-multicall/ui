@@ -5,7 +5,7 @@
     border-radius: size.$task-radius;
     padding: 0.25 * size.$gap size.$gap;
     font-size: size.$text;
-    background-color: color.$dark;
+    background-color: color.$light;
 
     &:disabled {
         background-color: color.$darkish;

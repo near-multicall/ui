@@ -39,11 +39,11 @@
 
         &.is-active,
         &.is-active:hover {
-            background-color: color.$white;
+            background-color: color.$lightest;
         }
 
         &:hover {
-            background-color: rgba(color.$white, 0.1);
+            background-color: rgba(color.$lightest, 0.1);
         }
     }
 }
