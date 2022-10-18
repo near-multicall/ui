@@ -4,7 +4,7 @@ import { ButtonHTMLAttributes } from "react";
 import "./button.scss";
 
 interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children"> {
-    color: "default" | "success" | "error";
+    color?: "default" | "success" | "error";
     label: string;
     noRender?: boolean;
 }
