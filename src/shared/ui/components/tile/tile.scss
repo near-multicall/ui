@@ -19,6 +19,11 @@
         }
     }
 
+    &-content {
+        width: 100%;
+        height: 100%;
+    }
+
     @for $i from 0 to 3 {
         .MuiSvgIcon-root:nth-of-type(#{$i + 1}) {
             position: absolute;
