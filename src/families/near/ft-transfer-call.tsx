@@ -1,20 +1,22 @@
+import { DeleteOutline, EditOutlined, MoveDown } from "@mui/icons-material";
 import { InputAdornment } from "@mui/material";
+import clsx from "clsx";
 import { Form, useFormikContext } from "formik";
 import { useEffect } from "react";
 import { args as arx } from "../../shared/lib/args/args";
 import { fields } from "../../shared/lib/args/args-types/args-object";
 import { Call, CallError } from "../../shared/lib/call";
-import { toGas } from "../../shared/lib/converter";
 import { FungibleToken } from "../../shared/lib/standards/fungibleToken";
+import { Tooltip } from "../../shared/ui/components";
 import { TextField, UnitField } from "../../shared/ui/form-fields";
-import type { DefaultFormData } from "../base";
-import { BaseTask, BaseTaskProps, BaseTaskState } from "../base";
+import { BaseTask, BaseTaskProps, BaseTaskState, DefaultFormData, DisplayData } from "../base";
 import "./near.scss";
 
 type FormData = DefaultFormData & {
     receiverId: string;
     amount: string;
-    memo: string;
+    memo: string | null;
+    msg: string;
 };
 
 type Props = BaseTaskProps;
@@ -23,41 +25,42 @@ type State = BaseTaskState<FormData> & {
     token: FungibleToken;
 };
 
-export class FtTransfer extends BaseTask<FormData, Props, State> {
-    override uniqueClassName = "near-ft-transfer-task";
+export class FtTransferCall extends BaseTask<FormData, Props, State> {
+    override uniqueClassName = "near-ft-transfer-call-task";
     override schema = arx
         .object()
         .shape({
-            addr: arx.string().tokenContract(),
-            gas: arx.big().gas().min(toGas("1")).max(toGas("250")),
+            addr: arx.string().contract(),
+            gas: arx.big().gas(),
             receiverId: arx.string().address(),
-            amount: arx.big().token().min(0, "amount must be at least ${min}"),
+            amount: arx.big().token(),
             memo: arx.string().optional(),
+            msg: arx.string().optional(),
         })
-        .transform(({ gas, gasUnit, ...rest }) => ({
+        .transform(({ gas, gasUnit, depo, depoUnit, ...rest }) => ({
             ...rest,
             gas: arx.big().intoParsed(gasUnit).cast(gas),
         }))
-        .requireAll({ ignore: ["memo"] })
+        .requireAll({ ignore: ["memo", "msg"] })
         .retainAll();
 
     override initialValues: FormData = {
-        name: "FT Transfer",
-        addr: window.nearConfig.WNEAR_ADDRESS,
-        func: "ft_transfer",
-        gas: "10",
+        name: "FT Transfer Call",
+        addr: "",
+        func: "ft_transfer_call",
+        gas: "150",
         gasUnit: "Tgas",
         depo: "1",
         depoUnit: "yocto",
         receiverId: "",
-        amount: "0",
+        amount: "",
         memo: "",
+        msg: "",
     };
 
     constructor(props: Props) {
         super(props);
         this._constructor();
-
         this.state = {
             ...this.state,
             token: new FungibleToken(this.initialValues.addr),
@@ -71,6 +74,7 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
             receiver_id: string;
             amount: string;
             memo: string;
+            msg: string;
         }> | null
     ): void {
         if (call !== null) {
@@ -78,10 +82,13 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
                 addr: call.address,
                 func: call.actions[0].func,
                 gas: arx.big().intoFormatted(this.initialValues.gasUnit).cast(call.actions[0].gas).toFixed(),
+                depo: arx.big().intoFormatted(this.initialValues.depoUnit).cast(call.actions[0].depo).toFixed(),
                 receiverId: call.actions[0].args.receiver_id,
                 amount: call.actions[0].args.amount,
                 memo: call.actions[0].args.memo,
+                msg: call.actions[0].args.msg,
             };
+
             this.initialValues = Object.keys(this.initialValues).reduce((acc, k) => {
                 const v = fromCall[k as keyof typeof fromCall];
                 return v !== null && v !== undefined ? { ...acc, [k as keyof FormData]: v } : acc;
@@ -93,28 +100,37 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
     }
 
     static override inferOwnType(json: Call): boolean {
-        return !!json && arx.string().address().isValidSync(json.address) && json.actions[0].func === "ft_transfer";
+        return (
+            !!json && arx.string().address().isValidSync(json.address) && json.actions[0].func === "ft_transfer_call"
+        );
     }
 
     public override toCall(): Call {
-        const { addr, func, depo, gas, gasUnit, receiverId, amount, memo } = this.state.formData;
+        const { addr, func, receiverId, memo, msg, amount, gas, gasUnit, depo, depoUnit } = this.state.formData;
         const { token } = this.state;
 
         if (!arx.big().isValidSync(gas)) throw new CallError("Failed to parse gas input value", this.props.id);
-        if (!arx.big().isValidSync(amount)) throw new CallError("Failed to parse amount input value", this.props.id);
-
+        if (!arx.big().isValidSync(depo)) throw new CallError("Failed to parse deposit input value", this.props.id);
         return {
             address: addr,
             actions: [
                 {
                     func,
-                    args: {
-                        receiver_id: receiverId,
-                        amount: arx.big().intoParsed(token.metadata.decimals).cast(amount).toFixed(),
-                        memo,
-                    },
+                    args:
+                        memo !== null
+                            ? {
+                                  receiver_id: receiverId,
+                                  amount: arx.big().intoParsed(token.metadata.decimals).cast(amount).toFixed(),
+                                  msg,
+                              }
+                            : {
+                                  receiver_id: receiverId,
+                                  amount: arx.big().intoParsed(token.metadata.decimals).cast(amount).toFixed(),
+                                  memo,
+                                  msg,
+                              },
                     gas: arx.big().intoParsed(gasUnit).cast(gas).toFixed(),
-                    depo,
+                    depo: arx.big().intoParsed(depoUnit).cast(depo).toFixed(),
                 },
             ],
         };
@@ -183,6 +199,12 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
                 <TextField
                     name="memo"
                     label="Memo"
+                    multiline
+                />
+                <TextField
+                    name="msg"
+                    label="Message"
+                    multiline
                 />
                 <UnitField
                     name="gas"
