@@ -34,6 +34,8 @@ class MultiFungibleToken {
 
     // used to create and initialize a FungibleToken instance
     static async init(tokenAddress: string, tokenId: string): Promise<MultiFungibleToken> {
+        console.log(tokenAddress, tokenId);
+
         // fetch token info and mark it ready
         const newToken = new MultiFungibleToken(tokenAddress, tokenId);
         const [metadata] = await Promise.all([

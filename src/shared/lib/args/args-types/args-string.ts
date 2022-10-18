@@ -125,7 +125,7 @@ addMethod(_StringSchema, "ft", function ft(message = locale.string.ft) {
 
 // ensure string is a valid NEAR address with a token contract
 addMethod(_StringSchema, "mft", function mft(tokenAddress: Reference<string>, message = locale.string.mft) {
-    return this.address().test({
+    return this.test({
         name: "mft",
         message,
         test: async (value) => {

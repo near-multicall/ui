@@ -7,13 +7,14 @@ import { ref } from "yup";
 import { args as arx } from "../../shared/lib/args/args";
 import { fields } from "../../shared/lib/args/args-types/args-object";
 import { Call, CallError } from "../../shared/lib/call";
-import { FungibleToken } from "../../shared/lib/standards/fungibleToken";
+import { MultiFungibleToken } from "../../shared/lib/standards/multiFungibleToken";
 import { Tooltip } from "../../shared/ui/components";
 import { TextField, UnitField } from "../../shared/ui/form-fields";
 import { BaseTask, BaseTaskProps, BaseTaskState, DefaultFormData, DisplayData } from "../base";
 import "./near.scss";
 
 type FormData = DefaultFormData & {
+    tokenId: string;
     receiverId: string;
     amount: string;
     memo: string | null;
@@ -23,7 +24,7 @@ type FormData = DefaultFormData & {
 type Props = BaseTaskProps;
 
 type State = BaseTaskState<FormData> & {
-    token: FungibleToken;
+    token: MultiFungibleToken;
 };
 
 export class MftTransferCall extends BaseTask<FormData, Props, State> {
@@ -54,6 +55,7 @@ export class MftTransferCall extends BaseTask<FormData, Props, State> {
         gasUnit: "Tgas",
         depo: "1",
         depoUnit: "yocto",
+        tokenId: "",
         receiverId: "",
         amount: "",
         memo: "",
@@ -65,7 +67,7 @@ export class MftTransferCall extends BaseTask<FormData, Props, State> {
         this._constructor();
         this.state = {
             ...this.state,
-            token: new FungibleToken(this.initialValues.addr),
+            token: new MultiFungibleToken(this.state.formData.addr, this.state.formData.tokenId),
         };
 
         this.tryUpdateFt().catch(() => {});
@@ -73,6 +75,7 @@ export class MftTransferCall extends BaseTask<FormData, Props, State> {
 
     protected override init(
         call: Call<{
+            token_id: string;
             receiver_id: string;
             amount: string;
             memo: string;
@@ -85,6 +88,7 @@ export class MftTransferCall extends BaseTask<FormData, Props, State> {
                 func: call.actions[0].func,
                 gas: arx.big().intoFormatted(this.initialValues.gasUnit).cast(call.actions[0].gas).toFixed(),
                 depo: arx.big().intoFormatted(this.initialValues.depoUnit).cast(call.actions[0].depo).toFixed(),
+                tokenId: call.actions[0].args.token_id,
                 receiverId: call.actions[0].args.receiver_id,
                 amount: call.actions[0].args.amount,
                 memo: call.actions[0].args.memo,
@@ -108,7 +112,8 @@ export class MftTransferCall extends BaseTask<FormData, Props, State> {
     }
 
     public override toCall(): Call {
-        const { addr, func, receiverId, memo, msg, amount, gas, gasUnit, depo, depoUnit } = this.state.formData;
+        const { addr, func, tokenId, receiverId, memo, msg, amount, gas, gasUnit, depo, depoUnit } =
+            this.state.formData;
         const { token } = this.state;
 
         if (!arx.big().isValidSync(gas)) throw new CallError("Failed to parse gas input value", this.props.id);
@@ -121,6 +126,7 @@ export class MftTransferCall extends BaseTask<FormData, Props, State> {
                     args:
                         memo !== null
                             ? {
+                                  token_id: tokenId,
                                   receiver_id: receiverId,
                                   amount: arx.big().intoParsed(token.metadata.decimals).cast(amount).toFixed(),
                                   msg,
@@ -145,7 +151,9 @@ export class MftTransferCall extends BaseTask<FormData, Props, State> {
                 if (!addr.isBad()) {
                     this.confidentlyUpdateFt().then((ready) => (ready ? resolve() : reject()));
                 } else {
-                    this.setState({ token: new FungibleToken(this.state.formData.addr) }); // will be invalid
+                    this.setState({
+                        token: new MultiFungibleToken(this.state.formData.addr, this.state.formData.tokenId),
+                    }); // will be invalid
                     reject();
                 }
             });
@@ -153,8 +161,8 @@ export class MftTransferCall extends BaseTask<FormData, Props, State> {
     }
 
     private async confidentlyUpdateFt(): Promise<boolean> {
-        const { addr } = this.state.formData;
-        const newToken = await FungibleToken.init(addr);
+        const { addr, tokenId } = this.state.formData;
+        const newToken = await MultiFungibleToken.init(addr, tokenId);
         this.setState({ token: newToken });
         window.EDITOR.forceUpdate();
         return newToken.ready;

@@ -5,7 +5,7 @@ import { args as arx } from "../../shared/lib/args/args";
 import { fields } from "../../shared/lib/args/args-types/args-object";
 import { Call, CallError } from "../../shared/lib/call";
 import { toGas } from "../../shared/lib/converter";
-import { FungibleToken } from "../../shared/lib/standards/fungibleToken";
+import { MultiFungibleToken } from "../../shared/lib/standards/multiFungibleToken";
 import { TextField, UnitField } from "../../shared/ui/form-fields";
 import type { DefaultFormData } from "../base";
 import { BaseTask, BaseTaskProps, BaseTaskState } from "../base";
@@ -22,7 +22,7 @@ type FormData = DefaultFormData & {
 type Props = BaseTaskProps;
 
 type State = BaseTaskState<FormData> & {
-    token: FungibleToken;
+    token: MultiFungibleToken;
 };
 
 export class MftTransfer extends BaseTask<FormData, Props, State> {
@@ -32,7 +32,7 @@ export class MftTransfer extends BaseTask<FormData, Props, State> {
         .shape({
             addr: arx.string().contract(),
             gas: arx.big().gas().min(toGas("1")).max(toGas("250")),
-            tokenId: arx.string().mft(ref("addr")),
+            tokenId: arx.string().mft("ref-finance-101.testnet"),
             receiverId: arx.string().address(),
             amount: arx.big().token().min(0, "amount must be at least ${min}"),
             memo: arx.string().optional(),
@@ -64,10 +64,10 @@ export class MftTransfer extends BaseTask<FormData, Props, State> {
 
         this.state = {
             ...this.state,
-            token: new FungibleToken(this.initialValues.addr),
+            token: new MultiFungibleToken(this.state.formData.addr, this.state.formData.tokenId),
         };
 
-        this.tryUpdateFt().catch(() => {});
+        this.tryUpdateMft().catch(() => {});
     }
 
     protected override init(
@@ -115,6 +115,7 @@ export class MftTransfer extends BaseTask<FormData, Props, State> {
                 {
                     func,
                     args: {
+                        token_id: tokenId,
                         receiver_id: receiverId,
                         amount: arx.big().intoParsed(token.metadata.decimals).cast(amount).toFixed(),
                         memo,
@@ -126,23 +127,25 @@ export class MftTransfer extends BaseTask<FormData, Props, State> {
         };
     }
 
-    private tryUpdateFt(): Promise<void> {
+    private tryUpdateMft(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             this.schema.check(this.state.formData).then(() => {
                 const { addr } = fields(this.schema);
                 if (!addr.isBad()) {
-                    this.confidentlyUpdateFt().then((ready) => (ready ? resolve() : reject()));
+                    this.confidentlyUpdateMft().then((ready) => (ready ? resolve() : reject()));
                 } else {
-                    this.setState({ token: new FungibleToken(this.state.formData.addr) }); // will be invalid
+                    this.setState({
+                        token: new MultiFungibleToken(this.state.formData.addr, this.state.formData.tokenId),
+                    }); // will be invalid
                     reject();
                 }
             });
         });
     }
 
-    private async confidentlyUpdateFt(): Promise<boolean> {
-        const { addr } = this.state.formData;
-        const newToken = await FungibleToken.init(addr);
+    private async confidentlyUpdateMft(): Promise<boolean> {
+        const { addr, tokenId } = this.state.formData;
+        const newToken = await MultiFungibleToken.init(addr, tokenId);
         this.setState({ token: newToken });
         window.EDITOR.forceUpdate();
         return newToken.ready;
@@ -174,12 +177,12 @@ export class MftTransfer extends BaseTask<FormData, Props, State> {
                     roundtop
                 />
                 <TextField
-                    name="receiverId"
-                    label="Receiver Address"
-                />
-                <TextField
                     name="tokenId"
                     label="Token ID"
+                />
+                <TextField
+                    name="receiverId"
+                    label="Receiver Address"
                 />
                 <TextField
                     name="amount"
