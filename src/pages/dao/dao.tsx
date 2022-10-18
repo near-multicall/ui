@@ -20,6 +20,7 @@ import { TokensBalances } from "../../widgets/tokens-balances";
 import "./config/config.scss";
 import "./funds/funds.scss";
 import "./dao.scss";
+import { TextField } from "../../shared/ui/form-fields";
 
 // minimum balance a multicall instance needs for storage + state.
 const MIN_INSTANCE_BALANCE = toYocto(1); // 1 NEAR
@@ -602,9 +603,12 @@ export class DaoPage extends Component<Props, State> {
 
                                 return (
                                     <Form>
-                                        <Field
+                                        <TextField
                                             name="addr"
-                                            placeholder="Search for DAOs"
+                                            placeholder="Seach for DAOs"
+                                            hiddenLabel={true}
+                                            variant="standard"
+                                            autoFocus
                                         />
                                     </Form>
                                 );
