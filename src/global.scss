@@ -23,7 +23,7 @@ body {
 }
 
 a {
-    color: color.$blue !important;
+    color: darken(color.$blue, 30%);
     text-decoration: none;
     cursor: pointer;
 }
