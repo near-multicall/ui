@@ -20,6 +20,8 @@
     }
 
     &-content {
+        display: flex;
+        flex-flow: column nowrap;
         width: auto;
         height: 100%;
     }
@@ -31,43 +33,6 @@
             top: calc(0.5 * size.$gap + size.$gap / 6);
             right: calc(0.5 * size.$gap + $i * (size.$large-text + 0.25 * size.$gap) + size.$gap / 6);
             cursor: pointer;
-        }
-    }
-
-    ul {
-        display: flex;
-        flex-flow: column nowrap;
-
-        li {
-            margin-right: 0.5 * size.$gap;
-
-            span {
-                position: relative;
-                display: block;
-                width: 100%;
-
-                a {
-                    color: darken(color.$blue, 20%) !important;
-                }
-
-                .MuiSvgIcon-root {
-                    visibility: hidden;
-                    position: absolute;
-                    font-size: size.$large-text;
-                    top: auto !important;
-                    bottom: auto !important;
-                    right: 0 !important;
-                    cursor: pointer;
-                }
-            }
-
-            &:hover {
-                background-color: color.$lightest;
-
-                span > .MuiSvgIcon-root {
-                    visibility: visible;
-                }
-            }
         }
     }
 }

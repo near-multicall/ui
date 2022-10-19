@@ -3,40 +3,42 @@ import { MenuItem, TextField, TextFieldProps } from "@mui/material";
 
 import { ArgsError, ArgsString } from "../../../lib/args";
 
-interface TextInputProps extends Pick<TextFieldProps, "className" | "label" | "variant"> {
-    error: ArgsError;
-    update: (event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>, component: Component) => void;
-    value: ArgsString;
+interface TextInputProps extends Omit<TextFieldProps, "error" | "size" | "value" | "variant"> {
+    error?: ArgsError;
+    update?: (event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>, component: Component) => void;
+    value?: ArgsString;
 }
 
 export class TextInput extends Component<TextInputProps> {
     render() {
         const { label, value, error, update, ...props } = this.props;
 
-        const errors = Array.isArray(error) ? error : [error]; // works with undefined too
+        const errors = Array.isArray(error) ? error : [error];
 
         return (
             <TextField
-                label={label}
-                value={value.value}
+                value={value?.value}
                 margin="dense"
                 size="small"
                 onChange={(event) => {
-                    value.value = event.target.value;
-                    errors.forEach((error) => error?.validOrNull(value));
-                    update?.(event, this);
-                    this.forceUpdate();
+                    if (value) {
+                        value.value = event.target.value;
+                        errors.forEach((error) => error?.validOrNull(value));
+                        update?.(event, this);
+                        this.forceUpdate();
+                    }
                 }}
                 error={errors.some((error) => error?.isBad)}
                 helperText={errors.find((error) => error?.isBad)?.message}
                 InputLabelProps={{ shrink: true }}
-                {...props}
+                {...{ ...props, label }}
             />
         );
     }
 }
 
 interface TextInputWithUnitsProps extends TextInputProps {
+    value: ArgsString;
     // TODO!: Extend the interface
 }
 

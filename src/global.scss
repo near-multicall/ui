@@ -38,6 +38,13 @@ button {
     cursor: pointer;
 }
 
+.MuiTextField-root {
+    .MuiInputLabel-root,
+    .MuiInputBase-root {
+        font-size: 1em;
+    }
+}
+
 .disabled {
     background-color: color.$darkest !important;
     color: rgba(color.$light-text, 0.3);
