@@ -1,12 +1,12 @@
 import { AddOutlined, DeleteOutlined, EditOutlined } from "@mui/icons-material";
-import { IconButton, TextField } from "@mui/material";
+import { IconButton } from "@mui/material";
 import clsx from "clsx";
 import { HTMLProps, useState } from "react";
 
-import { ArgsAccount } from "../../../shared/lib/args";
+import { ArgsAccount, ArgsString } from "../../../shared/lib/args";
 import { Multicall } from "../../../shared/lib/contracts/multicall";
 import { toNEAR } from "../../../shared/lib/converter";
-import { Button, Tile } from "../../../shared/ui/components";
+import { Button, TextInput, Tile } from "../../../shared/ui/components";
 
 import "./config.scss";
 
@@ -44,11 +44,6 @@ interface DaoConfigTabComponentProps extends HTMLProps<HTMLDivElement> {
     };
 }
 
-enum Mode {
-    view = "VIEW",
-    edit = "EDIT",
-}
-
 const _DaoConfigTab = "DaoConfigTab";
 
 const DaoConfigTabComponent = ({ className, contracts: { multicall } }: DaoConfigTabComponentProps) => {
@@ -57,25 +52,23 @@ const DaoConfigTabComponent = ({ className, contracts: { multicall } }: DaoConfi
     const [addToken, setAddToken] = useState(false);
     const [croncatManager, setCroncatManager] = useState("");
     const [editCroncat, setEditCroncat] = useState(false);
-    const [addAdmins, setAddAdmins] = useState(multicall.admins);
-    const [addAdmin, setAddAdmin] = useState(false);
 
-    if (!editMode) {
-        return (
-            <div className={clsx(_DaoConfigTab, className)}>
-                <Tile
-                    className={`${_DaoConfigTab}-admins`}
-                    heading="Admins"
-                >
-                    <ul className="list">
-                        {multicall.admins.map((admin) => (
-                            <li key={admin}>
-                                <Link address={admin} />
-                            </li>
-                        ))}
-                    </ul>
-                </Tile>
+    return (
+        <div className={clsx(_DaoConfigTab, className)}>
+            <Tile
+                className={`${_DaoConfigTab}-admins`}
+                heading="Admins"
+            >
+                <ul className="list">
+                    {multicall.admins.map((admin) => (
+                        <li key={admin}>
+                            <Link address={admin} />
+                        </li>
+                    ))}
+                </ul>
+            </Tile>
 
+            {!editMode && (
                 <Tile
                     className={`${_DaoConfigTab}-tokensWhitelist`}
                     heading="Tokens whitelist"
@@ -88,68 +81,19 @@ const DaoConfigTabComponent = ({ className, contracts: { multicall } }: DaoConfi
                         ))}
                     </ul>
                 </Tile>
+            )}
 
+            {editMode && (
                 <Tile
-                    className={`${_DaoConfigTab}-jobsSettings`}
-                    heading="Jobs settings"
+                    className={`${_DaoConfigTab}-tokensWhitelist`}
+                    heading="Tokens whitelist"
                 >
-                    <h2 className="CroncatMng-heading heading">Croncat Manager</h2>
-                    <Link address={multicall.croncatManager} />
-
-                    <h2 className="JobBond-heading heading">Job Bond</h2>
-                    <span>{`${multicall.jobBond !== "" ? toNEAR(multicall.jobBond) : "..."} Ⓝ`}</span>
-                </Tile>
-
-                <Tile
-                    className={`${_DaoConfigTab}-proposalForm`}
-                    heading={editMode ? "Changes proposal" : null}
-                >
-                    <Button
-                        className={`${_DaoConfigTab}-action`}
-                        label="Propose changes"
-                        onClick={() => setEditMode(true)}
-                    />
-                </Tile>
-            </div>
-        );
-    } else {
-        return (
-            <div className={clsx(_DaoConfigTab, className)}>
-                <Tile className="AdminsList">
-                    <IconButton
-                        edge="start"
-                        onClick={() => setAddAdmin(true)}
-                    >
-                        <AddOutlined />
-                    </IconButton>
-
-                    <h1 className="heading">Admins</h1>
-
-                    <ul className="list">
-                        {addAdmins.map((admin) => (
-                            <li key={admin}>
-                                <Link
-                                    address={admin}
-                                    deleteIcon
-                                />
-                            </li>
-                        ))}
-
-                        {addAdmin ? (
-                            <TextField onBlur={(e) => setAddAdmins((arr) => [...arr, e.target.value])} />
-                        ) : null}
-                    </ul>
-                </Tile>
-
-                <Tile className="tokensWhitelist">
                     <IconButton
                         edge="start"
                         onClick={() => setAddToken(true)}
                     >
                         <AddOutlined />
                     </IconButton>
-
-                    <h1 className="heading">Whitelisted Tokens</h1>
 
                     <ul className="list">
                         {addTokens.map((token) => (
@@ -162,63 +106,88 @@ const DaoConfigTabComponent = ({ className, contracts: { multicall } }: DaoConfi
                         ))}
 
                         {addToken ? (
-                            <TextField onBlur={(e) => setAddTokens((arr) => [...arr, e.target.value])} />
+                            <TextInput
+                                onBlur={(event) =>
+                                    setAddTokens((previousState) => [...previousState, event.target.value])
+                                }
+                            />
                         ) : null}
                     </ul>
                 </Tile>
+            )}
 
-                <Tile className="JobBond">
-                    <h1 className="JobBond-heading heading">
-                        Job Bond
-                        <span>
-                            <TextField
-                                variant="filled"
-                                defaultValue={multicall.jobBond !== "" ? toNEAR(multicall.jobBond) : "..."}
-                            />
-                            {`Ⓝ`}
-                        </span>
-                    </h1>
-                </Tile>
+            <Tile
+                className={`${_DaoConfigTab}-jobsSettings`}
+                heading="Jobs settings"
+            >
+                <h3>Croncat manager</h3>
 
-                <Tile className="CroncatManager">
-                    <IconButton
-                        edge="start"
-                        onClick={() => setEditCroncat(true)}
-                    >
-                        <EditOutlined />
-                    </IconButton>
+                <IconButton
+                    edge="start"
+                    onClick={() => {
+                        setEditMode(true);
+                        setEditCroncat(true);
+                    }}
+                >
+                    <EditOutlined />
+                </IconButton>
 
-                    <h1 className="CroncatMng-heading heading">Croncat Manager</h1>
+                {editMode && editCroncat ? (
+                    <TextInput
+                        onBlur={(event) => {
+                            setCroncatManager(event.target.value);
+                            setEditCroncat(false);
+                        }}
+                        value={new ArgsString(multicall.croncatManager)}
+                        fullWidth
+                    />
+                ) : (
+                    <Link address={multicall.croncatManager} />
+                )}
 
-                    <ul className="list">
-                        <li>
-                            {editCroncat ? (
-                                <TextField
-                                    onBlur={(e) => {
-                                        setCroncatManager(e.target.value);
-                                        setEditCroncat(false);
-                                    }}
-                                    defaultValue={multicall.croncatManager}
-                                    size="small"
-                                />
-                            ) : (
-                                <Link address={multicall.croncatManager} />
-                            )}
-                        </li>
-                    </ul>
-                </Tile>
+                <h3>Job bond</h3>
 
-                <div className={`${_DaoConfigTab}-actions`}>
-                    <button
-                        className={`${_DaoConfigTab}-action`}
-                        onClick={() => setEditMode(false)}
-                    >
-                        Confirm
-                    </button>
-                </div>
-            </div>
-        );
-    }
+                <span>
+                    {!editMode && (multicall.jobBond !== "" ? toNEAR(multicall.jobBond) : "...") + " Ⓝ"}
+
+                    {editMode && (
+                        <TextInput
+                            InputProps={{ endAdornment: "Ⓝ" }}
+                            type="number"
+                            value={new ArgsString(multicall.jobBond !== "" ? toNEAR(multicall.jobBond) : "")}
+                        />
+                    )}
+                </span>
+            </Tile>
+
+            <Tile
+                className={`${_DaoConfigTab}-proposalForm`}
+                heading={editMode ? "Changes proposal" : null}
+            >
+                {!editMode ? (
+                    <Button
+                        color="success"
+                        label="Draft changes"
+                        onClick={() => setEditMode(true)}
+                    />
+                ) : (
+                    <>
+                        <Button
+                            color="error"
+                            label="Cancel"
+                            onClick={() => setEditMode(false)}
+                        />
+
+                        <Button
+                            color="success"
+                            label="Submit"
+                            onClick={() => setEditMode(false)}
+                        />
+                    </>
+                )}
+            </Tile>
+        </div>
+    );
 };
 
 export const DaoConfigTab = {
