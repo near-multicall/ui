@@ -108,6 +108,15 @@ const evolve = <E extends Evolver, V extends Evolvable<E>>(transformations: E, o
     }
 };
 
+/**
+ * A curried version of {@link evolve | `Props.evolve`}
+ */
+const evolveWith =
+    <E extends Evolver>(transformations: E) =>
+    <V extends Evolvable<E>>(object: V): Evolve<V, E> =>
+        evolve(transformations, object);
+
 export const Props = {
     evolve,
+    evolveWith,
 };
