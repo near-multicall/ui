@@ -1,8 +1,8 @@
-import { viewAccount, viewState, view } from "../wallet";
+import { type Tx, viewAccount, viewState, view } from "../wallet";
 import { Big, toGas, dateToCron, toYocto } from "../converter";
+import { ArgsAccount } from "../args";
 
-import type { FunctionCallAction as daoFunctionCallAction } from "./sputnik-dao";
-import type { Tx } from "../wallet";
+import type { FunctionCallAction as daoFunctionCallAction, SputnikDAOContract } from "./sputnik-dao";
 
 const FACTORY_ADDRESS_SELECTOR: Record<string, string> = {
     mainnet: "v1.multicall.near",
@@ -124,6 +124,33 @@ class Multicall {
     }
 
     /**
+     * Calls the given callback with a result of multicall contract instantiation,
+     *  represented as stateful response.
+     *
+     * @param daoContractAddress DAO contract address
+     * @param callback Stateful data fetch callback
+     */
+    static instanceDataFetchFx = async (
+        daoContractAddress: SputnikDAOContract["address"],
+        callback: (result: { data: Multicall | null; error: Error | null; loading: boolean }) => void
+    ) =>
+        callback(
+            await Multicall.init(
+                `${ArgsAccount.deconstructAddress(daoContractAddress).name}.${Multicall.FACTORY_ADDRESS}`
+            )
+                .then((multicallInstance) => ({
+                    data: multicallInstance,
+                    error: null,
+                    loading: false,
+                }))
+                .catch((error) => ({
+                    data: null,
+                    error: new Error(error),
+                    loading: false,
+                }))
+        );
+
+    /**
      * check of given accountId is a multicall instance.
      * uses code_hash of the contract deployed on accountId.
      *
@@ -216,7 +243,7 @@ class Multicall {
     }
 
     /**
-     * get whitelisted tokens
+     * get job bond
      */
     async getJobBond(): Promise<string> {
         return view(this.address, "get_job_bond", {});
@@ -277,5 +304,5 @@ class Multicall {
     }
 }
 
-export { Multicall };
+export { Multicall, Multicall as MulticallContract };
 export type { JobData, MulticallArgs };
