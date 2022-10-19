@@ -27,7 +27,7 @@ interface TableProps extends HTMLAttributes<HTMLDivElement> {
      */
     displayMode?: "default" | "compact" | "classic";
     header: TableRowProps["headerCells"];
-    rows?: TableRowProps["cells"][];
+    rows?: TableRowProps["cells"][] | null;
 }
 
 const _Table = "Table";
