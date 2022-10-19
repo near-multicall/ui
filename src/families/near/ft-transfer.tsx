@@ -1,5 +1,5 @@
 import { InputAdornment } from "@mui/material";
-import { Form, useFormikContext } from "formik";
+import { Form, FormikErrors, useFormikContext } from "formik";
 import { useEffect } from "react";
 import { args as arx } from "../../shared/lib/args/args";
 import { fields } from "../../shared/lib/args/args-types/args-object";
@@ -62,8 +62,6 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
             ...this.state,
             token: new FungibleToken(this.initialValues.addr),
         };
-
-        this.tryUpdateFt().catch(() => {});
     }
 
     protected override init(
@@ -90,6 +88,20 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
 
         this.state = { ...this.state, formData: this.initialValues };
         this.schema.check(this.state.formData);
+
+        if (call !== null)
+            this.tryUpdateFt().then((res) => {
+                console.log(res);
+                return this.setFormData({
+                    amount: res
+                        ? arx
+                              .big()
+                              .intoFormatted(this.state.token.metadata.decimals)
+                              .cast(this.state.formData.amount)
+                              .toFixed()
+                        : this.state.formData.amount,
+                });
+            });
     }
 
     static override inferOwnType(json: Call): boolean {
@@ -120,15 +132,15 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
         };
     }
 
-    private tryUpdateFt(): Promise<void> {
-        return new Promise<void>((resolve, reject) => {
+    private tryUpdateFt(): Promise<boolean> {
+        return new Promise<boolean>((resolve) => {
             this.schema.check(this.state.formData).then(() => {
                 const { addr } = fields(this.schema);
                 if (!addr.isBad()) {
-                    this.confidentlyUpdateFt().then((ready) => (ready ? resolve() : reject()));
+                    this.confidentlyUpdateFt().then((ready) => resolve(ready));
                 } else {
                     this.setState({ token: new FungibleToken(this.state.formData.addr) }); // will be invalid
-                    reject();
+                    resolve(false);
                 }
             });
         });
@@ -140,6 +152,26 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
         this.setState({ token: newToken });
         window.EDITOR.forceUpdate();
         return newToken.ready;
+    }
+
+    public override async validateForm(values: FormData): Promise<FormikErrors<FormData>> {
+        this.setFormData(values);
+        await new Promise((resolve) => this.resolveDebounced(resolve));
+        console.log(values);
+        await this.tryUpdateFt();
+        await this.schema
+            .transform(({ amount, ...rest }) => ({
+                ...rest,
+                amount: this.state.token.ready
+                    ? arx.big().intoParsed(this.state.token.metadata.decimals).cast(amount)?.toFixed() ?? null
+                    : amount,
+            }))
+            .check(values);
+        return Object.fromEntries(
+            Object.entries(fields(this.schema))
+                .map(([k, v]) => [k, v?.message() ?? ""])
+                .filter(([_, v]) => v !== "")
+        );
     }
 
     public override Editor = (): React.ReactNode => {
