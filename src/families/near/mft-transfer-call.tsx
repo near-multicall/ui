@@ -222,12 +222,12 @@ export class MftTransferCall extends BaseTask<FormData, Props, State> {
                     roundtop
                 />
                 <TextField
-                    name="receiverId"
-                    label="Receiver Address"
-                />
-                <TextField
                     name="tokenId"
                     label="Token ID"
+                />
+                <TextField
+                    name="receiverId"
+                    label="Receiver Address"
                 />
                 <TextField
                     name="amount"
