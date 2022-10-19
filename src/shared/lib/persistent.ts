@@ -56,7 +56,7 @@ class Persistent {
         if (window.SIDEBAR.getPage() !== "app") return;
 
         localStorage.setItem(STORAGE_KEY_ADDRESSES, JSON.stringify(this.addresses));
-        localStorage.setItem(STORAGE_KEY_JSON, JSON.stringify(window.LAYOUT.toBase64()));
+        localStorage.setItem(STORAGE_KEY_JSON, JSON.stringify(window.LAYOUT.toBase64(true)));
         // localStorage.setItem("multicall_layout", JSON.stringify(this.layout));
     }
 
