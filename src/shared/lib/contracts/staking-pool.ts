@@ -1,4 +1,5 @@
 import { view, viewAccount } from "../wallet";
+import { Big, removeTrailingZeros } from "../converter";
 
 const FACTORIES_SELECTOR: Record<string, string[]> = {
     mainnet: ["pool.near", "poolv1.near"],
@@ -18,6 +19,15 @@ const CONTRACT_CODE_HASHES_SELECTOR: Record<string, string[]> = {
 };
 
 type feeFractionType = { numerator: number; denominator: number };
+type HumanReadableAccount = {
+    account_id: string;
+    // The unstaked balance that can be withdrawn or staked.
+    unstaked_balance: string; // string encoded u128 number.
+    // The amount balance staked at the current "stake" share price.
+    staked_balance: string; // string encoded u128 number.
+    /// Whether the unstaked balance is available for withdrawal now.
+    can_withdraw: boolean;
+};
 
 class StakingPool {
     static FACTORIES: string[] = FACTORIES_SELECTOR[window.NEAR_ENV];
@@ -66,8 +76,56 @@ class StakingPool {
         return StakingPool.CONTRACT_CODE_HASHES.includes(codeHash);
     }
 
+    static fractionToString(fraction: feeFractionType, decimalPlaces: number = 2): string {
+        const { numerator, denominator } = fraction;
+        const result = Big(numerator).mul("100").div(denominator).toFixed(decimalPlaces);
+        return removeTrailingZeros(result);
+    }
+
+    /**
+     * Returns the current reward fee as a fraction.
+     *
+     * @returns
+     */
     async getRewardFeeFraction(): Promise<feeFractionType> {
         return view(this.address, "get_reward_fee_fraction", {});
+    }
+
+    /**
+     * Returns the total balance of the given account (including staked and unstaked balances).
+     *
+     * @param accountId
+     * @returns
+     */
+    async getAccountTotalBalance(accountId: string): Promise<string> {
+        const a: HumanReadableAccount = await view(this.address, "get_account_total_balance", {
+            account_id: accountId,
+        });
+        return Big(a.staked_balance).add(a.unstaked_balance).toFixed();
+    }
+
+    /**
+     * Returns the total staking balance.
+     *
+     * @returns
+     */
+    async getTotalStakedBalance(): Promise<string> {
+        return view(this.address, "get_total_staked_balance", {});
+    }
+
+    /// Returns account ID of the staking pool owner.
+    async getOwnerId(): Promise<string> {
+        return view(this.address, "get_owner_id", {});
+    }
+
+    /// Returns true if the staking is paused
+    async isStakingPaused(): Promise<boolean> {
+        return view(this.address, "is_staking_paused", {});
+    }
+
+    /// Returns human readable representation of the account for the given account ID.
+    async getAccount(accountId: string): Promise<HumanReadableAccount> {
+        return view(this.address, "get_account", { account_id: accountId });
     }
 }
 

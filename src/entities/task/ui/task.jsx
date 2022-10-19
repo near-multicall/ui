@@ -89,6 +89,14 @@ export class Task extends Component {
                                 json={json}
                             />
                         );
+                    case "deposit_and_stake":
+                        return (
+                            <Family.Near.DepositAndStake
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
                 }
 
             default:
