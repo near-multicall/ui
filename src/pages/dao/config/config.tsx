@@ -3,8 +3,10 @@ import { IconButton } from "@mui/material";
 import clsx from "clsx";
 import { HTMLProps, useState } from "react";
 
+import { Multicall } from "../../../entities";
 import { ArgsAccount, ArgsString } from "../../../shared/lib/args";
-import { Multicall } from "../../../shared/lib/contracts/multicall";
+import { MulticallContract } from "../../../shared/lib/contracts/multicall";
+import { SputnikDAOContract } from "../../../shared/lib/contracts/sputnik-dao";
 import { toNEAR } from "../../../shared/lib/converter";
 import { Button, TextInput, Tile } from "../../../shared/ui/components";
 
@@ -40,13 +42,15 @@ const Link = ({
 
 interface DaoConfigTabComponentProps extends HTMLProps<HTMLDivElement> {
     contracts: {
-        multicall: Multicall;
+        multicall: MulticallContract;
     };
+
+    daoContract: SputnikDAOContract;
 }
 
 const _DaoConfigTab = "DaoConfigTab";
 
-const DaoConfigTabComponent = ({ className, contracts: { multicall } }: DaoConfigTabComponentProps) => {
+const DaoConfigTabComponent = ({ className, contracts: { multicall }, daoContract }: DaoConfigTabComponentProps) => {
     const [editMode, setEditMode] = useState(false);
     const [addTokens, setAddTokens] = useState(multicall.tokensWhitelist);
     const [addToken, setAddToken] = useState(false);
@@ -69,18 +73,10 @@ const DaoConfigTabComponent = ({ className, contracts: { multicall } }: DaoConfi
             </Tile>
 
             {!editMode && (
-                <Tile
+                <Multicall.TokensWhitelist
                     className={`${_DaoConfigTab}-tokensWhitelist`}
-                    heading="Tokens whitelist"
-                >
-                    <ul className="list">
-                        {multicall.tokensWhitelist.map((token) => (
-                            <li key={token}>
-                                <Link address={token} />
-                            </li>
-                        ))}
-                    </ul>
-                </Tile>
+                    daoContractAddress={daoContract.address}
+                />
             )}
 
             {editMode && (

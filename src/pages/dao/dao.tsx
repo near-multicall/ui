@@ -402,7 +402,11 @@ export class DaoPage extends Component<Props, State> {
             <Tabs
                 classes={{ buttonsPanel: "DaoPage-tabs-buttonsPanel", contentSpace: "DaoPage-tabs-contentSpace" }}
                 items={[
-                    DaoConfigTab.connect({ className: `${_DaoPage}-content`, contracts: { multicall } }),
+                    DaoConfigTab.connect({
+                        className: `${_DaoPage}-content`,
+                        contracts: { multicall },
+                        daoContract: dao,
+                    }),
                     DaoFundsTab.connect({ className: `${_DaoPage}-content`, contracts: { dao, multicall } }),
                     DaoJobsTab.connect({ className: `${_DaoPage}-content`, contracts: { multicall } }),
                 ]}
