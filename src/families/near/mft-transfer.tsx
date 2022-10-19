@@ -120,6 +120,7 @@ export class MftTransfer extends BaseTask<FormData, Props, State> {
 
         if (!arx.big().isValidSync(gas)) throw new CallError("Failed to parse gas input value", this.props.id);
         if (!arx.big().isValidSync(amount)) throw new CallError("Failed to parse amount input value", this.props.id);
+        if (!token.ready) throw new CallError("Lacking token metadata", this.props.id);
 
         return {
             address: addr,
