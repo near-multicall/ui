@@ -1,6 +1,5 @@
 import { view } from "../wallet";
-import { StorageManagement } from "./storageManagement";
-import type { StorageBalance, StorageBalanceBounds } from "./storageManagement";
+import type { StorageBalanceBounds } from "./storageManagement";
 
 // Fungible token metadata follows NEP-148. See: https://nomicon.io/Standards/Tokens/FungibleToken/Metadata
 type MultiFungibleTokenMetadata = {
@@ -34,8 +33,6 @@ class MultiFungibleToken {
 
     // used to create and initialize a FungibleToken instance
     static async init(tokenAddress: string, tokenId: string): Promise<MultiFungibleToken> {
-        console.log(tokenAddress, tokenId);
-
         // fetch token info and mark it ready
         const newToken = new MultiFungibleToken(tokenAddress, tokenId);
         const [metadata] = await Promise.all([

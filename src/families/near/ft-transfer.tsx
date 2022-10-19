@@ -90,9 +90,8 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
         this.schema.check(this.state.formData);
 
         if (call !== null)
-            this.tryUpdateFt().then((res) => {
-                console.log(res);
-                return this.setFormData({
+            this.tryUpdateFt().then((res: boolean) =>
+                this.setFormData({
                     amount: res
                         ? arx
                               .big()
@@ -100,8 +99,8 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
                               .cast(this.state.formData.amount)
                               .toFixed()
                         : this.state.formData.amount,
-                });
-            });
+                })
+            );
     }
 
     static override inferOwnType(json: Call): boolean {
@@ -157,7 +156,6 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
     public override async validateForm(values: FormData): Promise<FormikErrors<FormData>> {
         this.setFormData(values);
         await new Promise((resolve) => this.resolveDebounced(resolve));
-        console.log(values);
         await this.tryUpdateFt();
         await this.schema
             .transform(({ amount, ...rest }) => ({

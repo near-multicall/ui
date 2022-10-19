@@ -15,7 +15,7 @@ declare module "yup" {
         sputnikDao(message?: string): this;
         multicall(message?: string): this;
         ft(message?: string): this;
-        mft(tokenAddress: Reference<string>, message?: string): this;
+        mft(addressKey: string, message?: string): this;
         intoUrl(): this;
         intoBaseAddress(prefixes?: string[]): this;
         append(appendStr: string): this;
@@ -124,14 +124,14 @@ addMethod(_StringSchema, "ft", function ft(message = locale.string.ft) {
 });
 
 // ensure string is a valid NEAR address with a token contract
-addMethod(_StringSchema, "mft", function mft(tokenAddress: Reference<string>, message = locale.string.mft) {
+addMethod(_StringSchema, "mft", function mft(addressKey: string, message = locale.string.mft) {
     return this.test({
         name: "mft",
         message,
-        test: async (value) => {
+        test: async (value, context) => {
             if (value == null) return true;
             try {
-                const multiFungibleToken = await MultiFungibleToken.init(tokenAddress.getValue(value), value);
+                const multiFungibleToken = await MultiFungibleToken.init(context.parent[addressKey], value);
                 return multiFungibleToken.ready;
             } catch (e) {
                 // TODO check reason for error

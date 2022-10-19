@@ -1,16 +1,12 @@
-import { DeleteOutline, EditOutlined, MoveDown } from "@mui/icons-material";
 import { InputAdornment } from "@mui/material";
-import clsx from "clsx";
-import { Form, useFormikContext } from "formik";
+import { Form, FormikErrors, useFormikContext } from "formik";
 import { useEffect } from "react";
-import { ref } from "yup";
 import { args as arx } from "../../shared/lib/args/args";
 import { fields } from "../../shared/lib/args/args-types/args-object";
 import { Call, CallError } from "../../shared/lib/call";
 import { MultiFungibleToken } from "../../shared/lib/standards/multiFungibleToken";
-import { Tooltip } from "../../shared/ui/components";
 import { TextField, UnitField } from "../../shared/ui/form-fields";
-import { BaseTask, BaseTaskProps, BaseTaskState, DefaultFormData, DisplayData } from "../base";
+import { BaseTask, BaseTaskProps, BaseTaskState, DefaultFormData } from "../base";
 import "./near.scss";
 
 type FormData = DefaultFormData & {
@@ -35,8 +31,8 @@ export class MftTransferCall extends BaseTask<FormData, Props, State> {
             addr: arx.string().contract(),
             gas: arx.big().gas(),
             receiverId: arx.string().address(),
-            tokenId: arx.string().mft(ref("addr")),
-            amount: arx.big().token(),
+            tokenId: arx.string().mft("addr"),
+            amount: arx.big().token().min(1, "cannot transfer 0 tokens"),
             memo: arx.string().optional(),
             msg: arx.string().optional(),
         })
@@ -49,7 +45,7 @@ export class MftTransferCall extends BaseTask<FormData, Props, State> {
 
     override initialValues: FormData = {
         name: "MFT Transfer Call",
-        addr: "",
+        addr: window.nearConfig.REF_EXCHANGE_ADDRESS,
         func: "mft_transfer_call",
         gas: "150",
         gasUnit: "Tgas",
@@ -57,7 +53,7 @@ export class MftTransferCall extends BaseTask<FormData, Props, State> {
         depoUnit: "yocto",
         tokenId: "",
         receiverId: "",
-        amount: "",
+        amount: "0",
         memo: "",
         msg: "",
     };
@@ -70,7 +66,7 @@ export class MftTransferCall extends BaseTask<FormData, Props, State> {
             token: new MultiFungibleToken(this.state.formData.addr, this.state.formData.tokenId),
         };
 
-        this.tryUpdateFt().catch(() => {});
+        this.tryUpdateMft().catch(() => {});
     }
 
     protected override init(
@@ -103,12 +99,23 @@ export class MftTransferCall extends BaseTask<FormData, Props, State> {
 
         this.state = { ...this.state, formData: this.initialValues };
         this.schema.check(this.state.formData);
+
+        if (call !== null)
+            this.tryUpdateMft().then((res: boolean) =>
+                this.setFormData({
+                    amount: res
+                        ? arx
+                              .big()
+                              .intoFormatted(this.state.token.metadata.decimals)
+                              .cast(this.state.formData.amount)
+                              .toFixed()
+                        : this.state.formData.amount,
+                })
+            );
     }
 
     static override inferOwnType(json: Call): boolean {
-        return (
-            !!json && arx.string().address().isValidSync(json.address) && json.actions[0].func === "mft_transfer_call"
-        );
+        return !!json && json.actions[0].func === "mft_transfer_call";
     }
 
     public override toCall(): Call {
@@ -144,28 +151,47 @@ export class MftTransferCall extends BaseTask<FormData, Props, State> {
         };
     }
 
-    private tryUpdateFt(): Promise<void> {
-        return new Promise<void>((resolve, reject) => {
+    private tryUpdateMft(): Promise<boolean> {
+        return new Promise<boolean>((resolve) => {
             this.schema.check(this.state.formData).then(() => {
                 const { addr } = fields(this.schema);
                 if (!addr.isBad()) {
-                    this.confidentlyUpdateFt().then((ready) => (ready ? resolve() : reject()));
+                    this.confidentlyUpdateMft().then((ready) => resolve(ready));
                 } else {
                     this.setState({
                         token: new MultiFungibleToken(this.state.formData.addr, this.state.formData.tokenId),
                     }); // will be invalid
-                    reject();
+                    resolve(false);
                 }
             });
         });
     }
 
-    private async confidentlyUpdateFt(): Promise<boolean> {
+    private async confidentlyUpdateMft(): Promise<boolean> {
         const { addr, tokenId } = this.state.formData;
         const newToken = await MultiFungibleToken.init(addr, tokenId);
         this.setState({ token: newToken });
         window.EDITOR.forceUpdate();
         return newToken.ready;
+    }
+
+    public override async validateForm(values: FormData): Promise<FormikErrors<FormData>> {
+        this.setFormData(values);
+        await new Promise((resolve) => this.resolveDebounced(resolve));
+        await this.tryUpdateMft();
+        await this.schema
+            .transform(({ amount, ...rest }) => ({
+                ...rest,
+                amount: this.state.token.ready
+                    ? arx.big().intoParsed(this.state.token.metadata.decimals).cast(amount)?.toFixed() ?? null
+                    : amount,
+            }))
+            .check(values);
+        return Object.fromEntries(
+            Object.entries(fields(this.schema))
+                .map(([k, v]) => [k, v?.message() ?? ""])
+                .filter(([_, v]) => v !== "")
+        );
     }
 
     public override Editor = (): React.ReactNode => {
