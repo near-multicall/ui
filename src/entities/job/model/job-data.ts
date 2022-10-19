@@ -3,12 +3,6 @@ import { useEffect, useState } from "react";
 import { type JobEntity } from "../config";
 import { JobNormalized } from "../lib/job-normalized";
 
-const jobsDataInitialState = {
-    data: null,
-    error: null,
-    loading: true,
-};
-
 type JobsDataFxResponse = {
     /** Jobs indexed by ID for easy access to each particular job */
     data: Record<JobEntity.DataWithStatus["id"], JobEntity.DataWithStatus> | null;
@@ -24,9 +18,6 @@ const jobsDataFx = async (
         await multicall
             .getJobs()
             .then((data) => ({
-                ...jobsDataInitialState,
-                loading: false,
-
                 data: data.reduce(
                     (jobsIndexedById, job) => ({
                         ...jobsIndexedById,
@@ -34,12 +25,19 @@ const jobsDataFx = async (
                     }),
                     {}
                 ),
+
+                error: null,
+                loading: false,
             }))
-            .catch((error) => ({ ...jobsDataInitialState, error: new Error(error), loading: false }))
+            .catch((error) => ({
+                data: null,
+                error: new Error(error),
+                loading: false,
+            }))
     );
 
 const useJobsData = (contracts: JobEntity.Dependencies["contracts"]) => {
-    const [state, stateUpdate] = useState<JobsDataFxResponse>(jobsDataInitialState);
+    const [state, stateUpdate] = useState<JobsDataFxResponse>({ data: null, error: null, loading: true });
 
     useEffect(() => void jobsDataFx(contracts, stateUpdate), []);
 
