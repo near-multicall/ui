@@ -39,7 +39,7 @@ const jobsDataFx = async (
 const useJobsData = (contracts: JobEntity.Dependencies["contracts"]) => {
     const [state, stateUpdate] = useState<JobsDataFxResponse>({ data: null, error: null, loading: true });
 
-    useEffect(() => void jobsDataFx(contracts, stateUpdate), []);
+    useEffect(() => void jobsDataFx(contracts, stateUpdate), [contracts, stateUpdate]);
 
     useEffect(() => {
         state.error instanceof Error && void console.error(state.error);

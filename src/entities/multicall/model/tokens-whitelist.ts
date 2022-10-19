@@ -26,7 +26,7 @@ const whitelistedTokensDataFx = async (
 const useAllWhitelistedTokensData = (daoContractAddress: MulticallEntity.Dependencies["daoContractAddress"]) => {
     const [state, stateUpdate] = useState<WhitelistedTokensDataFxResponse>({ data: null, error: null, loading: true });
 
-    useEffect(() => void whitelistedTokensDataFx(daoContractAddress, stateUpdate), []);
+    useEffect(() => void whitelistedTokensDataFx(daoContractAddress, stateUpdate), [daoContractAddress, stateUpdate]);
 
     return state;
 };

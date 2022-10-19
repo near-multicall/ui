@@ -41,7 +41,7 @@ const nearTokenDataFx = async (
 const useNearTokenData = (contracts: NearTokenEntity.Dependencies["contracts"]) => {
     const [state, stateUpdate] = useState<NearTokenDataFxResponse>({ data: null, loading: true });
 
-    useEffect(() => void nearTokenDataFx(contracts, stateUpdate), []);
+    useEffect(() => void nearTokenDataFx(contracts, stateUpdate), [contracts, stateUpdate]);
 
     return state;
 };

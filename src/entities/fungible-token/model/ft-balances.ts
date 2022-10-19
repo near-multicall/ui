@@ -57,7 +57,7 @@ const fungibleTokensDataFx = async (
 const useAllFungibleTokensData = (contracts: FungibleTokenEntity.Dependencies["contracts"]) => {
     const [state, stateUpdate] = useState<FungibleTokensDataFxResponse>({ data: null, loading: true });
 
-    useEffect(() => void fungibleTokensDataFx(contracts, stateUpdate), []);
+    useEffect(() => void fungibleTokensDataFx(contracts, stateUpdate), [contracts, stateUpdate]);
 
     return state;
 };
