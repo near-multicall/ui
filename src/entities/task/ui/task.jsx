@@ -89,6 +89,14 @@ export class Task extends Component {
                                 json={json}
                             />
                         );
+                    case "storage_withdraw":
+                        return (
+                            <Family.Near.StorageWithdraw
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
                 }
 
             default:

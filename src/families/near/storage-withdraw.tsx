@@ -1,60 +1,77 @@
-import { DeleteOutline, EditOutlined, MoveDown } from "@mui/icons-material";
-import clsx from "clsx";
-import { Form, useFormikContext } from "formik";
+import { InputAdornment } from "@mui/material";
+import { Form, FormikErrors, useFormikContext } from "formik";
 import { useEffect } from "react";
-import { args as arx } from "../shared/lib/args/args";
-import { Call, CallError } from "../shared/lib/call";
-import { Tooltip } from "../shared/ui/components";
-import { TextField, UnitField } from "../shared/ui/form-fields";
-import { BaseTask, BaseTaskProps, DefaultFormData, DisplayData } from "./base";
-import "./custom.scss";
+import { args as arx } from "../../shared/lib/args/args";
+import { fields } from "../../shared/lib/args/args-types/args-object";
+import { Call, CallError } from "../../shared/lib/call";
+import { FungibleToken } from "../../shared/lib/standards/fungibleToken";
+import { CheckboxField, TextField, UnitField } from "../../shared/ui/form-fields";
+import { BaseTask, BaseTaskProps, BaseTaskState, DefaultFormData } from "./../base";
+import "./near.scss";
 
 type FormData = DefaultFormData & {
     amount: string;
     withdrawAll: boolean;
 };
 
-export class StorageWithdraw extends BaseTask<FormData> {
+type Props = BaseTaskProps;
+
+type State = BaseTaskState<FormData> & {
+    token: FungibleToken;
+};
+
+export class StorageWithdraw extends BaseTask<FormData, Props, State> {
     override uniqueClassName = "near-storage-withdraw-task";
     override schema = arx
         .object()
         .shape({
-            addr: arx.string().contract(),
+            addr: arx.string().ft(),
             gas: arx.big().gas(),
             amount: arx.big().token(),
         })
         .transform(({ gas, gasUnit, depo, depoUnit, ...rest }) => ({
             ...rest,
             gas: arx.big().intoParsed(gasUnit).cast(gas),
-            depo: arx.big().intoParsed(depoUnit).cast(depo),
         }))
         .requireAll()
         .retainAll();
 
     override initialValues: FormData = {
-        name: "Custom",
-        addr: "",
-        func: "",
-        gas: "0",
+        name: "Storage Withdraw",
+        addr: window.nearConfig.WNEAR_ADDRESS,
+        func: "storage_withdraw",
+        gas: "7.5",
         gasUnit: "Tgas",
-        depo: "0",
-        depoUnit: "NEAR",
-        args: "{}",
+        depo: "1",
+        depoUnit: "yocto",
+        amount: "0",
+        withdrawAll: true,
     };
 
     constructor(props: BaseTaskProps) {
         super(props);
         this._constructor();
+
+        this.state = {
+            ...this.state,
+            token: new FungibleToken(this.initialValues.addr),
+        };
+
+        this.tryUpdateFt().catch(() => {});
     }
 
-    protected override init(call: Call | null): void {
+    protected override init(
+        call: Call<{
+            amount: string;
+        }> | null
+    ): void {
         if (call !== null) {
             const fromCall = {
                 addr: call.address,
                 func: call.actions[0].func,
                 gas: arx.big().intoFormatted(this.initialValues.gasUnit).cast(call.actions[0].gas).toFixed(),
-                depo: arx.big().intoFormatted(this.initialValues.depoUnit).cast(call.actions[0].depo).toFixed(),
-                args: JSON.stringify(call.actions[0].args),
+                amount: call.actions[0].args.amount,
+                withdrawAll: call.actions[0].args.amount === undefined,
             };
 
             this.initialValues = Object.keys(this.initialValues).reduce((acc, k) => {
@@ -65,33 +82,95 @@ export class StorageWithdraw extends BaseTask<FormData> {
 
         this.state = { ...this.state, formData: this.initialValues };
         this.schema.check(this.state.formData);
+
+        if (call !== null)
+            this.tryUpdateFt().then((res) =>
+                this.setFormData({
+                    amount: res
+                        ? arx
+                              .big()
+                              .intoFormatted(this.state.token.metadata.decimals)
+                              .cast(this.state.formData.amount)
+                              .toFixed()
+                        : this.state.formData.amount,
+                })
+            );
     }
 
     static override inferOwnType(json: Call): boolean {
-        return false;
+        return (
+            !!json && arx.string().address().isValidSync(json.address) && json.actions[0].func === "storage_withdraw"
+        );
     }
 
     public override toCall(): Call {
-        const { addr, func, args, gas, gasUnit, depo, depoUnit } = this.state.formData;
-        if (!arx.string().json().isValidSync(args))
-            throw new CallError("Failed to parse function arguments", this.props.id);
+        const { token } = this.state;
+        const { addr, func, gas, gasUnit, depo, amount, withdrawAll } = this.state.formData;
+
         if (!arx.big().isValidSync(gas)) throw new CallError("Failed to parse gas input value", this.props.id);
-        if (!arx.big().isValidSync(depo)) throw new CallError("Failed to parse deposit input value", this.props.id);
+        if (!arx.big().isValidSync(amount)) throw new CallError("Failed to parse amount input value", this.props.id);
+        if (!token.ready) throw new CallError("Lacking token metadata", this.props.id);
+
         return {
             address: addr,
             actions: [
                 {
                     func,
-                    args: JSON.parse(args),
+                    args: withdrawAll
+                        ? {}
+                        : {
+                              amount: arx.big().intoParsed(token.metadata.decimals).cast(amount).toFixed(),
+                          },
                     gas: arx.big().intoParsed(gasUnit).cast(gas).toFixed(),
-                    depo: arx.big().intoParsed(depoUnit).cast(depo).toFixed(),
+                    depo,
                 },
             ],
         };
     }
 
+    private tryUpdateFt(): Promise<boolean> {
+        return new Promise<boolean>((resolve) => {
+            this.schema.check(this.state.formData).then(() => {
+                const { addr } = fields(this.schema);
+                if (!addr.isBad()) {
+                    this.confidentlyUpdateFt().then((ready) => resolve(ready));
+                } else {
+                    this.setState({ token: new FungibleToken(this.state.formData.addr) }); // will be invalid
+                    resolve(false);
+                }
+            });
+        });
+    }
+
+    private async confidentlyUpdateFt(): Promise<boolean> {
+        const { addr } = this.state.formData;
+        const newToken = await FungibleToken.init(addr);
+        this.setState({ token: newToken });
+        window.EDITOR.forceUpdate();
+        return newToken.ready;
+    }
+
+    public override async validateForm(values: FormData): Promise<FormikErrors<FormData>> {
+        this.setFormData(values);
+        await new Promise((resolve) => this.resolveDebounced(resolve));
+        await this.tryUpdateFt();
+        await this.schema
+            .transform(({ amount, ...rest }) => ({
+                ...rest,
+                amount: this.state.token.ready
+                    ? arx.big().intoParsed(this.state.token.metadata.decimals).cast(amount)?.toFixed() ?? null
+                    : amount,
+            }))
+            .check(values);
+        return Object.fromEntries(
+            Object.entries(fields(this.schema))
+                .map(([k, v]) => [k, v?.message() ?? ""])
+                .filter(([_, v]) => v !== "")
+        );
+    }
+
     public override Editor = (): React.ReactNode => {
-        const { resetForm, validateForm } = useFormikContext();
+        const { resetForm, validateForm, values } = useFormikContext<FormData>();
 
         useEffect(() => {
             resetForm({
@@ -112,45 +191,33 @@ export class StorageWithdraw extends BaseTask<FormData> {
                 <div className="empty-line" />
                 <TextField
                     name="addr"
-                    label="Contract Address"
+                    label="Token Address"
                     roundtop
                 />
-                <TextField
-                    name="func"
-                    label="Function"
+                <CheckboxField
+                    name="withdrawAll"
+                    label="Withdraw all available funds"
+                    checked={values.withdrawAll}
                 />
-                <TextField
-                    name="args"
-                    label="Function Arguments"
-                />
+                {!values.withdrawAll && (
+                    <TextField
+                        name="amount"
+                        label="Amount"
+                        InputProps={{
+                            endAdornment: (
+                                <InputAdornment position="end">{this.state.token.metadata.symbol}</InputAdornment>
+                            ),
+                        }}
+                    />
+                )}
                 <UnitField
                     name="gas"
                     unit="gasUnit"
                     options={["Tgas", "gas"]}
                     label="Allocated gas"
-                />
-                <UnitField
-                    name="depo"
-                    unit="depoUnit"
-                    options={["NEAR", "yocto"]}
-                    label="Allocated deposit"
                     roundbottom
                 />
             </Form>
         );
     };
-
-    protected override getDisplayData(): DisplayData {
-        const { name, addr, func, gas, gasUnit, depo, depoUnit, args } = this.state.formData;
-        return {
-            name,
-            addr,
-            func,
-            gas,
-            gasUnit: gasUnit.toString(),
-            depo,
-            depoUnit: depoUnit.toString(),
-            args: arx.string().json().isValidSync(args) ? JSON.stringify(JSON.parse(args), null, "  ") : args,
-        };
-    }
 }
