@@ -1,9 +1,9 @@
 import clsx from "clsx";
 
-import { Placeholder, Scrollable, Table, Tile } from "../../../shared/ui/components";
-
+import { Scrollable, Table, Tile } from "../../../shared/ui/components";
 import { TokensWhitelistModel } from "../model/tokens-whitelist";
 import { type MulticallEntity } from "../config";
+
 import { multicallWhitelistedTokenTableRow } from "./whitelisted-token";
 
 interface MulticallTokensWhitelistProps extends MulticallEntity.Dependencies {
