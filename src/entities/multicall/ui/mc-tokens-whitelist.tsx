@@ -1,30 +1,33 @@
 import clsx from "clsx";
 
 import { Scrollable, Table, Tile } from "../../../shared/ui/components";
-import { TokensWhitelistModel } from "../model/tokens-whitelist";
+import { MulticallTokensModel } from "../model/mc-tokens";
 import { type MulticallEntity } from "../config";
 
 import { multicallWhitelistedTokenTableRow } from "./mc-whitelisted-token";
 
-interface MulticallTokensWhitelistProps extends MulticallEntity.Dependencies {
+interface MulticallTokensWhitelistTableProps extends MulticallEntity.Dependencies {
     className?: string;
 }
 
-const _MulticallTokensWhitelist = "MulticallTokensWhitelist";
+const _MulticallTokensWhitelistTable = "MulticallTokensWhitelistTable";
 
-export const MulticallTokensWhitelist = ({ className, daoContractAddress }: MulticallTokensWhitelistProps) => {
-    const { data, error, loading } = TokensWhitelistModel.useAllTokensFor(daoContractAddress);
+export const MulticallTokensWhitelistTable = ({
+    className,
+    daoContractAddress,
+}: MulticallTokensWhitelistTableProps) => {
+    const { data, error, loading } = MulticallTokensModel.useWhitelist(daoContractAddress);
 
     return (
         <Tile
-            className={clsx(_MulticallTokensWhitelist, className)}
+            className={clsx(_MulticallTokensWhitelistTable, className)}
             heading="Tokens whitelist"
             noData={data !== null && data.length === 0}
             {...{ error, loading }}
         >
             <Scrollable>
                 <Table
-                    className={`${_MulticallTokensWhitelist}-body`}
+                    className={`${_MulticallTokensWhitelistTable}-body`}
                     displayMode="compact"
                     header={["Contract address"]}
                     rows={data?.map(multicallWhitelistedTokenTableRow)}

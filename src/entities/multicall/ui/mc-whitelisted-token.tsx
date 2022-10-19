@@ -5,7 +5,7 @@ interface MulticallWhitelistedTokenProps {
     address: FungibleToken["address"];
 }
 
-const MulticallWhitelistedToken = ({ address }: MulticallWhitelistedTokenProps) => {
+const MulticallWhitelistedTokenEntry = ({ address }: MulticallWhitelistedTokenProps) => {
     const addr = new ArgsAccount(address);
 
     return (
@@ -22,5 +22,5 @@ const MulticallWhitelistedToken = ({ address }: MulticallWhitelistedTokenProps) 
 };
 
 export const multicallWhitelistedTokenTableRow = (address: MulticallWhitelistedTokenProps["address"]) => [
-    <MulticallWhitelistedToken {...{ address }} />,
+    <MulticallWhitelistedTokenEntry {...{ address }} />,
 ];

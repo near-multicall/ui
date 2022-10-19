@@ -73,7 +73,7 @@ const DaoConfigTabComponent = ({ className, contracts: { multicall }, daoContrac
             </Tile>
 
             {!editMode && (
-                <Multicall.TokensWhitelist
+                <Multicall.TokensWhitelistTable
                     className={`${_DaoConfigTab}-tokensWhitelist`}
                     daoContractAddress={daoContract.address}
                 />
