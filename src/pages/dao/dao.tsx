@@ -428,7 +428,6 @@ export class DaoPage extends Component<Props, State> {
                 () => {
                     this.errors.address.validOrNull(daoAccount);
                     this.loadInfo();
-                    this.forceUpdate();
                 }
             );
         }
@@ -456,7 +455,6 @@ export class DaoPage extends Component<Props, State> {
                                 if (daoAccount.isValid()) {
                                     this.loadInfoDebounced();
                                 }
-                                this.forceUpdate();
                             }}
                             InputProps={{
                                 endAdornment: (
