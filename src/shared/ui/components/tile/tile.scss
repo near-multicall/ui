@@ -22,8 +22,10 @@
     &-content {
         display: flex;
         flex-flow: column nowrap;
+        position: relative;
         width: auto;
         height: 100%;
+        overflow: hidden;
     }
 
     @for $i from 0 to 3 {
