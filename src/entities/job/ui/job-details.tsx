@@ -24,7 +24,7 @@ const JobDisplayStatus = ({ job }: Pick<JobEntity.DataWithStatus, "job">) => {
     );
 };
 
-export const jobDetailsTableRowRender = ({ id, job }: JobDetailsTableRowRenderProps) => [
+export const jobDetailsTableRow = ({ id, job }: JobDetailsTableRowRenderProps) => [
     <JobDisplayStatus {...{ job }} />,
     id,
     // Multicall returns timestamp in nanoseconds, JS Date uses milliseconds

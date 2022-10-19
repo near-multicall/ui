@@ -4,7 +4,7 @@ import { Placeholder, Scrollable, Table, Tile } from "../../../shared/ui/compone
 
 import { type JobEntity } from "../config";
 import { JobDataModel } from "../model/job-data";
-import { jobDetailsTableRowRender } from "./job-details";
+import { jobDetailsTableRow } from "./job-details";
 import "./jobs-list.scss";
 
 interface JobsListProps extends JobEntity.Dependencies {}
@@ -37,7 +37,7 @@ export const JobsList = ({ className, contracts }: JobsListProps) => {
                         className={`${_JobsList}-body`}
                         displayMode="compact"
                         header={["Status", "ID", "Start at", "Croncat hash", "Creator", "Trigger gas", "Multicalls"]}
-                        rows={Object.values(data).map(jobDetailsTableRowRender)}
+                        rows={Object.values(data).map(jobDetailsTableRow)}
                     />
                 </Scrollable>
             )}
