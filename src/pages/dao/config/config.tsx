@@ -59,18 +59,10 @@ const DaoConfigTabComponent = ({ className, contracts: { multicall }, daoContrac
 
     return (
         <div className={clsx(_DaoConfigTab, className)}>
-            <Tile
+            <Multicall.AdminsTable
                 className={`${_DaoConfigTab}-admins`}
-                heading="Admins"
-            >
-                <ul className="list">
-                    {multicall.admins.map((admin) => (
-                        <li key={admin}>
-                            <Link address={admin} />
-                        </li>
-                    ))}
-                </ul>
-            </Tile>
+                daoContractAddress={daoContract.address}
+            />
 
             {!editMode && (
                 <Multicall.TokensWhitelistTable
