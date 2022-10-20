@@ -4,7 +4,7 @@
 .ButtonGroup {
     @include mixin.center-items(space-between, center);
     flex-flow: row nowrap;
-    padding: size.$gap;
+    width: 100%;
 
     &--end {
         margin-top: auto;

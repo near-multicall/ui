@@ -18,6 +18,11 @@
 
         &:not(.is-inEditMode) {
             @include mixin.center-items(space-evenly, center);
+
+            .ButtonGroup {
+                justify-content: center;
+                margin-top: 0;
+            }
         }
     }
 
