@@ -5,7 +5,7 @@
     display: flex;
     align-items: center;
     gap: 0.6 * size.$gap;
-    line-height: 1;
+    line-height: 0;
 
     &-icon {
         width: fit-content;
