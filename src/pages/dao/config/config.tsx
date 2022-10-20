@@ -37,7 +37,6 @@ const _DaoConfigTab = "DaoConfigTab";
 const DaoConfigTabComponent = ({ className, contracts: { multicall } }: DaoConfigTabComponentProps) => (
     <div className={clsx(_DaoConfigTab, className)}>
         <Tile className="AdminsList">
-            <AddOutlined />
             <h1 className="title">Admins</h1>
 
             <ul className="list">
