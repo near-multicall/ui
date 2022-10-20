@@ -7,14 +7,18 @@ import { type MulticallEntity } from "../config";
 import { multicallWhitelistedTokenTableRow } from "./mc-whitelisted-token";
 
 interface MulticallTokensWhitelistTableProps extends MulticallEntity.Dependencies {
+    additionalItems?: JSX.Element[][];
     className?: string;
+    toolbarContent?: JSX.Element;
 }
 
 const _MulticallTokensWhitelistTable = "MulticallTokensWhitelistTable";
 
 export const MulticallTokensWhitelistTable = ({
+    additionalItems,
     className,
     daoContractAddress,
+    toolbarContent,
 }: MulticallTokensWhitelistTableProps) => {
     const { data, error, loading } = MulticallTokensModel.useWhitelist(daoContractAddress);
 
@@ -30,7 +34,7 @@ export const MulticallTokensWhitelistTable = ({
                     className={`${_MulticallTokensWhitelistTable}-body`}
                     displayMode="compact"
                     header={["Contract address"]}
-                    rows={data?.map(multicallWhitelistedTokenTableRow)}
+                    rows={(data?.map(multicallWhitelistedTokenTableRow) ?? []).concat(additionalItems ?? [])}
                 />
             </Scrollable>
         </Tile>
