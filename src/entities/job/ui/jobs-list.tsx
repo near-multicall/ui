@@ -36,7 +36,7 @@ export const JobsList = ({ className, contracts }: JobsListProps) => {
                         className={`${_JobsList}-body`}
                         displayMode="compact"
                         header={["Status", "ID", "Start at", "Croncat hash", "Creator", "Trigger gas", "Multicalls"]}
-                        rows={Object.values(data).map(jobDetailsTableRowRender)}
+                        rows={Object.values(data).map(jobDetailsTableRowRender).reverse()}
                     />
                 </Scrollable>
             )}
