@@ -11,5 +11,12 @@
         padding-bottom: size.$gap;
         position: relative;
         overflow: hidden;
+        .Table-row-content--compact {
+            &:not(&:first-of-type) {
+                span:last-of-type {
+                    font-family: font.$code;
+                }
+            }
+        }
     }
 }
