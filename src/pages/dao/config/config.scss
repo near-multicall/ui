@@ -14,8 +14,11 @@
         "jobsSettings proposalForm";
 
     &-proposalForm {
-        @include mixin.center-items(space-evenly, center);
         grid-area: proposalForm;
+
+        &:not(.is-inEditMode) {
+            @include mixin.center-items(space-evenly, center);
+        }
     }
 
     &-admins {

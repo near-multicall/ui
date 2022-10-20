@@ -8,7 +8,7 @@ import { ArgsAccount, ArgsString } from "../../../shared/lib/args";
 import { MulticallContract } from "../../../shared/lib/contracts/multicall";
 import { SputnikDAOContract } from "../../../shared/lib/contracts/sputnik-dao";
 import { toNEAR } from "../../../shared/lib/converter";
-import { Button, TextInput, Tile } from "../../../shared/ui/components";
+import { Button, ButtonGroup, TextInput, Tile } from "../../../shared/ui/components";
 
 import "./config.scss";
 
@@ -149,30 +149,32 @@ const DaoConfigTabComponent = ({ className, contracts: { multicall }, daoContrac
             </Tile>
 
             <Tile
-                className={`${_DaoConfigTab}-proposalForm`}
+                className={clsx(`${_DaoConfigTab}-proposalForm`, { "is-inEditMode": editMode })}
                 heading={editMode ? "Changes proposal" : null}
             >
-                {!editMode ? (
-                    <Button
-                        color="success"
-                        label="Draft changes"
-                        onClick={() => setEditMode(true)}
-                    />
-                ) : (
-                    <>
-                        <Button
-                            color="error"
-                            label="Cancel"
-                            onClick={() => setEditMode(false)}
-                        />
-
+                <ButtonGroup>
+                    {!editMode ? (
                         <Button
                             color="success"
-                            label="Submit"
-                            onClick={() => setEditMode(false)}
+                            label="Draft changes"
+                            onClick={() => setEditMode(true)}
                         />
-                    </>
-                )}
+                    ) : (
+                        <>
+                            <Button
+                                color="error"
+                                label="Cancel"
+                                onClick={() => setEditMode(false)}
+                            />
+
+                            <Button
+                                color="success"
+                                label="Submit"
+                                onClick={() => setEditMode(false)}
+                            />
+                        </>
+                    )}
+                </ButtonGroup>
             </Tile>
         </div>
     );
