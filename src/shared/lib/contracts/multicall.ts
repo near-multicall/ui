@@ -305,4 +305,4 @@ class Multicall {
 }
 
 export { Multicall, Multicall as MulticallContract };
-export type { JobData, MulticallArgs };
+export type { JobData, MulticallArgs, MulticallConfigChanges };
