@@ -5,13 +5,13 @@ import { Job } from "../../../entities";
 
 import "./jobs.scss";
 
-interface DaoJobsTabComponentProps extends HTMLProps<HTMLDivElement>, ComponentProps<typeof Job.ListOfAll> {}
+interface DaoJobsTabComponentProps extends HTMLProps<HTMLDivElement>, ComponentProps<typeof Job.EntriesTable> {}
 
 const _DaoJobsTab = "DaoJobsTab";
 
 const DaoJobsTabComponent = ({ className, contracts }: DaoJobsTabComponentProps) => (
     <div className={clsx(_DaoJobsTab, className)}>
-        <Job.ListOfAll
+        <Job.EntriesTable
             className={`${_DaoJobsTab}-jobsList`}
             {...{ contracts }}
         />

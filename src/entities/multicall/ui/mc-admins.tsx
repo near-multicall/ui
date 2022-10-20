@@ -4,7 +4,7 @@ import { Scrollable, Table, Tile } from "../../../shared/ui/components";
 import { MulticallAdminsModel } from "../model/mc-admins";
 import { type MulticallEntity } from "../config";
 
-import { multicallAdminTableRow } from "./mc-admin";
+import { multicallAdminTableRow } from "./mc-admin-entry";
 
 interface MulticallAdminsTableProps extends MulticallEntity.Dependencies {
     className?: string;

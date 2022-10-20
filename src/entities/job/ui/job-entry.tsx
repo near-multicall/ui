@@ -4,9 +4,9 @@ import { Big, toTGas } from "../../../shared/lib/converter";
 import { DataInspector, IconLabel } from "../../../shared/ui/components";
 
 import { JobConfig, type JobEntity } from "../config";
-import "./job-details.scss";
+import "./job-entry.scss";
 
-interface JobDetailsTableRowRenderProps extends JobEntity.DataWithStatus {}
+interface JobEntryProps extends JobEntity.DataWithStatus {}
 
 const _Job = "Job";
 
@@ -24,7 +24,7 @@ const JobDisplayStatus = ({ job }: Pick<JobEntity.DataWithStatus, "job">) => {
     );
 };
 
-export const jobDetailsTableRow = ({ id, job }: JobDetailsTableRowRenderProps) => [
+export const jobTableRow = ({ id, job }: JobEntryProps) => [
     <JobDisplayStatus {...{ job }} />,
     id,
     // Multicall returns timestamp in nanoseconds, JS Date uses milliseconds
