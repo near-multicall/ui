@@ -105,6 +105,14 @@ export class Task extends Component {
                                 json={json}
                             />
                         );
+                    case "withdraw":
+                        return (
+                            <Family.Near.Withdraw
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
                 }
 
             default:

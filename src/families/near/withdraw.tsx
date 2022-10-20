@@ -1,4 +1,4 @@
-// TODO: add checkbox and support "unstake_all".
+// TODO: add checkbox and support "withdraw_all".
 
 import { Form, FormikErrors, useFormikContext } from "formik";
 import { useEffect } from "react";
@@ -27,14 +27,14 @@ type State = BaseTaskState<FormData> & {
     StakeInfo: HumanReadableAccount;
 };
 
-export class Unstake extends BaseTask<FormData, Props, State> {
-    override uniqueClassName = "near-unstake-task";
+export class Withdraw extends BaseTask<FormData, Props, State> {
+    override uniqueClassName = "near-withdraw-task";
     override schema = arx
         .object()
         .shape({
             addr: arx.string().stakingPool(),
             gas: arx.big().gas().min(toGas("3.5")).max(toGas("250")),
-            amount: arx.big().token().min("1", "cannot unstake 0 NEAR"),
+            amount: arx.big().token().min("1", "cannot withdraw 0 NEAR"),
         })
         .transform(({ gas, gasUnit, amount, amountUnit, ...rest }) => ({
             ...rest,
@@ -45,9 +45,9 @@ export class Unstake extends BaseTask<FormData, Props, State> {
         .retainAll();
 
     override initialValues: FormData = {
-        name: "Unstake",
+        name: "Withdraw Stake",
         addr: "",
-        func: "unstake",
+        func: "withdraw",
         gas: "20",
         gasUnit: "Tgas",
         depo: "1",
@@ -97,7 +97,7 @@ export class Unstake extends BaseTask<FormData, Props, State> {
     }
 
     static override inferOwnType(json: Call): boolean {
-        return !!json && json.actions[0].func === "unstake";
+        return !!json && json.actions[0].func === "withdraw";
     }
 
     public override toCall(): Call {
@@ -150,17 +150,15 @@ export class Unstake extends BaseTask<FormData, Props, State> {
         this.setFormData(values);
         await new Promise((resolve) => this.resolveDebounced(resolve));
         const schemaWithTest = this.schema
-            .test("max unstake amount", "potato too high", (value) => {
+            .test("max withdraw amount", "potato too high", (value) => {
                 console.log("hey from test");
                 // TODO: check amount parseable to big
                 const { amount } = value;
                 const { StakeInfo } = this.state;
-                const { unstaked_balance, can_withdraw } = StakeInfo;
-                const withdrawable = StakingPool.getWithdrawableAmount(unstaked_balance, can_withdraw);
                 console.log("amount:", amount);
-                console.log("withdrawable:", withdrawable);
-                console.log(arx.big().max(withdrawable).isValidSync(amount));
-                return arx.big().max(withdrawable).isValidSync(amount);
+                console.log("unstaked balance:", StakeInfo.unstaked_balance);
+                console.log(arx.big().max(StakeInfo.unstaked_balance).isValidSync(amount));
+                return arx.big().max(StakeInfo.unstaked_balance).isValidSync(amount);
             })
             .test({
                 name: "test",
@@ -190,7 +188,6 @@ export class Unstake extends BaseTask<FormData, Props, State> {
     public override Editor = (): React.ReactNode => {
         const { resetForm, validateForm } = useFormikContext();
         const { pool, StakeInfo } = this.state;
-        const withdrawable = StakingPool.getWithdrawableAmount(StakeInfo.unstaked_balance, StakeInfo.can_withdraw);
 
         useEffect(() => {
             resetForm({
@@ -214,7 +211,9 @@ export class Unstake extends BaseTask<FormData, Props, State> {
                     label="Validator Address"
                     roundtop
                 />
-                {pool.ready ? <div>{`Staked balance: ${formatTokenAmount(withdrawable, 24, 2)} Ⓝ`}</div> : null}
+                {pool.ready ? (
+                    <div>{`Available to withdraw: ${formatTokenAmount(StakeInfo.unstaked_balance, 24, 2)} Ⓝ`}</div>
+                ) : null}
                 <UnitField
                     name="amount"
                     unit="amountUnit"

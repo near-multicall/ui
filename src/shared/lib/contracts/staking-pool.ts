@@ -25,7 +25,7 @@ type HumanReadableAccount = {
     unstaked_balance: string; // string encoded u128 number.
     // The amount balance staked at the current "stake" share price.
     staked_balance: string; // string encoded u128 number.
-    /// Whether the unstaked balance is available for withdrawal now.
+    // Whether the unstaked balance is available for withdrawal now.
     can_withdraw: boolean;
 };
 
@@ -80,6 +80,10 @@ class StakingPool {
         const { numerator, denominator } = fraction;
         const result = Big(numerator).mul("100").div(denominator).toFixed(decimalPlaces);
         return removeTrailingZeros(result);
+    }
+
+    static getWithdrawableAmount(unstakedBalance: string, canWithdraw: boolean): string {
+        return canWithdraw ? unstakedBalance : "0";
     }
 
     /**
