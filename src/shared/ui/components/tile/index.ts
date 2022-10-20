@@ -1,1 +1,1 @@
-export { Tile } from "./tile";
+export { Tile, type TileProps } from "./tile";

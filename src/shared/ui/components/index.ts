@@ -2,6 +2,7 @@
 export { Button } from "./button";
 export { ButtonGroup } from "./button-group";
 export { NearIcons } from "./icons";
+export { NearLink, type NearLinkProps } from "./near-link";
 export { Placeholder } from "./placeholder";
 export { PopupMenu } from "./popup-menu";
 export { Scrollable } from "./scrollable";
@@ -10,7 +11,7 @@ export { Tooltip } from "./tooltip";
 /** Molecules */
 export { IconLabel } from "./icon-label";
 export { TextInput, TextInputWithUnits } from "./text-input";
-export { Tile } from "./tile";
+export { Tile, type TileProps } from "./tile";
 
 /** Organisms */
 export { DataInspector } from "./data-inspector";
