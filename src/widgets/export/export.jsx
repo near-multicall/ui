@@ -245,13 +245,6 @@ export class Export extends Component {
                                 ]);
                                 signAndSendTxs([addJobTx, proposeJobTx]);
                             }
-                            //    WALLET_COMPONENT.state.currentDAO.proposeMulticall(
-                            //        desc.value,
-                            //        multicallArgs,
-                            //        // if attach NEAR disabled, ignore depo amount and attach 1 yocto.
-                            //        attachNEAR ? convert(depo.value, depo.unit) : "1",
-                            //        convert(gas.value, gas.unit)
-                            //    );
                         }
                     }}
                 >

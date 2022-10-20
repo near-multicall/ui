@@ -17,11 +17,11 @@
         &:first-of-type {
             text-align: left;
             font-family: font.$text;
-            padding-left: calc(1.25 * size.$gap);
+            padding-left: 1.25 * size.$gap;
         }
 
         &:last-of-type {
-            padding-right: calc(1.25 * size.$gap);
+            padding-right: 1.25 * size.$gap;
         }
     }
 
@@ -32,9 +32,9 @@
     &--compact {
         display: flex;
         flex-direction: column;
-        gap: calc(size.$gap / 2);
+        gap: 0.5 * size.$gap;
         border-radius: size.$task-radius;
-        padding: calc(size.$gap / 2);
+        padding: 0.5 * size.$gap;
         background-color: color.$white;
     }
 
@@ -43,10 +43,10 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: calc(1.1 * size.$text);
+            font-size: 1.1 * size.$text;
 
             &:first-of-type {
-                padding: calc(size.$gap / 2);
+                padding: 0.5 * size.$gap;
 
                 & > span {
                     &:first-of-type {
@@ -60,18 +60,18 @@
             }
 
             &:not(:first-of-type) {
-                padding: calc(size.$gap / 1.5) size.$gap;
+                padding: 0.5 * size.$gap size.$gap;
                 background-color: rgba(color.$lightest, 0.7);
             }
 
             &:nth-of-type(2) {
-                border-top-left-radius: calc(size.$task-radius / 1.2);
-                border-top-right-radius: calc(size.$task-radius / 1.2);
+                border-top-left-radius: 0.8 * size.$task-radius;
+                border-top-right-radius: 0.8 * size.$task-radius;
             }
 
             &:last-of-type {
-                border-bottom-left-radius: calc(size.$task-radius / 1.2);
-                border-bottom-right-radius: calc(size.$task-radius / 1.2);
+                border-bottom-left-radius: 0.8 * size.$task-radius;
+                border-bottom-right-radius: 0.8 * size.$task-radius;
             }
 
             span:first-of-type {

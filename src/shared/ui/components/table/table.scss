@@ -9,7 +9,7 @@
 
     .MuiTableCell-root {
         border-bottom: none;
-        padding: calc(0.5 * size.$gap);
+        padding: 0.5 * size.$gap;
     }
 
     table {
@@ -31,11 +31,11 @@
 
             &:first-of-type {
                 text-align: left;
-                padding-left: calc(1.25 * size.$gap);
+                padding-left: 1.25 * size.$gap;
             }
 
             &:last-of-type {
-                padding-right: calc(1.25 * size.$gap);
+                padding-right: 1.25 * size.$gap;
             }
         }
     }
@@ -43,7 +43,7 @@
     &--compact {
         display: flex;
         flex-flow: column nowrap;
-        padding: calc(1.25 * size.$gap);
+        padding: 1.25 * size.$gap;
         gap: size.$gap;
     }
 }

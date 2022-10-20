@@ -5,7 +5,7 @@
     display: flex;
     flex-flow: column nowrap;
     position: relative;
-    padding: calc(0.25 * size.$gap);
+    padding: 0.25 * size.$gap;
     border-radius: size.$task-radius;
     background-color: color.$lightest;
     font-size: size.$small-text;
