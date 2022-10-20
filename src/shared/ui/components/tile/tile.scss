@@ -11,11 +11,28 @@
     font-size: size.$small-text;
 
     &-heading {
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: center;
+        gap: size.$gap;
         padding-bottom: calc(size.$gap * 1);
-        font-size: size.$large-text;
 
-        span {
-            float: right;
+        &-text,
+        svg {
+            font-size: size.$large-text;
+        }
+
+        &-slot {
+            &--left,
+            &--right {
+                .MuiButtonBase-root {
+                    padding: 4px;
+                }
+            }
+
+            &--right {
+                margin-left: auto;
+            }
         }
     }
 
@@ -26,15 +43,5 @@
         width: auto;
         height: 100%;
         overflow: hidden;
-    }
-
-    @for $i from 0 to 3 {
-        .MuiSvgIcon-root:nth-of-type(#{$i + 1}) {
-            position: absolute;
-            font-size: size.$large-text;
-            top: calc(0.5 * size.$gap + size.$gap / 6);
-            right: calc(0.5 * size.$gap + $i * (size.$large-text + 0.25 * size.$gap) + size.$gap / 6);
-            cursor: pointer;
-        }
     }
 }

@@ -25,6 +25,7 @@ export const MulticallAdminsTable = ({ className, daoContractAddress }: Multical
             <Scrollable>
                 <Table
                     className={`${_MulticallAdminsTable}-body`}
+                    denseHeader
                     displayMode="compact"
                     header={["Account address"]}
                     rows={data?.map(multicallAdminTableRow)}

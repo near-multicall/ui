@@ -40,9 +40,13 @@
             align-items: center;
             font-size: calc(1.1 * size.$text);
 
-            &:first-of-type {
-                padding: calc(size.$gap / 2);
+            &:not(&--denseHeader) {
+                &:first-of-type {
+                    padding: calc(size.$gap / 2);
+                }
+            }
 
+            &:first-of-type {
                 & > span {
                     &:first-of-type {
                         display: none;

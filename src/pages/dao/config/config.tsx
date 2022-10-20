@@ -87,17 +87,11 @@ const DaoConfigTabComponent = ({ className, daoContractAddress, multicallContrac
                 daoContractAddress={daoContractAddress}
                 toolbarContent={
                     tokensWhitelistEditMode ? (
-                        <IconButton
-                            edge="end"
-                            onClick={() => tokensWhitelistEditModeSwitch(false)}
-                        >
+                        <IconButton onClick={() => tokensWhitelistEditModeSwitch(false)}>
                             <VisibilityOutlined />
                         </IconButton>
                     ) : (
-                        <IconButton
-                            edge="end"
-                            onClick={() => tokensWhitelistEditModeSwitch(true)}
-                        >
+                        <IconButton onClick={() => tokensWhitelistEditModeSwitch(true)}>
                             <AddOutlined />
                         </IconButton>
                     )

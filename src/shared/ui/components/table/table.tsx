@@ -13,7 +13,7 @@ import { HTMLAttributes } from "react";
 import { TableRowCard, TableRow, type TableRowProps } from "./row";
 import "./table.scss";
 
-interface TableProps extends HTMLAttributes<HTMLDivElement> {
+interface TableProps extends HTMLAttributes<HTMLDivElement>, Pick<TableRowProps, "denseHeader"> {
     /**
      * `"classic"` mode is a classic table view.
      *
@@ -32,7 +32,7 @@ interface TableProps extends HTMLAttributes<HTMLDivElement> {
 
 const _Table = "Table";
 
-export const Table = ({ className, displayMode = "default", header, rows }: TableProps) => {
+export const Table = ({ className, denseHeader = false, displayMode = "default", header, rows }: TableProps) => {
     const mediumOrSmallScreen = useMediaQuery(useTheme().breakpoints.down("md")),
         classicModeRequired = (!mediumOrSmallScreen && displayMode === "default") || displayMode === "classic",
         compactModeRequired = (mediumOrSmallScreen && displayMode === "default") || displayMode === "compact";
@@ -70,7 +70,7 @@ export const Table = ({ className, displayMode = "default", header, rows }: Tabl
                             <TableRowCard
                                 headerCells={header}
                                 key={index}
-                                {...{ cells }}
+                                {...{ cells, denseHeader }}
                             />
                         ))}
                 </div>

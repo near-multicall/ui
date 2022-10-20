@@ -10,13 +10,34 @@ const _Tile = "Tile";
 export interface TileProps extends PropsWithChildren, HTMLAttributes<HTMLDivElement> {
     error?: Error | null;
     heading?: string | null;
+    headingSlotsContent?: { left?: JSX.Element; right?: JSX.Element };
     loading?: boolean;
     noData?: boolean;
 }
 
-export const Tile = ({ children, className, error, heading, loading = false, noData = false }: TileProps) => (
+export const Tile = ({
+    children,
+    className,
+    error,
+    heading,
+    headingSlotsContent,
+    loading = false,
+    noData = false,
+}: TileProps) => (
     <div className={_Tile}>
-        {heading && <h1 className={`${_Tile}-heading`}>{heading}</h1>}
+        {heading && (
+            <span className={`${_Tile}-heading`}>
+                {headingSlotsContent?.left && (
+                    <span className={`${_Tile}-heading-slot--left`}>{headingSlotsContent?.left}</span>
+                )}
+
+                <h1 className={`${_Tile}-heading-text`}>{heading}</h1>
+
+                {headingSlotsContent?.right && (
+                    <span className={`${_Tile}-heading-slot--right`}>{headingSlotsContent?.right}</span>
+                )}
+            </span>
+        )}
 
         <div className={clsx(`${_Tile}-content`, className)}>
             {loading && <div className="loader" />}
