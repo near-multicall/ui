@@ -1,19 +1,20 @@
 /** Atoms */
 export { Button } from "./button";
+export { ButtonGroup } from "./button-group";
 export { NearIcons } from "./icons";
 export { Placeholder } from "./placeholder";
 export { PopupMenu } from "./popup-menu";
 export { Scrollable } from "./scrollable";
-export { Tile } from "./tile";
 export { Tooltip } from "./tooltip";
 
 /** Molecules */
 export { IconLabel } from "./icon-label";
+export { TextInput, TextInputWithUnits } from "./text-input";
+export { Tile } from "./tile";
 
-/** Uncategorized ( yet ) */
+/** Organisms */
 export { DataInspector } from "./data-inspector";
 export { DateTimePicker, type DateTimePickerProps } from "./date-time-picker";
 export { Dialog } from "./dialog";
 export { Table } from "./table";
 export { Tabs } from "./tabs";
-export { TextInput, TextInputWithUnits } from "./text-input";

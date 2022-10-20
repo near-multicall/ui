@@ -1,0 +1,7 @@
+@use "sass/mixin";
+
+.ButtonGroup {
+    @include mixin.center-items(space-between, center);
+    flex-flow: row nowrap;
+    padding: size.$gap;
+}
