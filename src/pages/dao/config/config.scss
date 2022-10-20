@@ -7,8 +7,8 @@
     display: grid;
 
     grid-template:
-        "AdminsList ." 6fr
-        "TokenWhitelist ." 5fr
+        "TokenWhitelist AdminsList" 6fr
+        "TokenWhitelist AdminsList" 5fr
         "TokenWhitelist JobBond" 1fr / 1fr 1fr;
 
     .AdminsList {
