@@ -19,9 +19,7 @@ export class MulticallAdminsModel {
     ) =>
         await MulticallContract.instanceDataFetchFx(
             `${ArgsAccount.deconstructAddress(daoContractAddress).name}.${MulticallContract.FACTORY_ADDRESS}`,
-
-            (multicallInstanceData) =>
-                callback(Props.evolve({ data: ({ tokensWhitelist }) => tokensWhitelist }, multicallInstanceData))
+            (multicallInstanceData) => callback(Props.evolve({ data: ({ admins }) => admins }, multicallInstanceData))
         );
 
     static useAllEntries = (daoContractAddress: MulticallEntity.Dependencies["daoContractAddress"]) => {
