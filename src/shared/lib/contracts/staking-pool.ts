@@ -130,3 +130,4 @@ class StakingPool {
 }
 
 export { StakingPool };
+export type { HumanReadableAccount };

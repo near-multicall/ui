@@ -3,46 +3,55 @@ import { useEffect } from "react";
 import { args as arx } from "../../shared/lib/args/args";
 import { fields } from "../../shared/lib/args/args-types/args-object";
 import { Call, CallError } from "../../shared/lib/call";
-import { toGas } from "../../shared/lib/converter";
+import { toGas, unit, formatTokenAmount } from "../../shared/lib/converter";
 import { StakingPool } from "../../shared/lib/contracts/staking-pool";
 import { TextField, UnitField } from "../../shared/ui/form-fields";
-import type { DefaultFormData } from "../base";
 import { BaseTask, BaseTaskProps, BaseTaskState } from "../base";
 import "./near.scss";
+import { STORAGE } from "../../shared/lib/persistent";
 
-type FormData = DefaultFormData;
+import type { DefaultFormData } from "../base";
+import type { HumanReadableAccount } from "../../shared/lib/contracts/staking-pool";
+
+type FormData = DefaultFormData & {
+    amount: string;
+    amountUnit: number | unit;
+};
 
 type Props = BaseTaskProps;
 
 type State = BaseTaskState<FormData> & {
     pool: StakingPool;
+    StakeInfo: HumanReadableAccount;
 };
 
-export class DepositAndStake extends BaseTask<FormData, Props, State> {
-    override uniqueClassName = "near-deposit-and-stake-task";
+export class Unstake extends BaseTask<FormData, Props, State> {
+    override uniqueClassName = "near-unstake-task";
     override schema = arx
         .object()
         .shape({
             addr: arx.string().stakingPool(),
             gas: arx.big().gas().min(toGas("3.5")).max(toGas("250")),
-            depo: arx.big().token().min("1", "cannot stake 0 NEAR"),
+            amount: arx.big().token().min("1", "cannot unstake 0 NEAR"),
         })
-        .transform(({ gas, gasUnit, depo, depoUnit, ...rest }) => ({
+        .transform(({ gas, gasUnit, amount, amountUnit, ...rest }) => ({
             ...rest,
             gas: arx.big().intoParsed(gasUnit).cast(gas),
-            depo: arx.big().intoParsed(depoUnit).cast(depo),
+            amount: arx.big().intoParsed(amountUnit).cast(amount),
         }))
         .requireAll()
         .retainAll();
 
     override initialValues: FormData = {
-        name: "Deposit & Stake",
+        name: "Unstake",
         addr: "",
-        func: "deposit_and_stake",
+        func: "unstake",
         gas: "20",
         gasUnit: "Tgas",
-        depo: "0",
-        depoUnit: "NEAR",
+        depo: "1",
+        depoUnit: "yocto",
+        amount: "0",
+        amountUnit: "NEAR",
     };
 
     constructor(props: Props) {
@@ -57,13 +66,23 @@ export class DepositAndStake extends BaseTask<FormData, Props, State> {
         this.tryUpdateStakingPool().catch(() => {});
     }
 
-    protected override init(call: Call<{}> | null): void {
+    protected override init(
+        call: Call<{
+            amount: string;
+        }> | null
+    ): void {
         if (call !== null) {
             const fromCall = {
                 addr: call.address,
                 func: call.actions[0].func,
                 gas: arx.big().intoFormatted(this.initialValues.gasUnit).cast(call.actions[0].gas).toFixed(),
-                depo: arx.big().intoFormatted(this.initialValues.depoUnit).cast(call.actions[0].depo).toFixed(),
+                amount:
+                    arx
+                        .big()
+                        .intoFormatted(this.initialValues.amountUnit)
+                        .cast(call.actions[0].args.amount)
+                        ?.toFixed() ?? null,
+                transferAll: call.actions[0].args.amount === undefined,
             };
             this.initialValues = Object.keys(this.initialValues).reduce((acc, k) => {
                 const v = fromCall[k as keyof typeof fromCall];
@@ -76,11 +95,11 @@ export class DepositAndStake extends BaseTask<FormData, Props, State> {
     }
 
     static override inferOwnType(json: Call): boolean {
-        return !!json && json.actions[0].func === "deposit_and_stake";
+        return !!json && json.actions[0].func === "unstake";
     }
 
     public override toCall(): Call {
-        const { addr, func, gas, gasUnit, depo, depoUnit } = this.state.formData;
+        const { addr, func, gas, gasUnit, depo, amount, amountUnit } = this.state.formData;
 
         if (!arx.big().isValidSync(gas)) throw new CallError("Failed to parse gas input value", this.props.id);
         if (!arx.big().isValidSync(depo)) throw new CallError("Failed to parse deposit input value", this.props.id);
@@ -90,9 +109,11 @@ export class DepositAndStake extends BaseTask<FormData, Props, State> {
             actions: [
                 {
                     func,
-                    args: {},
+                    args: {
+                        amount: arx.big().intoParsed(amountUnit).cast(amount).toFixed(),
+                    },
                     gas: arx.big().intoParsed(gasUnit).cast(gas).toFixed(),
-                    depo: arx.big().intoParsed(depoUnit).cast(depo).toFixed(),
+                    depo,
                 },
             ],
         };
@@ -114,8 +135,11 @@ export class DepositAndStake extends BaseTask<FormData, Props, State> {
 
     private async confidentlyUpdateStakingPool(): Promise<boolean> {
         const { addr } = this.state.formData;
-        const stakingPool = await StakingPool.init(addr);
-        this.setState({ pool: stakingPool });
+        const [stakingPool, multicallStakeInfo] = await Promise.all([
+            StakingPool.init(addr),
+            new StakingPool(addr).getAccount(STORAGE.addresses.multicall),
+        ]);
+        this.setState({ pool: stakingPool, StakeInfo: multicallStakeInfo });
         window.EDITOR.forceUpdate();
         return stakingPool.ready;
     }
@@ -123,8 +147,35 @@ export class DepositAndStake extends BaseTask<FormData, Props, State> {
     public async validateForm(values: FormData): Promise<FormikErrors<FormData>> {
         this.setFormData(values);
         await new Promise((resolve) => this.resolveDebounced(resolve));
+        const schemaWithTest = this.schema
+            .test("max unstake amount", "potato too high", (value) => {
+                console.log("hey from test");
+                // TODO: check amount parseable to big
+                const { amount } = value;
+                const { StakeInfo } = this.state;
+                console.log("amount:", amount);
+                console.log("stake info:", StakeInfo.staked_balance);
+                console.log(arx.big().max(StakeInfo.staked_balance).isValidSync(amount));
+                return arx.big().max(StakeInfo.staked_balance).isValidSync(amount);
+            })
+            .test({
+                name: "test",
+                message: "test",
+                test: (value) => {
+                    console.log("test");
+                    return true;
+                },
+            })
+            .transform((value) => {
+                console.log("transform");
+                return value;
+            });
         // run promises in parallel as staking pool info isn't needed for form validation
-        await Promise.all([this.tryUpdateStakingPool(), this.schema.check(values)]);
+        await Promise.all([
+            this.tryUpdateStakingPool(),
+            // test can't stake more than balance
+            schemaWithTest.check(values),
+        ]);
         return Object.fromEntries(
             Object.entries(fields(this.schema))
                 .map(([k, v]) => [k, v?.message() ?? ""])
@@ -134,7 +185,7 @@ export class DepositAndStake extends BaseTask<FormData, Props, State> {
 
     public override Editor = (): React.ReactNode => {
         const { resetForm, validateForm } = useFormikContext();
-        const { pool } = this.state;
+        const { pool, StakeInfo } = this.state;
 
         useEffect(() => {
             resetForm({
@@ -158,12 +209,14 @@ export class DepositAndStake extends BaseTask<FormData, Props, State> {
                     label="Validator Address"
                     roundtop
                 />
-                {pool.ready ? <div>{`Validator fee: ${StakingPool.fractionToString(pool.feeFraction)}%`}</div> : null}
+                {pool.ready ? (
+                    <div>{`Staked balance: ${formatTokenAmount(StakeInfo.staked_balance, 24, 2)} Ⓝ`}</div>
+                ) : null}
                 <UnitField
-                    name="depo"
-                    unit="depoUnit"
+                    name="amount"
+                    unit="amountUnit"
                     options={["NEAR", "yocto"]}
-                    label="Staking amount"
+                    label="Unstaking amount"
                 />
                 <UnitField
                     name="gas"

@@ -97,6 +97,14 @@ export class Task extends Component {
                                 json={json}
                             />
                         );
+                    case "unstake":
+                        return (
+                            <Family.Near.Unstake
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
                 }
 
             default:
