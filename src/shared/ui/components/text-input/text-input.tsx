@@ -11,7 +11,7 @@ interface TextInputProps extends Omit<TextFieldProps, "error" | "size" | "value"
 
 export class TextInput extends Component<TextInputProps> {
     render() {
-        const { label, value, error, update, ...props } = this.props;
+        const { label, value, error, onChange, update, ...props } = this.props;
 
         const errors = Array.isArray(error) ? error : [error];
 
@@ -22,6 +22,7 @@ export class TextInput extends Component<TextInputProps> {
                 size="small"
                 onChange={(event) => {
                     if (value) {
+                        onChange?.(event);
                         value.value = event.target.value;
                         errors.forEach((error) => error?.validOrNull(value));
                         update?.(event, this);
