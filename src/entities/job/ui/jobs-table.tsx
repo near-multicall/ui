@@ -26,7 +26,9 @@ export const JobsTable = ({ className, contracts }: JobsTableProps) => {
                     className={`${_JobsTable}-body`}
                     displayMode="compact"
                     header={["Status", "ID", "Start at", "Croncat hash", "Creator", "Trigger gas", "Multicalls"]}
-                    rows={Object.values(data ?? {}).map(jobTableRow)}
+                    rows={Object.values(data ?? {})
+                        .map(jobTableRow)
+                        .reverse()}
                 />
             </Scrollable>
         </Tile>
