@@ -1,108 +1,108 @@
-import { AddOutlined, DeleteOutlined, EditOutlined } from "@mui/icons-material";
+import { AddOutlined, DeleteOutlined, EditOutlined, PreviewOutlined, VisibilityOutlined } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
 import clsx from "clsx";
-import { HTMLProps, useState } from "react";
+import { HTMLProps, useReducer, useState } from "react";
 
 import { Multicall } from "../../../entities";
 import { ArgsAccount, ArgsString } from "../../../shared/lib/args";
-import { MulticallContract } from "../../../shared/lib/contracts/multicall";
+import { type MulticallConfigChanges, type MulticallContract } from "../../../shared/lib/contracts/multicall";
 import { SputnikDAOContract } from "../../../shared/lib/contracts/sputnik-dao";
 import { toNEAR } from "../../../shared/lib/converter";
-import { Button, ButtonGroup, TextInput, Tile } from "../../../shared/ui/components";
+import { Button, ButtonGroup, NearLink, TextInput, Tile } from "../../../shared/ui/components";
 
 import "./config.scss";
 
-const Link = ({
-    address,
-    deleteIcon = false,
-    editIcon = false,
-    onClick,
-}: {
-    address: string;
-    deleteIcon?: boolean;
-    editIcon?: boolean;
-    onClick?: () => {};
-}) => {
-    const addr = new ArgsAccount(address);
-
-    return (
-        <span>
-            <a
-                href={addr.toUrl()}
-                target="_blank"
-                rel="noopener noreferrer"
-            >
-                {addr.value}
-            </a>
-
-            {deleteIcon ? <DeleteOutlined /> : editIcon ? <EditOutlined /> : null}
-        </span>
-    );
-};
-
 interface DaoConfigTabComponentProps extends HTMLProps<HTMLDivElement> {
-    contracts: {
-        multicall: MulticallContract;
-    };
-
-    daoContract: SputnikDAOContract;
+    daoContractAddress: SputnikDAOContract["address"];
+    multicallContract: MulticallContract;
 }
 
 const _DaoConfigTab = "DaoConfigTab";
 
-const DaoConfigTabComponent = ({ className, contracts: { multicall }, daoContract }: DaoConfigTabComponentProps) => {
-    const [editMode, setEditMode] = useState(false);
-    const [addTokens, setAddTokens] = useState(multicall.tokensWhitelist);
-    const [addToken, setAddToken] = useState(false);
-    const [croncatManager, setCroncatManager] = useState("");
-    const [editCroncat, setEditCroncat] = useState(false);
+const DaoConfigTabComponent = ({ className, daoContractAddress, multicallContract }: DaoConfigTabComponentProps) => {
+    const [editMode, editModeSwitch] = useState(false),
+        [tokensWhitelistEditMode, tokensWhitelistEditModeSwitch] = useState(false),
+        [jobsSettingsEditMode, jobsSettingsEditModeSwitch] = useState(false);
+
+    const changesDiffInitialState = {
+        removeTokens: [],
+        addTokens: [],
+        jobBond: "",
+        croncatManager: "",
+    };
+
+    const [changesDiff, changesDiffUpdate] = useReducer(
+        (
+            previousState: MulticallConfigChanges,
+
+            update: {
+                reset?: boolean;
+                field?: keyof MulticallConfigChanges;
+                value?: MulticallConfigChanges[keyof MulticallConfigChanges];
+            }
+        ): MulticallConfigChanges =>
+            update.reset
+                ? changesDiffInitialState
+                : {
+                      ...previousState,
+
+                      ...(update.field && update.value
+                          ? {
+                                [update.field as keyof MulticallConfigChanges]: Array.isArray(update.value)
+                                    ? (previousState[update.field as keyof MulticallConfigChanges] as string[]).concat(
+                                          update.value
+                                      )
+                                    : update.value,
+                            }
+                          : {}),
+                  },
+
+        changesDiffInitialState
+    );
+
+    console.log(changesDiff);
 
     return (
         <div className={clsx(_DaoConfigTab, className)}>
             <Multicall.AdminsTable
                 className={`${_DaoConfigTab}-admins`}
-                daoContractAddress={daoContract.address}
+                daoContractAddress={daoContractAddress}
             />
 
-            {!editMode && (
-                <Multicall.TokensWhitelistTable
-                    className={`${_DaoConfigTab}-tokensWhitelist`}
-                    daoContractAddress={daoContract.address}
-                />
-            )}
-
-            {editMode && (
-                <Tile
-                    className={`${_DaoConfigTab}-tokensWhitelist`}
-                    heading="Tokens whitelist"
-                >
-                    <IconButton
-                        edge="start"
-                        onClick={() => setAddToken(true)}
-                    >
-                        <AddOutlined />
-                    </IconButton>
-
-                    <ul className="list">
-                        {addTokens.map((token) => (
-                            <li key={token}>
-                                <Link
-                                    address={token}
-                                    deleteIcon
-                                />
-                            </li>
-                        ))}
-
-                        {addToken ? (
-                            <TextInput
-                                onBlur={(event) =>
-                                    setAddTokens((previousState) => [...previousState, event.target.value])
-                                }
-                            />
-                        ) : null}
-                    </ul>
-                </Tile>
-            )}
+            <Multicall.TokensWhitelistTable
+                additionalItems={changesDiff.addTokens
+                    .map(Multicall.whitelistedTokenTableRow)
+                    .concat(
+                        tokensWhitelistEditMode
+                            ? [
+                                  <TextInput
+                                      onBlur={(event) =>
+                                          changesDiffUpdate({ field: "addTokens", value: event.target.value })
+                                      }
+                                  />,
+                              ]
+                            : []
+                    )}
+                className={`${_DaoConfigTab}-tokensWhitelist`}
+                daoContractAddress={daoContractAddress}
+                toolbarContent={
+                    tokensWhitelistEditMode ? (
+                        <IconButton
+                            edge="end"
+                            onClick={() => tokensWhitelistEditModeSwitch(false)}
+                        >
+                            <VisibilityOutlined />
+                        </IconButton>
+                    ) : (
+                        <IconButton
+                            edge="end"
+                            onClick={() => tokensWhitelistEditModeSwitch(true)}
+                        >
+                            <AddOutlined />
+                        </IconButton>
+                    )
+                }
+            />
 
             <Tile
                 className={`${_DaoConfigTab}-jobsSettings`}
@@ -113,36 +113,38 @@ const DaoConfigTabComponent = ({ className, contracts: { multicall }, daoContrac
                 <IconButton
                     edge="start"
                     onClick={() => {
-                        setEditMode(true);
-                        setEditCroncat(true);
+                        editModeSwitch(true);
+                        jobsSettingsEditModeSwitch(true);
                     }}
                 >
                     <EditOutlined />
                 </IconButton>
 
-                {editMode && editCroncat ? (
+                {editMode && jobsSettingsEditMode ? (
                     <TextInput
-                        onBlur={(event) => {
-                            setCroncatManager(event.target.value);
-                            setEditCroncat(false);
-                        }}
-                        value={new ArgsString(multicall.croncatManager)}
+                        onBlur={(event) => changesDiffUpdate({ field: "croncatManager", value: event.target.value })}
+                        value={new ArgsString(multicallContract.croncatManager)}
                         fullWidth
                     />
                 ) : (
-                    <Link address={multicall.croncatManager} />
+                    <NearLink address={multicallContract.croncatManager} />
                 )}
 
                 <h3>Job bond</h3>
 
                 <span>
-                    {!editMode && (multicall.jobBond !== "" ? toNEAR(multicall.jobBond) : "...") + " Ⓝ"}
+                    {!editMode && (multicallContract.jobBond !== "" ? toNEAR(multicallContract.jobBond) : "...") + " Ⓝ"}
 
                     {editMode && (
                         <TextInput
                             InputProps={{ endAdornment: "Ⓝ" }}
+                            update={(event) => changesDiffUpdate({ field: "jobBond", value: event.target.value })}
                             type="number"
-                            value={new ArgsString(multicall.jobBond !== "" ? toNEAR(multicall.jobBond) : "")}
+                            value={
+                                new ArgsString(
+                                    multicallContract.jobBond !== "" ? toNEAR(multicallContract.jobBond) : ""
+                                )
+                            }
                         />
                     )}
                 </span>
@@ -157,20 +159,23 @@ const DaoConfigTabComponent = ({ className, contracts: { multicall }, daoContrac
                         <Button
                             color="success"
                             label="Draft changes"
-                            onClick={() => setEditMode(true)}
+                            onClick={() => editModeSwitch(true)}
                         />
                     ) : (
                         <>
                             <Button
                                 color="error"
                                 label="Cancel"
-                                onClick={() => setEditMode(false)}
+                                onClick={() => {
+                                    changesDiffUpdate({ reset: true });
+                                    editModeSwitch(false);
+                                }}
                             />
 
                             <Button
                                 color="success"
                                 label="Submit"
-                                onClick={() => setEditMode(false)}
+                                onClick={() => editModeSwitch(false)}
                             />
                         </>
                     )}
