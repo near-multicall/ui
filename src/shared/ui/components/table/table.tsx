@@ -13,7 +13,7 @@ import { HTMLAttributes } from "react";
 import { TableRowCard, TableRow, type TableRowProps } from "./row";
 import "./table.scss";
 
-interface TableProps extends HTMLAttributes<HTMLDivElement>, Pick<TableRowProps, "denseHeader"> {
+export interface TableProps extends HTMLAttributes<HTMLDivElement>, Pick<TableRowProps, "denseHeader"> {
     /**
      * `"classic"` mode is a classic table view.
      *

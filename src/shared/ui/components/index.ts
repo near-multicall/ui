@@ -17,5 +17,5 @@ export { Tile, type TileProps } from "./tile";
 export { DataInspector } from "./data-inspector";
 export { DateTimePicker, type DateTimePickerProps } from "./date-time-picker";
 export { Dialog } from "./dialog";
-export { Table } from "./table";
+export { Table, type TableProps } from "./table";
 export { Tabs } from "./tabs";
