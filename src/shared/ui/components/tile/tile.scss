@@ -22,7 +22,7 @@
             font-size: size.$large-text;
         }
 
-        &-slot {
+        &-corner {
             &--left,
             &--right {
                 .MuiButtonBase-root {
@@ -43,5 +43,11 @@
         width: auto;
         height: 100%;
         overflow: hidden;
+    }
+
+    &-footer {
+        display: flex;
+        justify-content: center;
+        margin-top: auto;
     }
 }
