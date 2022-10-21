@@ -1,18 +1,26 @@
 @use "sass/color";
 @use "sass/size";
+@use "sass/mixin";
+@use "sass/font";
 
 .DataInspector {
     &-label {
         color: darken(color.$blue, 30%);
         cursor: pointer;
+        & > span {
+            font-family: font.$text !important;
+        }
     }
 
     &-body {
+        @include mixin.no-scrollbar;
         margin-top: 0.5 * size.$gap;
-        padding: 0.5 * size.$gap;
+        overflow-x: scroll;
+        overflow-y: hidden;
 
         & * {
-            font-size: size.$large-text;
+            font-size: size.$text;
+            font-family: font.$code !important;
         }
 
         div > span {

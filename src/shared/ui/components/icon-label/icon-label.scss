@@ -4,8 +4,8 @@
 .IconLabel {
     display: flex;
     align-items: center;
-    gap: calc(size.$gap * 0.6);
-    line-height: 1;
+    gap: 0.6 * size.$gap;
+    line-height: 0;
 
     &-icon {
         width: fit-content;
