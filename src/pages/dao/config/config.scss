@@ -6,35 +6,13 @@
 .DaoConfigTab {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 6fr 4fr;
-    gap: 0px 0px;
+    grid-template-rows: 1fr 1fr;
 
     grid-template-areas:
-        "admins tokensWhitelist"
-        "jobsSettings proposalForm";
+        "DaoConfigEditor DaoConfigEditor"
+        "DaoConfigEditor DaoConfigEditor";
 
-    &-proposalForm {
-        grid-area: proposalForm;
-
-        &:not(.is-inEditMode) {
-            @include mixin.center-items(space-evenly, center);
-
-            .ButtonGroup {
-                justify-content: center;
-                margin-top: 0;
-            }
-        }
-    }
-
-    &-admins {
-        grid-area: admins;
-    }
-
-    &-jobsSettings {
-        grid-area: jobsSettings;
-    }
-
-    &-tokensWhitelist {
-        grid-area: tokensWhitelist;
+    .DaoConfigEditor {
+        grid-area: DaoConfigEditor;
     }
 }

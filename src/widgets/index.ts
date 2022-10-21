@@ -1,4 +1,5 @@
 export { Column } from "./column/column.jsx";
+export { DaoConfigEditor, type DaoConfigEditorWidget } from "./dao-config-editor";
 export { DialogsLayer } from "./dialogs-layer";
 export { Menu } from "./menu/menu.jsx";
 export { Builder } from "./builder/builder.jsx";

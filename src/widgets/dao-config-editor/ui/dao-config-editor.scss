@@ -1,0 +1,40 @@
+@use "sass/color";
+@use "sass/font";
+@use "sass/mixin";
+@use "sass/size";
+
+.DaoConfigEditor {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 6fr 4fr;
+    gap: size.$gap;
+
+    grid-template-areas:
+        "admins tokensWhitelist"
+        "jobsSettings proposalForm";
+
+    &-proposalForm {
+        grid-area: proposalForm;
+
+        &:not(.is-inEditMode) {
+            @include mixin.center-items(space-evenly, center);
+
+            .ButtonGroup {
+                justify-content: center;
+                margin-top: 0;
+            }
+        }
+    }
+
+    &-admins {
+        grid-area: admins;
+    }
+
+    &-jobsSettings {
+        grid-area: jobsSettings;
+    }
+
+    &-tokensWhitelist {
+        grid-area: tokensWhitelist;
+    }
+}
