@@ -1,0 +1,17 @@
+@use "sass/color";
+@use "sass/size";
+
+.FormRadio {
+    &-button.MuiButtonBase-root {
+        color: color.$white;
+
+        &.Mui-checked {
+            color: color.$white;
+        }
+    }
+
+    &-label.MuiFormControlLabel-label {
+        color: color.$white;
+        font-size: size.$text;
+    }
+}

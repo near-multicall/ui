@@ -1,8 +1,10 @@
 // TODO: de-deprecate near-wallet on wallet selector. Use patch
 import { providers } from "near-api-js";
-import type { NetworkId } from "@near-wallet-selector/core";
 import { getConfig } from "../../near-config";
 import { Base64 } from "js-base64";
+
+import type { AccountView, ViewStateResult } from "near-api-js/lib/providers/provider";
+import type { NetworkId, Transaction } from "@near-wallet-selector/core";
 
 declare global {
     interface Window {
@@ -11,6 +13,8 @@ declare global {
     }
 }
 
+type Tx = Omit<Transaction, "signerId">;
+
 window.NEAR_ENV = <NetworkId>process.env.NEAR_ENV ?? "testnet";
 window.nearConfig = getConfig(window.NEAR_ENV);
 // create RPC Provider object.
@@ -18,13 +22,8 @@ const rpcProvider = new providers.JsonRpcProvider({
     url: window.nearConfig.nodeUrl,
 });
 
-async function tx(
-    addr: string,
-    func: string,
-    args: object | Uint8Array,
-    gas: string,
-    depo: string = "0"
-): Promise<any> {
+async function signAndSendTxs(txs: Tx[]): Promise<any> {
+    if (txs.length < 1) return;
     // is user logged in?
     if (!window.selector.isSignedIn()) {
         console.error("Wallet not connected");
@@ -34,20 +33,7 @@ async function tx(
 
     // get wallet from wallet selector
     const wallet = await window.selector.wallet();
-    return wallet.signAndSendTransaction({
-        receiverId: addr,
-        actions: [
-            {
-                type: "FunctionCall",
-                params: {
-                    methodName: func,
-                    args: args,
-                    gas: gas,
-                    deposit: depo,
-                },
-            },
-        ],
-    });
+    return wallet.signAndSendTransactions({ transactions: txs });
 }
 
 /**
@@ -81,16 +67,8 @@ async function view(addr: string, func: string, args: object): Promise<any> {
  *
  * @param accountId
  */
-async function viewAccount(accountId: string): Promise<{
-    amount: string;
-    locked: string;
-    code_hash: string;
-    storage_usage: number;
-    storage_paid_at: number;
-    block_height: number;
-    block_hash: string;
-}> {
-    const accountInfo: any = await rpcProvider.query({
+async function viewAccount(accountId: string): Promise<AccountView> {
+    const accountInfo = await rpcProvider.query<AccountView>({
         request_type: "view_account",
         finality: "final",
         account_id: accountId,
@@ -99,4 +77,30 @@ async function viewAccount(accountId: string): Promise<{
     return accountInfo;
 }
 
-export { tx, view, viewAccount, rpcProvider };
+async function viewState(
+    accountId: string,
+    prefix: string = ""
+): Promise<
+    {
+        key: string;
+        value: string;
+    }[]
+> {
+    // encode prefix in base64
+    if (prefix !== "") prefix = Base64.encode(prefix);
+    // query RPC, returns state value in base64 encoding
+    const state = await rpcProvider.query<ViewStateResult>({
+        request_type: "view_state",
+        finality: "final",
+        account_id: accountId,
+        prefix_base64: prefix,
+    });
+
+    return state.values.map((item) => ({
+        key: Base64.decode(item.key),
+        value: Base64.decode(item.value),
+    }));
+}
+
+export { signAndSendTxs, view, viewAccount, viewState, rpcProvider };
+export type { Tx };

@@ -1,17 +1,17 @@
 import { InfoOutlined } from "@mui/icons-material";
 import clsx from "clsx";
-import { useCallback, useMemo, useReducer, useState } from "react";
+import { ComponentProps, useCallback, useMemo, useReducer, useState } from "react";
 
 import { ArgsError, ArgsString } from "../../../shared/lib/args";
 import { STORAGE } from "../../../shared/lib/persistent";
 import { Validation } from "../../../shared/lib/validation";
-import { Dialog, type DialogProps, TextInput, Tooltip } from "../../../shared/ui/components";
+import { Dialog, TextInput, Tooltip } from "../../../shared/ui/components";
 import { DappLoginConfig as Config } from "../config";
 import { DappLoginDialogsModel } from "../model/dapp-login-dialogs";
 
 import "./dapp-login-dialog.scss";
 
-interface DappLoginDialogProps extends Pick<DialogProps, "className" | "onClose" | "open" | "title"> {
+interface DappLoginDialogProps extends Pick<ComponentProps<typeof Dialog>, "className" | "onClose" | "open" | "title"> {
     method: "dao" | "multicall";
 }
 

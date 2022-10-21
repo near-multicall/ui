@@ -134,7 +134,7 @@ export class BaseTask extends Component {
 
     updateCard() {
         this.forceUpdate();
-        EDITOR.forceUpdate();
+        EDITOR?.forceUpdate();
     }
 
     renderEditor() {

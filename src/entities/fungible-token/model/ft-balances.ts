@@ -2,14 +2,18 @@ import { useEffect, useState } from "react";
 
 import { Big } from "../../../shared/lib/converter";
 import { FungibleToken } from "../../../shared/lib/standards/fungibleToken";
-import { DaoContracts } from "../../types";
 
-type FungibleTokensData = {
+import { type FungibleTokenEntity } from "../config";
+
+type FungibleTokensDataFxResponse = {
     data: { metadata: FungibleToken["metadata"]; dao: string; multicall: string; total: string }[] | null;
     loading: boolean;
 };
 
-const fungibleTokensDataFx = async ({ dao, multicall }: DaoContracts, callback: (data: FungibleTokensData) => void) => {
+const fungibleTokensDataFx = async (
+    { dao, multicall }: FungibleTokenEntity.Dependencies["contracts"],
+    callback: (result: FungibleTokensDataFxResponse) => void
+) => {
     /* Get LikelyTokens list on DAO and its Multicall instance */
     const [daoLikelyTokensList, multicallLikelyTokensList] = await Promise.all([
         FungibleToken.getLikelyTokenContracts(dao.address),
@@ -50,8 +54,8 @@ const fungibleTokensDataFx = async ({ dao, multicall }: DaoContracts, callback: 
     });
 };
 
-const useFungibleTokensData = (contracts: DaoContracts) => {
-    const [state, stateUpdate] = useState<FungibleTokensData>({ data: null, loading: true });
+const useAllFungibleTokensData = (contracts: FungibleTokenEntity.Dependencies["contracts"]) => {
+    const [state, stateUpdate] = useState<FungibleTokensDataFxResponse>({ data: null, loading: true });
 
     useEffect(() => void fungibleTokensDataFx(contracts, stateUpdate), []);
 
@@ -59,5 +63,5 @@ const useFungibleTokensData = (contracts: DaoContracts) => {
 };
 
 export class FungibleTokenBalancesModel {
-    static useAllData = useFungibleTokensData;
+    static useAllTokensFrom = useAllFungibleTokensData;
 }
