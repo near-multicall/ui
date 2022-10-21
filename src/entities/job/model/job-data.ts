@@ -35,7 +35,7 @@ const jobsDataFx = async (
                     {}
                 ),
             }))
-            .catch((error) => ({ ...jobsDataInitialState, error: new Error(error), loading: false }))
+            .catch((error) => ({ ...jobsDataInitialState, error, loading: false }))
     );
 
 const useJobsData = (contracts: JobEntity.Dependencies["contracts"]) => {
