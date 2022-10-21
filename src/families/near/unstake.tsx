@@ -14,6 +14,7 @@ import { STORAGE } from "../../shared/lib/persistent";
 
 import type { DefaultFormData } from "../base";
 import type { HumanReadableAccount } from "../../shared/lib/contracts/staking-pool";
+import { InfoField } from "../../shared/ui/form-fields/info-field/info-field";
 
 type FormData = DefaultFormData & {
     amount: string;
@@ -207,7 +208,7 @@ export class Unstake extends BaseTask<FormData, Props, State> {
                     roundtop
                 />
                 {pool.ready && withdrawable ? (
-                    <div>{`Staked balance: ${formatTokenAmount(withdrawable, 24, 2)} Ⓝ`}</div>
+                    <InfoField>{`Staked balance: ${formatTokenAmount(withdrawable, 24, 2)} Ⓝ`}</InfoField>
                 ) : null}
                 <UnitField
                     name="amount"
