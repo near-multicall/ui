@@ -5,22 +5,22 @@ import { Job } from "../../../entities";
 
 import "./jobs.scss";
 
-interface DaoJobsTabComponentProps extends HTMLProps<HTMLDivElement>, ComponentProps<typeof Job.EntriesTable> {}
+interface DaoJobsTabUIProps extends HTMLProps<HTMLDivElement>, ComponentProps<typeof Job.EntriesTable> {}
 
 const _DaoJobsTab = "DaoJobsTab";
 
-const DaoJobsTabComponent = ({ className, contracts }: DaoJobsTabComponentProps) => (
-    <div className={clsx(_DaoJobsTab, className)}>
-        <Job.EntriesTable
-            className={`${_DaoJobsTab}-jobsList`}
-            {...{ contracts }}
-        />
+const DaoJobsTabUI = ({ className, contracts, ...props }: DaoJobsTabUIProps) => (
+    <div
+        className={clsx(_DaoJobsTab, className)}
+        {...props}
+    >
+        <Job.EntriesTable {...{ contracts }} />
     </div>
 );
 
 export const DaoJobsTab = {
-    connect: (props: DaoJobsTabComponentProps) => ({
-        content: <DaoJobsTabComponent {...props} />,
+    uiConnect: (props: DaoJobsTabUIProps) => ({
+        content: <DaoJobsTabUI {...props} />,
         lazy: true,
         name: "Jobs",
     }),

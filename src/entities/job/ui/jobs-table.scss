@@ -1,18 +1,29 @@
 @use "sass/color";
+@use "sass/font";
 @use "sass/size";
 
 .JobsTable {
+    grid-area: JobsTable;
+
     &-body {
-        .Table-row-content--compact:last-of-type {
-            align-items: flex-start;
-
-            & > span {
-                &:first-of-type {
-                    position: absolute;
+        .Table-row-content--compact {
+            &:not(&:first-of-type) {
+                span:last-of-type {
+                    font-family: font.$code;
                 }
+            }
 
-                &:last-of-type {
-                    width: 100%;
+            &:last-of-type {
+                align-items: flex-start;
+
+                & > span {
+                    &:first-of-type {
+                        position: absolute;
+                    }
+
+                    &:last-of-type {
+                        width: 100%;
+                    }
                 }
             }
         }

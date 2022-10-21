@@ -24,7 +24,7 @@ export const MulticallTokensWhitelistTable = ({
 
     return (
         <Tile
-            className={clsx(_MulticallTokensWhitelistTable, className)}
+            classes={{ root: clsx(_MulticallTokensWhitelistTable, className) }}
             heading="Tokens whitelist"
             headingSlotsContent={{ right: toolbarContent }}
             noData={data !== null && data.length === 0}

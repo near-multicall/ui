@@ -7,7 +7,8 @@ import "./tile.scss";
 
 const _Tile = "Tile";
 
-export interface TileProps extends PropsWithChildren, HTMLAttributes<HTMLDivElement> {
+export interface TileProps extends PropsWithChildren, Omit<HTMLAttributes<HTMLDivElement>, "className"> {
+    classes?: Partial<Record<"root" | "heading" | "content", HTMLAttributes<HTMLDivElement>["className"]>>;
     error?: Error | null;
     heading?: string | null;
     headingSlotsContent?: { left?: JSX.Element; right?: JSX.Element };
@@ -17,16 +18,16 @@ export interface TileProps extends PropsWithChildren, HTMLAttributes<HTMLDivElem
 
 export const Tile = ({
     children,
-    className,
+    classes,
     error,
     heading,
     headingSlotsContent,
     loading = false,
     noData = false,
 }: TileProps) => (
-    <div className={_Tile}>
+    <div className={clsx(_Tile, classes?.root)}>
         {heading && (
-            <span className={`${_Tile}-heading`}>
+            <span className={clsx(`${_Tile}-heading`, classes?.heading)}>
                 {headingSlotsContent?.left && (
                     <span className={`${_Tile}-heading-slot--left`}>{headingSlotsContent?.left}</span>
                 )}
@@ -39,9 +40,8 @@ export const Tile = ({
             </span>
         )}
 
-        <div className={clsx(`${_Tile}-content`, className)}>
+        <div className={clsx(`${_Tile}-content`, classes?.content)}>
             {loading && <div className="loader" />}
-
             {!loading && noData && <Placeholder type="noData" />}
 
             {!loading && error && (

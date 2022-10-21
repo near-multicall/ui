@@ -5,19 +5,22 @@ import { DaoConfigEditor, type DaoConfigEditorWidget } from "../../../widgets";
 
 import "./config.scss";
 
-interface DaoConfigTabComponentProps extends HTMLProps<HTMLDivElement>, DaoConfigEditorWidget.Dependencies {}
+interface DaoConfigTabUIProps extends HTMLProps<HTMLDivElement>, DaoConfigEditorWidget.Dependencies {}
 
 const _DaoConfigTab = "DaoConfigTab";
 
-const DaoConfigTabComponent = ({ className, ...props }: DaoConfigTabComponentProps) => (
-    <div className={clsx(_DaoConfigTab, className)}>
-        <DaoConfigEditor.UI {...props} />
+const DaoConfigTabUI = ({ className, daoContractAddress, multicallContract, ...props }: DaoConfigTabUIProps) => (
+    <div
+        className={clsx(_DaoConfigTab, className)}
+        {...props}
+    >
+        <DaoConfigEditor.UI {...{ daoContractAddress, multicallContract }} />
     </div>
 );
 
 export const DaoConfigTab = {
-    connect: (props: DaoConfigTabComponentProps) => ({
-        content: <DaoConfigTabComponent {...props} />,
+    uiConnect: (props: DaoConfigTabUIProps) => ({
+        content: <DaoConfigTabUI {...props} />,
         name: "Config",
     }),
 };

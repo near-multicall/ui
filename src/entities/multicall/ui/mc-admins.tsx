@@ -17,7 +17,7 @@ export const MulticallAdminsTable = ({ className, daoContractAddress }: Multical
 
     return (
         <Tile
-            className={clsx(_MulticallAdminsTable, className)}
+            classes={{ root: clsx(_MulticallAdminsTable, className) }}
             heading="Admins"
             noData={data !== null && data.length === 0}
             {...{ error, loading }}

@@ -12,13 +12,11 @@ import { type DaoConfigEditorWidget } from "../config";
 
 import "./dao-config-editor.scss";
 
+interface DaoConfigEditorUIProps extends DaoConfigEditorWidget.Dependencies {}
+
 const _DaoConfigEditor = "DaoConfigEditor";
 
-export const DaoConfigEditorUI = ({
-    className,
-    daoContractAddress,
-    multicallContract,
-}: DaoConfigEditorWidget.Dependencies) => {
+export const DaoConfigEditorUI = ({ className, daoContractAddress, multicallContract }: DaoConfigEditorUIProps) => {
     const [editMode, editModeSwitch] = useState(false),
         [tokensWhitelistEditMode, tokensWhitelistEditModeSwitch] = useState(false),
         [jobsSettingsEditMode, jobsSettingsEditModeSwitch] = useState(false);
@@ -108,7 +106,7 @@ export const DaoConfigEditorUI = ({
             />
 
             <Tile
-                className={`${_DaoConfigEditor}-jobsSettings`}
+                classes={{ root: `${_DaoConfigEditor}-jobsSettings` }}
                 heading="Jobs settings"
             >
                 <h3>Croncat manager</h3>
@@ -157,7 +155,7 @@ export const DaoConfigEditorUI = ({
             </Tile>
 
             <Tile
-                className={clsx(`${_DaoConfigEditor}-proposalForm`, { "is-inEditMode": editMode })}
+                classes={{ content: clsx(`${_DaoConfigEditor}-proposalForm`, { "is-inEditMode": editMode }) }}
                 heading={editMode ? "Changes proposal" : null}
             >
                 <ButtonGroup>

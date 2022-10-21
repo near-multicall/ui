@@ -1,8 +1,3 @@
-@use "sass/color";
-@use "sass/font";
-@use "sass/mixin";
-@use "sass/size";
-
 .DaoConfigTab {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -11,8 +6,4 @@
     grid-template-areas:
         "DaoConfigEditor DaoConfigEditor"
         "DaoConfigEditor DaoConfigEditor";
-
-    .DaoConfigEditor {
-        grid-area: DaoConfigEditor;
-    }
 }

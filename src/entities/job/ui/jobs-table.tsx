@@ -16,7 +16,7 @@ export const JobsTable = ({ className, contracts }: JobsTableProps) => {
 
     return (
         <Tile
-            className={clsx(_JobsTable, className)}
+            classes={{ root: clsx(_JobsTable, className) }}
             heading="All jobs"
             noData={data !== null && Object.values(data).length === 0}
             {...{ error, loading }}

@@ -1,0 +1,13 @@
+@use "sass/font";
+
+.TokensBalances {
+    grid-area: TokensBalances;
+
+    .Table-row-content--compact {
+        &:not(&:first-of-type) {
+            span:last-of-type {
+                font-family: font.$code;
+            }
+        }
+    }
+}

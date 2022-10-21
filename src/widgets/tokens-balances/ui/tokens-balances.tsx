@@ -1,15 +1,23 @@
+import clsx from "clsx";
+
 import { Tile, Scrollable, Table } from "../../../shared/ui/components";
 import { FungibleToken, NearToken } from "../../../entities";
 
 import { type TokensBalancesWidget } from "../config";
 
-export const TokensBalances = ({ className, contracts }: TokensBalancesWidget.Dependencies) => {
+import "./tokens-balances.scss";
+
+interface TokensBalancesUIProps extends TokensBalancesWidget.Dependencies {}
+
+const _TokensBalances = "TokensBalances";
+
+export const TokensBalancesUI = ({ className, contracts }: TokensBalancesUIProps) => {
     const nearTokenBalances = NearToken.balancesRender({ contracts }),
         fungibleTokensBalances = FungibleToken.allBalancesRender({ contracts });
 
     return (
         <Tile
-            {...{ className }}
+            classes={{ root: clsx(_TokensBalances, className) }}
             heading="Tokens balances"
         >
             {(nearTokenBalances ?? fungibleTokensBalances) && (

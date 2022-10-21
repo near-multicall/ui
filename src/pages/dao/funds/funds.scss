@@ -1,21 +1,9 @@
-@use "sass/color";
-@use "sass/font";
-@use "sass/mixin";
-@use "sass/size";
-
 .DaoFundsTab {
     display: grid;
-    grid-template: "tokenBalances" 1fr / 1fr;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
 
-    &-tokenBalances {
-        grid-area: tokenBalances;
-
-        .Table-row-content--compact {
-            &:not(&:first-of-type) {
-                span:last-of-type {
-                    font-family: font.$code;
-                }
-            }
-        }
-    }
+    grid-template-areas:
+        "TokensBalances TokensBalances"
+        "TokensBalances TokensBalances";
 }
