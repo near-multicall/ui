@@ -10,17 +10,19 @@ import { multicallWhitelistedTokenTableRow } from "./mc-whitelisted-token";
 interface MulticallTokensWhitelistTableProps
     extends MulticallEntity.Dependencies,
         Pick<TileProps, "footer" | "headingCorners"> {
+    ItemComponent?: TableProps["RowComponent"];
+    ItemCompactComponent?: TableProps["RowCompactComponent"];
     additionalItems?: FungibleToken["address"][];
     className?: string;
-    customItemRenderer?: (item: FungibleToken["address"]) => JSX.Element[];
 }
 
 const _MulticallTokensWhitelistTable = "MulticallTokensWhitelistTable";
 
 export const MulticallTokensWhitelistTable = ({
+    ItemComponent,
+    ItemCompactComponent,
     additionalItems,
     className,
-    customItemRenderer,
     daoContractAddress,
     footer,
     headingCorners,
@@ -36,13 +38,13 @@ export const MulticallTokensWhitelistTable = ({
         >
             <Scrollable>
                 <Table
+                    RowComponent={ItemComponent}
+                    RowCompactComponent={ItemCompactComponent}
                     className={`${_MulticallTokensWhitelistTable}-body`}
                     denseHeader
                     displayMode="compact"
                     header={["Contract address"]}
-                    rows={data
-                        ?.concat(additionalItems ?? [])
-                        .map(customItemRenderer ?? multicallWhitelistedTokenTableRow)}
+                    rows={data?.concat(additionalItems ?? []).map(multicallWhitelistedTokenTableRow)}
                 />
             </Scrollable>
         </Tile>

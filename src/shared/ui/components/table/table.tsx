@@ -10,10 +10,12 @@ import {
 import clsx from "clsx";
 import { HTMLAttributes } from "react";
 
-import { TableRowCard, TableRow, type TableRowProps } from "./row";
+import { TableRowCard, TableRow, type TableRowProps, TableHeader } from "./row";
 import "./table.scss";
 
 export interface TableProps extends HTMLAttributes<HTMLDivElement>, Pick<TableRowProps, "denseHeader"> {
+    RowComponent?: typeof TableRow;
+    RowCompactComponent?: typeof TableRowCard;
     /**
      * `"classic"` mode is a classic table view.
      *
@@ -26,7 +28,7 @@ export interface TableProps extends HTMLAttributes<HTMLDivElement>, Pick<TableRo
      * Whether `"compact"` or `"classic"` mode is selected, it's being applied regardless of the screen size.
      */
     displayMode?: "default" | "compact" | "classic";
-    header: TableRowProps["headerCells"];
+    header: TableHeader;
     rows?: TableRowProps["cells"][] | null;
 }
 
@@ -53,9 +55,9 @@ export const Table = ({ className, denseHeader = false, displayMode = "default",
                         <TableBody>
                             {(rows ?? header).map((cells, index) => (
                                 <TableRow
-                                    headerCells={header}
                                     key={`row-${index}`}
                                     cells={typeof cells !== "string" ? cells : null}
+                                    {...{ header }}
                                 />
                             ))}
                         </TableBody>
@@ -68,9 +70,8 @@ export const Table = ({ className, denseHeader = false, displayMode = "default",
                     {rows &&
                         rows.map((cells, index) => (
                             <TableRowCard
-                                headerCells={header}
                                 key={index}
-                                {...{ cells, denseHeader }}
+                                {...{ cells, denseHeader, header }}
                             />
                         ))}
                 </div>
