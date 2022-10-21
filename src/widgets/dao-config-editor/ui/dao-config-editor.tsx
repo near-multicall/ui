@@ -7,7 +7,7 @@ import { Multicall } from "../../../entities";
 import { ArgsString } from "../../../shared/lib/args";
 import { type MulticallConfigChanges } from "../../../shared/lib/contracts/multicall";
 import { toNEAR } from "../../../shared/lib/converter";
-import { Button, ButtonGroup, NearLink, TextInput, Tile } from "../../../shared/ui/components";
+import { Button, ButtonGroup, NearIcons, NearLink, TextInput, Tile } from "../../../shared/ui/components";
 import { type DaoConfigEditorWidget } from "../config";
 
 import "./dao-config-editor.scss";
@@ -136,11 +136,14 @@ export const DaoConfigEditorUI = ({
                 <h3>Job bond</h3>
 
                 <span>
-                    {!editMode && (multicallContract.jobBond !== "" ? toNEAR(multicallContract.jobBond) : "...") + " Ⓝ"}
+                    {!editMode &&
+                        `${multicallContract.jobBond !== "" ? toNEAR(multicallContract.jobBond) : "..."} ${
+                            NearIcons.NATIVE_TOKEN_CHARACTER
+                        }`}
 
                     {editMode && (
                         <TextInput
-                            InputProps={{ endAdornment: "Ⓝ" }}
+                            InputProps={{ endAdornment: NearIcons.NATIVE_TOKEN_CHARACTER }}
                             update={(event) => changesDiffUpdate({ field: "jobBond", value: event.target.value })}
                             type="number"
                             value={

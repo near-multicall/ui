@@ -16,6 +16,8 @@ const NativeTokenIconFilled = ({ className }: NativeTokenIconProps) => (
     </svg>
 );
 
+const NEAR_NATIVE_TOKEN_CHARACTER = "Ⓝ";
+
 const _GenericTokenIcon = "GenericTokenIcon";
 
 interface GenericTokenIconProps extends SVGProps<SVGElement> {}
@@ -43,4 +45,5 @@ const GenericTokenIconFilled = ({ className }: GenericTokenIconProps) => (
 export const NearIcons = {
     GenericTokenFilled: GenericTokenIconFilled,
     NativeTokenFilled: NativeTokenIconFilled,
+    NATIVE_TOKEN_CHARACTER: NEAR_NATIVE_TOKEN_CHARACTER,
 };
