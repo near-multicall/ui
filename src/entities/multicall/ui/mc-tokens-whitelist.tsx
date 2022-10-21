@@ -1,15 +1,18 @@
 import clsx from "clsx";
 
-import { Scrollable, Table, Tile } from "../../../shared/ui/components";
+import { FungibleToken } from "../../../shared/lib/standards/fungibleToken";
+import { Scrollable, Table, type TableProps, Tile, TileProps } from "../../../shared/ui/components";
 import { MulticallTokensModel } from "../model/mc-tokens";
 import { type MulticallEntity } from "../config";
 
 import { multicallWhitelistedTokenTableRow } from "./mc-whitelisted-token";
 
-interface MulticallTokensWhitelistTableProps extends MulticallEntity.Dependencies {
-    additionalItems?: JSX.Element[][];
+interface MulticallTokensWhitelistTableProps
+    extends MulticallEntity.Dependencies,
+        Pick<TileProps, "footer" | "headingCorners"> {
+    additionalItems?: FungibleToken["address"][];
     className?: string;
-    toolbarContent?: JSX.Element;
+    customItemRenderer?: (item: FungibleToken["address"]) => JSX.Element[];
 }
 
 const _MulticallTokensWhitelistTable = "MulticallTokensWhitelistTable";
@@ -17,8 +20,10 @@ const _MulticallTokensWhitelistTable = "MulticallTokensWhitelistTable";
 export const MulticallTokensWhitelistTable = ({
     additionalItems,
     className,
+    customItemRenderer,
     daoContractAddress,
-    toolbarContent,
+    footer,
+    headingCorners,
 }: MulticallTokensWhitelistTableProps) => {
     const { data, error, loading } = MulticallTokensModel.useWhitelist(daoContractAddress);
 
@@ -26,9 +31,8 @@ export const MulticallTokensWhitelistTable = ({
         <Tile
             classes={{ root: clsx(_MulticallTokensWhitelistTable, className) }}
             heading="Tokens whitelist"
-            headingSlotsContent={{ right: toolbarContent }}
             noData={data !== null && data.length === 0}
-            {...{ error, loading }}
+            {...{ error, footer, headingCorners, loading }}
         >
             <Scrollable>
                 <Table
@@ -36,7 +40,9 @@ export const MulticallTokensWhitelistTable = ({
                     denseHeader
                     displayMode="compact"
                     header={["Contract address"]}
-                    rows={(data?.map(multicallWhitelistedTokenTableRow) ?? []).concat(additionalItems ?? [])}
+                    rows={data
+                        ?.concat(additionalItems ?? [])
+                        .map(customItemRenderer ?? multicallWhitelistedTokenTableRow)}
                 />
             </Scrollable>
         </Tile>
