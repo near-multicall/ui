@@ -23,7 +23,7 @@ export const TableRow = ({ cells, header }: TableRowProps) => (
     </>
 );
 
-export const TableRowCard = ({ cells, denseHeader, header }: TableRowProps) => (
+export const TableRowCompact = ({ cells, denseHeader, header }: TableRowProps) => (
     <div className={`${_TableRow}--compact`}>
         {header.map((headerCell, headerCellIndex) => (
             <div

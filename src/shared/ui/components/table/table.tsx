@@ -10,12 +10,12 @@ import {
 import clsx from "clsx";
 import { HTMLAttributes } from "react";
 
-import { TableRowCard, TableRow, type TableRowProps, TableHeader } from "./row";
+import { TableRowCompact, TableRow, type TableRowProps, TableHeader } from "./row";
 import "./table.scss";
 
 export interface TableProps extends HTMLAttributes<HTMLDivElement>, Pick<TableRowProps, "denseHeader"> {
     RowComponent?: typeof TableRow;
-    RowCompactComponent?: typeof TableRowCard;
+    RowCompactComponent?: typeof TableRowCompact;
     /**
      * `"classic"` mode is a classic table view.
      *
@@ -69,7 +69,7 @@ export const Table = ({ className, denseHeader = false, displayMode = "default",
                 <div className={clsx(`${_Table}--compact`, className)}>
                     {rows &&
                         rows.map((cells, index) => (
-                            <TableRowCard
+                            <TableRowCompact
                                 key={index}
                                 {...{ cells, denseHeader, header }}
                             />
