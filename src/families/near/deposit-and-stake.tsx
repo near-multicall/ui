@@ -124,7 +124,8 @@ export class DepositAndStake extends BaseTask<FormData, Props, State> {
         this.setFormData(values);
         await new Promise((resolve) => this.resolveDebounced(resolve));
         // run promises in parallel as staking pool info isn't needed for form validation
-        await Promise.all([this.tryUpdateStakingPool(), this.schema.check(values)]);
+        this.tryUpdateStakingPool();
+        await this.schema.check(values);
         return Object.fromEntries(
             Object.entries(fields(this.schema))
                 .map(([k, v]) => [k, v?.message() ?? ""])

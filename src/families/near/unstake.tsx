@@ -24,7 +24,7 @@ type Props = BaseTaskProps;
 
 type State = BaseTaskState<FormData> & {
     pool: StakingPool;
-    StakeInfo: HumanReadableAccount;
+    stakeInfo: HumanReadableAccount | null;
 };
 
 export class Unstake extends BaseTask<FormData, Props, State> {
@@ -34,7 +34,18 @@ export class Unstake extends BaseTask<FormData, Props, State> {
         .shape({
             addr: arx.string().stakingPool(),
             gas: arx.big().gas().min(toGas("3.5")).max(toGas("250")),
-            amount: arx.big().token().min("1", "cannot unstake 0 NEAR"),
+            amount: arx
+                .big()
+                .token()
+                .min("1", "cannot unstake 0 NEAR")
+                .test({
+                    name: "dynamic max",
+                    message: "amount is exceeding withdrawable amount",
+                    test: (value, ctx) =>
+                        value == null ||
+                        ctx.options.context?.withdrawable == null ||
+                        value.lte(ctx.options.context.withdrawable),
+                }),
         })
         .transform(({ gas, gasUnit, amount, amountUnit, ...rest }) => ({
             ...rest,
@@ -63,6 +74,7 @@ export class Unstake extends BaseTask<FormData, Props, State> {
         this.state = {
             ...this.state,
             pool: new StakingPool(this.initialValues.addr),
+            stakeInfo: null,
         };
 
         this.tryUpdateStakingPool().catch(() => {});
@@ -141,7 +153,7 @@ export class Unstake extends BaseTask<FormData, Props, State> {
             StakingPool.init(addr),
             new StakingPool(addr).getAccount(STORAGE.addresses.multicall),
         ]);
-        this.setState({ pool: stakingPool, StakeInfo: multicallStakeInfo });
+        this.setState({ pool: stakingPool, stakeInfo: multicallStakeInfo });
         window.EDITOR.forceUpdate();
         return stakingPool.ready;
     }
@@ -149,37 +161,15 @@ export class Unstake extends BaseTask<FormData, Props, State> {
     public async validateForm(values: FormData): Promise<FormikErrors<FormData>> {
         this.setFormData(values);
         await new Promise((resolve) => this.resolveDebounced(resolve));
-        const schemaWithTest = this.schema
-            .test("max unstake amount", "potato too high", (value) => {
-                console.log("hey from test");
-                // TODO: check amount parseable to big
-                const { amount } = value;
-                const { StakeInfo } = this.state;
-                const { unstaked_balance, can_withdraw } = StakeInfo;
-                const withdrawable = StakingPool.getWithdrawableAmount(unstaked_balance, can_withdraw);
-                console.log("amount:", amount);
-                console.log("withdrawable:", withdrawable);
-                console.log(arx.big().max(withdrawable).isValidSync(amount));
-                return arx.big().max(withdrawable).isValidSync(amount);
-            })
-            .test({
-                name: "test",
-                message: "test",
-                test: (value) => {
-                    console.log("test");
-                    return true;
-                },
-            })
-            .transform((value) => {
-                console.log("transform");
-                return value;
-            });
-        // run promises in parallel as staking pool info isn't needed for form validation
-        await Promise.all([
-            this.tryUpdateStakingPool(),
-            // test can't stake more than balance
-            schemaWithTest.check(values),
-        ]);
+        await this.tryUpdateStakingPool();
+        const withdrawable = !!this.state.stakeInfo
+            ? StakingPool.getWithdrawableAmount(
+                  this.state.stakeInfo.unstaked_balance,
+                  this.state.stakeInfo.can_withdraw
+              )
+            : null;
+        // test can't stake more than balance
+        await this.schema.check(values, { context: { withdrawable } });
         return Object.fromEntries(
             Object.entries(fields(this.schema))
                 .map(([k, v]) => [k, v?.message() ?? ""])
@@ -189,8 +179,10 @@ export class Unstake extends BaseTask<FormData, Props, State> {
 
     public override Editor = (): React.ReactNode => {
         const { resetForm, validateForm } = useFormikContext();
-        const { pool, StakeInfo } = this.state;
-        const withdrawable = StakingPool.getWithdrawableAmount(StakeInfo.unstaked_balance, StakeInfo.can_withdraw);
+        const { pool, stakeInfo } = this.state;
+        const withdrawable = !!stakeInfo
+            ? StakingPool.getWithdrawableAmount(stakeInfo.unstaked_balance, stakeInfo.can_withdraw)
+            : null;
 
         useEffect(() => {
             resetForm({
@@ -214,7 +206,9 @@ export class Unstake extends BaseTask<FormData, Props, State> {
                     label="Validator Address"
                     roundtop
                 />
-                {pool.ready ? <div>{`Staked balance: ${formatTokenAmount(withdrawable, 24, 2)} Ⓝ`}</div> : null}
+                {pool.ready && withdrawable ? (
+                    <div>{`Staked balance: ${formatTokenAmount(withdrawable, 24, 2)} Ⓝ`}</div>
+                ) : null}
                 <UnitField
                     name="amount"
                     unit="amountUnit"
