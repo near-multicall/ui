@@ -8,17 +8,21 @@ import { ArgsString } from "../../../shared/lib/args";
 import { type MulticallConfigChanges } from "../../../shared/lib/contracts/multicall";
 import { toNEAR } from "../../../shared/lib/converter";
 import { Button, ButtonGroup, NearIcons, NearLink, TextInput, Tile } from "../../../shared/ui/components";
-import { type DaoConfigEditorWidget } from "../config";
+import { type MulticallConfigEditorWidget } from "../config";
 
-import "./dao-config-editor.scss";
+import "./multicall-config-editor.scss";
 
-interface DaoConfigEditorUIProps extends DaoConfigEditorWidget.Dependencies {}
+interface MulticallConfigEditorUIProps extends MulticallConfigEditorWidget.Dependencies {}
 
-const _DaoConfigEditor = "DaoConfigEditor";
+const _MulticallConfigEditor = "MulticallConfigEditor";
 
-export const DaoConfigEditorUI = ({ className, daoContractAddress, multicallContract }: DaoConfigEditorUIProps) => {
+export const MulticallConfigEditorUI = ({
+    className,
+    daoContractAddress,
+    multicallContract,
+}: MulticallConfigEditorUIProps) => {
     const [editMode, editModeSwitch] = useState(false),
-        [tokensWhitelistEditMode, tokensWhitelistEditModeSwitch] = useState(false),
+        [tokensWhitelistAddMode, tokensWhitelistAddModeSwitch] = useState(false),
         [jobsSettingsEditMode, jobsSettingsEditModeSwitch] = useState(false);
 
     const changesDiffInitialState = {
@@ -35,24 +39,26 @@ export const DaoConfigEditorUI = ({ className, daoContractAddress, multicallCont
             update: {
                 reset?: boolean;
                 field?: keyof MulticallConfigChanges;
-                value?: MulticallConfigChanges[keyof MulticallConfigChanges];
+                value?: string;
             }
-        ): MulticallConfigChanges =>
-            update.reset
-                ? changesDiffInitialState
-                : {
-                      ...previousState,
+        ): MulticallConfigChanges => {
+            if (update.reset) {
+                return changesDiffInitialState;
+            } else {
+                return Object.assign(
+                    previousState,
 
-                      ...(update.field && update.value
-                          ? {
-                                [update.field as keyof MulticallConfigChanges]: Array.isArray(update.value)
-                                    ? (previousState[update.field as keyof MulticallConfigChanges] as string[]).concat(
-                                          update.value
-                                      )
-                                    : update.value,
-                            }
-                          : {}),
-                  },
+                    update.field &&
+                        update.value && {
+                            [update.field]: Array.isArray(previousState[update.field])
+                                ? previousState[update.field].includes(update.value)
+                                    ? previousState[update.field]
+                                    : previousState[update.field].concat(update.value)
+                                : update.value,
+                        }
+                );
+            }
+        },
 
         changesDiffInitialState
     );
@@ -60,53 +66,42 @@ export const DaoConfigEditorUI = ({ className, daoContractAddress, multicallCont
     console.log(changesDiff);
 
     return (
-        <div className={clsx(_DaoConfigEditor, className)}>
+        <div className={clsx(_MulticallConfigEditor, className)}>
             <Multicall.AdminsTable
-                className={`${_DaoConfigEditor}-admins`}
+                className={`${_MulticallConfigEditor}-admins`}
                 daoContractAddress={daoContractAddress}
             />
 
             <Multicall.TokensWhitelistTable
-                additionalItems={changesDiff.addTokens
-                    .map(Multicall.whitelistedTokenTableRow)
-                    .concat(
-                        tokensWhitelistEditMode
-                            ? [
-                                  <TextInput
-                                      onBlur={(event) =>
-                                          changesDiffUpdate({ field: "addTokens", value: event.target.value })
-                                      }
-                                  />,
-                              ]
-                            : []
-                    )}
-                className={`${_DaoConfigEditor}-tokensWhitelist`}
+                additionalItems={changesDiff.addTokens}
+                className={`${_MulticallConfigEditor}-tokensWhitelist`}
                 daoContractAddress={daoContractAddress}
-                toolbarContent={
-                    tokensWhitelistEditMode ? (
-                        <IconButton
-                            onClick={() => {
-                                editModeSwitch(true);
-                                tokensWhitelistEditModeSwitch(false);
+                footer={
+                    tokensWhitelistAddMode ? (
+                        <TextInput
+                            onBlur={(event) => {
+                                changesDiffUpdate({ field: "addTokens", value: event.target.value });
+                                tokensWhitelistAddModeSwitch(false);
                             }}
-                        >
-                            <VisibilityOutlined />
-                        </IconButton>
-                    ) : (
+                        />
+                    ) : null
+                }
+                headingCorners={{
+                    right: (
                         <IconButton
                             onClick={() => {
                                 editModeSwitch(true);
-                                tokensWhitelistEditModeSwitch(true);
+                                tokensWhitelistAddModeSwitch(true);
                             }}
                         >
                             <AddOutlined />
                         </IconButton>
-                    )
-                }
+                    ),
+                }}
             />
 
             <Tile
-                classes={{ root: `${_DaoConfigEditor}-jobsSettings` }}
+                classes={{ root: `${_MulticallConfigEditor}-jobsSettings` }}
                 heading="Jobs settings"
             >
                 <h3>Croncat manager</h3>
@@ -155,9 +150,16 @@ export const DaoConfigEditorUI = ({ className, daoContractAddress, multicallCont
             </Tile>
 
             <Tile
-                classes={{ content: clsx(`${_DaoConfigEditor}-proposalForm`, { "is-inEditMode": editMode }) }}
+                classes={{ content: clsx(`${_MulticallConfigEditor}-proposalForm`, { "is-inEditMode": editMode }) }}
                 heading={editMode ? "Changes proposal" : null}
             >
+                {editMode && (
+                    <div>
+                        <h3>Description</h3>
+                        <TextInput />
+                    </div>
+                )}
+
                 <ButtonGroup>
                     {!editMode ? (
                         <Button

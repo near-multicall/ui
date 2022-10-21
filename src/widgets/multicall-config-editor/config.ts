@@ -3,13 +3,13 @@ import { HTMLProps } from "react";
 import { MulticallContract } from "../../shared/lib/contracts/multicall";
 import { SputnikDAOContract } from "../../shared/lib/contracts/sputnik-dao";
 
-namespace DaoConfigEditorWidget {
+namespace MulticallConfigEditorWidget {
     export interface Dependencies extends HTMLProps<HTMLDivElement> {
         daoContractAddress: SputnikDAOContract["address"];
         multicallContract: MulticallContract;
     }
 }
 
-class DaoConfigEditorConfig {}
+class MulticallConfigEditorConfig {}
 
-export { DaoConfigEditorConfig, type DaoConfigEditorWidget };
+export { MulticallConfigEditorConfig, type MulticallConfigEditorWidget };
