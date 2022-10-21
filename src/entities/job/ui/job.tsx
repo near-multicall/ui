@@ -4,7 +4,7 @@ import { Big, toTGas } from "../../../shared/lib/converter";
 import { DataInspector, IconLabel } from "../../../shared/ui/components";
 
 import { JobConfig, type JobEntity } from "../config";
-import "./job-entry.scss";
+import "./job.scss";
 
 interface JobEntryProps extends JobEntity.DataWithStatus {}
 

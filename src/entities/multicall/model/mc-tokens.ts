@@ -6,7 +6,7 @@ import { Props } from "../../../shared/lib/props";
 
 import { type MulticallEntity } from "../config";
 
-type MulticallTokensWhitelistFetchFxResponse = {
+export type MulticallTokensWhitelist = {
     data: MulticallContract["tokensWhitelist"] | null;
     error: Error | null;
     loading: boolean;
@@ -15,7 +15,7 @@ type MulticallTokensWhitelistFetchFxResponse = {
 export class MulticallTokensModel {
     static whitelistFetchFx = async (
         daoContractAddress: MulticallEntity.Dependencies["daoContractAddress"],
-        callback: (result: MulticallTokensWhitelistFetchFxResponse) => void
+        callback: (result: MulticallTokensWhitelist) => void
     ) =>
         await MulticallContract.instanceDataFetchFx(
             `${ArgsAccount.deconstructAddress(daoContractAddress).name}.${MulticallContract.FACTORY_ADDRESS}`,
@@ -25,7 +25,7 @@ export class MulticallTokensModel {
         );
 
     static useWhitelist = (daoContractAddress: MulticallEntity.Dependencies["daoContractAddress"]) => {
-        const [state, stateUpdate] = useState<MulticallTokensWhitelistFetchFxResponse>({
+        const [state, stateUpdate] = useState<MulticallTokensWhitelist>({
             data: null,
             error: null,
             loading: true,

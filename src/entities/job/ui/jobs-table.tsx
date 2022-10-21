@@ -1,10 +1,10 @@
 import clsx from "clsx";
 
 import { Scrollable, Table, Tile } from "../../../shared/ui/components";
-import { JobDataModel } from "../model/jobs-data";
+import { JobModel } from "../model/job";
 import { type JobEntity } from "../config";
 
-import { jobTableRow } from "./job-entry";
+import { jobTableRow } from "./job";
 import "./jobs-table.scss";
 
 interface JobsTableProps extends JobEntity.Dependencies {}
@@ -12,7 +12,7 @@ interface JobsTableProps extends JobEntity.Dependencies {}
 const _JobsTable = "JobsTable";
 
 export const JobsTable = ({ className, contracts }: JobsTableProps) => {
-    const { data, error, loading } = JobDataModel.useAllEntries(contracts);
+    const { data, error, loading } = JobModel.useAllEntries(contracts);
 
     return (
         <Tile
