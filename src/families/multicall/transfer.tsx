@@ -29,6 +29,7 @@ export class Transfer extends BaseTask<FormData> {
         .transform(({ gas, gasUnit, amount, amountUnit, transferAll, ...rest }) => ({
             ...rest,
             gas: arx.big().intoParsed(gasUnit).cast(gas),
+            // If transferAll, then amount takes a valid dummy value to silence errors.
             amount: transferAll ? 0 : arx.big().intoParsed(amountUnit).cast(amount),
         }))
         .requireAll()

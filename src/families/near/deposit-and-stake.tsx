@@ -39,7 +39,7 @@ export class DepositAndStake extends BaseTask<FormData, Props, State> {
         name: "Deposit & Stake",
         addr: "",
         func: "deposit_and_stake",
-        gas: "20",
+        gas: "30",
         gasUnit: "Tgas",
         depo: "0",
         depoUnit: "NEAR",

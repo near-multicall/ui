@@ -1,4 +1,4 @@
-// TODO: add checkbox and support "withdraw_all".
+// include "context" everytime we call check()
 
 import { Form, FormikErrors, useFormikContext } from "formik";
 import { useEffect } from "react";
@@ -7,7 +7,7 @@ import { fields } from "../../shared/lib/args/args-types/args-object";
 import { Call, CallError } from "../../shared/lib/call";
 import { toGas, unit, formatTokenAmount } from "../../shared/lib/converter";
 import { StakingPool } from "../../shared/lib/contracts/staking-pool";
-import { TextField, UnitField } from "../../shared/ui/form-fields";
+import { CheckboxField, InfoField, TextField, UnitField } from "../../shared/ui/form-fields";
 import { BaseTask, BaseTaskProps, BaseTaskState } from "../base";
 import "./near.scss";
 import { STORAGE } from "../../shared/lib/persistent";
@@ -18,13 +18,14 @@ import type { HumanReadableAccount } from "../../shared/lib/contracts/staking-po
 type FormData = DefaultFormData & {
     amount: string;
     amountUnit: number | unit;
+    withdrawAll: boolean;
 };
 
 type Props = BaseTaskProps;
 
 type State = BaseTaskState<FormData> & {
     pool: StakingPool;
-    StakeInfo: HumanReadableAccount;
+    stakeInfo: HumanReadableAccount | null;
 };
 
 export class Withdraw extends BaseTask<FormData, Props, State> {
@@ -34,12 +35,33 @@ export class Withdraw extends BaseTask<FormData, Props, State> {
         .shape({
             addr: arx.string().stakingPool(),
             gas: arx.big().gas().min(toGas("3.5")).max(toGas("250")),
-            amount: arx.big().token().min("1", "cannot withdraw 0 NEAR"),
+            withdrawAll: arx.boolean(),
+            amount: arx
+                .big()
+                .token()
+                .min("1", "cannot withdraw 0 NEAR")
+                .when("withdrawAll", {
+                    is: true,
+                    then: (s) => {
+                        console.log("hello from when");
+                        return s.optional();
+                    },
+                    otherwise: (s) => s.required(),
+                })
+                .test({
+                    name: "dynamic max",
+                    message: "withdrawable amount exceeded",
+                    test: (value, ctx) =>
+                        value == null ||
+                        ctx.options.context?.withdrawable == null ||
+                        value.lte(ctx.options.context.withdrawable),
+                }),
         })
-        .transform(({ gas, gasUnit, amount, amountUnit, ...rest }) => ({
+        .transform(({ gas, gasUnit, amount, amountUnit, withdrawAll, ...rest }) => ({
             ...rest,
+            withdrawAll,
             gas: arx.big().intoParsed(gasUnit).cast(gas),
-            amount: arx.big().intoParsed(amountUnit).cast(amount),
+            amount: withdrawAll ? null : arx.big().intoParsed(amountUnit).cast(amount),
         }))
         .requireAll()
         .retainAll();
@@ -48,12 +70,13 @@ export class Withdraw extends BaseTask<FormData, Props, State> {
         name: "Withdraw Stake",
         addr: "",
         func: "withdraw",
-        gas: "20",
+        gas: "30",
         gasUnit: "Tgas",
         depo: "1",
         depoUnit: "yocto",
         amount: "0",
         amountUnit: "NEAR",
+        withdrawAll: false,
     };
 
     constructor(props: Props) {
@@ -63,6 +86,7 @@ export class Withdraw extends BaseTask<FormData, Props, State> {
         this.state = {
             ...this.state,
             pool: new StakingPool(this.initialValues.addr),
+            stakeInfo: null,
         };
 
         this.tryUpdateStakingPool().catch(() => {});
@@ -101,7 +125,7 @@ export class Withdraw extends BaseTask<FormData, Props, State> {
     }
 
     public override toCall(): Call {
-        const { addr, func, gas, gasUnit, depo, amount, amountUnit } = this.state.formData;
+        const { addr, func, gas, gasUnit, depo, amount, amountUnit, withdrawAll } = this.state.formData;
 
         if (!arx.big().isValidSync(gas)) throw new CallError("Failed to parse gas input value", this.props.id);
         if (!arx.big().isValidSync(depo)) throw new CallError("Failed to parse deposit input value", this.props.id);
@@ -110,10 +134,12 @@ export class Withdraw extends BaseTask<FormData, Props, State> {
             address: addr,
             actions: [
                 {
-                    func,
-                    args: {
-                        amount: arx.big().intoParsed(amountUnit).cast(amount).toFixed(),
-                    },
+                    func: withdrawAll ? "withdraw_all" : "withdraw",
+                    args: withdrawAll
+                        ? {}
+                        : {
+                              amount: arx.big().intoParsed(amountUnit).cast(amount).toFixed(),
+                          },
                     gas: arx.big().intoParsed(gasUnit).cast(gas).toFixed(),
                     depo,
                 },
@@ -141,43 +167,24 @@ export class Withdraw extends BaseTask<FormData, Props, State> {
             StakingPool.init(addr),
             new StakingPool(addr).getAccount(STORAGE.addresses.multicall),
         ]);
-        this.setState({ pool: stakingPool, StakeInfo: multicallStakeInfo });
+        this.setState({ pool: stakingPool, stakeInfo: multicallStakeInfo });
         window.EDITOR.forceUpdate();
         return stakingPool.ready;
     }
 
     public async validateForm(values: FormData): Promise<FormikErrors<FormData>> {
+        values.func = values.withdrawAll ? "withdraw_all" : "withdraw";
         this.setFormData(values);
         await new Promise((resolve) => this.resolveDebounced(resolve));
-        const schemaWithTest = this.schema
-            .test("max withdraw amount", "potato too high", (value) => {
-                console.log("hey from test");
-                // TODO: check amount parseable to big
-                const { amount } = value;
-                const { StakeInfo } = this.state;
-                console.log("amount:", amount);
-                console.log("unstaked balance:", StakeInfo.unstaked_balance);
-                console.log(arx.big().max(StakeInfo.unstaked_balance).isValidSync(amount));
-                return arx.big().max(StakeInfo.unstaked_balance).isValidSync(amount);
-            })
-            .test({
-                name: "test",
-                message: "test",
-                test: (value) => {
-                    console.log("test");
-                    return true;
-                },
-            })
-            .transform((value) => {
-                console.log("transform");
-                return value;
-            });
-        // run promises in parallel as staking pool info isn't needed for form validation
-        await Promise.all([
-            this.tryUpdateStakingPool(),
-            // test can't stake more than balance
-            schemaWithTest.check(values),
-        ]);
+        await this.tryUpdateStakingPool();
+        const withdrawable = !!this.state.stakeInfo
+            ? StakingPool.getWithdrawableAmount(
+                  this.state.stakeInfo.unstaked_balance,
+                  this.state.stakeInfo.can_withdraw
+              )
+            : null;
+        // test can't stake more than balance
+        await this.schema.check(values, { context: { withdrawable } });
         return Object.fromEntries(
             Object.entries(fields(this.schema))
                 .map(([k, v]) => [k, v?.message() ?? ""])
@@ -186,8 +193,11 @@ export class Withdraw extends BaseTask<FormData, Props, State> {
     }
 
     public override Editor = (): React.ReactNode => {
-        const { resetForm, validateForm } = useFormikContext();
-        const { pool, StakeInfo } = this.state;
+        const { resetForm, validateForm, values } = useFormikContext<FormData>();
+        const { pool, stakeInfo } = this.state;
+        const withdrawable = !!stakeInfo
+            ? StakingPool.getWithdrawableAmount(stakeInfo.unstaked_balance, stakeInfo.can_withdraw)
+            : null;
 
         useEffect(() => {
             resetForm({
@@ -211,15 +221,22 @@ export class Withdraw extends BaseTask<FormData, Props, State> {
                     label="Validator Address"
                     roundtop
                 />
-                {pool.ready ? (
-                    <div>{`Available to withdraw: ${formatTokenAmount(StakeInfo.unstaked_balance, 24, 2)} Ⓝ`}</div>
+                {pool.ready && withdrawable ? (
+                    <InfoField>{`Available to withdraw: ${formatTokenAmount(withdrawable, 24, 2)} Ⓝ`}</InfoField>
                 ) : null}
-                <UnitField
-                    name="amount"
-                    unit="amountUnit"
-                    options={["NEAR", "yocto"]}
-                    label="Unstaking amount"
+                <CheckboxField
+                    name="withdrawAll"
+                    label="Unstake all available funds"
+                    checked={values.withdrawAll}
                 />
+                {!values.withdrawAll && (
+                    <UnitField
+                        name="amount"
+                        unit="amountUnit"
+                        options={["NEAR", "yocto"]}
+                        label="Unstaking amount"
+                    />
+                )}
                 <UnitField
                     name="gas"
                     unit="gasUnit"

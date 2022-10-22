@@ -7,7 +7,7 @@ import { fields } from "../../shared/lib/args/args-types/args-object";
 import { Call, CallError } from "../../shared/lib/call";
 import { toGas, unit, formatTokenAmount } from "../../shared/lib/converter";
 import { StakingPool } from "../../shared/lib/contracts/staking-pool";
-import { TextField, UnitField } from "../../shared/ui/form-fields";
+import { CheckboxField, TextField, UnitField } from "../../shared/ui/form-fields";
 import { BaseTask, BaseTaskProps, BaseTaskState } from "../base";
 import "./near.scss";
 import { STORAGE } from "../../shared/lib/persistent";
@@ -19,6 +19,7 @@ import { InfoField } from "../../shared/ui/form-fields/info-field/info-field";
 type FormData = DefaultFormData & {
     amount: string;
     amountUnit: number | unit;
+    unstakeAll: boolean;
 };
 
 type Props = BaseTaskProps;
@@ -35,37 +36,41 @@ export class Unstake extends BaseTask<FormData, Props, State> {
         .shape({
             addr: arx.string().stakingPool(),
             gas: arx.big().gas().min(toGas("3.5")).max(toGas("250")),
+            unstakeAll: arx.boolean(),
             amount: arx
                 .big()
                 .token()
                 .min("1", "cannot unstake 0 NEAR")
-                .test({
-                    name: "dynamic max",
-                    message: "amount is exceeding withdrawable amount",
-                    test: (value, ctx) =>
-                        value == null ||
-                        ctx.options.context?.withdrawable == null ||
-                        value.lte(ctx.options.context.withdrawable),
+                .when("unstakeAll", {
+                    is: true,
+                    then: (s) => {
+                        console.log("hello from when");
+                        return s.optional();
+                    },
+                    otherwise: (s) => s.required(),
                 }),
         })
-        .transform(({ gas, gasUnit, amount, amountUnit, ...rest }) => ({
+        .transform(({ gas, gasUnit, amount, amountUnit, unstakeAll, ...rest }) => ({
             ...rest,
+            unstakeAll,
             gas: arx.big().intoParsed(gasUnit).cast(gas),
-            amount: arx.big().intoParsed(amountUnit).cast(amount),
+            // If transferAll, then amount takes a valid dummy value to silence errors.
+            amount: unstakeAll ? null : arx.big().intoParsed(amountUnit).cast(amount),
         }))
-        .requireAll()
+        .requireAll({ ignore: ["amount"] })
         .retainAll();
 
     override initialValues: FormData = {
         name: "Unstake",
         addr: "",
         func: "unstake",
-        gas: "20",
+        gas: "30",
         gasUnit: "Tgas",
         depo: "1",
         depoUnit: "yocto",
         amount: "0",
         amountUnit: "NEAR",
+        unstakeAll: false,
     };
 
     constructor(props: Props) {
@@ -110,11 +115,11 @@ export class Unstake extends BaseTask<FormData, Props, State> {
     }
 
     static override inferOwnType(json: Call): boolean {
-        return !!json && json.actions[0].func === "unstake";
+        return !!json && ["unstake", "unstake_all"].includes(json.actions[0].func);
     }
 
     public override toCall(): Call {
-        const { addr, func, gas, gasUnit, depo, amount, amountUnit } = this.state.formData;
+        const { addr, gas, gasUnit, depo, amount, amountUnit, unstakeAll } = this.state.formData;
 
         if (!arx.big().isValidSync(gas)) throw new CallError("Failed to parse gas input value", this.props.id);
         if (!arx.big().isValidSync(depo)) throw new CallError("Failed to parse deposit input value", this.props.id);
@@ -123,10 +128,12 @@ export class Unstake extends BaseTask<FormData, Props, State> {
             address: addr,
             actions: [
                 {
-                    func,
-                    args: {
-                        amount: arx.big().intoParsed(amountUnit).cast(amount).toFixed(),
-                    },
+                    func: unstakeAll ? "unstake_all" : "unstake",
+                    args: unstakeAll
+                        ? {}
+                        : {
+                              amount: arx.big().intoParsed(amountUnit).cast(amount).toFixed(),
+                          },
                     gas: arx.big().intoParsed(gasUnit).cast(gas).toFixed(),
                     depo,
                 },
@@ -160,17 +167,12 @@ export class Unstake extends BaseTask<FormData, Props, State> {
     }
 
     public async validateForm(values: FormData): Promise<FormikErrors<FormData>> {
+        values.func = values.unstakeAll ? "unstake_all" : "unstake";
         this.setFormData(values);
         await new Promise((resolve) => this.resolveDebounced(resolve));
         await this.tryUpdateStakingPool();
-        const withdrawable = !!this.state.stakeInfo
-            ? StakingPool.getWithdrawableAmount(
-                  this.state.stakeInfo.unstaked_balance,
-                  this.state.stakeInfo.can_withdraw
-              )
-            : null;
         // test can't stake more than balance
-        await this.schema.check(values, { context: { withdrawable } });
+        await this.schema.check(values, { context: { stakedAmount: this.state.stakeInfo?.staked_balance } });
         return Object.fromEntries(
             Object.entries(fields(this.schema))
                 .map(([k, v]) => [k, v?.message() ?? ""])
@@ -179,11 +181,8 @@ export class Unstake extends BaseTask<FormData, Props, State> {
     }
 
     public override Editor = (): React.ReactNode => {
-        const { resetForm, validateForm } = useFormikContext();
+        const { resetForm, validateForm, values } = useFormikContext<FormData>();
         const { pool, stakeInfo } = this.state;
-        const withdrawable = !!stakeInfo
-            ? StakingPool.getWithdrawableAmount(stakeInfo.unstaked_balance, stakeInfo.can_withdraw)
-            : null;
 
         useEffect(() => {
             resetForm({
@@ -207,15 +206,22 @@ export class Unstake extends BaseTask<FormData, Props, State> {
                     label="Validator Address"
                     roundtop
                 />
-                {pool.ready && withdrawable ? (
-                    <InfoField>{`Staked balance: ${formatTokenAmount(withdrawable, 24, 2)} Ⓝ`}</InfoField>
+                {pool.ready ? (
+                    <InfoField>{`Staked balance: ${formatTokenAmount(stakeInfo!.staked_balance, 24, 2)} Ⓝ`}</InfoField>
                 ) : null}
-                <UnitField
-                    name="amount"
-                    unit="amountUnit"
-                    options={["NEAR", "yocto"]}
-                    label="Unstaking amount"
+                <CheckboxField
+                    name="unstakeAll"
+                    label="Unstake all available funds"
+                    checked={values.unstakeAll}
                 />
+                {!values.unstakeAll && (
+                    <UnitField
+                        name="amount"
+                        unit="amountUnit"
+                        options={["NEAR", "yocto"]}
+                        label="Unstaking amount"
+                    />
+                )}
                 <UnitField
                     name="gas"
                     unit="gasUnit"
