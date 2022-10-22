@@ -19,13 +19,11 @@ export const TableRow = ({ cells, headerCells }: TableRowProps) => (
     </>
 );
 
-const _TableRowCard = `${_TableRow}--compact`;
-
 export const TableRowCard = ({ cells, headerCells }: TableRowProps) => (
-    <div className={_TableRowCard}>
+    <div className={`${_TableRow}--compact`}>
         {headerCells.map((headerCell, headerCellIndex) => (
             <div
-                className={`${_TableRowCard}-content`}
+                className={`${_TableRow}-content--compact`}
                 key={headerCellIndex}
             >
                 <span>{headerCell}</span>

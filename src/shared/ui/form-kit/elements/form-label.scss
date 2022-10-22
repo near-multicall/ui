@@ -1,0 +1,13 @@
+@use "sass/color";
+@use "sass/size";
+
+.FormLabel {
+    &.MuiFormLabel-root {
+        font-size: size.$text;
+        color: color.$white;
+    }
+
+    &.is-focused.Mui-focused {
+        color: color.$white;
+    }
+}

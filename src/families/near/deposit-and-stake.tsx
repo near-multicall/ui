@@ -5,7 +5,7 @@ import { fields } from "../../shared/lib/args/args-types/args-object";
 import { Call, CallError } from "../../shared/lib/call";
 import { toGas } from "../../shared/lib/converter";
 import { StakingPool } from "../../shared/lib/contracts/staking-pool";
-import { TextField, UnitField } from "../../shared/ui/form-fields";
+import { InfoField, TextField, UnitField } from "../../shared/ui/form-fields";
 import type { DefaultFormData } from "../base";
 import { BaseTask, BaseTaskProps, BaseTaskState } from "../base";
 import "./near.scss";
@@ -159,7 +159,9 @@ export class DepositAndStake extends BaseTask<FormData, Props, State> {
                     label="Validator Address"
                     roundtop
                 />
-                {pool.ready ? <div>{`Validator fee: ${StakingPool.fractionToString(pool.feeFraction)}%`}</div> : null}
+                {pool.ready ? (
+                    <InfoField>{`Validator fee: ${StakingPool.fractionToString(pool.feeFraction)}%`}</InfoField>
+                ) : null}
                 <UnitField
                     name="depo"
                     unit="depoUnit"

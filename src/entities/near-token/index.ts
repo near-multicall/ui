@@ -1,5 +1,8 @@
+import { NearTokenConfig, type NearTokenEntity } from "./config";
 import { nearTokenBalancesRender } from "./ui/near-balances";
 
-export class NearToken {
+class NearToken extends NearTokenConfig {
     static balancesRender = nearTokenBalancesRender;
 }
+
+export { NearToken, type NearTokenEntity };

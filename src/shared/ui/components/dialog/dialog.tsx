@@ -9,7 +9,7 @@ import { PropsWithChildren } from "react";
 
 import "./dialog.scss";
 
-export interface DialogProps extends PropsWithChildren {
+interface DialogProps extends PropsWithChildren {
     cancelRename?: string;
     className?: string;
     doneRename?: string;
