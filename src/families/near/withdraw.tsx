@@ -42,10 +42,7 @@ export class Withdraw extends BaseTask<FormData, Props, State> {
                 .min("1", "cannot withdraw 0 NEAR")
                 .when("withdrawAll", {
                     is: true,
-                    then: (s) => {
-                        console.log("hello from when");
-                        return s.optional();
-                    },
+                    then: (s) => s.optional(),
                     otherwise: (s) => s.required(),
                 })
                 .test({

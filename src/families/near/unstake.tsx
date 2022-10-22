@@ -43,10 +43,7 @@ export class Unstake extends BaseTask<FormData, Props, State> {
                 .min("1", "cannot unstake 0 NEAR")
                 .when("unstakeAll", {
                     is: true,
-                    then: (s) => {
-                        console.log("hello from when");
-                        return s.optional();
-                    },
+                    then: (s) => s.optional(),
                     otherwise: (s) => s.required(),
                 }),
         })
