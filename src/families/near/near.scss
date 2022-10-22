@@ -3,7 +3,8 @@
 @use "sass/size";
 
 .near-ft-transfer-task,
-.near-storage-withdraw-task {
+.near-storage-withdraw-task,
+.near-storage-unregister-task {
     background: color.$lightest;
     .name {
         color: color.$text !important;

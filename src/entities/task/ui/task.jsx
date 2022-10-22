@@ -101,6 +101,14 @@ export class Task extends Component {
                                 json={json}
                             />
                         );
+                    case "storage_unregister":
+                        return (
+                            <Family.Near.StorageUnregister
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
                 }
 
             default:

@@ -7,14 +7,10 @@ import { unit } from "../../shared/lib/converter";
 import { STORAGE } from "../../shared/lib/persistent";
 import { StorageManagement, StorageBalance } from "../../shared/lib/standards/storageManagement";
 import { CheckboxField, InfoField, TextField, UnitField } from "../../shared/ui/form-fields";
-import { BaseTask, BaseTaskProps, BaseTaskState, DefaultFormData } from "./../base";
+import { BaseTask, BaseTaskProps, BaseTaskState, DefaultFormData } from "../base";
 import "./near.scss";
 
-type FormData = DefaultFormData & {
-    amount: string;
-    amountUnit: unit | number;
-    withdrawAll: boolean;
-};
+type FormData = DefaultFormData;
 
 type Props = BaseTaskProps;
 
@@ -23,45 +19,29 @@ type State = BaseTaskState<FormData> & {
     storageBalance: StorageBalance | null;
 };
 
-export class StorageWithdraw extends BaseTask<FormData, Props, State> {
-    override uniqueClassName = "near-storage-withdraw-task";
+export class StorageUnregister extends BaseTask<FormData, Props, State> {
+    override uniqueClassName = "near-storage-unregister-task";
     override schema = arx
         .object()
         .shape({
             addr: arx.string().ft(),
             gas: arx.big().gas(),
-            amount: arx
-                .big()
-                .token()
-                .min("1", "cannot withdraw 0 NEAR")
-                .test({
-                    name: "dynamic max",
-                    message: "amount is exceeding available amount",
-                    test: (value, ctx) =>
-                        value == null ||
-                        ctx.options.context?.withdrawable == null ||
-                        value.lte(ctx.options.context.withdrawable),
-                }),
         })
-        .transform(({ gas, gasUnit, amount, amountUnit, withdrawAll, ...rest }) => ({
+        .transform(({ gas, gasUnit, amount, amountUnit, ...rest }) => ({
             ...rest,
             gas: arx.big().intoParsed(gasUnit).cast(gas),
-            amount: withdrawAll ? 0 : arx.big().intoParsed(amountUnit).cast(amount)?.toFixed() ?? null,
         }))
         .requireAll()
         .retainAll();
 
     override initialValues: FormData = {
-        name: "Storage Withdraw",
+        name: "Storage Unregister",
         addr: window.nearConfig.WNEAR_ADDRESS,
-        func: "storage_withdraw",
+        func: "storage_unregister",
         gas: "7.5",
         gasUnit: "Tgas",
         depo: "1",
         depoUnit: "yocto",
-        amount: "0",
-        amountUnit: "NEAR",
-        withdrawAll: true,
     };
 
     constructor(props: BaseTaskProps) {
@@ -87,8 +67,6 @@ export class StorageWithdraw extends BaseTask<FormData, Props, State> {
                 addr: call.address,
                 func: call.actions[0].func,
                 gas: arx.big().intoFormatted(this.initialValues.gasUnit).cast(call.actions[0].gas).toFixed(),
-                amount: call.actions[0].args.amount,
-                withdrawAll: call.actions[0].args.amount === undefined,
             };
 
             this.initialValues = Object.keys(this.initialValues).reduce((acc, k) => {
@@ -98,45 +76,28 @@ export class StorageWithdraw extends BaseTask<FormData, Props, State> {
         }
 
         this.state = { ...this.state, formData: this.initialValues };
-        this.schema.check(this.state.formData, { context: { withdrawable: this.state.storageBalance?.available } });
+        this.schema.check(this.state.formData);
 
-        if (call !== null)
-            this.tryUpdateSm().then((res) =>
-                this.setFormData({
-                    amount: res
-                        ? arx
-                              .big()
-                              .intoFormatted(this.state.formData.amountUnit)
-                              .cast(this.state.formData.amount)
-                              .toFixed()
-                        : this.state.formData.amount,
-                })
-            );
+        if (call !== null) this.tryUpdateSm();
     }
 
     static override inferOwnType(json: Call): boolean {
         return (
-            !!json && arx.string().address().isValidSync(json.address) && json.actions[0].func === "storage_withdraw"
+            !!json && arx.string().address().isValidSync(json.address) && json.actions[0].func === "storage_unregister"
         );
     }
 
     public override toCall(): Call {
-        const { addr, func, gas, gasUnit, depo, amount, amountUnit, withdrawAll } = this.state.formData;
+        const { addr, func, gas, gasUnit, depo } = this.state.formData;
 
         if (!arx.big().isValidSync(gas)) throw new CallError("Failed to parse gas input value", this.props.id);
-        if (!withdrawAll && !arx.big().isValidSync(amount))
-            throw new CallError("Failed to parse amount input value", this.props.id);
 
         return {
             address: addr,
             actions: [
                 {
                     func,
-                    args: withdrawAll
-                        ? {}
-                        : {
-                              amount: arx.big().intoParsed(amountUnit).cast(amount).toFixed(),
-                          },
+                    args: { force: false },
                     gas: arx.big().intoParsed(gasUnit).cast(gas).toFixed(),
                     depo,
                 },
@@ -146,20 +107,18 @@ export class StorageWithdraw extends BaseTask<FormData, Props, State> {
 
     private tryUpdateSm(): Promise<boolean> {
         return new Promise<boolean>((resolve) => {
-            this.schema
-                .check(this.state.formData, { context: { withdrawable: this.state.storageBalance?.available } })
-                .then(() => {
-                    const { addr } = fields(this.schema);
-                    if (!addr.isBad()) {
-                        this.confidentlyUpdateSm().then(() => resolve(true));
-                    } else {
-                        this.setState({
-                            storageManagement: null,
-                            storageBalance: null,
-                        });
-                        resolve(false);
-                    }
-                });
+            this.schema.check(this.state.formData).then(() => {
+                const { addr } = fields(this.schema);
+                if (!addr.isBad()) {
+                    this.confidentlyUpdateSm().then(() => resolve(true));
+                } else {
+                    this.setState({
+                        storageManagement: null,
+                        storageBalance: null,
+                    });
+                    resolve(false);
+                }
+            });
         });
     }
 
@@ -184,12 +143,9 @@ export class StorageWithdraw extends BaseTask<FormData, Props, State> {
     }
 
     public override Editor = (): React.ReactNode => {
-        const { resetForm, validateForm, values } = useFormikContext<FormData>();
-        const {
-            storageBalance,
-            formData: { amountUnit },
-        } = this.state;
-        const balance = arx.big().intoFormatted(amountUnit).cast(storageBalance?.available);
+        const { resetForm, validateForm } = useFormikContext();
+        const { storageBalance } = this.state;
+        const balance = arx.big().intoFormatted("NEAR").cast(storageBalance?.total);
 
         useEffect(() => {
             resetForm({
@@ -214,19 +170,6 @@ export class StorageWithdraw extends BaseTask<FormData, Props, State> {
                     roundtop
                 />
                 {!!balance && <InfoField>{`Current available storage balance: ${balance} Ⓝ`}</InfoField>}
-                <CheckboxField
-                    name="withdrawAll"
-                    label="Withdraw all available funds"
-                    checked={values.withdrawAll}
-                />
-                {!values.withdrawAll && (
-                    <UnitField
-                        name="amount"
-                        label="Amount"
-                        unit="amountUnit"
-                        options={["NEAR", "yocto"]}
-                    />
-                )}
                 <UnitField
                     name="gas"
                     unit="gasUnit"
