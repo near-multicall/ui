@@ -67,7 +67,7 @@ export class DaoPage extends Component<Props, State> {
 
     tryLoadInfoDebounced = debounce(() => this.tryLoadInfo(), 400);
 
-    lastAddr: string;
+    lastAddr: string | null;
     fee: string = "";
     formikSetValues?: (fields: State["formData"], shouldValidate?: boolean) => void;
 
@@ -96,7 +96,7 @@ export class DaoPage extends Component<Props, State> {
             this.tryLoadInfo();
         });
 
-        this.lastAddr = this.state.formData.addr;
+        this.lastAddr = null;
     }
 
     componentDidMount() {
@@ -375,6 +375,7 @@ export class DaoPage extends Component<Props, State> {
     }
 
     tryLoadInfo() {
+        if (this.lastAddr === this.state.formData.addr) return;
         this.lastAddr = this.state.formData.addr;
         this.schema.check(this.state.formData).then(() => {
             const { noDao } = fields(this.schema, "addr");

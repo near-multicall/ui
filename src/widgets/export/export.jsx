@@ -182,7 +182,7 @@ export class Export extends Component {
                     className={clsx(`${_Export}-action`, `${_Export}-action--propose`)}
                     disabled={isProposeDisabled}
                     onClick={async () => {
-                        const { currentDAO: dao, currentMulticall: multicall } = WALLET_COMPONENT.state;
+                        const { currentDao: dao, currentMulticall: multicall } = WALLET_COMPONENT.state;
                         // Case 1: immediate execution => basic multicall
                         if (!isJob) {
                             // multicall with attached FT
