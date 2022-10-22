@@ -1,21 +1,23 @@
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import { InputAdornment } from "@mui/material";
-import Icon from "@mui/material/Icon";
-import TextField from "@mui/material/TextField";
+import { EditOutlined as EditOutlinedIcon } from "@mui/icons-material";
+import { Icon, InputAdornment, TextField } from "@mui/material";
+import clsx from "clsx";
 import { Base64 } from "js-base64";
 import debounce from "lodash.debounce";
-import React, { Component } from "react";
+import { Component } from "react";
 import { Link } from "react-router-dom";
 
+import { Wallet } from "../../entities";
 import { ArgsAccount, ArgsBig, ArgsError, ArgsString } from "../../shared/lib/args-old";
+import { CallError } from "../../shared/lib/call";
+import { Multicall } from "../../shared/lib/contracts/multicall";
+import { Big, convert, toGas, toNEAR } from "../../shared/lib/converter";
 import { errorMsg } from "../../shared/lib/errors";
 import { STORAGE } from "../../shared/lib/persistent";
-import { convert, toGas, toNEAR } from "../../shared/lib/converter";
-import { view } from "../../shared/lib/wallet";
-import { Wallet } from "../../entities";
-import { TextInput, TextInputWithUnits } from "../../shared/ui/components";
-import { CallError } from "../../shared/lib/call";
+import { signAndSendTxs, view } from "../../shared/lib/wallet";
+import { DateTimePicker, TextInput, TextInputWithUnits } from "../../shared/ui/components";
 import "./export.scss";
+
+const _Export = "Export";
 
 export class Export extends Component {
     static contextType = Wallet.useSelector();
@@ -38,6 +40,8 @@ export class Export extends Component {
     };
 
     total = {
+        // Keep max gas below 270 Tgas, leaves a max of 30 Tgas for DAO operations if users vote with 300 Tgas.
+        // Keep max gas below 270 Tgas for jobs (croncat compatibility). See: https://github.com/CronCats/contracts/blob/cafd3caafb91b45abb6e811ce0fa2819980d6f96/manager/src/tasks.rs#L84
         gas: new ArgsBig("267.5", toGas("1"), toGas("270"), "Tgas"),
         depo: new ArgsBig(toNEAR("1"), "1", null, "NEAR"),
         desc: new ArgsString(""),
@@ -48,14 +52,18 @@ export class Export extends Component {
         token: new ArgsAccount(window.nearConfig.WNEAR_ADDRESS),
     };
 
-    attachNEAR = false;
-    attachFT = false;
-    showArgs = false;
-
     updateFTDebounced = debounce(() => this.updateFT(), 500);
 
     constructor(props) {
         super(props);
+
+        this.state = {
+            attachNEAR: false,
+            attachFT: false,
+            showArgs: false,
+            isJob: false,
+            jobDateTime: new Date(),
+        };
 
         this.update = this.update.bind(this);
 
@@ -82,8 +90,8 @@ export class Export extends Component {
     }
 
     toggleShowArgs() {
-        this.showArgs = !this.showArgs;
-        this.forceUpdate();
+        const { showArgs: oldValue } = this.state;
+        this.setState({ showArgs: !oldValue });
     }
 
     update() {
@@ -121,7 +129,7 @@ export class Export extends Component {
         });
     }
 
-    renderProposeButton() {
+    renderProposeButton(multicallArgs) {
         const { selector: walletSelector } = this.context;
         const walletError = window?.WALLET_COMPONENT?.errors
             ? Object.entries(WALLET_COMPONENT.errors).filter(([k, v]) => v.isBad)[0]?.[1].message
@@ -131,7 +139,7 @@ export class Export extends Component {
         if (!walletSelector.isSignedIn()) {
             return (
                 <button
-                    className="login button"
+                    className={clsx(`${_Export}-action`, `${_Export}-action--login`)}
                     onClick={() => WALLET_COMPONENT.signIn()}
                 >
                     Connect to Wallet
@@ -142,7 +150,7 @@ export class Export extends Component {
         else if (walletError === errorMsg.ERR_DAO_HAS_NO_MTCL) {
             return (
                 <button
-                    className="propose button"
+                    className={clsx(`${_Export}-action`, `${_Export}-action--propose`)}
                     disabled
                 >
                     {walletError}. <Link to="/dao">Get one now!</Link>
@@ -151,7 +159,9 @@ export class Export extends Component {
         }
         // normal propose multicall to DAO functionality
         else {
+            const { attachNEAR, attachFT, isJob, jobDateTime } = this.state;
             const { gas, depo, desc } = this.total;
+            const { token, amount } = this.ft;
             const errors = this.errors;
             // check if "propose" button is disabled
             const isProposeDisabled =
@@ -160,7 +170,7 @@ export class Export extends Component {
                 errors.depo.isBad ||
                 errors.desc.isBad ||
                 errors.hasErrors.isBad ||
-                (this.attachFT &&
+                (attachFT &&
                     (errors.amount.isBad ||
                         errors.token.isBad ||
                         errors.noToken.isBad ||
@@ -169,26 +179,74 @@ export class Export extends Component {
 
             return (
                 <button
-                    className="propose button"
+                    className={clsx(`${_Export}-action`, `${_Export}-action--propose`)}
                     disabled={isProposeDisabled}
-                    onClick={() => {
-                        // multicall with attached FT
-                        if (this.attachFT)
-                            WALLET_COMPONENT.proposeFT(
-                                desc.value,
-                                convert(gas.value, gas.unit),
-                                token.value,
-                                convert(amount.value, amount.unit, amount.decimals)
-                            );
-                        // multicall with attached NEAR
-                        else if (this.attachNEAR)
-                            WALLET_COMPONENT.propose(
-                                desc.value,
-                                convert(depo.value, depo.unit),
-                                convert(gas.value, gas.unit)
-                            );
-                        // attach NEAR disabled, ignore depo amount and attach 1 yocto.
-                        else WALLET_COMPONENT.propose(desc.value, "1", convert(gas.value, gas.unit));
+                    onClick={async () => {
+                        const { currentDAO: dao, currentMulticall: multicall } = WALLET_COMPONENT.state;
+                        // Case 1: immediate execution => basic multicall
+                        if (!isJob) {
+                            // multicall with attached FT
+                            if (attachFT) {
+                                const tx = await dao.proposeMulticallFT(
+                                    desc.value,
+                                    multicallArgs,
+                                    convert(gas.value, gas.unit),
+                                    token.value,
+                                    convert(amount.value, amount.unit, amount.decimals)
+                                );
+                                signAndSendTxs([tx]);
+                            }
+                            // multicall with attached NEAR
+                            else {
+                                const tx = await dao.proposeMulticall(
+                                    desc.value,
+                                    multicallArgs,
+                                    // if attach NEAR disabled, ignore depo amount and attach 1 yocto.
+                                    attachNEAR ? convert(depo.value, depo.unit) : "1",
+                                    convert(gas.value, gas.unit)
+                                );
+                                signAndSendTxs([tx]);
+                            }
+                        }
+                        // Case2: scheduled execution => use jobs
+                        else {
+                            // Job with attached FT
+                            if (attachFT) {
+                                const jobCount = await multicall.getJobCount();
+                                const [addJobTx, proposeJobTx] = await Promise.all([
+                                    multicall.addJob(
+                                        // TODO: support jobs with multiple multicalls
+                                        [multicallArgs],
+                                        jobDateTime,
+                                        convert(gas.value, gas.unit)
+                                    ),
+                                    dao.proposeJobActivationFT(
+                                        desc.value,
+                                        jobCount,
+                                        token.value,
+                                        convert(amount.value, amount.unit, amount.decimals)
+                                    ),
+                                ]);
+                                signAndSendTxs([addJobTx, proposeJobTx]);
+                            }
+                            // Job with attached NEAR
+                            else {
+                                const jobCost = attachNEAR
+                                    ? Big(convert(depo.value, depo.unit)).add(Multicall.CRONCAT_FEE).toFixed()
+                                    : Multicall.CRONCAT_FEE;
+                                const jobCount = await multicall.getJobCount();
+                                const [addJobTx, proposeJobTx] = await Promise.all([
+                                    multicall.addJob(
+                                        // TODO: support jobs with multiple multicalls
+                                        [multicallArgs],
+                                        jobDateTime,
+                                        convert(gas.value, gas.unit)
+                                    ),
+                                    dao.proposeJobActivation(desc.value, jobCount, jobCost),
+                                ]);
+                                signAndSendTxs([addJobTx, proposeJobTx]);
+                            }
+                        }
                     }}
                 >
                     {`Propose on ${STORAGE.addresses.dao}`}
@@ -200,9 +258,13 @@ export class Export extends Component {
 
     render() {
         const LAYOUT = this.props.layout; // ususally global parameter
-
+        const { attachNEAR, attachFT, showArgs, isJob, jobDateTime } = this.state;
         const { gas, depo, desc } = this.total;
         const { amount, token } = this.ft;
+        // do not schedule jobs in the past
+        const currentDate = new Date();
+        // limit job scheduling to one year from now
+        const maxDate = new Date(new Date().setFullYear(currentDate.getFullYear() + 1));
 
         const allErrors = LAYOUT.toErrors();
         const errors = this.errors;
@@ -215,32 +277,34 @@ export class Export extends Component {
             errors[k].validOrNull(account);
         });
 
-        // Multicall args to display for copy/paste
-        let multicallArgs = "";
-        if (this.showArgs) {
-            // toBase64 might throw on failure
-            try {
-                multicallArgs = !this.attachFT
-                    ? JSON.stringify({ calls: LAYOUT.toBase64() })
-                    : JSON.stringify({
-                          receiver_id: STORAGE.addresses.multicall,
-                          amount: convert(amount.value, amount.unit, amount.decimals),
-                          msg: JSON.stringify({
-                              function_id: "multicall",
-                              args: Base64.encode(JSON.stringify({ calls: LAYOUT.toBase64() }).toString()),
-                          }).toString(),
-                      });
-            } catch (e) {
-                if (e instanceof CallError)
-                    multicallArgs = `Error, could not create multicall arguments: ${e.message} in ${
-                        window.TASKS.find((t) => t.id === e.taskId)?.instance.current.state.formData.name
-                    }`;
-            }
+        // Multicall args used in making the proposal
+        let multicallArgs = {};
+        // Multicall args in text form to display for copy/pasting args
+        let multicallArgsText = "";
+
+        // toBase64 might throw on failure
+        try {
+            multicallArgs = { calls: LAYOUT.toBase64() };
+            multicallArgsText = !attachFT
+                ? JSON.stringify(multicallArgs)
+                : JSON.stringify({
+                      receiver_id: STORAGE.addresses.multicall,
+                      amount: convert(amount.value, amount.unit, amount.decimals),
+                      msg: JSON.stringify({
+                          function_id: "multicall",
+                          args: Base64.encode(JSON.stringify(multicallArgs).toString()),
+                      }).toString(),
+                  });
+        } catch (e) {
+            if (e instanceof CallError)
+                multicallArgsText = `Error, could not create multicall arguments: ${e.message} in ${
+                    window.TASKS.find((t) => t.id === e.taskId)?.instance.current.state.formData.name
+                }`;
         }
 
         return (
-            <div className="export-container">
-                <div className="input-container">
+            <div className={_Export}>
+                <div className={`${_Export}-params`}>
                     <TextInput
                         label="Proposal description"
                         value={desc}
@@ -248,6 +312,7 @@ export class Export extends Component {
                         multiline
                         update={this.update}
                     />
+
                     <TextInputWithUnits
                         label="Total allocated gas"
                         value={gas}
@@ -255,31 +320,38 @@ export class Export extends Component {
                         options={["Tgas", "gas"]}
                         update={this.update}
                     />
-                    <div className="attachment">
+
+                    <div className={`${_Export}-params-choice`}>
                         <p>Attach</p>
+
                         <button
-                            className={this.attachNEAR ? "selected" : ""}
+                            className={clsx({ selected: attachNEAR })}
                             onClick={() => {
-                                this.attachNEAR = !this.attachNEAR;
-                                this.attachFT = false;
-                                this.update();
+                                this.setState({
+                                    attachNEAR: !attachNEAR,
+                                    attachFT: false,
+                                });
                             }}
                         >
                             NEAR
                         </button>
+
                         <p>or</p>
+
                         <button
-                            className={this.attachFT ? "selected" : ""}
+                            className={clsx({ selected: attachFT })}
                             onClick={() => {
-                                this.attachNEAR = false;
-                                this.attachFT = !this.attachFT;
-                                this.update();
+                                this.setState({
+                                    attachNEAR: false,
+                                    attachFT: !attachFT,
+                                });
                             }}
                         >
                             fungible token
                         </button>
                     </div>
-                    {this.attachNEAR ? (
+
+                    {attachNEAR ? (
                         <TextInputWithUnits
                             label="Total attached deposit"
                             value={depo}
@@ -288,7 +360,8 @@ export class Export extends Component {
                             update={this.update}
                         />
                     ) : null}
-                    {this.attachFT ? (
+
+                    {attachFT ? (
                         <>
                             <TextInput
                                 label="Token address"
@@ -299,6 +372,7 @@ export class Export extends Component {
                                     this.updateFTDebounced();
                                 }}
                             />
+
                             <TextField
                                 label="Amount"
                                 value={errors.amount.validOrNull(amount) || errors.amount.intermediate}
@@ -318,13 +392,55 @@ export class Export extends Component {
                             />
                         </>
                     ) : null}
+
+                    <div className={clsx(`${_Export}-params-choice`, `${_Export}-params-scheduleMode`)}>
+                        <p>Execute</p>
+
+                        <button
+                            className={clsx({ selected: !isJob })}
+                            onClick={() => {
+                                this.setState({
+                                    isJob: false,
+                                });
+                            }}
+                        >
+                            immediately
+                        </button>
+
+                        <p>or</p>
+
+                        <button
+                            className={clsx({ selected: isJob })}
+                            onClick={() => {
+                                this.setState({
+                                    isJob: true,
+                                });
+                            }}
+                        >
+                            scheduled
+                        </button>
+                    </div>
+
+                    {isJob ? (
+                        <DateTimePicker
+                            classes={{ input: clsx(`${_Export}-params-scheduleTime`) }}
+                            label="Execution date"
+                            value={jobDateTime}
+                            minDateTime={currentDate}
+                            maxDateTime={maxDate}
+                            handleChange={(value) => this.setState({ jobDateTime: value.toJSDate() })}
+                        />
+                    ) : null}
                 </div>
+
                 {/* Display cards' errors */}
+
                 {allErrors.length > 0 && (
-                    <div className="error-container">
+                    <div className={`${_Export}-errors`}>
                         <div className="header">
                             <h3>{`Card errors (${allErrors.length})`}</h3>
                         </div>
+
                         <div className="error-list">
                             {allErrors.map((e, i) => (
                                 <div
@@ -344,21 +460,24 @@ export class Export extends Component {
                         </div>
                     </div>
                 )}
-                <div className="section">
-                    <div className="sidebar">
+
+                <div className={`${_Export}-section`}>
+                    <div className="header">
                         <Icon
                             className="icon collapse"
                             onClick={() => this.toggleShowArgs()}
-                            collapsed={this.showArgs ? "no" : "yes"}
+                            collapsed={showArgs ? "no" : "yes"}
                         >
                             expand_more
                         </Icon>
+
                         <h3 onClick={() => this.toggleShowArgs()}>Multicall args</h3>
-                        {this.showArgs ? (
+
+                        {showArgs ? (
                             <Icon
                                 className="icon copy"
                                 onClick={(e) => {
-                                    navigator.clipboard.writeText(multicallArgs);
+                                    navigator.clipboard.writeText(multicallArgsText);
                                     this.updateCopyIcon(e);
                                 }}
                             >
@@ -368,16 +487,17 @@ export class Export extends Component {
                             <></>
                         )}
                     </div>
-                    {this.showArgs ? (
+
+                    {showArgs ? (
                         <div className="value">
-                            <pre className="code">{multicallArgs}</pre>
+                            <pre className="code">{multicallArgsText}</pre>
                         </div>
                     ) : (
                         <></>
                     )}
                 </div>
-                <div className="spacer"></div>
-                {this.renderProposeButton()}
+
+                {this.renderProposeButton(multicallArgs)}
             </div>
         );
     }

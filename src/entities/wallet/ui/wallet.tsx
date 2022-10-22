@@ -1,3 +1,5 @@
+// TODO: use Multical helper class to fetch & store infos, like admins, tokens etc...
+
 import { Icon } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
@@ -8,9 +10,8 @@ import { Component, ContextType } from "react";
 import { args } from "../../../shared/lib/args/args";
 import { fields } from "../../../shared/lib/args/args-types/args-object";
 import { SputnikDAO } from "../../../shared/lib/contracts/sputnik-dao";
-import { Big, toGas } from "../../../shared/lib/converter";
+import { Multicall } from "../../../shared/lib/contracts/multicall";
 import { STORAGE } from "../../../shared/lib/persistent";
-import { tx, view } from "../../../shared/lib/wallet";
 import { useWalletSelector } from "./providers";
 import "./wallet.scss";
 
@@ -24,6 +25,8 @@ interface Props {}
 
 interface State {
     currentDao: SputnikDAO;
+    currentMulticall: Multicall;
+
     expanded: {
         user: boolean;
         dao: boolean;
@@ -67,7 +70,7 @@ export class WalletComponent extends Component<Props, State> {
         })
         .retain();
 
-    daoList = [];
+    daoList: string[] = [];
 
     daoSearchDebounced = debounce(
         // debounced function
@@ -86,6 +89,7 @@ export class WalletComponent extends Component<Props, State> {
 
         this.state = {
             currentDao: new SputnikDAO(STORAGE.addresses.dao),
+            currentMulticall: new Multicall(STORAGE.addresses.multicall),
             expanded: {
                 user: false,
                 dao: false || STORAGE.addresses.dao === "",
@@ -100,12 +104,8 @@ export class WalletComponent extends Component<Props, State> {
 
         window.WALLET_COMPONENT = this;
         if (accountId) {
-            const URL = `https://api.${
-                window.NEAR_ENV === "mainnet" ? "" : "testnet."
-            }app.astrodao.com/api/v1/daos/account-daos/${accountId}`;
-            fetch(URL)
-                .then((response) => response.json())
-                .then((data) => (this.daoList = data.map((dao: { id: number }) => dao.id)))
+            SputnikDAO.getUserDaosInfo(accountId)
+                .then((data) => (this.daoList = data.map((dao) => dao.id)))
                 .then(() => this.forceUpdate());
         }
     }
@@ -115,7 +115,7 @@ export class WalletComponent extends Component<Props, State> {
             .string()
             .ensure()
             .intoBaseAddress()
-            .append("." + window.nearConfig.MULTICALL_FACTORY_ADDRESS)
+            .append("." + Multicall.FACTORY_ADDRESS)
             .cast(addr);
     }
 
@@ -134,116 +134,26 @@ export class WalletComponent extends Component<Props, State> {
         });
     }
 
-    propose(desc: string, depo: string, gas: string) {
-        const { multicall, dao } = STORAGE.addresses;
-
-        const args = {
-            proposal: {
-                description: desc,
-                kind: {
-                    FunctionCall: {
-                        receiver_id: multicall,
-                        actions: [
-                            {
-                                method_name: "multicall",
-                                args: Base64.encode(JSON.stringify({ calls: window.LAYOUT.toBase64() })),
-                                deposit: `${depo}`,
-                                gas: `${gas}`,
-                            },
-                        ],
-                    },
-                },
-            },
-        };
-
-        const { proposal_bond } = this.state.currentDao.policy;
-
-        tx(dao, "add_proposal", args, toGas("15"), proposal_bond);
-    }
-
-    /**
-     * propose multicall with attached FT
-     *
-     * @param {string} desc DAO proposal description
-     * @param {string} gas gas for the multicall action
-     * @param {string} token attached FT address
-     * @param {string} amount attached FT amount
-     */
-    async proposeFT(desc: string, gas: string, token: string, amount: string) {
-        const { multicall, dao } = STORAGE.addresses;
-
-        const args = {
-            proposal: {
-                description: desc,
-                kind: {
-                    FunctionCall: {
-                        receiver_id: token,
-                        actions: [
-                            {
-                                method_name: "ft_transfer_call",
-                                args: Base64.encode(
-                                    JSON.stringify({
-                                        receiver_id: multicall,
-                                        amount: amount,
-                                        msg: JSON.stringify({
-                                            function_id: "multicall",
-                                            args: Base64.encode(
-                                                JSON.stringify({ calls: window.LAYOUT.toBase64() }).toString()
-                                            ),
-                                        }).toString(),
-                                    })
-                                ),
-                                deposit: "1", // nep-141 specifies EXACTLY 1 yocto
-                                gas: gas,
-                            },
-                        ],
-                    },
-                },
-            },
-        };
-
-        // check if multicall has enough storage on Token
-        const [storageBalance, storageBounds] = await Promise.all([
-            // get storage balance of multicall on the token
-            view(token, "storage_balance_of", { account_id: multicall }).catch((e) => "0"), // return 0 if failed
-            // get storage balance bounds in case multicall has no storage on the token and it needs to be paid
-            view(token, "storage_balance_bounds", {}).catch((e) => {}),
-        ]);
-        const totalStorageBalance = Big(storageBalance?.total ?? "0");
-        const storageMinBound = Big(storageBounds.min);
-
-        // if storage balance is less than minimum bound, add proposal action to pay for storage
-        if (totalStorageBalance.lt(storageMinBound)) {
-            // push to beginning of actions array. Has to execute before ft_transfer_call
-            args.proposal.kind.FunctionCall.actions.unshift({
-                method_name: "storage_deposit",
-                args: Base64.encode(JSON.stringify({ account_id: multicall })),
-                deposit: storageMinBound.sub(totalStorageBalance).toFixed(), // difference between current storage total and required minimum
-                gas: toGas("5"), // 5 Tgas
-            });
-        }
-
-        const { proposal_bond } = this.state.currentDao.policy;
-
-        tx(dao, "add_proposal", args, toGas("15"), proposal_bond);
-    }
-
-    connectDao(dao: string) {
+    connectDao(dao: SputnikDAO["address"]) {
         const { accountId } = this.context!;
         const { noDao, noMulticall } = fields(this.schema, "dao");
+
+        const multicallAddress = this.toMulticallAddress(dao);
 
         Promise.all([
             SputnikDAO.init(dao).catch(() => {
                 // return non-initialized DAO obj as ready = false per default.
                 return new SputnikDAO(dao);
             }),
+            Multicall.init(multicallAddress).catch((e) => new Multicall(multicallAddress)),
             this.schema.check({ dao }),
         ])
-            .then(([newDao]) => {
+            .then(([newDao, newMulticall]) => {
                 if (!newDao?.ready) return;
 
                 this.setState({
                     currentDao: newDao,
+                    currentMulticall: newMulticall,
                 });
 
                 this.schema.check({ user: accountId });

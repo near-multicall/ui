@@ -1,0 +1,16 @@
+@use "sass/color";
+@use "sass/size";
+
+.Placeholder-content {
+    padding: size.$gap;
+    text-align: center;
+    font-size: 1.5 * size.$large-text;
+
+    &--unknownError {
+        color: darken(color.$red, 20);
+    }
+
+    &--noData {
+        color: color.$darkish;
+    }
+}

@@ -7,35 +7,42 @@ import {
     useMediaQuery,
     useTheme,
 } from "@mui/material";
+import clsx from "clsx";
+import { HTMLAttributes } from "react";
 
 import { TableRowCard, TableRow, type TableRowProps } from "./row";
 import "./table.scss";
 
-interface TableProps {
+interface TableProps extends HTMLAttributes<HTMLDivElement> {
+    /**
+     * `"classic"` mode is a classic table view.
+     *
+     * In `"compact"` mode, the table is being rendered as a single column with `rows` rendered as cards,
+     *  where every card is entitled by corresponding element from `header`.
+     *
+     * In `"default"` mode, the table is being rendered according to the screen size:
+     *  `"classic"` mode is meant for wide screens, while `"compact"` is meant for medium and small ones.
+     *
+     * Whether `"compact"` or `"classic"` mode is selected, it's being applied regardless of the screen size.
+     */
+    displayMode?: "default" | "compact" | "classic";
     header: TableRowProps["headerCells"];
     rows?: TableRowProps["cells"][];
 }
 
-export const Table = ({ header, rows }: TableProps) => {
-    const matches = useMediaQuery(useTheme().breakpoints.down("md"));
+const _Table = "Table";
+
+export const Table = ({ className, displayMode = "default", header, rows }: TableProps) => {
+    const mediumOrSmallScreen = useMediaQuery(useTheme().breakpoints.down("md")),
+        classicModeRequired = (!mediumOrSmallScreen && displayMode === "default") || displayMode === "classic",
+        compactModeRequired = (mediumOrSmallScreen && displayMode === "default") || displayMode === "compact";
 
     return (
         <>
-            {matches ? (
-                <div className="Table--compact">
-                    {rows &&
-                        rows.map((cells, index) => (
-                            <TableRowCard
-                                headerCells={header}
-                                key={index}
-                                {...{ cells }}
-                            />
-                        ))}
-                </div>
-            ) : (
-                <TableContainer className="Table">
+            {classicModeRequired && (
+                <TableContainer className={clsx(_Table, className)}>
                     <table>
-                        <TableHead className="Table-head">
+                        <TableHead className={`${_Table}-head`}>
                             <MuiTableRow>
                                 {header.map((headerCell, index) => (
                                     <TableCell key={index}>{headerCell}</TableCell>
@@ -54,6 +61,19 @@ export const Table = ({ header, rows }: TableProps) => {
                         </TableBody>
                     </table>
                 </TableContainer>
+            )}
+
+            {compactModeRequired && (
+                <div className={clsx(`${_Table}--compact`, className)}>
+                    {rows &&
+                        rows.map((cells, index) => (
+                            <TableRowCard
+                                headerCells={header}
+                                key={index}
+                                {...{ cells }}
+                            />
+                        ))}
+                </div>
             )}
         </>
     );
