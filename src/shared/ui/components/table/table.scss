@@ -43,6 +43,7 @@
     &--compact {
         display: flex;
         flex-flow: column nowrap;
+        padding: 1.25 * size.$gap;
         gap: size.$gap;
     }
 }

@@ -58,8 +58,12 @@ export class Task extends Component {
     }
 
     componentWillUnmount() {
-        TASKS.splice(TASKS.indexOf(this), 1);
-        EDITOR.forceUpdate();
+        const index = window.TASKS.indexOf(this);
+
+        if (index === -1) return;
+
+        window.TASKS.splice(index, 1);
+        window.EDITOR.forceUpdate();
     }
 
     getTaskType() {

@@ -32,29 +32,56 @@
     &--compact {
         display: flex;
         flex-direction: column;
-        gap: 0.25 * size.$gap;
+        gap: 0.5 * size.$gap;
         border-radius: size.$task-radius;
-        padding: size.$gap;
-        background-color: color.$light;
+        padding: 0.5 * size.$gap;
+        background-color: color.$white;
+    }
 
-        & > div {
+    &-content {
+        &--compact {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: size.$text;
-            span:first-of-type {
-                font-weight: 800;
-            }
+            font-size: 1.1 * size.$text;
+
             &:first-of-type {
-                margin-bottom: 0.5 * size.$gap;
+                padding: 0.5 * size.$gap;
+
                 & > span {
                     &:first-of-type {
                         display: none;
                     }
+
                     &:last-child {
                         font-size: size.$large-text;
                     }
                 }
+            }
+
+            &:not(:first-of-type) {
+                padding: 0.5 * size.$gap size.$gap;
+                background-color: rgba(color.$lightest, 0.7);
+                & > span:last-of-type {
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    padding-left: 1.5rem;
+                    overflow: hidden;
+                }
+            }
+
+            &:nth-of-type(2) {
+                border-top-left-radius: 0.8 * size.$task-radius;
+                border-top-right-radius: 0.8 * size.$task-radius;
+            }
+
+            &:last-of-type {
+                border-bottom-left-radius: 0.8 * size.$task-radius;
+                border-bottom-right-radius: 0.8 * size.$task-radius;
+            }
+
+            span:first-of-type {
+                font-weight: 800;
             }
         }
     }
