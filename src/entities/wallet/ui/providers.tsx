@@ -17,6 +17,8 @@ import { setupMathWallet } from "@near-wallet-selector/math-wallet";
 import React, { useCallback, useEffect, useState } from "react";
 import { map, distinctUntilChanged } from "rxjs";
 
+import { Multicall } from "../../../shared/lib/contracts/multicall";
+
 declare global {
     interface Window {
         selector: WalletSelector;
@@ -51,7 +53,7 @@ export const WalletSelectorContextProvider: React.FC<any> = ({ children }) => {
         });
 
         const _modal = setupModal(_selector, {
-            contractId: window.nearConfig.MULTICALL_FACTORY_ADDRESS,
+            contractId: Multicall.FACTORY_ADDRESS,
             theme: "dark",
         });
 
@@ -69,7 +71,7 @@ export const WalletSelectorContextProvider: React.FC<any> = ({ children }) => {
     useEffect(() => {
         init().catch((err) => {
             console.error(err);
-            alert("Failed to initialise wallet selector");
+            alert("Failed to initialize wallet selector");
         });
     }, [init]);
 

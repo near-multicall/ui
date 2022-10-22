@@ -1,0 +1,22 @@
+@use "sass/color";
+@use "sass/font";
+@use "sass/size";
+
+.DaoJobsTab {
+    display: grid;
+    grid-template: "jobsList " auto / 100%;
+
+    &-jobsList {
+        grid-area: jobsList;
+        padding-bottom: size.$gap;
+        position: relative;
+        overflow: hidden;
+        .Table-row-content--compact {
+            &:not(&:first-of-type) {
+                span:last-of-type {
+                    font-family: font.$code;
+                }
+            }
+        }
+    }
+}

@@ -1,20 +1,27 @@
 @use "sass/mixin";
 @use "sass/size";
 
-.TokenLabel {
+.IconLabel {
     display: flex;
     align-items: center;
-    gap: size.$gap;
+    gap: 0.6 * size.$gap;
+    line-height: 0;
 
     &-icon {
-        width: 1.5 * size.$gap;
-        height: 1.5 * size.$gap;
+        width: fit-content;
+        height: fit-content;
         cursor: default !important;
         border-radius: 50%;
         box-shadow: 0px 5px 11px -3px rgba(0, 0, 0, 0.1);
+
+        & > img,
+        & > svg {
+            width: 1.5 * size.$gap;
+            height: 1.5 * size.$gap;
+        }
     }
 
-    &-symbol {
+    &-label {
         font-weight: bold;
     }
 }
