@@ -29,7 +29,7 @@ export class StorageWithdraw extends BaseTask<FormData, Props, State> {
             gas: arx.big().gas(),
             amount: arx.big().token(),
         })
-        .transform(({ gas, gasUnit, depo, depoUnit, ...rest }) => ({
+        .transform(({ gas, gasUnit, ...rest }) => ({
             ...rest,
             gas: arx.big().intoParsed(gasUnit).cast(gas),
         }))
@@ -56,6 +56,15 @@ export class StorageWithdraw extends BaseTask<FormData, Props, State> {
             ...this.state,
             token: new FungibleToken(this.initialValues.addr),
         };
+
+        this.schema = this.schema.transform(({ amount, withdrawAll, ...rest }) => ({
+            ...rest,
+            amount: withdrawAll
+                ? 0
+                : this.state.token.ready
+                ? arx.big().intoParsed(this.state.token.metadata.decimals).cast(amount)?.toFixed() ?? null
+                : amount,
+        }));
 
         this.tryUpdateFt().catch(() => {});
     }
@@ -154,14 +163,7 @@ export class StorageWithdraw extends BaseTask<FormData, Props, State> {
         this.setFormData(values);
         await new Promise((resolve) => this.resolveDebounced(resolve));
         await this.tryUpdateFt();
-        await this.schema
-            .transform(({ amount, ...rest }) => ({
-                ...rest,
-                amount: this.state.token.ready
-                    ? arx.big().intoParsed(this.state.token.metadata.decimals).cast(amount)?.toFixed() ?? null
-                    : amount,
-            }))
-            .check(values);
+        await this.schema.check(values);
         return Object.fromEntries(
             Object.entries(fields(this.schema))
                 .map(([k, v]) => [k, v?.message() ?? ""])
