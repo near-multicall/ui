@@ -1,28 +1,36 @@
-import { AddOutlined, DeleteOutlined, EditOutlined, VisibilityOutlined } from "@mui/icons-material";
+import { AddOutlined, CancelOutlined, DeleteOutlined, EditOutlined, VisibilityOutlined } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
 import clsx from "clsx";
 import { useReducer, useState } from "react";
 
-import { Multicall } from "../../../entities";
+import { MI } from "../../../entities";
+import { MITokensWhitelistEdit } from "../../../features";
 import { ArgsString } from "../../../shared/lib/args";
-import { type MulticallConfigChanges } from "../../../shared/lib/contracts/multicall";
+import { type MIEntityConfigChanges } from "../../../shared/lib/contracts/multicall";
 import { toNEAR } from "../../../shared/lib/converter";
-import { Button, ButtonGroup, NearIcons, NearLink, TextInput, Tile } from "../../../shared/ui/components";
-import { type MulticallConfigEditorWidget } from "../config";
+import {
+    Button,
+    ButtonGroup,
+    NearIcons,
+    NearLink,
+    TableRowCompact,
+    TextInput,
+    Tile,
+} from "../../../shared/ui/components";
+import { type MIEntityConfigEditorWidget } from "../config";
 
 import "./multicall-config-editor.scss";
 
-interface MulticallConfigEditorUIProps extends MulticallConfigEditorWidget.Dependencies {}
+interface MIEntityConfigEditorUIProps extends MIEntityConfigEditorWidget.Dependencies {}
 
-const _MulticallConfigEditor = "MulticallConfigEditor";
+const _MIEntityConfigEditor = "MIEntityConfigEditor";
 
-export const MulticallConfigEditorUI = ({
+export const MIEntityConfigEditorUI = ({
     className,
-    daoContractAddress,
+    controllerContractAddress,
     multicallContract,
-}: MulticallConfigEditorUIProps) => {
+}: MIEntityConfigEditorUIProps) => {
     const [editMode, editModeSwitch] = useState(false),
-        [tokensWhitelistAddMode, tokensWhitelistAddModeSwitch] = useState(false),
         [jobsSettingsEditMode, jobsSettingsEditModeSwitch] = useState(false);
 
     const changesDiffInitialState = {
@@ -34,14 +42,14 @@ export const MulticallConfigEditorUI = ({
 
     const [changesDiff, changesDiffUpdate] = useReducer(
         (
-            previousState: MulticallConfigChanges,
+            previousState: MIEntityConfigChanges,
 
             update: {
                 reset?: boolean;
-                field?: keyof MulticallConfigChanges;
+                field?: keyof MIEntityConfigChanges;
                 value?: string;
             }
-        ): MulticallConfigChanges => {
+        ): MIEntityConfigChanges => {
             if (update.reset) {
                 return changesDiffInitialState;
             } else {
@@ -66,42 +74,20 @@ export const MulticallConfigEditorUI = ({
     console.log(changesDiff);
 
     return (
-        <div className={clsx(_MulticallConfigEditor, className)}>
-            <Multicall.AdminsTable
-                className={`${_MulticallConfigEditor}-admins`}
-                daoContractAddress={daoContractAddress}
+        <div className={clsx(_MIEntityConfigEditor, className)}>
+            <MI.AdminsTable
+                className={`${_MIEntityConfigEditor}-admins`}
+                controllerContractAddress={controllerContractAddress}
             />
 
-            <Multicall.TokensWhitelistTable
-                additionalItems={changesDiff.addTokens}
-                className={`${_MulticallConfigEditor}-tokensWhitelist`}
-                daoContractAddress={daoContractAddress}
-                footer={
-                    tokensWhitelistAddMode ? (
-                        <TextInput
-                            onBlur={(event) => {
-                                changesDiffUpdate({ field: "addTokens", value: event.target.value });
-                                tokensWhitelistAddModeSwitch(false);
-                            }}
-                        />
-                    ) : null
-                }
-                headingCorners={{
-                    right: (
-                        <IconButton
-                            onClick={() => {
-                                editModeSwitch(true);
-                                tokensWhitelistAddModeSwitch(true);
-                            }}
-                        >
-                            <AddOutlined />
-                        </IconButton>
-                    ),
-                }}
+            <MITokensWhitelistEdit.Form
+                className={`${_MIEntityConfigEditor}-tokensWhitelist`}
+                onChange={() => {}}
+                {...{ controllerContractAddress }}
             />
 
             <Tile
-                classes={{ root: `${_MulticallConfigEditor}-jobsSettings` }}
+                classes={{ root: `${_MIEntityConfigEditor}-jobsSettings` }}
                 heading="Jobs settings"
             >
                 <h3>Croncat manager</h3>
@@ -150,7 +136,7 @@ export const MulticallConfigEditorUI = ({
             </Tile>
 
             <Tile
-                classes={{ content: clsx(`${_MulticallConfigEditor}-proposalForm`, { "is-inEditMode": editMode }) }}
+                classes={{ content: clsx(`${_MIEntityConfigEditor}-proposalForm`, { "is-inEditMode": editMode }) }}
                 heading={editMode ? "Changes proposal" : null}
             >
                 {editMode && (

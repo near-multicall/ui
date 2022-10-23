@@ -65,7 +65,7 @@ type MulticallArgs = {
     calls: BatchCall[][];
 };
 
-class MulticallConfigChanges {
+class MIEntityConfigChanges {
     removeTokens: string[] = [];
     addTokens: string[] = [];
     jobBond: string = "";
@@ -134,16 +134,16 @@ class Multicall {
      * Calls the given callback with a result of multicall contract instantiation,
      *  represented as stateful response.
      *
-     * @param ownerContractAddress DAO contract address
+     * @param controllerContractAddress DAO contract address
      * @param callback Stateful data fetch callback
      */
     static instanceDataFetchFx = async (
-        ownerContractAddress: SputnikDAOContract["address"],
+        controllerContractAddress: SputnikDAOContract["address"],
         callback: (result: { data: Multicall | null; error: Error | null; loading: boolean }) => void
     ) =>
         callback(
             await Multicall.init(
-                `${ArgsAccount.deconstructAddress(ownerContractAddress).name}.${Multicall.FACTORY_ADDRESS}`
+                `${ArgsAccount.deconstructAddress(controllerContractAddress).name}.${Multicall.FACTORY_ADDRESS}`
             )
                 .then((multicallInstance) => ({
                     data: multicallInstance,
@@ -184,7 +184,7 @@ class Multicall {
      * @param configDiff changes to current config of some multicall instance.
      * @returns actions that can be passed to JSON for DAO "add_proposal".
      */
-    static configDiffToProposalActions(configDiff: MulticallConfigChanges): daoFunctionCallAction[] {
+    static configDiffToProposalActions(configDiff: MIEntityConfigChanges): daoFunctionCallAction[] {
         const { removeTokens, addTokens, jobBond, croncatManager } = configDiff;
         const actions: daoFunctionCallAction[] = [];
 
@@ -312,4 +312,4 @@ class Multicall {
 }
 
 export { Multicall, Multicall as MulticallContract };
-export type { JobData, MulticallArgs, MulticallConfigChanges };
+export type { JobData, MulticallArgs, MIEntityConfigChanges };

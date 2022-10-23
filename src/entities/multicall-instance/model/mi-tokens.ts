@@ -4,36 +4,36 @@ import { ArgsAccount } from "../../../shared/lib/args";
 import { MulticallContract } from "../../../shared/lib/contracts/multicall";
 import { Props } from "../../../shared/lib/props";
 
-import { type MulticallEntity } from "../config";
+import { type MIEntity } from "../config";
 
-export type MulticallTokensWhitelist = {
+export type MITokensWhitelist = {
     data: MulticallContract["tokensWhitelist"] | null;
     error: Error | null;
     loading: boolean;
 };
 
-export class MulticallTokensModel {
+export class MITokensModel {
     static whitelistFetchFx = async (
-        ownerContractAddress: MulticallEntity.Dependencies["ownerContractAddress"],
-        callback: (result: MulticallTokensWhitelist) => void
+        controllerContractAddress: MIEntity.Dependencies["controllerContractAddress"],
+        callback: (result: MITokensWhitelist) => void
     ) =>
         await MulticallContract.instanceDataFetchFx(
-            `${ArgsAccount.deconstructAddress(ownerContractAddress).name}.${MulticallContract.FACTORY_ADDRESS}`,
+            `${ArgsAccount.deconstructAddress(controllerContractAddress).name}.${MulticallContract.FACTORY_ADDRESS}`,
 
             (multicallInstanceData) =>
                 callback(Props.evolve({ data: ({ tokensWhitelist }) => tokensWhitelist }, multicallInstanceData))
         );
 
-    static useWhitelist = (ownerContractAddress: MulticallEntity.Dependencies["ownerContractAddress"]) => {
-        const [state, stateUpdate] = useState<MulticallTokensWhitelist>({
+    static useWhitelist = (controllerContractAddress: MIEntity.Dependencies["controllerContractAddress"]) => {
+        const [state, stateUpdate] = useState<MITokensWhitelist>({
             data: null,
             error: null,
             loading: true,
         });
 
         useEffect(
-            () => void MulticallTokensModel.whitelistFetchFx(ownerContractAddress, stateUpdate),
-            [ownerContractAddress, stateUpdate]
+            () => void MITokensModel.whitelistFetchFx(controllerContractAddress, stateUpdate),
+            [controllerContractAddress, stateUpdate]
         );
 
         return state;

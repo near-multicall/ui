@@ -404,7 +404,7 @@ export class DaoPage extends Component<Props, State> {
                 items={[
                     DaoConfigTab.uiConnect({
                         className: `${_DaoPage}-content`,
-                        ownerContractAddress: dao.address,
+                        controllerContractAddress: dao.address,
                         multicallContract: multicall,
                     }),
                     DaoFundsTab.uiConnect({ className: `${_DaoPage}-content`, contracts: { dao, multicall } }),

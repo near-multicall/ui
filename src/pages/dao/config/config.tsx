@@ -1,20 +1,20 @@
 import clsx from "clsx";
 import { HTMLProps } from "react";
 
-import { MulticallConfigEditor, type MulticallConfigEditorWidget } from "../../../widgets";
+import { MIEntityConfigEditor, type MIEntityConfigEditorWidget } from "../../../widgets";
 
 import "./config.scss";
 
-interface DaoConfigTabUIProps extends HTMLProps<HTMLDivElement>, MulticallConfigEditorWidget.Dependencies {}
+interface DaoConfigTabUIProps extends HTMLProps<HTMLDivElement>, MIEntityConfigEditorWidget.Dependencies {}
 
 const _DaoConfigTab = "DaoConfigTab";
 
-const DaoConfigTabUI = ({ className, ownerContractAddress, multicallContract, ...props }: DaoConfigTabUIProps) => (
+const DaoConfigTabUI = ({ className, controllerContractAddress, multicallContract, ...props }: DaoConfigTabUIProps) => (
     <div
         className={clsx(_DaoConfigTab, className)}
         {...props}
     >
-        <MulticallConfigEditor.UI {...{ ownerContractAddress, multicallContract }} />
+        <MIEntityConfigEditor.UI {...{ controllerContractAddress, multicallContract }} />
     </div>
 );
 

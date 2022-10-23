@@ -2,11 +2,11 @@ import { Account } from "near-api-js";
 
 import { ArgsAccount } from "../../../shared/lib/args";
 
-interface MulticallAdminEntryProps {
+interface MIAdminEntryProps {
     address: Account["accountId"];
 }
 
-const MulticallAdminEntry = ({ address }: MulticallAdminEntryProps) => {
+const MIAdminEntry = ({ address }: MIAdminEntryProps) => {
     const addr = new ArgsAccount(address);
 
     return (
@@ -22,6 +22,4 @@ const MulticallAdminEntry = ({ address }: MulticallAdminEntryProps) => {
     );
 };
 
-export const multicallAdminTableRow = (address: MulticallAdminEntryProps["address"]) => [
-    <MulticallAdminEntry {...{ address }} />,
-];
+export const multicallAdminTableRow = (address: MIAdminEntryProps["address"]) => [<MIAdminEntry {...{ address }} />];
