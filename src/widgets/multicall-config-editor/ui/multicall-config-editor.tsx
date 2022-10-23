@@ -1,22 +1,14 @@
-import { AddOutlined, CancelOutlined, DeleteOutlined, EditOutlined, VisibilityOutlined } from "@mui/icons-material";
+import { EditOutlined } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
 import clsx from "clsx";
-import { useReducer, useState } from "react";
+import { useCallback, useEffect, useReducer, useState } from "react";
 
 import { MI } from "../../../entities";
 import { MITokensWhitelistEdit } from "../../../features";
 import { ArgsString } from "../../../shared/lib/args";
-import { type MIEntityConfigChanges } from "../../../shared/lib/contracts/multicall";
+import { type MulticallConfigChanges } from "../../../shared/lib/contracts/multicall";
 import { toNEAR } from "../../../shared/lib/converter";
-import {
-    Button,
-    ButtonGroup,
-    NearIcons,
-    NearLink,
-    TableRowCompact,
-    TextInput,
-    Tile,
-} from "../../../shared/ui/components";
+import { Button, ButtonGroup, NearIcons, NearLink, TextInput, Tile } from "../../../shared/ui/components";
 import { type MIEntityConfigEditorWidget } from "../config";
 
 import "./multicall-config-editor.scss";
@@ -33,7 +25,7 @@ export const MIEntityConfigEditorUI = ({
     const [editMode, editModeSwitch] = useState(false),
         [jobsSettingsEditMode, jobsSettingsEditModeSwitch] = useState(false);
 
-    const changesDiffInitialState = {
+    const changesDiffInitialState: MulticallConfigChanges = {
         removeTokens: [],
         addTokens: [],
         jobBond: "",
@@ -42,34 +34,36 @@ export const MIEntityConfigEditorUI = ({
 
     const [changesDiff, changesDiffUpdate] = useReducer(
         (
-            previousState: MIEntityConfigChanges,
-
-            update: {
-                reset?: boolean;
-                field?: keyof MIEntityConfigChanges;
-                value?: string;
-            }
-        ): MIEntityConfigChanges => {
-            if (update.reset) {
-                return changesDiffInitialState;
-            } else {
-                return Object.assign(
-                    previousState,
-
-                    update.field &&
-                        update.value && {
-                            [update.field]: Array.isArray(previousState[update.field])
-                                ? previousState[update.field].includes(update.value)
-                                    ? previousState[update.field]
-                                    : previousState[update.field].concat(update.value)
-                                : update.value,
-                        }
-                );
-            }
-        },
+            previousState: typeof changesDiffInitialState,
+            update: Partial<MulticallConfigChanges>
+        ): MulticallConfigChanges => Object.assign(previousState, update),
 
         changesDiffInitialState
     );
+
+    const formReset = useCallback(
+        () => changesDiffUpdate(changesDiffInitialState),
+        [changesDiffUpdate, changesDiffInitialState]
+    );
+
+    const onCancel = useCallback(() => {
+        formReset();
+        editModeSwitch(false);
+    }, [editModeSwitch, formReset]);
+
+    const onEdit = useCallback(
+        (update: Partial<MulticallConfigChanges>) => {
+            changesDiffUpdate(update);
+
+            editModeSwitch(
+                JSON.stringify(Object.assign(changesDiff, update)) !== JSON.stringify(changesDiffInitialState)
+            );
+        },
+
+        [changesDiffUpdate]
+    );
+
+    const onSubmit = useCallback(() => editModeSwitch(false), [editModeSwitch]);
 
     console.log(changesDiff);
 
@@ -82,8 +76,8 @@ export const MIEntityConfigEditorUI = ({
 
             <MITokensWhitelistEdit.Form
                 className={`${_MIEntityConfigEditor}-tokensWhitelist`}
-                onChange={() => {}}
-                {...{ controllerContractAddress }}
+                disabled={!editMode}
+                {...{ controllerContractAddress, onEdit }}
             />
 
             <Tile
@@ -104,7 +98,7 @@ export const MIEntityConfigEditorUI = ({
 
                 {editMode && jobsSettingsEditMode ? (
                     <TextInput
-                        onBlur={(event) => changesDiffUpdate({ field: "croncatManager", value: event.target.value })}
+                        onBlur={(event) => changesDiffUpdate({ croncatManager: event.target.value })}
                         value={new ArgsString(multicallContract.croncatManager)}
                         fullWidth
                     />
@@ -123,7 +117,7 @@ export const MIEntityConfigEditorUI = ({
                     {editMode && (
                         <TextInput
                             InputProps={{ endAdornment: NearIcons.NATIVE_TOKEN_CHARACTER }}
-                            update={(event) => changesDiffUpdate({ field: "jobBond", value: event.target.value })}
+                            update={(event) => changesDiffUpdate({ jobBond: event.target.value })}
                             type="number"
                             value={
                                 new ArgsString(
@@ -139,39 +133,30 @@ export const MIEntityConfigEditorUI = ({
                 classes={{ content: clsx(`${_MIEntityConfigEditor}-proposalForm`, { "is-inEditMode": editMode }) }}
                 heading={editMode ? "Changes proposal" : null}
             >
-                {editMode && (
-                    <div>
-                        <h3>Description</h3>
-                        <TextInput />
-                    </div>
-                )}
+                {!editMode && <p>To create config changes proposal template, start editing</p>}
 
-                <ButtonGroup>
-                    {!editMode ? (
-                        <Button
-                            color="success"
-                            label="Draft changes"
-                            onClick={() => editModeSwitch(true)}
-                        />
-                    ) : (
-                        <>
+                {editMode && (
+                    <>
+                        <div>
+                            <h3>Description</h3>
+                            <TextInput />
+                        </div>
+
+                        <ButtonGroup>
                             <Button
                                 color="error"
                                 label="Cancel"
-                                onClick={() => {
-                                    changesDiffUpdate({ reset: true });
-                                    editModeSwitch(false);
-                                }}
+                                onClick={onCancel}
                             />
 
                             <Button
                                 color="success"
                                 label="Submit"
-                                onClick={() => editModeSwitch(false)}
+                                onClick={onSubmit}
                             />
-                        </>
-                    )}
-                </ButtonGroup>
+                        </ButtonGroup>
+                    </>
+                )}
             </Tile>
         </div>
     );

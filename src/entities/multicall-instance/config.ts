@@ -1,5 +1,5 @@
+import { type MulticallConfigChanges } from "../../shared/lib/contracts/multicall";
 import { SputnikDAOContract } from "../../shared/lib/contracts/sputnik-dao";
-import { FungibleToken } from "../../shared/lib/standards/fungibleToken";
 
 /**
  * Type declaration for Multicall Instance entity
@@ -9,7 +9,7 @@ namespace MIEntity {
         controllerContractAddress: SputnikDAOContract["address"];
     }
 
-    export type Token = FungibleToken;
+    export type ConfigChanges = MulticallConfigChanges;
 }
 
 /**

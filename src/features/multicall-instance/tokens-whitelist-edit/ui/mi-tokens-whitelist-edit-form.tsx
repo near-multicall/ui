@@ -1,45 +1,61 @@
-import { CancelOutlined, EditOutlined } from "@mui/icons-material";
+import { CancelOutlined, DeleteOutlined, EditOutlined } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
-import { useEffect, useReducer, useState } from "react";
+import { useCallback, useEffect, useReducer, useState } from "react";
 
 import { TextInput } from "../../../../shared/ui/components";
 import { MI, MIEntity } from "../../../../entities";
 import { type MITokensWhitelistEditFeature } from "../config";
+import { Fn } from "../../../../shared/lib/fn";
 
 interface MITokensWhitelistEditFormProps extends MITokensWhitelistEditFeature.Dependencies {}
 
 export const MITokensWhitelistEditForm = ({
     className,
     controllerContractAddress,
-    onChange,
+    disabled,
+    onEdit,
 }: MITokensWhitelistEditFormProps) => {
-    const [editModeEnabled, editModeSwitch] = useState(false);
+    const [editModeEnabled, editModeSwitch] = useState(!disabled);
 
-    const [toAdd, markForAddition] = useReducer(
-        (previousState: MIEntity.Token["address"][], tokenAddress: MIEntity.Token["address"]) =>
-            previousState.includes(tokenAddress) ? previousState : [...previousState, tokenAddress],
-
-        []
-    );
-
-    const [toRemove, markForRemoval] = useReducer(
-        (previousState: MIEntity.Token["address"][], tokenAddress: MIEntity.Token["address"]) =>
-            previousState.includes(tokenAddress) ? previousState : [...previousState, tokenAddress],
+    const [addTokens, markForAddition] = useReducer(
+        (previousState: MIEntity.ConfigChanges["addTokens"], address: string | null) =>
+            address === null ? [] : previousState.includes(address) ? previousState : [...previousState, address],
 
         []
     );
 
-    useEffect(() => onChange({ toAdd, toRemove }), [toAdd, toRemove, onChange]);
+    const [removeTokens, markForRemoval] = useReducer(
+        (previousState: MIEntity.ConfigChanges["removeTokens"], address: string | null) =>
+            address === null ? [] : previousState.includes(address) ? previousState : [...previousState, address],
+
+        []
+    );
+
+    const formReset = useCallback(() => {
+        editModeSwitch(false);
+        markForAddition(null);
+        markForRemoval(null);
+    }, []);
+
+    useEffect(disabled ? formReset : Fn.returnVoid, [disabled, formReset]);
+
+    useEffect(() => onEdit({ addTokens, removeTokens }), [addTokens, removeTokens, onEdit]);
 
     return (
         <MI.TokensWhitelistTable
-            additionalItems={toAdd}
+            additionalItems={addTokens}
             footer={editModeEnabled ? <TextInput onBlur={(event) => markForAddition(event.target.value)} /> : null}
             headingCorners={{
                 right: editModeEnabled ? (
-                    <IconButton onClick={() => editModeSwitch(false)}>
-                        <CancelOutlined />
-                    </IconButton>
+                    <>
+                        <IconButton onClick={() => editModeSwitch(false)}>
+                            <DeleteOutlined />
+                        </IconButton>
+
+                        <IconButton onClick={formReset}>
+                            <CancelOutlined />
+                        </IconButton>
+                    </>
                 ) : (
                     <IconButton onClick={() => editModeSwitch(true)}>
                         <EditOutlined />

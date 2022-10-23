@@ -21,9 +21,12 @@
             @include mixin.center-items(space-evenly, center);
 
             .ButtonGroup {
-                justify-content: center;
-                margin-top: 0;
+                display: none;
             }
+        }
+
+        p {
+            font-size: size.$text;
         }
     }
 
