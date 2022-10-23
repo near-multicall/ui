@@ -34,7 +34,15 @@ export interface TableProps extends HTMLAttributes<HTMLDivElement>, Pick<TableRo
 
 const _Table = "Table";
 
-export const Table = ({ className, denseHeader = false, displayMode = "default", header, rows }: TableProps) => {
+export const Table = ({
+    RowComponent = TableRow,
+    RowCompactComponent = TableRowCompact,
+    className,
+    denseHeader = false,
+    displayMode = "default",
+    header,
+    rows,
+}: TableProps) => {
     const mediumOrSmallScreen = useMediaQuery(useTheme().breakpoints.down("md")),
         classicModeRequired = (!mediumOrSmallScreen && displayMode === "default") || displayMode === "classic",
         compactModeRequired = (mediumOrSmallScreen && displayMode === "default") || displayMode === "compact";
@@ -54,7 +62,7 @@ export const Table = ({ className, denseHeader = false, displayMode = "default",
 
                         <TableBody>
                             {(rows ?? header).map((cells, index) => (
-                                <TableRow
+                                <RowComponent
                                     key={`row-${index}`}
                                     cells={typeof cells !== "string" ? cells : null}
                                     {...{ header }}
@@ -69,7 +77,7 @@ export const Table = ({ className, denseHeader = false, displayMode = "default",
                 <div className={clsx(`${_Table}--compact`, className)}>
                     {rows &&
                         rows.map((cells, index) => (
-                            <TableRowCompact
+                            <RowCompactComponent
                                 key={index}
                                 {...{ cells, denseHeader, header }}
                             />
