@@ -12,8 +12,8 @@ interface MulticallAdminsTableProps extends MulticallEntity.Dependencies {
 
 const _MulticallAdminsTable = "MulticallAdminsTable";
 
-export const MulticallAdminsTable = ({ className, daoContractAddress }: MulticallAdminsTableProps) => {
-    const { data, error, loading } = MulticallAdminsModel.useAddressList(daoContractAddress);
+export const MulticallAdminsTable = ({ className, ownerContractAddress }: MulticallAdminsTableProps) => {
+    const { data, error, loading } = MulticallAdminsModel.useAddressList(ownerContractAddress);
 
     return (
         <Tile

@@ -23,11 +23,11 @@ export const MulticallTokensWhitelistTable = ({
     ItemCompactComponent,
     additionalItems,
     className,
-    daoContractAddress,
+    ownerContractAddress,
     footer,
     headingCorners,
 }: MulticallTokensWhitelistTableProps) => {
-    const { data, error, loading } = MulticallTokensModel.useWhitelist(daoContractAddress);
+    const { data, error, loading } = MulticallTokensModel.useWhitelist(ownerContractAddress);
 
     return (
         <Tile

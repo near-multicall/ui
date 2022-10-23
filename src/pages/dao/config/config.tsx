@@ -9,12 +9,12 @@ interface DaoConfigTabUIProps extends HTMLProps<HTMLDivElement>, MulticallConfig
 
 const _DaoConfigTab = "DaoConfigTab";
 
-const DaoConfigTabUI = ({ className, daoContractAddress, multicallContract, ...props }: DaoConfigTabUIProps) => (
+const DaoConfigTabUI = ({ className, ownerContractAddress, multicallContract, ...props }: DaoConfigTabUIProps) => (
     <div
         className={clsx(_DaoConfigTab, className)}
         {...props}
     >
-        <MulticallConfigEditor.UI {...{ daoContractAddress, multicallContract }} />
+        <MulticallConfigEditor.UI {...{ ownerContractAddress, multicallContract }} />
     </div>
 );
 

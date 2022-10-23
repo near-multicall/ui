@@ -5,7 +5,7 @@ import { SputnikDAOContract } from "../../shared/lib/contracts/sputnik-dao";
 
 namespace MulticallConfigEditorWidget {
     export interface Dependencies extends HTMLProps<HTMLDivElement> {
-        daoContractAddress: SputnikDAOContract["address"];
+        ownerContractAddress: SputnikDAOContract["address"];
         multicallContract: MulticallContract;
     }
 }

@@ -134,16 +134,16 @@ class Multicall {
      * Calls the given callback with a result of multicall contract instantiation,
      *  represented as stateful response.
      *
-     * @param daoContractAddress DAO contract address
+     * @param ownerContractAddress DAO contract address
      * @param callback Stateful data fetch callback
      */
     static instanceDataFetchFx = async (
-        daoContractAddress: SputnikDAOContract["address"],
+        ownerContractAddress: SputnikDAOContract["address"],
         callback: (result: { data: Multicall | null; error: Error | null; loading: boolean }) => void
     ) =>
         callback(
             await Multicall.init(
-                `${ArgsAccount.deconstructAddress(daoContractAddress).name}.${Multicall.FACTORY_ADDRESS}`
+                `${ArgsAccount.deconstructAddress(ownerContractAddress).name}.${Multicall.FACTORY_ADDRESS}`
             )
                 .then((multicallInstance) => ({
                     data: multicallInstance,

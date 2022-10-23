@@ -14,15 +14,15 @@ export type MulticallAdminsAddressList = {
 
 export class MulticallAdminsModel {
     static addressListFetchFx = async (
-        daoContractAddress: MulticallEntity.Dependencies["daoContractAddress"],
+        ownerContractAddress: MulticallEntity.Dependencies["ownerContractAddress"],
         callback: (result: MulticallAdminsAddressList) => void
     ) =>
         await MulticallContract.instanceDataFetchFx(
-            `${ArgsAccount.deconstructAddress(daoContractAddress).name}.${MulticallContract.FACTORY_ADDRESS}`,
+            `${ArgsAccount.deconstructAddress(ownerContractAddress).name}.${MulticallContract.FACTORY_ADDRESS}`,
             (multicallInstanceData) => callback(Props.evolve({ data: ({ admins }) => admins }, multicallInstanceData))
         );
 
-    static useAddressList = (daoContractAddress: MulticallEntity.Dependencies["daoContractAddress"]) => {
+    static useAddressList = (ownerContractAddress: MulticallEntity.Dependencies["ownerContractAddress"]) => {
         const [state, stateUpdate] = useState<MulticallAdminsAddressList>({
             data: null,
             error: null,
@@ -30,8 +30,8 @@ export class MulticallAdminsModel {
         });
 
         useEffect(
-            () => void MulticallAdminsModel.addressListFetchFx(daoContractAddress, stateUpdate),
-            [daoContractAddress, stateUpdate]
+            () => void MulticallAdminsModel.addressListFetchFx(ownerContractAddress, stateUpdate),
+            [ownerContractAddress, stateUpdate]
         );
 
         return state;

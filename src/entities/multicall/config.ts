@@ -2,7 +2,7 @@ import { SputnikDAOContract } from "../../shared/lib/contracts/sputnik-dao";
 
 namespace MulticallEntity {
     export interface Dependencies {
-        daoContractAddress: SputnikDAOContract["address"];
+        ownerContractAddress: SputnikDAOContract["address"];
     }
 }
 

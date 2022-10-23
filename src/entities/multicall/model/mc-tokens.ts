@@ -14,17 +14,17 @@ export type MulticallTokensWhitelist = {
 
 export class MulticallTokensModel {
     static whitelistFetchFx = async (
-        daoContractAddress: MulticallEntity.Dependencies["daoContractAddress"],
+        ownerContractAddress: MulticallEntity.Dependencies["ownerContractAddress"],
         callback: (result: MulticallTokensWhitelist) => void
     ) =>
         await MulticallContract.instanceDataFetchFx(
-            `${ArgsAccount.deconstructAddress(daoContractAddress).name}.${MulticallContract.FACTORY_ADDRESS}`,
+            `${ArgsAccount.deconstructAddress(ownerContractAddress).name}.${MulticallContract.FACTORY_ADDRESS}`,
 
             (multicallInstanceData) =>
                 callback(Props.evolve({ data: ({ tokensWhitelist }) => tokensWhitelist }, multicallInstanceData))
         );
 
-    static useWhitelist = (daoContractAddress: MulticallEntity.Dependencies["daoContractAddress"]) => {
+    static useWhitelist = (ownerContractAddress: MulticallEntity.Dependencies["ownerContractAddress"]) => {
         const [state, stateUpdate] = useState<MulticallTokensWhitelist>({
             data: null,
             error: null,
@@ -32,8 +32,8 @@ export class MulticallTokensModel {
         });
 
         useEffect(
-            () => void MulticallTokensModel.whitelistFetchFx(daoContractAddress, stateUpdate),
-            [daoContractAddress, stateUpdate]
+            () => void MulticallTokensModel.whitelistFetchFx(ownerContractAddress, stateUpdate),
+            [ownerContractAddress, stateUpdate]
         );
 
         return state;
