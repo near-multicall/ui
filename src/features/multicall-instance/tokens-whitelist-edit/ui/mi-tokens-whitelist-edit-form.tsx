@@ -19,7 +19,11 @@ export const MITokensWhitelistEditForm = ({
 
     const [addTokens, markForAddition] = useReducer(
         (previousState: MIEntity.ConfigChanges["addTokens"], address: string | null) =>
-            address === null ? [] : previousState.includes(address) ? previousState : [...previousState, address],
+            address === null
+                ? []
+                : previousState.includes(address) || address.length < 1
+                ? previousState
+                : [...previousState, address],
 
         []
     );
