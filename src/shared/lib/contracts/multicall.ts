@@ -65,7 +65,7 @@ type MulticallArgs = {
     calls: BatchCall[][];
 };
 
-class MIEntityConfigChanges {
+class MulticallConfigChanges {
     removeTokens: string[] = [];
     addTokens: string[] = [];
     jobBond: string = "";
@@ -312,4 +312,4 @@ class Multicall {
 }
 
 export { Multicall, Multicall as MulticallContract };
-export type { JobData, MulticallArgs, MIEntityConfigChanges };
+export type { JobData, MulticallArgs, MulticallConfigChanges };
