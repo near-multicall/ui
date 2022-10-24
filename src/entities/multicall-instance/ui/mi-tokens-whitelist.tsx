@@ -41,7 +41,7 @@ export const MITokensWhitelistTable = ({
                     RowComponent={ItemComponent}
                     RowCompactComponent={ItemCompactComponent}
                     className={`${_MITokensWhitelistTable}-body`}
-                    denseHeader
+                    dense
                     displayMode="compact"
                     header={["Contract address"]}
                     rows={data?.concat(additionalItems ?? []).map(miWhitelistedTokenTableRowRender)}
