@@ -3,8 +3,8 @@
 @use "sass/mixin";
 @use "sass/size";
 
-.MIEntityConfigEditor {
-    grid-area: MIEntityConfigEditor;
+.MulticallConfigEditor {
+    grid-area: MulticallConfigEditor;
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 6fr 4fr;

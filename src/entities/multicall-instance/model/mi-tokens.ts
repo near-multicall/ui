@@ -4,7 +4,7 @@ import { ArgsAccount } from "../../../shared/lib/args";
 import { MulticallContract } from "../../../shared/lib/contracts/multicall";
 import { Props } from "../../../shared/lib/props";
 
-import { type MIEntity } from "../config";
+import { type MulticallInstanceEntity } from "../config";
 
 export type MITokensWhitelist = {
     data: MulticallContract["tokensWhitelist"] | null;
@@ -14,7 +14,7 @@ export type MITokensWhitelist = {
 
 export class MITokensModel {
     static whitelistFetchFx = async (
-        controllerContractAddress: MIEntity.Dependencies["controllerContractAddress"],
+        controllerContractAddress: MulticallInstanceEntity.Dependencies["controllerContractAddress"],
         callback: (result: MITokensWhitelist) => void
     ) =>
         await MulticallContract.instanceDataFetchFx(
@@ -24,7 +24,9 @@ export class MITokensModel {
                 callback(Props.evolve({ data: ({ tokensWhitelist }) => tokensWhitelist }, multicallInstanceData))
         );
 
-    static useWhitelist = (controllerContractAddress: MIEntity.Dependencies["controllerContractAddress"]) => {
+    static useWhitelist = (
+        controllerContractAddress: MulticallInstanceEntity.Dependencies["controllerContractAddress"]
+    ) => {
         const [state, stateUpdate] = useState<MITokensWhitelist>({
             data: null,
             error: null,

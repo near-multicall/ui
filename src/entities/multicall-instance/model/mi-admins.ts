@@ -4,7 +4,7 @@ import { ArgsAccount } from "../../../shared/lib/args";
 import { MulticallContract } from "../../../shared/lib/contracts/multicall";
 import { Props } from "../../../shared/lib/props";
 
-import { type MIEntity } from "../config";
+import { type MulticallInstanceEntity } from "../config";
 
 export type MIAdminsAddressList = {
     data: MulticallContract["admins"] | null;
@@ -14,7 +14,7 @@ export type MIAdminsAddressList = {
 
 export class MIAdminsModel {
     static addressListFetchFx = async (
-        controllerContractAddress: MIEntity.Dependencies["controllerContractAddress"],
+        controllerContractAddress: MulticallInstanceEntity.Dependencies["controllerContractAddress"],
         callback: (result: MIAdminsAddressList) => void
     ) =>
         await MulticallContract.instanceDataFetchFx(
@@ -22,7 +22,9 @@ export class MIAdminsModel {
             (multicallInstanceData) => callback(Props.evolve({ data: ({ admins }) => admins }, multicallInstanceData))
         );
 
-    static useAddressList = (controllerContractAddress: MIEntity.Dependencies["controllerContractAddress"]) => {
+    static useAddressList = (
+        controllerContractAddress: MulticallInstanceEntity.Dependencies["controllerContractAddress"]
+    ) => {
         const [state, stateUpdate] = useState<MIAdminsAddressList>({
             data: null,
             error: null,

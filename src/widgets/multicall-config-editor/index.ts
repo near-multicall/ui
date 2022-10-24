@@ -1,8 +1,8 @@
-import { MIEntityConfigEditorConfig, type MIEntityConfigEditorWidget } from "./config";
-import { MIEntityConfigEditorUI } from "./ui/multicall-config-editor";
+import { MulticallConfigEditorConfig, type MulticallConfigEditorWidget } from "./config";
+import { MulticallConfigEditorUI } from "./ui/multicall-config-editor";
 
-class MIEntityConfigEditor extends MIEntityConfigEditorConfig {
-    static UI = MIEntityConfigEditorUI;
+class MulticallConfigEditor extends MulticallConfigEditorConfig {
+    static UI = MulticallConfigEditorUI;
 }
 
-export { MIEntityConfigEditor, type MIEntityConfigEditorWidget };
+export { MulticallConfigEditor, type MulticallConfigEditorWidget };

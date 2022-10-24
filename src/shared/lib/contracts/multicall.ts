@@ -184,7 +184,7 @@ class Multicall {
      * @param configDiff changes to current config of some multicall instance.
      * @returns actions that can be passed to JSON for DAO "add_proposal".
      */
-    static configDiffToProposalActions(configDiff: MIEntityConfigChanges): daoFunctionCallAction[] {
+    static configDiffToProposalActions(configDiff: MulticallConfigChanges): daoFunctionCallAction[] {
         const { removeTokens, addTokens, jobBond, croncatManager } = configDiff;
         const actions: daoFunctionCallAction[] = [];
 

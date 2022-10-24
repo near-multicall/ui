@@ -2,11 +2,11 @@ import clsx from "clsx";
 
 import { Scrollable, Table, Tile } from "../../../shared/ui/components";
 import { MIAdminsModel } from "../model/mi-admins";
-import { type MIEntity } from "../config";
+import { type MulticallInstanceEntity } from "../config";
 
 import { multicallAdminTableRow } from "./mi-admin-entry";
 
-interface MIAdminsTableProps extends MIEntity.Dependencies {
+interface MIAdminsTableProps extends MulticallInstanceEntity.Dependencies {
     className?: string;
 }
 

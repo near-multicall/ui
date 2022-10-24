@@ -1,29 +1,24 @@
-import { EditOutlined } from "@mui/icons-material";
-import { IconButton } from "@mui/material";
 import clsx from "clsx";
-import { useCallback, useEffect, useReducer, useState } from "react";
+import { useCallback, useReducer, useState } from "react";
 
-import { MI } from "../../../entities";
-import { MITokensWhitelistEdit } from "../../../features";
-import { ArgsString } from "../../../shared/lib/args";
+import { MulticallInstance } from "../../../entities";
+import { JobsSettingsEdit, TokensWhitelistEdit } from "../../../features";
 import { type MulticallConfigChanges } from "../../../shared/lib/contracts/multicall";
-import { toNEAR } from "../../../shared/lib/converter";
-import { Button, ButtonGroup, NearIcons, NearLink, TextInput, Tile } from "../../../shared/ui/components";
-import { type MIEntityConfigEditorWidget } from "../config";
+import { Button, ButtonGroup, TextInput, Tile } from "../../../shared/ui/components";
+import { type MulticallConfigEditorWidget } from "../config";
 
 import "./multicall-config-editor.scss";
 
-interface MIEntityConfigEditorUIProps extends MIEntityConfigEditorWidget.Dependencies {}
+interface MulticallConfigEditorUIProps extends MulticallConfigEditorWidget.Dependencies {}
 
-const _MIEntityConfigEditor = "MIEntityConfigEditor";
+const _MulticallConfigEditor = "MulticallConfigEditor";
 
-export const MIEntityConfigEditorUI = ({
+export const MulticallConfigEditorUI = ({
     className,
     controllerContractAddress,
     multicallContract,
-}: MIEntityConfigEditorUIProps) => {
-    const [editMode, editModeSwitch] = useState(false),
-        [jobsSettingsEditMode, jobsSettingsEditModeSwitch] = useState(false);
+}: MulticallConfigEditorUIProps) => {
+    const [editMode, editModeSwitch] = useState(false);
 
     const changesDiffInitialState: MulticallConfigChanges = {
         removeTokens: [],
@@ -68,69 +63,27 @@ export const MIEntityConfigEditorUI = ({
     console.log(changesDiff);
 
     return (
-        <div className={clsx(_MIEntityConfigEditor, className)}>
-            <MI.AdminsTable
-                className={`${_MIEntityConfigEditor}-admins`}
+        <div className={clsx(_MulticallConfigEditor, className)}>
+            <MulticallInstance.AdminsTable
+                className={`${_MulticallConfigEditor}-admins`}
                 controllerContractAddress={controllerContractAddress}
             />
 
-            <MITokensWhitelistEdit.Form
-                className={`${_MIEntityConfigEditor}-tokensWhitelist`}
+            <TokensWhitelistEdit.Form
+                className={`${_MulticallConfigEditor}-tokensWhitelist`}
                 disabled={!editMode}
                 {...{ controllerContractAddress, onEdit }}
             />
 
-            <Tile
-                classes={{ root: `${_MIEntityConfigEditor}-jobsSettings` }}
-                heading="Jobs settings"
-            >
-                <h3>Croncat manager</h3>
-
-                <IconButton
-                    edge="start"
-                    onClick={() => {
-                        editModeSwitch(true);
-                        jobsSettingsEditModeSwitch(true);
-                    }}
-                >
-                    <EditOutlined />
-                </IconButton>
-
-                {editMode && jobsSettingsEditMode ? (
-                    <TextInput
-                        onBlur={(event) => changesDiffUpdate({ croncatManager: event.target.value })}
-                        value={new ArgsString(multicallContract.croncatManager)}
-                        fullWidth
-                    />
-                ) : (
-                    <NearLink address={multicallContract.croncatManager} />
-                )}
-
-                <h3>Job bond</h3>
-
-                <span>
-                    {!editMode &&
-                        `${multicallContract.jobBond !== "" ? toNEAR(multicallContract.jobBond) : "..."} ${
-                            NearIcons.NATIVE_TOKEN_CHARACTER
-                        }`}
-
-                    {editMode && (
-                        <TextInput
-                            InputProps={{ endAdornment: NearIcons.NATIVE_TOKEN_CHARACTER }}
-                            update={(event) => changesDiffUpdate({ jobBond: event.target.value })}
-                            type="number"
-                            value={
-                                new ArgsString(
-                                    multicallContract.jobBond !== "" ? toNEAR(multicallContract.jobBond) : ""
-                                )
-                            }
-                        />
-                    )}
-                </span>
-            </Tile>
+            <JobsSettingsEdit.Form
+                className={`${_MulticallConfigEditor}-jobsSettings`}
+                {...{ controllerContractAddress, multicallContract, onEdit }}
+            />
 
             <Tile
-                classes={{ content: clsx(`${_MIEntityConfigEditor}-proposalForm`, { "is-inEditMode": editMode }) }}
+                classes={{
+                    content: clsx(`${_MulticallConfigEditor}-proposalForm`, { "is-inEditMode": editMode }),
+                }}
                 heading={editMode ? "Changes proposal" : null}
             >
                 {!editMode && <p>To create config changes proposal template, start editing</p>}

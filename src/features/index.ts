@@ -1,2 +1,3 @@
 export { DappLogin } from "./dapp-login";
-export { MITokensWhitelistEdit } from "./multicall-instance/tokens-whitelist-edit";
+export { JobsSettingsEdit, type JobsSettingsEditFeature } from "./jobs-settings-edit";
+export { TokensWhitelistEdit, type TokensWhitelistEditFeature } from "./tokens-whitelist-edit";

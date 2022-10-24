@@ -2,25 +2,24 @@ import { CancelOutlined, DeleteOutlined, EditOutlined } from "@mui/icons-materia
 import { IconButton } from "@mui/material";
 import { useCallback, useEffect, useReducer, useState } from "react";
 
-import { TextInput } from "../../../../shared/ui/components";
-import { Fn } from "../../../../shared/lib/fn";
-import { ArgsString } from "../../../../shared/lib/args";
-import { MI, MIEntity } from "../../../../entities";
-import { type MITokensWhitelistEditFeature } from "../config";
+import { TextInput } from "../../../shared/ui/components";
+import { Fn } from "../../../shared/lib/fn";
+import { ArgsString } from "../../../shared/lib/args";
+import { MulticallInstance, MulticallInstanceEntity } from "../../../entities";
+import { type TokensWhitelistEditFeature } from "../config";
 
-interface MITokensWhitelistEditFormProps extends MITokensWhitelistEditFeature.Dependencies {}
+interface TokensWhitelistFormProps extends TokensWhitelistEditFeature.Dependencies {}
 
-export const MITokensWhitelistEditForm = ({
+export const TokensWhitelistForm = ({
     className,
     controllerContractAddress,
     disabled,
     onEdit,
-}: MITokensWhitelistEditFormProps) => {
+}: TokensWhitelistFormProps) => {
     const [editModeEnabled, editModeSwitch] = useState(!disabled);
 
-    const [addTokens, markForAddition] = useState<MIEntity.ConfigChanges["addTokens"]>([]);
-
-    const [removeTokens, markForRemoval] = useState<MIEntity.ConfigChanges["removeTokens"]>([]);
+    const [addTokens, markForAddition] = useState<MulticallInstanceEntity.ConfigChanges["addTokens"]>([]),
+        [removeTokens, markForRemoval] = useState<MulticallInstanceEntity.ConfigChanges["removeTokens"]>([]);
 
     const tokenToAddAddress = new ArgsString("");
 
@@ -69,7 +68,7 @@ export const MITokensWhitelistEditForm = ({
     useEffect(() => onEdit({ addTokens, removeTokens }), [addTokens, removeTokens, onEdit]);
 
     return (
-        <MI.TokensWhitelistTable
+        <MulticallInstance.TokensWhitelistTable
             additionalItems={addTokens}
             footer={
                 editModeEnabled ? (
@@ -82,9 +81,11 @@ export const MITokensWhitelistEditForm = ({
             headingCorners={{
                 right: editModeEnabled ? (
                     <>
-                        <IconButton onClick={onRemovalRequest}>
-                            <DeleteOutlined />
-                        </IconButton>
+                        {selected.length > 0 && (
+                            <IconButton onClick={onRemovalRequest}>
+                                <DeleteOutlined />
+                            </IconButton>
+                        )}
 
                         <IconButton onClick={formReset}>
                             <CancelOutlined />

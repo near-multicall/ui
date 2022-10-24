@@ -1,15 +1,13 @@
 import { HTMLProps } from "react";
+import { JobsSettingsEditFeature, TokensWhitelistEditFeature } from "../../features";
 
-import { MulticallContract } from "../../shared/lib/contracts/multicall";
-import { SputnikDAOContract } from "../../shared/lib/contracts/sputnik-dao";
-
-namespace MIEntityConfigEditorWidget {
-    export interface Dependencies extends HTMLProps<HTMLDivElement> {
-        controllerContractAddress: SputnikDAOContract["address"];
-        multicallContract: MulticallContract;
-    }
+namespace MulticallConfigEditorWidget {
+    export interface Dependencies
+        extends HTMLProps<HTMLDivElement>,
+            Omit<TokensWhitelistEditFeature.Dependencies, "onEdit">,
+            Omit<JobsSettingsEditFeature.Dependencies, "onEdit"> {}
 }
 
-class MIEntityConfigEditorConfig {}
+class MulticallConfigEditorConfig {}
 
-export { MIEntityConfigEditorConfig, type MIEntityConfigEditorWidget };
+export { MulticallConfigEditorConfig, type MulticallConfigEditorWidget };
