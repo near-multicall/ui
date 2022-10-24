@@ -2,7 +2,7 @@ import clsx from "clsx";
 import { useCallback, useReducer, useState } from "react";
 
 import { MulticallInstance } from "../../../entities";
-import { JobsSettingsEdit, TokensWhitelistEdit } from "../../../features";
+import { JobSettingsEdit, TokensWhitelistEdit } from "../../../features";
 import { type MulticallConfigChanges } from "../../../shared/lib/contracts/multicall";
 import { Button, ButtonGroup, TextInput, Tile } from "../../../shared/ui/components";
 import { type MulticallConfigEditorWidget } from "../config";
@@ -73,7 +73,7 @@ export const MulticallConfigEditorUI = ({
                 {...{ controllerContractAddress, onEdit }}
             />
 
-            <JobsSettingsEdit.Form
+            <JobSettingsEdit.Form
                 className={`${_MulticallConfigEditor}-jobsSettings`}
                 disabled={!editMode}
                 {...{ controllerContractAddress, multicallContract, onEdit }}

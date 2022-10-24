@@ -6,20 +6,22 @@ import { ArgsString } from "../../../shared/lib/args";
 import { toNEAR } from "../../../shared/lib/converter";
 import { Fn } from "../../../shared/lib/fn";
 import { NearIcons, NearLink, TextInput, Tile } from "../../../shared/ui/components";
-import { type JobsSettingsEditFeature } from "../config";
+import { type JobSettingsEditFeature } from "../config";
 
-interface JobsSettingsFormProps extends JobsSettingsEditFeature.Dependencies {}
+interface JobSettingsFormProps extends JobSettingsEditFeature.Dependencies {}
 
-export const JobsSettingsForm = ({ className, disabled, multicallContract, onEdit }: JobsSettingsFormProps) => {
+const _JobSettings = "JobSettings";
+
+export const JobSettingsForm = ({ className, disabled, multicallContract, onEdit }: JobSettingsFormProps) => {
     const [editModeEnabled, editModeSwitch] = useState(!disabled);
 
-    const formInitialState: JobsSettingsEditFeature.FormState = {
+    const formInitialState: JobSettingsEditFeature.FormState = {
         croncatManager: "",
         jobBond: "",
     };
 
     const [formValues, formValuesUpdate] = useReducer(
-        (latestState: JobsSettingsEditFeature.FormState, update: Partial<JobsSettingsEditFeature.FormState>) =>
+        (latestState: JobSettingsEditFeature.FormState, update: Partial<JobSettingsEditFeature.FormState>) =>
             Object.assign(latestState, update),
 
         formInitialState
@@ -72,35 +74,39 @@ export const JobsSettingsForm = ({ className, disabled, multicallContract, onEdi
                 ),
             }}
         >
-            <h3>Croncat manager</h3>
-
             {editModeEnabled ? (
                 <TextInput
+                    label="Croncat manager"
                     update={(event) => formValuesUpdate({ croncatManager: event.target.value })}
                     value={formFields.croncatManager}
                     fullWidth
                 />
             ) : (
-                <NearLink address={multicallContract.croncatManager} />
+                <span>
+                    <h3>Croncat manager</h3>
+                    <NearLink address={multicallContract.croncatManager} />
+                </span>
             )}
 
-            <h3>Job bond</h3>
+            {editModeEnabled ? (
+                <TextInput
+                    InputProps={{ endAdornment: NearIcons.NATIVE_TOKEN_CHARACTER }}
+                    label="Job bond"
+                    update={(event) => formValuesUpdate({ jobBond: event.target.value })}
+                    type="number"
+                    value={formFields.jobBond}
+                />
+            ) : (
+                <span>
+                    <h3>Job bond</h3>
 
-            <span>
-                {!editModeEnabled &&
-                    `${multicallContract.jobBond !== "" ? toNEAR(multicallContract.jobBond) : "..."} ${
-                        NearIcons.NATIVE_TOKEN_CHARACTER
-                    }`}
-
-                {editModeEnabled && (
-                    <TextInput
-                        InputProps={{ endAdornment: NearIcons.NATIVE_TOKEN_CHARACTER }}
-                        update={(event) => formValuesUpdate({ jobBond: event.target.value })}
-                        type="number"
-                        value={formFields.jobBond}
-                    />
-                )}
-            </span>
+                    <span>
+                        {`${multicallContract.jobBond !== "" ? toNEAR(multicallContract.jobBond) : "..."} ${
+                            NearIcons.NATIVE_TOKEN_CHARACTER
+                        }`}
+                    </span>
+                </span>
+            )}
         </Tile>
     );
 };

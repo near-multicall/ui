@@ -3,7 +3,7 @@ import { HTMLProps } from "react";
 import { MulticallInstanceEntity } from "../../entities";
 import { MulticallContract } from "../../shared/lib/contracts/multicall";
 
-namespace JobsSettingsEditFeature {
+namespace JobSettingsEditFeature {
     export interface Dependencies
         extends Omit<HTMLProps<HTMLDivElement>, "onChange">,
             Pick<MulticallInstanceEntity.Dependencies, "controllerContractAddress"> {
@@ -14,4 +14,4 @@ namespace JobsSettingsEditFeature {
     export type FormState = Pick<MulticallInstanceEntity.ConfigChanges, "croncatManager" | "jobBond">;
 }
 
-export { type JobsSettingsEditFeature };
+export { type JobSettingsEditFeature };

@@ -1,11 +1,11 @@
 import { HTMLProps } from "react";
-import { JobsSettingsEditFeature, TokensWhitelistEditFeature } from "../../features";
+import { JobSettingsEditFeature, TokensWhitelistEditFeature } from "../../features";
 
 namespace MulticallConfigEditorWidget {
     export interface Dependencies
         extends HTMLProps<HTMLDivElement>,
             Omit<TokensWhitelistEditFeature.Dependencies, "onEdit">,
-            Omit<JobsSettingsEditFeature.Dependencies, "onEdit"> {}
+            Omit<JobSettingsEditFeature.Dependencies, "onEdit"> {}
 }
 
 class MulticallConfigEditorConfig {}
