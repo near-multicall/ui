@@ -41,7 +41,7 @@ button {
 .MuiTextField-root {
     .MuiInputLabel-root,
     .MuiInputBase-root {
-        font-size: 1em;
+        font-size: size.$text;
     }
 }
 
