@@ -29,8 +29,12 @@
         flex-direction: column;
         gap: 0.5 * size.$gap;
         border-radius: size.$task-radius;
-        padding: 0.5 * size.$gap;
+        padding: size.$gap * 0.5;
         background-color: color.$white;
+
+        &--dense {
+            padding: calc(size.$gap * 0.4) calc(size.$gap * 0.6);
+        }
     }
 
     &-content {
@@ -40,9 +44,9 @@
             align-items: center;
             font-size: 1.1 * size.$text;
 
-            &:not(&--denseHeader) {
+            &:not(&--dense) {
                 &:first-of-type {
-                    padding: calc(size.$gap / 2);
+                    padding: size.$gap * 0.5;
                 }
             }
 

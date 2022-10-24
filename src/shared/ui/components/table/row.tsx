@@ -9,7 +9,7 @@ export type TableHeader = string[];
 
 export interface TableRowProps {
     cells?: (string | number | JSX.Element)[] | null;
-    denseHeader?: boolean;
+    dense?: boolean;
     header: TableHeader;
 }
 
@@ -23,12 +23,16 @@ export const TableRow = ({ cells, header }: TableRowProps) => (
     </>
 );
 
-export const TableRowCompact = ({ cells, denseHeader, header }: TableRowProps) => (
-    <div className={`${_TableRow}--compact`}>
+export const TableRowCompact = ({ cells, dense, header }: TableRowProps) => (
+    <div
+        className={clsx(`${_TableRow}--compact`, {
+            [`${_TableRow}--compact--dense`]: dense,
+        })}
+    >
         {header.map((headerCell, headerCellIndex) => (
             <div
                 className={clsx(`${_TableRow}-content--compact`, {
-                    [`${_TableRow}-content--compact--denseHeader`]: denseHeader,
+                    [`${_TableRow}-content--compact--dense`]: dense,
                 })}
                 key={headerCellIndex}
             >

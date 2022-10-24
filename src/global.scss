@@ -42,6 +42,15 @@ button {
     .MuiInputLabel-root,
     .MuiInputBase-root {
         font-size: size.$text;
+
+        input {
+            padding: calc(size.$gap * 0.4) calc(size.$gap * 0.6);
+            font-size: size.$text;
+        }
+
+        fieldset {
+            border-radius: size.$task-radius;
+        }
     }
 }
 
