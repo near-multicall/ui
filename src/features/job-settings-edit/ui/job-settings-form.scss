@@ -1,2 +1,7 @@
+@use "sass/size";
+
 .JobSettings {
+    &-content {
+        gap: size.$gap;
+    }
 }

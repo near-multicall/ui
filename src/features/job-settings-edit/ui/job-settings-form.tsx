@@ -51,7 +51,7 @@ export const JobSettingsForm = ({ className, disabled, multicallContract, onEdit
 
     return (
         <Tile
-            classes={{ root: clsx(_JobSettings, className) }}
+            classes={{ root: clsx(_JobSettings, className), content: `${_JobSettings}-content` }}
             heading="Jobs settings"
             headingCorners={{
                 right: editModeEnabled ? (
