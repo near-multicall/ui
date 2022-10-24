@@ -132,7 +132,7 @@ class Multicall {
 
     /**
      * Calls the given callback with a result of multicall contract instantiation,
-     *  represented as stateful response.
+     * represented as stateful response.
      *
      * @param controllerContractAddress DAO contract address
      * @param callback Stateful data fetch callback

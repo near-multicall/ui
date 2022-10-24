@@ -1,5 +1,6 @@
 import { CancelOutlined, EditOutlined, VisibilityOutlined } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
+import clsx from "clsx";
 import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
 
 import { ArgsString } from "../../../shared/lib/args";
@@ -8,6 +9,8 @@ import { Fn } from "../../../shared/lib/fn";
 import { NearIcons, NearLink, TextInput, Tile } from "../../../shared/ui/components";
 import { type JobSettingsEditFeature } from "../config";
 
+import "./job-settings-form.scss";
+
 interface JobSettingsFormProps extends JobSettingsEditFeature.Dependencies {}
 
 const _JobSettings = "JobSettings";
@@ -15,49 +18,45 @@ const _JobSettings = "JobSettings";
 export const JobSettingsForm = ({ className, disabled, multicallContract, onEdit }: JobSettingsFormProps) => {
     const [editModeEnabled, editModeSwitch] = useState(!disabled);
 
-    const formInitialState: JobSettingsEditFeature.FormState = {
-        croncatManager: "",
-        jobBond: "",
-    };
+    const formInitialState = { croncatManager: "", jobBond: "" };
 
-    const [formValues, formValuesUpdate] = useReducer(
-        (latestState: JobSettingsEditFeature.FormState, update: Partial<JobSettingsEditFeature.FormState>) =>
-            Object.assign(latestState, update),
-
-        formInitialState
-    );
+    const [[croncatManager, croncatManagerUpdate], [jobBond, jobBondUpdate]] = [
+        useState<JobSettingsEditFeature.FormState["croncatManager"]>(formInitialState.croncatManager),
+        useState<JobSettingsEditFeature.FormState["jobBond"]>(formInitialState.jobBond),
+    ];
 
     const formFields = {
-        croncatManager: useMemo(() => new ArgsString(multicallContract.croncatManager), []),
+        croncatManager: useMemo(() => new ArgsString(multicallContract.croncatManager), [disabled]),
 
         jobBond: useMemo(
             () => new ArgsString(multicallContract.jobBond !== "" ? toNEAR(multicallContract.jobBond) : ""),
-            []
+            [disabled]
         ),
     };
 
     const formReset = useCallback(() => {
-        formValuesUpdate(formInitialState);
+        croncatManagerUpdate(formInitialState.croncatManager);
+        jobBondUpdate(formInitialState.jobBond);
         editModeSwitch(false);
-    }, [editModeSwitch, formInitialState, formValuesUpdate]);
+    }, [croncatManagerUpdate, editModeSwitch, formInitialState, jobBondUpdate]);
 
-    useEffect(
-        disabled && Object.values(formValues).filter(({ length }) => length > 0).length > 0 ? formReset : Fn.returnVoid,
-        [disabled, formValues, formReset]
-    );
+    useEffect(disabled && croncatManager.length > 0 && jobBond.length > 0 ? formReset : Fn.returnVoid, [
+        croncatManager,
+        disabled,
+        formReset,
+        jobBond,
+    ]);
 
-    useEffect(() => onEdit(formValues), [formValues.croncatManager, formValues.jobBond, onEdit]);
-
-    console.log(formValues);
+    useEffect(() => onEdit({ croncatManager, jobBond }), [croncatManager, jobBond, onEdit]);
 
     return (
         <Tile
-            classes={{ root: className }}
+            classes={{ root: clsx(_JobSettings, className) }}
             heading="Jobs settings"
             headingCorners={{
                 right: editModeEnabled ? (
                     <>
-                        {Object.values(formValues).filter(({ length }) => length > 0).length > 0 && (
+                        {(croncatManager.length > 0 || jobBond.length > 0) && (
                             <IconButton onClick={() => editModeSwitch(false)}>
                                 <VisibilityOutlined />
                             </IconButton>
@@ -77,14 +76,14 @@ export const JobSettingsForm = ({ className, disabled, multicallContract, onEdit
             {editModeEnabled ? (
                 <TextInput
                     label="Croncat manager"
-                    update={(event) => formValuesUpdate({ croncatManager: event.target.value })}
+                    update={(event) => croncatManagerUpdate(event.target.value)}
                     value={formFields.croncatManager}
                     fullWidth
                 />
             ) : (
                 <span>
                     <h3>Croncat manager</h3>
-                    <NearLink address={multicallContract.croncatManager} />
+                    <NearLink address={croncatManager || multicallContract.croncatManager} />
                 </span>
             )}
 
@@ -92,7 +91,7 @@ export const JobSettingsForm = ({ className, disabled, multicallContract, onEdit
                 <TextInput
                     InputProps={{ endAdornment: NearIcons.NATIVE_TOKEN_CHARACTER }}
                     label="Job bond"
-                    update={(event) => formValuesUpdate({ jobBond: event.target.value })}
+                    update={(event) => jobBondUpdate(event.target.value)}
                     type="number"
                     value={formFields.jobBond}
                 />
@@ -101,9 +100,8 @@ export const JobSettingsForm = ({ className, disabled, multicallContract, onEdit
                     <h3>Job bond</h3>
 
                     <span>
-                        {`${multicallContract.jobBond !== "" ? toNEAR(multicallContract.jobBond) : "..."} ${
-                            NearIcons.NATIVE_TOKEN_CHARACTER
-                        }`}
+                        {jobBond || (multicallContract.jobBond !== "" ? toNEAR(multicallContract.jobBond) : "...")}
+                        {NearIcons.NATIVE_TOKEN_CHARACTER}
                     </span>
                 </span>
             )}

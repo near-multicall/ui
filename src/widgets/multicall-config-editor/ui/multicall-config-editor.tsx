@@ -85,7 +85,7 @@ export const MulticallConfigEditorUI = ({
                 }}
                 heading={editMode ? "Changes proposal" : null}
             >
-                <p>To create config changes proposal template, start editing</p>
+                <p>Start editing to create config changes proposal template</p>
 
                 <form>
                     <div>

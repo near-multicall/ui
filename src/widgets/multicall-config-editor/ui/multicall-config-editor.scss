@@ -19,7 +19,8 @@
 
         p {
             @include mixin.center-items();
-            font-size: size.$text;
+            text-align: center;
+            font-size: size.$large-text;
         }
 
         form {
