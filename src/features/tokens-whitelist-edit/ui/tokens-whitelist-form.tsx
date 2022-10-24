@@ -30,7 +30,7 @@ export const TokensWhitelistForm = ({
             } else {
                 markForAddition((markedForAddition) =>
                     markedForAddition.concat(
-                        [input].filter((address) => !markedForAddition.includes(address) || address.length > 0)
+                        [input].filter((address) => !markedForAddition.includes(address) && address.length > 0)
                     )
                 );
             }
