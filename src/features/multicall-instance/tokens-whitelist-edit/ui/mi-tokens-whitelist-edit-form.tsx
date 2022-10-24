@@ -3,9 +3,10 @@ import { IconButton } from "@mui/material";
 import { useCallback, useEffect, useReducer, useState } from "react";
 
 import { TextInput } from "../../../../shared/ui/components";
+import { Fn } from "../../../../shared/lib/fn";
+import { ArgsString } from "../../../../shared/lib/args";
 import { MI, MIEntity } from "../../../../entities";
 import { type MITokensWhitelistEditFeature } from "../config";
-import { Fn } from "../../../../shared/lib/fn";
 
 interface MITokensWhitelistEditFormProps extends MITokensWhitelistEditFeature.Dependencies {}
 
@@ -17,29 +18,51 @@ export const MITokensWhitelistEditForm = ({
 }: MITokensWhitelistEditFormProps) => {
     const [editModeEnabled, editModeSwitch] = useState(!disabled);
 
-    const [addTokens, markForAddition] = useReducer(
-        (previousState: MIEntity.ConfigChanges["addTokens"], address: string | null) =>
-            address === null
-                ? []
-                : previousState.includes(address) || address.length < 1
-                ? previousState
-                : [...previousState, address],
+    const [addTokens, markForAddition] = useState<MIEntity.ConfigChanges["addTokens"]>([]);
 
-        []
+    const [removeTokens, markForRemoval] = useState<MIEntity.ConfigChanges["removeTokens"]>([]);
+
+    const tokenToAddAddress = new ArgsString("");
+
+    const onAdditionRequest = useCallback(
+        (input: string) => {
+            if (removeTokens.includes(input)) {
+                markForRemoval((markedForRemoval) => markedForRemoval.filter((address) => address !== input));
+            } else {
+                markForAddition((markedForAddition) =>
+                    markedForAddition.concat(
+                        [input].filter((address) => !markedForAddition.includes(address) || address.length > 0)
+                    )
+                );
+            }
+
+            tokenToAddAddress.value = "";
+        },
+
+        [markForAddition]
     );
 
-    const [removeTokens, markForRemoval] = useReducer(
-        (previousState: MIEntity.ConfigChanges["removeTokens"], address: string | null) =>
-            address === null ? [] : previousState.includes(address) ? previousState : [...previousState, address],
+    const [selected, onSelect] = useState<string[]>([]);
 
-        []
-    );
+    const onRemovalRequest = useCallback(() => {
+        if (selected.some(addTokens.includes)) {
+            markForAddition((markedForAddition) => markedForAddition.filter((address) => !selected.includes(address)));
+        }
+
+        markForRemoval((markedForRemoval) =>
+            markedForRemoval.concat(
+                selected.filter((address) => !markedForRemoval.includes(address) || !addTokens.includes(address))
+            )
+        );
+
+        editModeSwitch(false);
+    }, [editModeSwitch, markForRemoval, selected]);
 
     const formReset = useCallback(() => {
+        markForAddition([]);
+        markForRemoval([]);
         editModeSwitch(false);
-        markForAddition(null);
-        markForRemoval(null);
-    }, []);
+    }, [editModeSwitch, markForAddition, markForRemoval]);
 
     useEffect(disabled ? formReset : Fn.returnVoid, [disabled, formReset]);
 
@@ -48,11 +71,18 @@ export const MITokensWhitelistEditForm = ({
     return (
         <MI.TokensWhitelistTable
             additionalItems={addTokens}
-            footer={editModeEnabled ? <TextInput onBlur={(event) => markForAddition(event.target.value)} /> : null}
+            footer={
+                editModeEnabled ? (
+                    <TextInput
+                        onBlur={(event) => onAdditionRequest(event.target.value)}
+                        value={tokenToAddAddress}
+                    />
+                ) : null
+            }
             headingCorners={{
                 right: editModeEnabled ? (
                     <>
-                        <IconButton onClick={() => editModeSwitch(false)}>
+                        <IconButton onClick={onRemovalRequest}>
                             <DeleteOutlined />
                         </IconButton>
 
@@ -66,6 +96,7 @@ export const MITokensWhitelistEditForm = ({
                     </IconButton>
                 ),
             }}
+            onItemsSelected={onSelect}
             {...{ className, controllerContractAddress }}
         />
     );
