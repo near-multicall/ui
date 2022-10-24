@@ -1,11 +1,11 @@
 import { CancelOutlined, DeleteOutlined, EditOutlined } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
-import { useCallback, useEffect, useReducer, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { TextInput } from "../../../shared/ui/components";
 import { Fn } from "../../../shared/lib/fn";
 import { ArgsString } from "../../../shared/lib/args";
-import { MulticallInstance, MulticallInstanceEntity } from "../../../entities";
+import { MulticallInstance } from "../../../entities";
 import { type TokensWhitelistEditFeature } from "../config";
 
 interface TokensWhitelistFormProps extends TokensWhitelistEditFeature.Dependencies {}
@@ -18,8 +18,8 @@ export const TokensWhitelistForm = ({
 }: TokensWhitelistFormProps) => {
     const [editModeEnabled, editModeSwitch] = useState(!disabled);
 
-    const [addTokens, markForAddition] = useState<MulticallInstanceEntity.ConfigChanges["addTokens"]>([]),
-        [removeTokens, markForRemoval] = useState<MulticallInstanceEntity.ConfigChanges["removeTokens"]>([]);
+    const [addTokens, markForAddition] = useState<TokensWhitelistEditFeature.FormState["addTokens"]>([]),
+        [removeTokens, markForRemoval] = useState<TokensWhitelistEditFeature.FormState["removeTokens"]>([]);
 
     const tokenToAddAddress = new ArgsString("");
 
@@ -73,6 +73,8 @@ export const TokensWhitelistForm = ({
             footer={
                 editModeEnabled ? (
                     <TextInput
+                        fullWidth
+                        label="New token address"
                         onBlur={(event) => onAdditionRequest(event.target.value)}
                         value={tokenToAddAddress}
                     />

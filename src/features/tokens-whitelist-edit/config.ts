@@ -6,8 +6,10 @@ namespace TokensWhitelistEditFeature {
     export interface Dependencies
         extends Omit<HTMLProps<HTMLDivElement>, "onChange">,
             MulticallInstanceEntity.Dependencies {
-        onEdit: (payload: Pick<MulticallInstanceEntity.ConfigChanges, "addTokens" | "removeTokens">) => void;
+        onEdit: (payload: FormState) => void;
     }
+
+    export type FormState = Pick<MulticallInstanceEntity.ConfigChanges, "addTokens" | "removeTokens">;
 }
 
 export { type TokensWhitelistEditFeature };

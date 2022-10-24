@@ -27,18 +27,18 @@ export const MulticallConfigEditorUI = ({
         croncatManager: "",
     };
 
-    const [changesDiff, changesDiffUpdate] = useReducer(
+    const [formState, formStateUpdate] = useReducer(
         (
-            previousState: typeof changesDiffInitialState,
+            latestState: typeof changesDiffInitialState,
             update: Partial<MulticallConfigChanges>
-        ): MulticallConfigChanges => Object.assign(previousState, update),
+        ): MulticallConfigChanges => Object.assign(latestState, update),
 
         changesDiffInitialState
     );
 
     const formReset = useCallback(
-        () => changesDiffUpdate(changesDiffInitialState),
-        [changesDiffUpdate, changesDiffInitialState]
+        () => formStateUpdate(changesDiffInitialState),
+        [formStateUpdate, changesDiffInitialState]
     );
 
     const onCancel = useCallback(() => {
@@ -48,25 +48,23 @@ export const MulticallConfigEditorUI = ({
 
     const onEdit = useCallback(
         (update: Partial<MulticallConfigChanges>) => {
-            changesDiffUpdate(update);
+            const newFormState = Object.assign(formState, update);
 
-            editModeSwitch(
-                JSON.stringify(Object.assign(changesDiff, update)) !== JSON.stringify(changesDiffInitialState)
-            );
+            formStateUpdate(newFormState);
+            editModeSwitch(Object.values(newFormState).filter(({ length }) => length > 0).length > 0);
+            console.log(formState);
         },
 
-        [changesDiffUpdate]
+        [formState, formStateUpdate]
     );
 
     const onSubmit = useCallback(() => editModeSwitch(false), [editModeSwitch]);
-
-    console.log(changesDiff);
 
     return (
         <div className={clsx(_MulticallConfigEditor, className)}>
             <MulticallInstance.AdminsTable
                 className={`${_MulticallConfigEditor}-admins`}
-                controllerContractAddress={controllerContractAddress}
+                {...{ controllerContractAddress }}
             />
 
             <TokensWhitelistEdit.Form
@@ -77,6 +75,7 @@ export const MulticallConfigEditorUI = ({
 
             <JobsSettingsEdit.Form
                 className={`${_MulticallConfigEditor}-jobsSettings`}
+                disabled={!editMode}
                 {...{ controllerContractAddress, multicallContract, onEdit }}
             />
 
@@ -86,30 +85,32 @@ export const MulticallConfigEditorUI = ({
                 }}
                 heading={editMode ? "Changes proposal" : null}
             >
-                {!editMode && <p>To create config changes proposal template, start editing</p>}
+                <p>To create config changes proposal template, start editing</p>
 
-                {editMode && (
-                    <>
-                        <div>
-                            <h3>Description</h3>
-                            <TextInput />
-                        </div>
+                <form>
+                    <div>
+                        <TextInput
+                            fullWidth
+                            label="Description"
+                            minRows={3}
+                            multiline
+                        />
+                    </div>
 
-                        <ButtonGroup>
-                            <Button
-                                color="error"
-                                label="Cancel"
-                                onClick={onCancel}
-                            />
+                    <ButtonGroup>
+                        <Button
+                            color="error"
+                            label="Cancel"
+                            onClick={onCancel}
+                        />
 
-                            <Button
-                                color="success"
-                                label="Submit"
-                                onClick={onSubmit}
-                            />
-                        </ButtonGroup>
-                    </>
-                )}
+                        <Button
+                            color="success"
+                            label="Submit"
+                            onClick={onSubmit}
+                        />
+                    </ButtonGroup>
+                </form>
             </Tile>
         </div>
     );

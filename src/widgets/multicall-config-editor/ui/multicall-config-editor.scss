@@ -17,16 +17,29 @@
     &-proposalForm {
         grid-area: proposalForm;
 
-        &:not(.is-inEditMode) {
-            @include mixin.center-items(space-evenly, center);
-
-            .ButtonGroup {
-                display: none;
-            }
+        p {
+            @include mixin.center-items();
+            font-size: size.$text;
         }
 
-        p {
-            font-size: size.$text;
+        form {
+            display: none;
+        }
+
+        p,
+        form {
+            flex-flow: inherit;
+            height: inherit;
+        }
+
+        &.is-inEditMode {
+            p {
+                display: none;
+            }
+
+            form {
+                display: inherit;
+            }
         }
     }
 
