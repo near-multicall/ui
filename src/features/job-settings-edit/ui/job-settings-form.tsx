@@ -111,6 +111,7 @@ export const JobSettingsForm = ({ className, disabled, multicallContract, onEdit
                                         ? toNEAR(jobBond || multicallContract.jobBond)
                                         : "..."
                                 }
+                                reversed
                             />
                         ),
                     ],
