@@ -38,24 +38,24 @@ export const TokensWhitelistForm = ({
             tokenToAddAddress.value = "";
         },
 
-        [markForAddition]
+        [markForAddition, markForRemoval, removeTokens]
     );
 
-    const [selected, onSelect] = useState<string[]>([]);
+    const [selected, onSelected] = useState<string[]>([]);
 
     const onRemovalRequest = useCallback(() => {
-        if (selected.some(addTokens.includes)) {
+        if (selected.some((address) => addTokens.includes(address))) {
             markForAddition((markedForAddition) => markedForAddition.filter((address) => !selected.includes(address)));
         }
 
         markForRemoval((markedForRemoval) =>
             markedForRemoval.concat(
-                selected.filter((address) => !markedForRemoval.includes(address) || !addTokens.includes(address))
+                selected.filter((address) => !markedForRemoval.includes(address) && !addTokens.includes(address))
             )
         );
 
         editModeSwitch(false);
-    }, [editModeSwitch, markForRemoval, selected]);
+    }, [addTokens, editModeSwitch, markForAddition, markForRemoval, selected]);
 
     const formReset = useCallback(() => {
         markForAddition([]);
@@ -99,7 +99,7 @@ export const TokensWhitelistForm = ({
                     </IconButton>
                 ),
             }}
-            onItemsSelected={onSelect}
+            onItemsSelected={editModeEnabled ? onSelected : null}
             {...{ className, controllerContractAddress }}
         />
     );
