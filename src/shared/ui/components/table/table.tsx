@@ -13,9 +13,10 @@ import { HTMLAttributes } from "react";
 import { TableRowCompact, TableRow, type TableRowProps, TableHeader } from "./row";
 import "./table.scss";
 
-export interface TableProps extends HTMLAttributes<HTMLDivElement>, Pick<TableRowProps, "dense" | "entitled"> {
+export interface TableProps extends HTMLAttributes<HTMLDivElement>, Pick<TableRowProps, "dense"> {
     RowComponent?: typeof TableRow;
     RowCompactComponent?: typeof TableRowCompact;
+    RowProps?: Omit<TableRowProps, "cells" | "dense" | "header">;
     /**
      * `"classic"` mode is a classic table view.
      *
@@ -37,9 +38,9 @@ const _Table = "Table";
 export const Table = ({
     RowComponent = TableRow,
     RowCompactComponent = TableRowCompact,
+    RowProps,
     className,
     dense = false,
-    entitled = false,
     displayMode = "default",
     header,
     rows,
@@ -80,7 +81,7 @@ export const Table = ({
                         rows.map((cells, index) => (
                             <RowCompactComponent
                                 key={index}
-                                {...{ cells, dense, entitled, header }}
+                                {...{ cells, dense, header, ...RowProps }}
                             />
                         ))}
                 </div>

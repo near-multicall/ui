@@ -42,6 +42,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: size.$gap;
             font-size: 1.1 * size.$text;
 
             &:last-of-type {
@@ -59,9 +60,44 @@
                 padding: 0.5 * size.$gap size.$gap;
                 background-color: rgba(color.$lightest, 0.7);
 
-                &:first-of-type {
+                :first-of-type {
                     border-top-left-radius: 0.8 * size.$task-radius;
                     border-top-right-radius: 0.8 * size.$task-radius;
+                }
+
+                & > span {
+                    &:first-of-type {
+                        text-align: start;
+                    }
+                }
+            }
+
+            .MuiFormControl-root {
+                margin-top: 0;
+                margin-bottom: 0;
+            }
+
+            & > span {
+                &:first-of-type {
+                    flex: 1;
+                    font-weight: 800;
+                }
+
+                &:not(:first-of-type) {
+                    flex: auto;
+                    text-align: center;
+
+                    .MuiInputBase-root input {
+                        text-align: center;
+                    }
+                }
+
+                &:last-of-type {
+                    text-align: end;
+
+                    .MuiInputBase-root input {
+                        text-align: end;
+                    }
                 }
             }
 
@@ -82,11 +118,12 @@
                     padding: 0.5 * size.$gap size.$gap;
                     background-color: rgba(color.$lightest, 0.7);
 
-                    & > span:last-of-type {
-                        text-overflow: ellipsis;
-                        white-space: nowrap;
-                        padding-left: 1.5rem;
-                        overflow: hidden;
+                    & > span {
+                        &:last-of-type {
+                            text-overflow: ellipsis;
+                            white-space: nowrap;
+                            overflow: hidden;
+                        }
                     }
                 }
 
@@ -94,10 +131,32 @@
                     border-top-left-radius: 0.8 * size.$task-radius;
                     border-top-right-radius: 0.8 * size.$task-radius;
                 }
+
+                &--centeredTitle {
+                    &:first-of-type {
+                        & > span:not(:first-of-type) {
+                            text-align: center;
+                        }
+                    }
+                }
             }
 
-            span:first-of-type {
-                font-weight: 800;
+            &--noKeys {
+                & > span {
+                    &:first-of-type {
+                        display: none;
+                    }
+
+                    &:not(:first-of-type) {
+                        display: flex;
+                        justify-content: center;
+                        text-align: center;
+
+                        .MuiInputBase-root input {
+                            text-align: center;
+                        }
+                    }
+                }
             }
         }
     }

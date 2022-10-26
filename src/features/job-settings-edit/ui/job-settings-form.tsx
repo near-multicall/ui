@@ -72,19 +72,19 @@ export const JobSettingsForm = ({ className, disabled, multicallContract, onEdit
             }}
         >
             <Table
+                RowProps={{ centeredTitle: true, entitled: true, noKeys: true }}
                 displayMode="compact"
                 dense
-                entitled
-                header={["Property", "Value"]}
+                header={["Option", "Value"]}
                 rows={[
                     [
                         "Croncat manager",
 
                         editModeEnabled ? (
                             <TextInput
+                                fullWidth
                                 update={(event) => croncatManagerUpdate(event.target.value)}
                                 value={formFields.croncatManager}
-                                fullWidth
                             />
                         ) : (
                             <NearLink address={croncatManager || multicallContract.croncatManager} />

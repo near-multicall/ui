@@ -6,6 +6,7 @@
     flex-direction: row;
     align-items: center;
     gap: 0.6 * size.$gap;
+    width: fit-content;
     line-height: 0;
 
     &--reversed {
