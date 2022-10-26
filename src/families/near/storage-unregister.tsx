@@ -24,7 +24,7 @@ export class StorageUnregister extends BaseTask<FormData, Props, State> {
     override schema = arx
         .object()
         .shape({
-            addr: arx.string().ft(),
+            addr: arx.string().contract(),
             gas: arx.big().gas(),
         })
         .transform(({ gas, gasUnit, amount, amountUnit, ...rest }) => ({

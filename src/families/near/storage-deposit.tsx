@@ -1,11 +1,13 @@
+// TODO adjust lower and upper bounds by existing balance
+
 import { Form, FormikErrors, useFormikContext } from "formik";
 import { useEffect } from "react";
 import { args as arx } from "../../shared/lib/args/args";
 import { fields } from "../../shared/lib/args/args-types/args-object";
 import { Call, CallError } from "../../shared/lib/call";
-import { unit } from "../../shared/lib/converter";
+import { Big, unit } from "../../shared/lib/converter";
 import { STORAGE } from "../../shared/lib/persistent";
-import { StorageManagement, StorageBalance } from "../../shared/lib/standards/storageManagement";
+import { StorageManagement, StorageBalance, StorageBalanceBounds } from "../../shared/lib/standards/storageManagement";
 import { CheckboxField, InfoField, TextField, UnitField } from "../../shared/ui/form-fields";
 import { BaseTask, BaseTaskProps, BaseTaskState, DefaultFormData } from "./../base";
 import "./near.scss";
@@ -13,7 +15,7 @@ import "./near.scss";
 type FormData = DefaultFormData & {
     amount: string;
     amountUnit: unit | number;
-    withdrawAll: boolean;
+    registration_only: boolean;
 };
 
 type Props = BaseTaskProps;
@@ -21,10 +23,11 @@ type Props = BaseTaskProps;
 type State = BaseTaskState<FormData> & {
     storageManagement: StorageManagement | null;
     storageBalance: StorageBalance | null;
+    storageBalanceBounds: StorageBalanceBounds | null;
 };
 
-export class StorageWithdraw extends BaseTask<FormData, Props, State> {
-    override uniqueClassName = "near-storage-withdraw-task";
+export class StorageDeposit extends BaseTask<FormData, Props, State> {
+    override uniqueClassName = "near-storage-deposit-task";
     override schema = arx
         .object()
         .shape({
@@ -33,35 +36,47 @@ export class StorageWithdraw extends BaseTask<FormData, Props, State> {
             amount: arx
                 .big()
                 .token()
-                .min("1", "cannot withdraw 0 NEAR")
                 .test({
-                    name: "dynamic max",
-                    message: "amount is exceeding available amount",
+                    name: "dynamic min",
+                    message: "amount is less than lower storage balance bound",
                     test: (value, ctx) =>
                         value == null ||
-                        ctx.options.context?.withdrawable == null ||
-                        value.lte(ctx.options.context.withdrawable),
+                        ctx.options.context?.lowerStorageBalanceBound == null ||
+                        ctx.options.context?.storageBalance == null ||
+                        Big(value)
+                            .add(ctx.options.context.storageBalance)
+                            .gte(ctx.options.context.lowerStorageBalanceBound),
+                })
+                .test({
+                    name: "dynamic max",
+                    message: "amount is more than upper storage balance bound",
+                    test: (value, ctx) =>
+                        value == null ||
+                        ctx.options.context?.upperStorageBalanceBound == null ||
+                        ctx.options.context?.storageBalance == null ||
+                        Big(value)
+                            .add(ctx.options.context.storageBalance)
+                            .lte(ctx.options.context.upperStorageBalanceBound),
                 }),
         })
-        .transform(({ gas, gasUnit, amount, amountUnit, withdrawAll, ...rest }) => ({
+        .transform(({ gas, gasUnit, ...rest }) => ({
             ...rest,
             gas: arx.big().intoParsed(gasUnit).cast(gas),
-            amount: withdrawAll ? 0 : arx.big().intoParsed(amountUnit).cast(amount)?.toFixed() ?? null,
         }))
         .requireAll()
         .retainAll();
 
     override initialValues: FormData = {
-        name: "Storage Withdraw",
+        name: "Storage Deposit",
         addr: window.nearConfig.WNEAR_ADDRESS,
-        func: "storage_withdraw",
+        func: "storage_deposit",
         gas: "7.5",
         gasUnit: "Tgas",
         depo: "1",
         depoUnit: "yocto",
         amount: "0",
         amountUnit: "NEAR",
-        withdrawAll: true,
+        registration_only: true,
     };
 
     constructor(props: BaseTaskProps) {
@@ -72,14 +87,24 @@ export class StorageWithdraw extends BaseTask<FormData, Props, State> {
             ...this.state,
             storageManagement: new StorageManagement(this.initialValues.addr),
             storageBalance: null,
+            storageBalanceBounds: null,
         };
+
+        this.schema = this.schema.transform(({ amount, amountUnit, registration_only, ...rest }) => ({
+            ...rest,
+            amount:
+                registration_only && !!this.state.storageBalanceBounds
+                    ? this.state.storageBalanceBounds.min
+                    : arx.big().intoParsed(amountUnit).cast(amount).toFixed(),
+        }));
 
         this.tryUpdateSm().catch(() => {});
     }
 
     protected override init(
         call: Call<{
-            amount: string;
+            amount: string | null;
+            registration_only: boolean | null;
         }> | null
     ): void {
         if (call !== null) {
@@ -87,8 +112,8 @@ export class StorageWithdraw extends BaseTask<FormData, Props, State> {
                 addr: call.address,
                 func: call.actions[0].func,
                 gas: arx.big().intoFormatted(this.initialValues.gasUnit).cast(call.actions[0].gas).toFixed(),
-                amount: call.actions[0].args.amount,
-                withdrawAll: call.actions[0].args.amount === undefined,
+                amount: call.actions[0].args?.amount ?? "",
+                registration_only: call.actions[0].args?.registration_only ?? true,
             };
 
             this.initialValues = Object.keys(this.initialValues).reduce((acc, k) => {
@@ -98,7 +123,13 @@ export class StorageWithdraw extends BaseTask<FormData, Props, State> {
         }
 
         this.state = { ...this.state, formData: this.initialValues };
-        this.schema.check(this.state.formData, { context: { withdrawable: this.state.storageBalance?.available } });
+        this.schema.check(this.state.formData, {
+            context: {
+                lowerStorageBalanceBound: this.state.storageBalanceBounds?.min,
+                upperStorageBalanceBound: this.state.storageBalanceBounds?.max,
+                storageBalance: this.state.storageBalance,
+            },
+        });
 
         if (call !== null)
             this.tryUpdateSm().then((res) =>
@@ -115,28 +146,27 @@ export class StorageWithdraw extends BaseTask<FormData, Props, State> {
     }
 
     static override inferOwnType(json: Call): boolean {
-        return (
-            !!json && arx.string().address().isValidSync(json.address) && json.actions[0].func === "storage_withdraw"
-        );
+        return !!json && arx.string().address().isValidSync(json.address) && json.actions[0].func === "storage_deposit";
     }
 
     public override toCall(): Call {
-        const { addr, func, gas, gasUnit, depo, amount, amountUnit, withdrawAll } = this.state.formData;
+        const { addr, func, gas, gasUnit, depo, amount, amountUnit, registration_only } = this.state.formData;
 
         if (!arx.big().isValidSync(gas)) throw new CallError("Failed to parse gas input value", this.props.id);
-        if (!withdrawAll && !arx.big().isValidSync(amount))
-            throw new CallError("Failed to parse amount input value", this.props.id);
+        if (!arx.big().isValidSync(amount)) throw new CallError("Failed to parse amount input value", this.props.id);
 
         return {
             address: addr,
             actions: [
                 {
                     func,
-                    args: withdrawAll
-                        ? {}
-                        : {
-                              amount: arx.big().intoParsed(amountUnit).cast(amount).toFixed(),
-                          },
+                    args: {
+                        amount:
+                            registration_only && !!this.state.storageBalanceBounds
+                                ? this.state.storageBalanceBounds.min
+                                : arx.big().intoParsed(amountUnit).cast(amount).toFixed(),
+                        ...(registration_only !== null && { registration_only }),
+                    },
                     gas: arx.big().intoParsed(gasUnit).cast(gas).toFixed(),
                     depo,
                 },
@@ -147,7 +177,13 @@ export class StorageWithdraw extends BaseTask<FormData, Props, State> {
     private tryUpdateSm(): Promise<boolean> {
         return new Promise<boolean>((resolve) => {
             this.schema
-                .check(this.state.formData, { context: { withdrawable: this.state.storageBalance?.available } })
+                .check(this.state.formData, {
+                    context: {
+                        lowerStorageBalanceBound: this.state.storageBalanceBounds?.min,
+                        upperStorageBalanceBound: this.state.storageBalanceBounds?.max,
+                        storageBalance: this.state.storageBalance,
+                    },
+                })
                 .then(() => {
                     const { addr } = fields(this.schema);
                     if (!addr.isBad()) {
@@ -156,6 +192,7 @@ export class StorageWithdraw extends BaseTask<FormData, Props, State> {
                         this.setState({
                             storageManagement: null,
                             storageBalance: null,
+                            storageBalanceBounds: null,
                         });
                         resolve(false);
                     }
@@ -166,8 +203,11 @@ export class StorageWithdraw extends BaseTask<FormData, Props, State> {
     private async confidentlyUpdateSm(): Promise<boolean> {
         const { addr } = this.state.formData;
         const storageManagement = new StorageManagement(addr);
-        const storageBalance = await storageManagement.storageBalanceOf(STORAGE.addresses.multicall);
-        this.setState({ storageManagement, storageBalance });
+        const [storageBalance, storageBalanceBounds] = await Promise.all([
+            storageManagement.storageBalanceOf(STORAGE.addresses.multicall),
+            storageManagement.storageBalanceBounds(),
+        ]);
+        this.setState({ storageManagement, storageBalance, storageBalanceBounds });
         window.EDITOR.forceUpdate();
         return true;
     }
@@ -185,8 +225,10 @@ export class StorageWithdraw extends BaseTask<FormData, Props, State> {
 
     public override Editor = (): React.ReactNode => {
         const { resetForm, validateForm, values } = useFormikContext<FormData>();
-        const { storageBalance } = this.state;
-        const balance = arx.big().intoFormatted("NEAR").cast(storageBalance?.available);
+        const { storageBalance, storageBalanceBounds } = this.state;
+        const balance = arx.big().intoFormatted("NEAR").cast(storageBalance?.available),
+            lowerStorageBalanceBound = arx.big().intoFormatted("NEAR").cast(storageBalanceBounds?.min),
+            upperStorageBalanceBound = arx.big().intoFormatted("NEAR").cast(storageBalanceBounds?.max);
 
         useEffect(() => {
             resetForm({
@@ -210,13 +252,26 @@ export class StorageWithdraw extends BaseTask<FormData, Props, State> {
                     label="Token Address"
                     roundtop
                 />
-                {!!balance && <InfoField>{`Current available storage balance: ${balance} Ⓝ`}</InfoField>}
+                {!!balance && !!lowerStorageBalanceBound && (
+                    <InfoField>
+                        {`Current available storage balance: ${balance} Ⓝ`}
+                        <br />
+                        {`Minimum deposit: ${lowerStorageBalanceBound} Ⓝ`}
+                        <br />
+                        {!!upperStorageBalanceBound && (
+                            <>
+                                {`Maximum deposit: ${upperStorageBalanceBound} Ⓝ`}
+                                <br />
+                            </>
+                        )}
+                    </InfoField>
+                )}
                 <CheckboxField
-                    name="withdrawAll"
-                    label="Withdraw all available funds"
-                    checked={values.withdrawAll}
+                    name="registration_only"
+                    label="Register only"
+                    checked={values.registration_only}
                 />
-                {!values.withdrawAll && (
+                {!values.registration_only && (
                     <UnitField
                         name="amount"
                         label="Amount"
