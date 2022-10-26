@@ -30,7 +30,7 @@ export interface TableProps extends HTMLAttributes<HTMLDivElement>, Pick<TableRo
      */
     displayMode?: "default" | "compact" | "classic";
     header: TableHeader;
-    onRowsSelected?: (selectedRowsIds: TableRowProps["id"][]) => void;
+    onRowsSelected?: ((selectedRowsIds: TableRowProps["id"][]) => void) | null;
     rows?: { id: TableRowProps["id"]; content: TableRowProps["cells"] }[] | null;
 }
 
@@ -52,12 +52,14 @@ export const Table = ({
         compactModeRequired = (mediumOrSmallScreen && displayMode === "default") || displayMode === "compact";
 
     const [selectedRowsIds, selectedRowsIdsUpdate] = useState<TableRowProps["id"][]>([]),
-        rowSelectionEnabled = onRowsSelected !== undefined;
+        rowSelectionEnabled = typeof onRowsSelected === "function";
 
     const onRowSelect = useCallback(
         ({ id, checked }: { id: TableRowProps["id"]; checked: boolean }) =>
             selectedRowsIdsUpdate((latestState) =>
-                checked ? latestState.concat([id]) : latestState.filter((rowId) => rowId !== id)
+                checked
+                    ? latestState.concat([id].filter((rowId) => !latestState.includes(rowId)))
+                    : latestState.filter((rowId) => rowId !== id)
             ),
         [selectedRowsIdsUpdate]
     );

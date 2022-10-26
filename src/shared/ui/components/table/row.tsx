@@ -65,7 +65,12 @@ export const TableRowCompact = ({
                     })}
                     key={headerCellIndex}
                 >
-                    {selectable && <Checkbox onChange={onSelectMemoized} />}
+                    {selectable && (
+                        <div className={_TableRow + "-content" + "-slot" + "--start"}>
+                            <Checkbox onChange={onSelectMemoized} />
+                        </div>
+                    )}
+
                     <span>{headerCell}</span>
                     <span>{cells ? cells[headerCellIndex] : "No data"}</span>
                 </div>

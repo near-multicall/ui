@@ -159,5 +159,15 @@
                 }
             }
         }
+
+        &--compact &-slot {
+            &--start {
+                display: flex;
+
+                .MuiCheckbox-root {
+                    padding: calc(size.$text / 4);
+                }
+            }
+        }
     }
 }

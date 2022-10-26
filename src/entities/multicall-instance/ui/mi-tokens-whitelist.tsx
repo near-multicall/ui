@@ -12,6 +12,7 @@ interface MulticallInstanceTokensWhitelistTableProps
     ItemCompactComponent?: TableProps["RowCompactComponent"];
     additionalItems?: FungibleToken["address"][];
     className?: string;
+    onItemsSelected?: TableProps["onRowsSelected"];
 }
 
 export const MulticallInstanceTokensWhitelistTable = ({
@@ -22,6 +23,7 @@ export const MulticallInstanceTokensWhitelistTable = ({
     controllerContractAddress,
     footer,
     headingCorners,
+    onItemsSelected,
 }: MulticallInstanceTokensWhitelistTableProps) => {
     const { data, error, loading } = MulticallInstanceTokensModel.useWhitelist(controllerContractAddress);
 
@@ -40,6 +42,7 @@ export const MulticallInstanceTokensWhitelistTable = ({
                     dense
                     displayMode="compact"
                     header={["Contract address"]}
+                    onRowsSelected={onItemsSelected}
                     rows={data?.concat(additionalItems ?? []).map(miWhitelistedTokenTableRowRender)}
                 />
             </Scrollable>
