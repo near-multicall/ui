@@ -4,12 +4,10 @@ import clsx from "clsx";
 import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
 
 import { ArgsString } from "../../../shared/lib/args";
-import { toNEAR } from "../../../shared/lib/converter";
+import { toNEAR, toYocto } from "../../../shared/lib/converter";
 import { Fn } from "../../../shared/lib/fn";
-import { NearIcons, NearLink, TextInput, Tile } from "../../../shared/ui/components";
+import { IconLabel, NearIcons, NearLink, Table, TextInput, Tile } from "../../../shared/ui/components";
 import { type JobSettingsEditFeature } from "../config";
-
-import "./job-settings-form.scss";
 
 interface JobSettingsFormProps extends JobSettingsEditFeature.Dependencies {}
 
@@ -51,7 +49,7 @@ export const JobSettingsForm = ({ className, disabled, multicallContract, onEdit
 
     return (
         <Tile
-            classes={{ root: clsx(_JobSettings, className), content: `${_JobSettings}-content` }}
+            classes={{ root: className }}
             heading="Jobs settings"
             headingCorners={{
                 right: editModeEnabled ? (
@@ -73,38 +71,51 @@ export const JobSettingsForm = ({ className, disabled, multicallContract, onEdit
                 ),
             }}
         >
-            {editModeEnabled ? (
-                <TextInput
-                    label="Croncat manager"
-                    update={(event) => croncatManagerUpdate(event.target.value)}
-                    value={formFields.croncatManager}
-                    fullWidth
-                />
-            ) : (
-                <span>
-                    <h3>Croncat manager</h3>
-                    <NearLink address={croncatManager || multicallContract.croncatManager} />
-                </span>
-            )}
+            <Table
+                displayMode="compact"
+                dense
+                entitled
+                header={["Property", "Value"]}
+                rows={[
+                    [
+                        "Croncat manager",
 
-            {editModeEnabled ? (
-                <TextInput
-                    InputProps={{ endAdornment: NearIcons.NATIVE_TOKEN_CHARACTER }}
-                    label="Job bond"
-                    update={(event) => jobBondUpdate(event.target.value)}
-                    type="number"
-                    value={formFields.jobBond}
-                />
-            ) : (
-                <span>
-                    <h3>Job bond</h3>
+                        editModeEnabled ? (
+                            <TextInput
+                                update={(event) => croncatManagerUpdate(event.target.value)}
+                                value={formFields.croncatManager}
+                                fullWidth
+                            />
+                        ) : (
+                            <NearLink address={croncatManager || multicallContract.croncatManager} />
+                        ),
+                    ],
+                    [
+                        "Job bond",
 
-                    <span>
-                        {jobBond || (multicallContract.jobBond !== "" ? toNEAR(multicallContract.jobBond) : "...")}
-                        {NearIcons.NATIVE_TOKEN_CHARACTER}
-                    </span>
-                </span>
-            )}
+                        editModeEnabled ? (
+                            <TextInput
+                                InputProps={{
+                                    endAdornment: NearIcons.NATIVE_TOKEN_CHARACTER,
+                                    inputProps: { min: 0, step: 0.001 },
+                                }}
+                                update={(event) => jobBondUpdate(toYocto(event.target.value))}
+                                type="number"
+                                value={formFields.jobBond}
+                            />
+                        ) : (
+                            <IconLabel
+                                icon={NearIcons.NATIVE_TOKEN_CHARACTER}
+                                label={
+                                    jobBond || multicallContract.jobBond !== ""
+                                        ? toNEAR(jobBond || multicallContract.jobBond)
+                                        : "..."
+                                }
+                            />
+                        ),
+                    ],
+                ]}
+            />
         </Tile>
     );
 };
