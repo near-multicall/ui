@@ -15,8 +15,8 @@ namespace MulticallInstanceEntity {
 /**
  * Multicall Instance entity config
  */
-class MIEntityConfig {
+class MulticallInstanceEntityConfig {
     // all the constants must be grouped in objects whenever it's possible and stored here as static properties
 }
 
-export { MIEntityConfig, type MulticallInstanceEntity };
+export { MulticallInstanceEntityConfig, type MulticallInstanceEntity };

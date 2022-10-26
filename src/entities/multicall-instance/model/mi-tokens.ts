@@ -6,16 +6,16 @@ import { Props } from "../../../shared/lib/props";
 
 import { type MulticallInstanceEntity } from "../config";
 
-export type MITokensWhitelist = {
+export type MulticallInstanceTokensWhitelist = {
     data: MulticallContract["tokensWhitelist"] | null;
     error: Error | null;
     loading: boolean;
 };
 
-export class MITokensModel {
+export class MulticallInstanceTokensModel {
     static whitelistFetchFx = async (
         controllerContractAddress: MulticallInstanceEntity.Dependencies["controllerContractAddress"],
-        callback: (result: MITokensWhitelist) => void
+        callback: (result: MulticallInstanceTokensWhitelist) => void
     ) =>
         await MulticallContract.instanceDataFetchFx(
             `${ArgsAccount.deconstructAddress(controllerContractAddress).name}.${MulticallContract.FACTORY_ADDRESS}`,
@@ -27,14 +27,14 @@ export class MITokensModel {
     static useWhitelist = (
         controllerContractAddress: MulticallInstanceEntity.Dependencies["controllerContractAddress"]
     ) => {
-        const [state, stateUpdate] = useState<MITokensWhitelist>({
+        const [state, stateUpdate] = useState<MulticallInstanceTokensWhitelist>({
             data: null,
             error: null,
             loading: true,
         });
 
         useEffect(
-            () => void MITokensModel.whitelistFetchFx(controllerContractAddress, stateUpdate),
+            () => void MulticallInstanceTokensModel.whitelistFetchFx(controllerContractAddress, stateUpdate),
             [controllerContractAddress, stateUpdate]
         );
 

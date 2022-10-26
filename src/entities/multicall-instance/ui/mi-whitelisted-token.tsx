@@ -1,11 +1,11 @@
 import { ArgsAccount } from "../../../shared/lib/args";
 import { FungibleToken } from "../../../shared/lib/standards/fungibleToken";
 
-interface MIWhitelistedTokenProps {
+interface MulticallInstanceWhitelistedTokenProps {
     address: FungibleToken["address"];
 }
 
-const MIWhitelistedTokenEntry = ({ address }: MIWhitelistedTokenProps) => {
+const MulticallInstanceWhitelistedTokenEntry = ({ address }: MulticallInstanceWhitelistedTokenProps) => {
     const addr = new ArgsAccount(address);
 
     return (
@@ -21,6 +21,6 @@ const MIWhitelistedTokenEntry = ({ address }: MIWhitelistedTokenProps) => {
     );
 };
 
-export const miWhitelistedTokenTableRowRender = (item: MIWhitelistedTokenProps["address"]) => [
-    <MIWhitelistedTokenEntry address={item} />,
+export const miWhitelistedTokenTableRowRender = (item: MulticallInstanceWhitelistedTokenProps["address"]) => [
+    <MulticallInstanceWhitelistedTokenEntry address={item} />,
 ];

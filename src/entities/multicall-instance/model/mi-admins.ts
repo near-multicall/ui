@@ -6,16 +6,16 @@ import { Props } from "../../../shared/lib/props";
 
 import { type MulticallInstanceEntity } from "../config";
 
-export type MIAdminsAddressList = {
+export type MulticallInstanceAdminsAddressList = {
     data: MulticallContract["admins"] | null;
     error: Error | null;
     loading: boolean;
 };
 
-export class MIAdminsModel {
+export class MulticallInstanceAdminsModel {
     static addressListFetchFx = async (
         controllerContractAddress: MulticallInstanceEntity.Dependencies["controllerContractAddress"],
-        callback: (result: MIAdminsAddressList) => void
+        callback: (result: MulticallInstanceAdminsAddressList) => void
     ) =>
         await MulticallContract.instanceDataFetchFx(
             `${ArgsAccount.deconstructAddress(controllerContractAddress).name}.${MulticallContract.FACTORY_ADDRESS}`,
@@ -25,14 +25,14 @@ export class MIAdminsModel {
     static useAddressList = (
         controllerContractAddress: MulticallInstanceEntity.Dependencies["controllerContractAddress"]
     ) => {
-        const [state, stateUpdate] = useState<MIAdminsAddressList>({
+        const [state, stateUpdate] = useState<MulticallInstanceAdminsAddressList>({
             data: null,
             error: null,
             loading: true,
         });
 
         useEffect(
-            () => void MIAdminsModel.addressListFetchFx(controllerContractAddress, stateUpdate),
+            () => void MulticallInstanceAdminsModel.addressListFetchFx(controllerContractAddress, stateUpdate),
             [controllerContractAddress, stateUpdate]
         );
 

@@ -1,13 +1,11 @@
-import clsx from "clsx";
-
 import { FungibleToken } from "../../../shared/lib/standards/fungibleToken";
 import { Scrollable, Table, type TableProps, Tile, TileProps } from "../../../shared/ui/components";
-import { MITokensModel } from "../model/mi-tokens";
+import { MulticallInstanceTokensModel } from "../model/mi-tokens";
 import { type MulticallInstanceEntity } from "../config";
 
 import { miWhitelistedTokenTableRowRender } from "./mi-whitelisted-token";
 
-interface MITokensWhitelistTableProps
+interface MulticallInstanceTokensWhitelistTableProps
     extends MulticallInstanceEntity.Dependencies,
         Pick<TileProps, "footer" | "headingCorners"> {
     ItemComponent?: TableProps["RowComponent"];
@@ -16,9 +14,7 @@ interface MITokensWhitelistTableProps
     className?: string;
 }
 
-const _MITokensWhitelistTable = "MITokensWhitelistTable";
-
-export const MITokensWhitelistTable = ({
+export const MulticallInstanceTokensWhitelistTable = ({
     ItemComponent,
     ItemCompactComponent,
     additionalItems,
@@ -26,12 +22,12 @@ export const MITokensWhitelistTable = ({
     controllerContractAddress,
     footer,
     headingCorners,
-}: MITokensWhitelistTableProps) => {
-    const { data, error, loading } = MITokensModel.useWhitelist(controllerContractAddress);
+}: MulticallInstanceTokensWhitelistTableProps) => {
+    const { data, error, loading } = MulticallInstanceTokensModel.useWhitelist(controllerContractAddress);
 
     return (
         <Tile
-            classes={{ root: clsx(_MITokensWhitelistTable, className) }}
+            classes={{ root: className }}
             heading="Tokens whitelist"
             noData={data !== null && data.length === 0}
             {...{ error, footer, headingCorners, loading }}
@@ -41,7 +37,6 @@ export const MITokensWhitelistTable = ({
                     RowComponent={ItemComponent}
                     RowCompactComponent={ItemCompactComponent}
                     RowProps={{ centeredTitle: true, entitled: true, noKeys: true }}
-                    className={`${_MITokensWhitelistTable}-body`}
                     dense
                     displayMode="compact"
                     header={["Contract address"]}

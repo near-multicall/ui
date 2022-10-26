@@ -1,23 +1,22 @@
-import clsx from "clsx";
-
 import { Scrollable, Table, Tile } from "../../../shared/ui/components";
-import { MIAdminsModel } from "../model/mi-admins";
+import { MulticallInstanceAdminsModel } from "../model/mi-admins";
 import { type MulticallInstanceEntity } from "../config";
 
 import { multicallAdminTableRow } from "./mi-admin-entry";
 
-interface MIAdminsTableProps extends MulticallInstanceEntity.Dependencies {
+interface MulticallInstanceAdminsTableProps extends MulticallInstanceEntity.Dependencies {
     className?: string;
 }
 
-const _MIAdminsTable = "MIAdminsTable";
-
-export const MIAdminsTable = ({ className, controllerContractAddress }: MIAdminsTableProps) => {
-    const { data, error, loading } = MIAdminsModel.useAddressList(controllerContractAddress);
+export const MulticallInstanceAdminsTable = ({
+    className,
+    controllerContractAddress,
+}: MulticallInstanceAdminsTableProps) => {
+    const { data, error, loading } = MulticallInstanceAdminsModel.useAddressList(controllerContractAddress);
 
     return (
         <Tile
-            classes={{ root: clsx(_MIAdminsTable, className) }}
+            classes={{ root: className }}
             heading="Admins"
             noData={data !== null && data.length === 0}
             {...{ error, loading }}
@@ -25,7 +24,6 @@ export const MIAdminsTable = ({ className, controllerContractAddress }: MIAdmins
             <Scrollable>
                 <Table
                     RowProps={{ centeredTitle: true, entitled: true, noKeys: true }}
-                    className={`${_MIAdminsTable}-body`}
                     dense
                     displayMode="compact"
                     header={["Account address"]}
