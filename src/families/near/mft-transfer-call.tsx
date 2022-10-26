@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { args as arx } from "../../shared/lib/args/args";
 import { fields } from "../../shared/lib/args/args-types/args-object";
 import { Call, CallError } from "../../shared/lib/call";
+import { toGas } from "../../shared/lib/converter";
 import { MultiFungibleToken } from "../../shared/lib/standards/multiFungibleToken";
 import { TextField, UnitField } from "../../shared/ui/form-fields";
 import { BaseTask, BaseTaskProps, BaseTaskState, DefaultFormData } from "../base";
@@ -29,7 +30,7 @@ export class MftTransferCall extends BaseTask<FormData, Props, State> {
         .object()
         .shape({
             addr: arx.string().contract(),
-            gas: arx.big().gas(),
+            gas: arx.big().gas().min(toGas(45)),
             receiverId: arx.string().address(),
             tokenId: arx.string().mft("addr"),
             amount: arx.big().token().min(1, "cannot transfer 0 tokens"),

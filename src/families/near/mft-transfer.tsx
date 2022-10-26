@@ -47,7 +47,7 @@ export class MftTransfer extends BaseTask<FormData, Props, State> {
         name: "MFT Transfer",
         addr: window.nearConfig.REF_EXCHANGE_ADDRESS,
         func: "mft_transfer",
-        gas: "10",
+        gas: "8",
         gasUnit: "Tgas",
         depo: "1",
         depoUnit: "yocto",
