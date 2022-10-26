@@ -38,6 +38,13 @@ button {
     cursor: pointer;
 }
 
+.MuiCheckbox-root {
+    .MuiSvgIcon-root {
+        width: 2rem;
+        height: 2rem;
+    }
+}
+
 .MuiTextField-root {
     .MuiInputLabel-root,
     .MuiInputBase-root {
