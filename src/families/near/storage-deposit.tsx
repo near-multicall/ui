@@ -42,9 +42,9 @@ export class StorageDeposit extends BaseTask<FormData, Props, State> {
                     test: (value, ctx) =>
                         value == null ||
                         ctx.options.context?.lowerStorageBalanceBound == null ||
-                        ctx.options.context?.storageBalance == null ||
+                        ctx.options.context?.storageBalance?.total == null ||
                         Big(value)
-                            .add(ctx.options.context.storageBalance)
+                            .add(ctx.options.context.storageBalance.total)
                             .gte(ctx.options.context.lowerStorageBalanceBound),
                 })
                 .test({
@@ -53,14 +53,16 @@ export class StorageDeposit extends BaseTask<FormData, Props, State> {
                     test: (value, ctx) =>
                         value == null ||
                         ctx.options.context?.upperStorageBalanceBound == null ||
-                        ctx.options.context?.storageBalance == null ||
+                        ctx.options.context?.storageBalance?.total == null ||
                         Big(value)
-                            .add(ctx.options.context.storageBalance)
+                            .add(ctx.options.context.storageBalance.total)
                             .lte(ctx.options.context.upperStorageBalanceBound),
                 }),
         })
-        .transform(({ gas, gasUnit, ...rest }) => ({
+        .transform(({ gas, gasUnit, depo, amount, ...rest }) => ({
             ...rest,
+            amount,
+            depo: amount,
             gas: arx.big().intoParsed(gasUnit).cast(gas),
         }))
         .requireAll()
@@ -150,10 +152,15 @@ export class StorageDeposit extends BaseTask<FormData, Props, State> {
     }
 
     public override toCall(): Call {
-        const { addr, func, gas, gasUnit, depo, amount, amountUnit, registration_only } = this.state.formData;
+        const { addr, func, gas, gasUnit, amount, amountUnit, registration_only } = this.state.formData;
 
         if (!arx.big().isValidSync(gas)) throw new CallError("Failed to parse gas input value", this.props.id);
         if (!arx.big().isValidSync(amount)) throw new CallError("Failed to parse amount input value", this.props.id);
+
+        const amt =
+            registration_only && !!this.state.storageBalanceBounds
+                ? this.state.storageBalanceBounds.min
+                : arx.big().intoParsed(amountUnit).cast(amount).toFixed();
 
         return {
             address: addr,
@@ -161,14 +168,12 @@ export class StorageDeposit extends BaseTask<FormData, Props, State> {
                 {
                     func,
                     args: {
-                        amount:
-                            registration_only && !!this.state.storageBalanceBounds
-                                ? this.state.storageBalanceBounds.min
-                                : arx.big().intoParsed(amountUnit).cast(amount).toFixed(),
+                        amount: amt,
+
                         ...(registration_only !== null && { registration_only }),
                     },
                     gas: arx.big().intoParsed(gasUnit).cast(gas).toFixed(),
-                    depo,
+                    depo: amt,
                 },
             ],
         };
@@ -213,6 +218,8 @@ export class StorageDeposit extends BaseTask<FormData, Props, State> {
     }
 
     public override async validateForm(values: FormData): Promise<FormikErrors<FormData>> {
+        values.depo = values.amount;
+        values.depoUnit = values.amountUnit;
         this.setFormData(values);
         await new Promise((resolve) => this.resolveDebounced(resolve));
         await this.tryUpdateSm();
