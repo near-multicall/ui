@@ -55,7 +55,7 @@ export class StorageWithdraw extends BaseTask<FormData, Props, State> {
         name: "Storage Withdraw",
         addr: window.nearConfig.WNEAR_ADDRESS,
         func: "storage_withdraw",
-        gas: "7.5",
+        gas: "12.5",
         gasUnit: "Tgas",
         depo: "1",
         depoUnit: "yocto",

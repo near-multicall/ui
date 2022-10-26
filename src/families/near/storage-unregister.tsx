@@ -38,7 +38,7 @@ export class StorageUnregister extends BaseTask<FormData, Props, State> {
         name: "Storage Unregister",
         addr: window.nearConfig.WNEAR_ADDRESS,
         func: "storage_unregister",
-        gas: "7.5",
+        gas: "8.5",
         gasUnit: "Tgas",
         depo: "1",
         depoUnit: "yocto",
