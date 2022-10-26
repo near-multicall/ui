@@ -89,6 +89,14 @@ export class Task extends Component {
                                 json={json}
                             />
                         );
+                    case "ft_transfer_call":
+                        return (
+                            <Family.Near.FtTransferCall
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
                 }
 
             default:

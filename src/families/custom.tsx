@@ -134,7 +134,7 @@ export class CustomTask extends BaseTask<FormData> {
                     name="depo"
                     unit="depoUnit"
                     options={["NEAR", "yocto"]}
-                    label="Allocated deposit"
+                    label="Attached deposit"
                     roundbottom
                 />
             </Form>

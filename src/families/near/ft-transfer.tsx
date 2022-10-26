@@ -97,7 +97,7 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
     }
 
     public override toCall(): Call {
-        const { addr, gas, gasUnit, receiverId, amount, memo } = this.state.formData;
+        const { addr, func, depo, gas, gasUnit, receiverId, amount, memo } = this.state.formData;
         const { token } = this.state;
 
         if (!arx.big().isValidSync(gas)) throw new CallError("Failed to parse gas input value", this.props.id);
@@ -107,14 +107,14 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
             address: addr,
             actions: [
                 {
-                    func: "ft_transfer",
+                    func,
                     args: {
                         receiver_id: receiverId,
                         amount: arx.big().intoParsed(token.metadata.decimals).cast(amount).toFixed(),
                         memo,
                     },
                     gas: arx.big().intoParsed(gasUnit).cast(gas).toFixed(),
-                    depo: "1",
+                    depo,
                 },
             ],
         };

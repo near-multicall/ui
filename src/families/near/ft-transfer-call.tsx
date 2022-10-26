@@ -1,6 +1,4 @@
-import { DeleteOutline, EditOutlined, MoveDown } from "@mui/icons-material";
 import { InputAdornment } from "@mui/material";
-import clsx from "clsx";
 import { Form, useFormikContext } from "formik";
 import { useEffect } from "react";
 import { args as arx } from "../../shared/lib/args/args";
@@ -8,9 +6,8 @@ import { fields } from "../../shared/lib/args/args-types/args-object";
 import { Call, CallError } from "../../shared/lib/call";
 import { toGas } from "../../shared/lib/converter";
 import { FungibleToken } from "../../shared/lib/standards/fungibleToken";
-import { Tooltip } from "../../shared/ui/components";
 import { TextField, UnitField } from "../../shared/ui/form-fields";
-import { BaseTask, BaseTaskProps, BaseTaskState, DefaultFormData, DisplayData } from "../base";
+import { BaseTask, BaseTaskProps, BaseTaskState, DefaultFormData } from "../base";
 import "./near.scss";
 
 type FormData = DefaultFormData & {
