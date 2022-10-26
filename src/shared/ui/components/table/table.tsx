@@ -13,7 +13,7 @@ import { HTMLAttributes } from "react";
 import { TableRowCompact, TableRow, type TableRowProps, TableHeader } from "./row";
 import "./table.scss";
 
-export interface TableProps extends HTMLAttributes<HTMLDivElement>, Pick<TableRowProps, "dense"> {
+export interface TableProps extends HTMLAttributes<HTMLDivElement>, Pick<TableRowProps, "dense" | "entitled"> {
     RowComponent?: typeof TableRow;
     RowCompactComponent?: typeof TableRowCompact;
     /**
@@ -39,6 +39,7 @@ export const Table = ({
     RowCompactComponent = TableRowCompact,
     className,
     dense = false,
+    entitled = false,
     displayMode = "default",
     header,
     rows,
@@ -79,7 +80,7 @@ export const Table = ({
                         rows.map((cells, index) => (
                             <RowCompactComponent
                                 key={index}
-                                {...{ cells, dense, header }}
+                                {...{ cells, dense, entitled, header }}
                             />
                         ))}
                 </div>

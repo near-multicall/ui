@@ -10,6 +10,10 @@ export type TableHeader = string[];
 export interface TableRowProps {
     cells?: (string | number | JSX.Element)[] | null;
     dense?: boolean;
+    /**
+     * Display first cell of each row as its title in `"compact"` table `displayMode`
+     */
+    entitled?: boolean;
     header: TableHeader;
 }
 
@@ -23,7 +27,7 @@ export const TableRow = ({ cells, header }: TableRowProps) => (
     </>
 );
 
-export const TableRowCompact = ({ cells, dense, header }: TableRowProps) => (
+export const TableRowCompact = ({ cells, dense, entitled, header }: TableRowProps) => (
     <div
         className={clsx(`${_TableRow}--compact`, {
             [`${_TableRow}--compact--dense`]: dense,
@@ -33,6 +37,7 @@ export const TableRowCompact = ({ cells, dense, header }: TableRowProps) => (
             <div
                 className={clsx(`${_TableRow}-content--compact`, {
                     [`${_TableRow}-content--compact--dense`]: dense,
+                    [`${_TableRow}-content--compact--entitled`]: entitled,
                 })}
                 key={headerCellIndex}
             >

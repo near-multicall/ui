@@ -7,12 +7,17 @@
     gap: 0.6 * size.$gap;
     line-height: 0;
 
+    &--symbolic {
+        line-height: 1;
+    }
+
     &-icon {
         width: fit-content;
         height: fit-content;
         cursor: default !important;
         border-radius: 50%;
         box-shadow: 0px 5px 11px -3px rgba(0, 0, 0, 0.1);
+        line-height: inherit;
 
         & > img,
         & > svg {
@@ -23,5 +28,6 @@
 
     &-label {
         font-weight: bold;
+        line-height: 0;
     }
 }

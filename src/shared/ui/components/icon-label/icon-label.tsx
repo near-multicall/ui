@@ -1,3 +1,5 @@
+import clsx from "clsx";
+
 import { Validation } from "../../../lib/validation";
 
 import "./icon-label.scss";
@@ -10,7 +12,11 @@ interface IconLabelProps {
 }
 
 export const IconLabel = ({ icon, label }: IconLabelProps) => (
-    <span className={_IconLabel}>
+    <span
+        className={clsx(_IconLabel, {
+            [_IconLabel + "--symbolic"]: typeof icon === "string" && !Validation.isUrl(icon),
+        })}
+    >
         <span className={`${_IconLabel}-icon`}>
             {typeof icon === "string" && Validation.isUrl(icon) ? (
                 <img

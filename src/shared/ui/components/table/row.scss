@@ -44,43 +44,56 @@
             align-items: center;
             font-size: 1.1 * size.$text;
 
+            &:last-of-type {
+                border-bottom-left-radius: 0.8 * size.$task-radius;
+                border-bottom-right-radius: 0.8 * size.$task-radius;
+            }
+
             &:not(&--dense) {
                 &:first-of-type {
                     padding: size.$gap * 0.5;
                 }
             }
 
-            &:first-of-type {
-                & > span {
-                    &:first-of-type {
-                        display: none;
-                    }
-
-                    &:last-child {
-                        font-size: size.$large-text;
-                    }
-                }
-            }
-
-            &:not(:first-of-type) {
+            &:not(&--entitled) {
                 padding: 0.5 * size.$gap size.$gap;
                 background-color: rgba(color.$lightest, 0.7);
-                & > span:last-of-type {
-                    text-overflow: ellipsis;
-                    white-space: nowrap;
-                    padding-left: 1.5rem;
-                    overflow: hidden;
+
+                &:first-of-type {
+                    border-top-left-radius: 0.8 * size.$task-radius;
+                    border-top-right-radius: 0.8 * size.$task-radius;
                 }
             }
 
-            &:nth-of-type(2) {
-                border-top-left-radius: 0.8 * size.$task-radius;
-                border-top-right-radius: 0.8 * size.$task-radius;
-            }
+            &--entitled {
+                &:first-of-type {
+                    & > span {
+                        &:first-of-type {
+                            display: none;
+                        }
 
-            &:last-of-type {
-                border-bottom-left-radius: 0.8 * size.$task-radius;
-                border-bottom-right-radius: 0.8 * size.$task-radius;
+                        &:last-child {
+                            font-size: size.$large-text;
+                        }
+                    }
+                }
+
+                &:not(:first-of-type) {
+                    padding: 0.5 * size.$gap size.$gap;
+                    background-color: rgba(color.$lightest, 0.7);
+
+                    & > span:last-of-type {
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                        padding-left: 1.5rem;
+                        overflow: hidden;
+                    }
+                }
+
+                &:nth-of-type(2) {
+                    border-top-left-radius: 0.8 * size.$task-radius;
+                    border-top-right-radius: 0.8 * size.$task-radius;
+                }
             }
 
             span:first-of-type {

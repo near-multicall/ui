@@ -26,6 +26,7 @@ export const MIAdminsTable = ({ className, controllerContractAddress }: MIAdmins
                 <Table
                     className={`${_MIAdminsTable}-body`}
                     dense
+                    entitled
                     displayMode="compact"
                     header={["Account address"]}
                     rows={data?.map(multicallAdminTableRow)}

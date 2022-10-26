@@ -25,6 +25,7 @@ export const JobsTable = ({ className, contracts }: JobsTableProps) => {
                 <Table
                     className={`${_JobsTable}-body`}
                     displayMode="compact"
+                    entitled
                     header={["Status", "ID", "Start at", "Croncat hash", "Creator", "Trigger gas", "Multicalls"]}
                     rows={Object.values(data ?? {})
                         .map(jobTableRow)
