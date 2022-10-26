@@ -30,7 +30,7 @@ export class MftTransferCall extends BaseTask<FormData, Props, State> {
         .object()
         .shape({
             addr: arx.string().contract(),
-            gas: arx.big().gas().min(toGas(45)),
+            gas: arx.big().gas().min(toGas("45")),
             receiverId: arx.string().address(),
             tokenId: arx.string().mft("addr"),
             amount: arx.big().token().min(1, "cannot transfer 0 tokens"),
