@@ -1,6 +1,6 @@
 import { CancelOutlined, DeleteOutlined, EditOutlined } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { TextInput } from "../../../shared/ui/components";
 import { Fn } from "../../../shared/lib/fn";
@@ -21,7 +21,7 @@ export const TokensWhitelistForm = ({
     const [addTokens, markForAddition] = useState<TokensWhitelistEditFeature.FormState["addTokens"]>([]),
         [removeTokens, markForRemoval] = useState<TokensWhitelistEditFeature.FormState["removeTokens"]>([]);
 
-    const tokenToAddAddress = new ArgsString("");
+    const tokenToAddAddress = useMemo(() => new ArgsString(""), []);
 
     const onAdditionRequest = useCallback(
         (input: string) => {

@@ -1,9 +1,11 @@
 import clsx from "clsx";
-import { useCallback, useReducer, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import { MulticallInstance } from "../../../entities";
 import { JobSettingsEdit, TokensWhitelistEdit } from "../../../features";
-import { type MulticallConfigChanges } from "../../../shared/lib/contracts/multicall";
+import { ArgsString } from "../../../shared/lib/args";
+import { MulticallContract, type MulticallConfigChanges } from "../../../shared/lib/contracts/multicall";
+import { SputnikDAOContract } from "../../../shared/lib/contracts/sputnik-dao";
 import { Button, ButtonGroup, TextInput, Tile } from "../../../shared/ui/components";
 import { type MulticallConfigEditorWidget } from "../config";
 
@@ -27,14 +29,8 @@ export const MulticallConfigEditorUI = ({
         croncatManager: "",
     };
 
-    const [formState, formStateUpdate] = useReducer(
-        (
-            latestState: typeof changesDiffInitialState,
-            update: Partial<MulticallConfigChanges>
-        ): MulticallConfigChanges => Object.assign(latestState, update),
-
-        changesDiffInitialState
-    );
+    const [formState, formStateUpdate] = useState<MulticallConfigChanges>(changesDiffInitialState),
+        [proposalDescription, proposalDescriptionUpdate] = useState("");
 
     const formReset = useCallback(
         () => formStateUpdate(changesDiffInitialState),
@@ -48,17 +44,31 @@ export const MulticallConfigEditorUI = ({
 
     const onEdit = useCallback(
         (update: Partial<MulticallConfigChanges>) => {
-            const newFormState = Object.assign(formState, update);
+            formStateUpdate((latestState) => Object.assign(latestState, update));
 
-            formStateUpdate(newFormState);
-            editModeSwitch(Object.values(newFormState).filter(({ length }) => length > 0).length > 0);
-            console.log(formState);
+            editModeSwitch(
+                Object.values(Object.assign(formState, update)).filter(({ length }) => length > 0).length > 0
+            );
+
+            console.log(formState, proposalDescription);
         },
 
-        [formState, formStateUpdate]
+        [editModeSwitch, formState, formStateUpdate, proposalDescription]
     );
 
-    const onSubmit = useCallback(() => editModeSwitch(false), [editModeSwitch]);
+    const onSubmit = useCallback(() => {
+        SputnikDAOContract.init(controllerContractAddress)
+            .then((instanceController) =>
+                instanceController.proposeFunctionCall(
+                    proposalDescription,
+                    multicallContract.address,
+                    MulticallContract.configDiffToProposalActions(formState)
+                )
+            )
+            .catch(console.error);
+
+        editModeSwitch(false);
+    }, [controllerContractAddress, editModeSwitch]);
 
     return (
         <div className={clsx(_MulticallConfigEditor, className)}>
@@ -94,6 +104,9 @@ export const MulticallConfigEditorUI = ({
                             label="Description"
                             minRows={3}
                             multiline
+                            required
+                            update={(event) => void proposalDescriptionUpdate(event.target.value)}
+                            value={useMemo(() => new ArgsString(""), [])}
                         />
                     </div>
 
@@ -106,6 +119,10 @@ export const MulticallConfigEditorUI = ({
 
                         <Button
                             color="success"
+                            disabled={
+                                !(Object.values(formState).filter(({ length }) => length > 0).length > 0) ||
+                                proposalDescription.length === 0
+                            }
                             label="Submit"
                             onClick={onSubmit}
                         />
