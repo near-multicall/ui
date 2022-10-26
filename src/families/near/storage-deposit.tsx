@@ -233,7 +233,7 @@ export class StorageDeposit extends BaseTask<FormData, Props, State> {
     public override Editor = (): React.ReactNode => {
         const { resetForm, validateForm, values } = useFormikContext<FormData>();
         const { storageBalance, storageBalanceBounds } = this.state;
-        const balance = arx.big().intoFormatted("NEAR").cast(storageBalance?.available),
+        const balance = arx.big().intoFormatted("NEAR").cast(storageBalance?.total),
             lowerStorageBalanceBound = arx.big().intoFormatted("NEAR").cast(storageBalanceBounds?.min),
             upperStorageBalanceBound = arx.big().intoFormatted("NEAR").cast(storageBalanceBounds?.max);
 
@@ -261,7 +261,7 @@ export class StorageDeposit extends BaseTask<FormData, Props, State> {
                 />
                 {!!balance && !!lowerStorageBalanceBound && (
                     <InfoField>
-                        {`Current available storage balance: ${balance} Ⓝ`}
+                        {`Current total storage balance: ${balance} Ⓝ`}
                         <br />
                         {`Minimum deposit: ${lowerStorageBalanceBound} Ⓝ`}
                         <br />
