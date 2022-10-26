@@ -4,6 +4,8 @@
 @use "sass/font";
 
 .DataInspector {
+    text-align: start;
+
     &-label {
         color: darken(color.$blue, 30%);
         cursor: pointer;

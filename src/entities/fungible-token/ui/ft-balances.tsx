@@ -11,14 +11,18 @@ export const fungibleTokensBalancesRender = ({ contracts }: FungibleTokensBalanc
 
     return !data
         ? null
-        : data.map(({ dao, metadata, multicall, total }) => [
-              <IconLabel
-                  icon={metadata.icon ?? <NearIcons.GenericTokenFilled />}
-                  label={metadata.symbol}
-              />,
+        : data.map(({ dao, metadata, multicall, total }) => ({
+              content: [
+                  <IconLabel
+                      icon={metadata.icon ?? <NearIcons.GenericTokenFilled />}
+                      label={metadata.symbol}
+                  />,
 
-              FungibleTokenFormat.amountToDisplayAmount(multicall, metadata.decimals),
-              FungibleTokenFormat.amountToDisplayAmount(dao, metadata.decimals),
-              FungibleTokenFormat.amountToDisplayAmount(total, metadata.decimals),
-          ]);
+                  FungibleTokenFormat.amountToDisplayAmount(multicall, metadata.decimals),
+                  FungibleTokenFormat.amountToDisplayAmount(dao, metadata.decimals),
+                  FungibleTokenFormat.amountToDisplayAmount(total, metadata.decimals),
+              ],
+
+              id: metadata.symbol,
+          }));
 };

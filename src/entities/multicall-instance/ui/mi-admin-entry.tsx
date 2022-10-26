@@ -22,6 +22,7 @@ const MulticallInstanceAdminEntry = ({ address }: MulticallInstanceAdminEntryPro
     );
 };
 
-export const multicallAdminTableRow = (address: MulticallInstanceAdminEntryProps["address"]) => [
-    <MulticallInstanceAdminEntry {...{ address }} />,
-];
+export const multicallAdminTableRow = (item: MulticallInstanceAdminEntryProps["address"]) => ({
+    content: [<MulticallInstanceAdminEntry address={item} />],
+    id: item,
+});

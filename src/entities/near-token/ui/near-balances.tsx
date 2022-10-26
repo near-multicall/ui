@@ -10,14 +10,18 @@ export const nearTokenBalancesRender = ({ contracts }: NearTokenBalancesRenderPr
 
     return !data
         ? null
-        : [
-              <IconLabel
-                  icon={<NearIcons.NativeTokenFilled />}
-                  label="NEAR"
-              />,
+        : {
+              content: [
+                  <IconLabel
+                      icon={<NearIcons.NativeTokenFilled />}
+                      label="NEAR"
+                  />,
 
-              data.multicall,
-              data.dao,
-              data.total,
-          ];
+                  data.multicall,
+                  data.dao,
+                  data.total,
+              ],
+
+              id: "NEAR",
+          };
 };

@@ -24,30 +24,34 @@ const JobDisplayStatus = ({ job }: Pick<JobEntity.DataWithStatus, "job">) => {
     );
 };
 
-export const jobTableRow = ({ id, job }: JobEntryProps) => [
-    <JobDisplayStatus {...{ job }} />,
-    id,
-    // Multicall returns timestamp in nanoseconds, JS Date uses milliseconds
-    new Date(parseInt(Big(job.start_at).div("1000000").toFixed())).toLocaleString(),
-    job.croncat_hash.length === 0 ? <i>none</i> : job.croncat_hash,
-    job.creator,
-    `${toTGas(job.trigger_gas)} Tgas`,
+export const jobTableRowRender = ({ id, job }: JobEntryProps) => ({
+    content: [
+        <JobDisplayStatus {...{ job }} />,
+        id,
+        /** Multicall returns timestamp in nanoseconds, JS Date uses milliseconds */
+        new Date(parseInt(Big(job.start_at).div("1000000").toFixed())).toLocaleString(),
+        job.croncat_hash.length === 0 ? <i>none</i> : job.croncat_hash,
+        job.creator,
+        `${toTGas(job.trigger_gas)} Tgas`,
 
-    <>
-        <DataInspector
-            classes={{ label: `${_Job}-dataInspector-label` }}
-            data={job.multicalls}
-            expandLevel={5}
-        />
+        <>
+            <DataInspector
+                classes={{ label: `${_Job}-dataInspector-label` }}
+                data={job.multicalls}
+                expandLevel={5}
+            />
 
-        {job.multicalls.length === 1 && (
-            <NavLink
-                to="/app"
-                className={`${_Job}-action`}
-                onClick={() => setTimeout(() => window.LAYOUT.fromJSON(job.multicalls[0].calls), 0)}
-            >
-                Open in Editor
-            </NavLink>
-        )}
-    </>,
-];
+            {job.multicalls.length === 1 && (
+                <NavLink
+                    to="/app"
+                    className={`${_Job}-action`}
+                    onClick={() => setTimeout(() => window.LAYOUT.fromJSON(job.multicalls[0].calls), 0)}
+                >
+                    Open in Editor
+                </NavLink>
+            )}
+        </>,
+    ],
+
+    id: id.toString(),
+});

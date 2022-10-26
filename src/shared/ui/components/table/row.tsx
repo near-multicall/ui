@@ -1,5 +1,6 @@
-import { TableCell, TableRow as MuiTableRow, Typography } from "@mui/material";
+import { Checkbox, TableCell, TableRow as MuiTableRow } from "@mui/material";
 import clsx from "clsx";
+import { ChangeEvent, useCallback } from "react";
 
 import "./row.scss";
 
@@ -16,7 +17,10 @@ export interface TableRowProps {
      */
     entitled?: boolean;
     header: TableHeader;
+    id: string;
     noKeys?: boolean;
+    onSelect?: (selectedRow: { id: TableRowProps["id"]; checked: boolean }) => void;
+    selectable: boolean;
 }
 
 export const TableRow = ({ cells, header }: TableRowProps) => (
@@ -29,25 +33,43 @@ export const TableRow = ({ cells, header }: TableRowProps) => (
     </>
 );
 
-export const TableRowCompact = ({ cells, centeredTitle, dense, entitled, header, noKeys }: TableRowProps) => (
-    <div
-        className={clsx(`${_TableRow}--compact`, {
-            [`${_TableRow}--compact--dense`]: dense,
-        })}
-    >
-        {header.map((headerCell, headerCellIndex) => (
-            <div
-                className={clsx(_TableRow + "-content" + "--compact", {
-                    [_TableRow + "-content" + "--compact" + "--dense"]: dense,
-                    [_TableRow + "-content" + "--compact" + "--entitled"]: entitled,
-                    [_TableRow + "-content" + "--compact" + "--entitled" + "--centeredTitle"]: centeredTitle,
-                    [_TableRow + "-content" + "--compact" + "--noKeys"]: noKeys,
-                })}
-                key={headerCellIndex}
-            >
-                <span>{headerCell}</span>
-                <span>{cells ? cells[headerCellIndex] : "No data"}</span>
-            </div>
-        ))}
-    </div>
-);
+export const TableRowCompact = ({
+    cells,
+    centeredTitle,
+    dense,
+    entitled,
+    header,
+    id,
+    noKeys,
+    onSelect,
+    selectable,
+}: TableRowProps) => {
+    const onSelectMemoized = useCallback(
+        (_event: ChangeEvent, checked: boolean) => onSelect?.({ checked, id }),
+        [onSelect]
+    );
+
+    return (
+        <div
+            className={clsx(`${_TableRow}--compact`, {
+                [`${_TableRow}--compact--dense`]: dense,
+            })}
+        >
+            {header.map((headerCell, headerCellIndex) => (
+                <div
+                    className={clsx(_TableRow + "-content" + "--compact", {
+                        [_TableRow + "-content" + "--compact" + "--dense"]: dense,
+                        [_TableRow + "-content" + "--compact" + "--entitled"]: entitled,
+                        [_TableRow + "-content" + "--compact" + "--entitled" + "--centeredTitle"]: centeredTitle,
+                        [_TableRow + "-content" + "--compact" + "--noKeys"]: noKeys,
+                    })}
+                    key={headerCellIndex}
+                >
+                    {selectable && <Checkbox onChange={onSelectMemoized} />}
+                    <span>{headerCell}</span>
+                    <span>{cells ? cells[headerCellIndex] : "No data"}</span>
+                </div>
+            ))}
+        </div>
+    );
+};

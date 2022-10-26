@@ -21,6 +21,7 @@ const MulticallInstanceWhitelistedTokenEntry = ({ address }: MulticallInstanceWh
     );
 };
 
-export const miWhitelistedTokenTableRowRender = (item: MulticallInstanceWhitelistedTokenProps["address"]) => [
-    <MulticallInstanceWhitelistedTokenEntry address={item} />,
-];
+export const miWhitelistedTokenTableRowRender = (item: MulticallInstanceWhitelistedTokenProps["address"]) => ({
+    content: [<MulticallInstanceWhitelistedTokenEntry address={item} />],
+    id: item,
+});

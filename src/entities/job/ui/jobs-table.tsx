@@ -4,7 +4,7 @@ import { Scrollable, Table, Tile } from "../../../shared/ui/components";
 import { JobModel } from "../model/job";
 import { type JobEntity } from "../config";
 
-import { jobTableRow } from "./job";
+import { jobTableRowRender } from "./job";
 import "./jobs-table.scss";
 
 interface JobsTableProps extends JobEntity.Dependencies {}
@@ -28,7 +28,7 @@ export const JobsTable = ({ className, contracts }: JobsTableProps) => {
                     displayMode="compact"
                     header={["Status", "ID", "Start at", "Croncat hash", "Creator", "Trigger gas", "Multicalls"]}
                     rows={Object.values(data ?? {})
-                        .map(jobTableRow)
+                        .map(jobTableRowRender)
                         .reverse()}
                 />
             </Scrollable>

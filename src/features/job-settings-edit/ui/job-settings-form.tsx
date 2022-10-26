@@ -77,44 +77,52 @@ export const JobSettingsForm = ({ className, disabled, multicallContract, onEdit
                 dense
                 header={["Option", "Value"]}
                 rows={[
-                    [
-                        "Croncat manager",
+                    {
+                        id: "croncatManager",
 
-                        editModeEnabled ? (
-                            <TextInput
-                                fullWidth
-                                update={(event) => croncatManagerUpdate(event.target.value)}
-                                value={formFields.croncatManager}
-                            />
-                        ) : (
-                            <NearLink address={croncatManager || multicallContract.croncatManager} />
-                        ),
-                    ],
-                    [
-                        "Job bond",
+                        content: [
+                            "Croncat manager",
 
-                        editModeEnabled ? (
-                            <TextInput
-                                InputProps={{
-                                    endAdornment: NearIcons.NATIVE_TOKEN_CHARACTER,
-                                    inputProps: { min: 0, step: 0.001 },
-                                }}
-                                update={(event) => jobBondUpdate(toYocto(event.target.value))}
-                                type="number"
-                                value={formFields.jobBond}
-                            />
-                        ) : (
-                            <IconLabel
-                                icon={NearIcons.NATIVE_TOKEN_CHARACTER}
-                                label={
-                                    jobBond || multicallContract.jobBond !== ""
-                                        ? toNEAR(jobBond || multicallContract.jobBond)
-                                        : "..."
-                                }
-                                reversed
-                            />
-                        ),
-                    ],
+                            editModeEnabled ? (
+                                <TextInput
+                                    fullWidth
+                                    update={(event) => croncatManagerUpdate(event.target.value)}
+                                    value={formFields.croncatManager}
+                                />
+                            ) : (
+                                <NearLink address={croncatManager || multicallContract.croncatManager} />
+                            ),
+                        ],
+                    },
+                    {
+                        id: "jobBond",
+
+                        content: [
+                            "Job bond",
+
+                            editModeEnabled ? (
+                                <TextInput
+                                    InputProps={{
+                                        endAdornment: NearIcons.NATIVE_TOKEN_CHARACTER,
+                                        inputProps: { min: 0, step: 0.001 },
+                                    }}
+                                    update={(event) => jobBondUpdate(toYocto(event.target.value))}
+                                    type="number"
+                                    value={formFields.jobBond}
+                                />
+                            ) : (
+                                <IconLabel
+                                    icon={NearIcons.NATIVE_TOKEN_CHARACTER}
+                                    label={
+                                        jobBond || multicallContract.jobBond !== ""
+                                            ? toNEAR(jobBond || multicallContract.jobBond)
+                                            : "..."
+                                    }
+                                    reversed
+                                />
+                            ),
+                        ],
+                    },
                 ]}
             />
         </Tile>

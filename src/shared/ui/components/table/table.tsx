@@ -8,7 +8,7 @@ import {
     useTheme,
 } from "@mui/material";
 import clsx from "clsx";
-import { HTMLAttributes } from "react";
+import { HTMLAttributes, useCallback, useEffect, useState } from "react";
 
 import { TableRowCompact, TableRow, type TableRowProps, TableHeader } from "./row";
 import "./table.scss";
@@ -16,7 +16,7 @@ import "./table.scss";
 export interface TableProps extends HTMLAttributes<HTMLDivElement>, Pick<TableRowProps, "dense"> {
     RowComponent?: typeof TableRow;
     RowCompactComponent?: typeof TableRowCompact;
-    RowProps?: Omit<TableRowProps, "cells" | "dense" | "header">;
+    RowProps?: Omit<TableRowProps, "cells" | "dense" | "header" | "id" | "selectable">;
     /**
      * `"classic"` mode is a classic table view.
      *
@@ -30,7 +30,8 @@ export interface TableProps extends HTMLAttributes<HTMLDivElement>, Pick<TableRo
      */
     displayMode?: "default" | "compact" | "classic";
     header: TableHeader;
-    rows?: TableRowProps["cells"][] | null;
+    onRowsSelected?: (selectedRowsIds: TableRowProps["id"][]) => void;
+    rows?: { id: TableRowProps["id"]; content: TableRowProps["cells"] }[] | null;
 }
 
 const _Table = "Table";
@@ -43,11 +44,25 @@ export const Table = ({
     dense = false,
     displayMode = "default",
     header,
+    onRowsSelected,
     rows,
 }: TableProps) => {
     const mediumOrSmallScreen = useMediaQuery(useTheme().breakpoints.down("md")),
         classicModeRequired = (!mediumOrSmallScreen && displayMode === "default") || displayMode === "classic",
         compactModeRequired = (mediumOrSmallScreen && displayMode === "default") || displayMode === "compact";
+
+    const [selectedRowsIds, selectedRowsIdsUpdate] = useState<TableRowProps["id"][]>([]),
+        rowSelectionEnabled = onRowsSelected !== undefined;
+
+    const onRowSelect = useCallback(
+        ({ id, checked }: { id: TableRowProps["id"]; checked: boolean }) =>
+            selectedRowsIdsUpdate((latestState) =>
+                checked ? latestState.concat([id]) : latestState.filter((rowId) => rowId !== id)
+            ),
+        [selectedRowsIdsUpdate]
+    );
+
+    useEffect(() => void onRowsSelected?.(selectedRowsIds), [selectedRowsIds]);
 
     return (
         <>
@@ -63,10 +78,13 @@ export const Table = ({
                         </TableHead>
 
                         <TableBody>
-                            {(rows ?? header).map((cells, index) => (
+                            {(rows ?? header).map((row, index) => (
                                 <RowComponent
+                                    cells={typeof row !== "string" ? row.content : null}
+                                    id={typeof row !== "string" ? row.id : index.toString()}
                                     key={`row-${index}`}
-                                    cells={typeof cells !== "string" ? cells : null}
+                                    onSelect={onRowSelect}
+                                    selectable={rowSelectionEnabled}
                                     {...{ header }}
                                 />
                             ))}
@@ -78,10 +96,14 @@ export const Table = ({
             {compactModeRequired && (
                 <div className={clsx(`${_Table}--compact`, className)}>
                     {rows &&
-                        rows.map((cells, index) => (
+                        rows.map((row, index) => (
                             <RowCompactComponent
+                                cells={row.content}
+                                id={row.id}
                                 key={index}
-                                {...{ cells, dense, header, ...RowProps }}
+                                onSelect={onRowSelect}
+                                selectable={rowSelectionEnabled}
+                                {...{ dense, header, ...RowProps }}
                             />
                         ))}
                 </div>
