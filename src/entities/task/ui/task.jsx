@@ -93,6 +93,22 @@ export class Task extends Component {
                                 json={json}
                             />
                         );
+                    case "mft_transfer":
+                        return (
+                            <Family.Near.MftTransfer
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
+                    case "mft_transfer_call":
+                        return (
+                            <Family.Near.MftTransferCall
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
                     case "deposit_and_stake":
                         return (
                             <Family.Near.DepositAndStake

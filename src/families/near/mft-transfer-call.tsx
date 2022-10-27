@@ -5,70 +5,78 @@ import { args as arx } from "../../shared/lib/args/args";
 import { fields } from "../../shared/lib/args/args-types/args-object";
 import { Call, CallError } from "../../shared/lib/call";
 import { toGas } from "../../shared/lib/converter";
-import { FungibleToken } from "../../shared/lib/standards/fungibleToken";
-import { InfoField, TextField, UnitField } from "../../shared/ui/form-fields";
-import type { DefaultFormData } from "../base";
-import { BaseTask, BaseTaskProps, BaseTaskState } from "../base";
+import { MultiFungibleToken } from "../../shared/lib/standards/multiFungibleToken";
+import { TextField, UnitField } from "../../shared/ui/form-fields";
+import { BaseTask, BaseTaskProps, BaseTaskState, DefaultFormData } from "../base";
 import "./near.scss";
 
 type FormData = DefaultFormData & {
+    tokenId: string;
     receiverId: string;
     amount: string;
-    memo: string;
+    memo: string | null;
+    msg: string;
 };
 
 type Props = BaseTaskProps;
 
 type State = BaseTaskState<FormData> & {
-    token: FungibleToken;
+    token: MultiFungibleToken;
 };
 
-export class FtTransfer extends BaseTask<FormData, Props, State> {
-    override uniqueClassName = "near-ft-transfer-task";
+export class MftTransferCall extends BaseTask<FormData, Props, State> {
+    override uniqueClassName = "near-ft-transfer-call-task";
     override schema = arx
         .object()
         .shape({
-            addr: arx.string().ft(),
-            gas: arx.big().gas().min(toGas("1")).max(toGas("250")),
+            addr: arx.string().contract(),
+            gas: arx.big().gas().min(toGas("45")),
             receiverId: arx.string().address(),
-            amount: arx.big().token().min(0, "amount must be at least ${min}"),
+            tokenId: arx.string().mft("addr"),
+            amount: arx.big().token().min(1, "cannot transfer 0 tokens"),
             memo: arx.string().optional(),
+            msg: arx.string().optional(),
         })
-        .transform(({ gas, gasUnit, ...rest }) => ({
+        .transform(({ gas, gasUnit, depo, depoUnit, ...rest }) => ({
             ...rest,
             gas: arx.big().intoParsed(gasUnit).cast(gas),
         }))
-        .requireAll({ ignore: ["memo"] })
+        .requireAll({ ignore: ["memo", "msg"] })
         .retainAll();
 
     override initialValues: FormData = {
-        name: "FT Transfer",
-        addr: window.nearConfig.WNEAR_ADDRESS,
-        func: "ft_transfer",
-        gas: "10",
+        name: "MFT Transfer Call",
+        addr: window.nearConfig.REF_EXCHANGE_ADDRESS,
+        func: "mft_transfer_call",
+        gas: "150",
         gasUnit: "Tgas",
         depo: "1",
         depoUnit: "yocto",
+        tokenId: "",
         receiverId: "",
         amount: "0",
         memo: "",
+        msg: "",
     };
 
     constructor(props: Props) {
         super(props);
         this._constructor();
-
         this.state = {
             ...this.state,
-            token: new FungibleToken(this.initialValues.addr),
+            token: new MultiFungibleToken(this.state.formData.addr, this.state.formData.tokenId),
         };
+
+        this.tryUpdateMft().catch(() => {});
     }
 
     protected override init(
         call: Call<{
+            token_id: string;
             receiver_id: string;
             amount: string;
             memo: string;
+            msg: string;
         }> | null
     ): void {
         if (call !== null) {
@@ -76,10 +84,14 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
                 addr: call.address,
                 func: call.actions[0].func,
                 gas: arx.big().intoFormatted(this.initialValues.gasUnit).cast(call.actions[0].gas).toFixed(),
+                depo: arx.big().intoFormatted(this.initialValues.depoUnit).cast(call.actions[0].depo).toFixed(),
+                tokenId: call.actions[0].args.token_id,
                 receiverId: call.actions[0].args.receiver_id,
                 amount: call.actions[0].args.amount,
                 memo: call.actions[0].args.memo,
+                msg: call.actions[0].args.msg,
             };
+
             this.initialValues = Object.keys(this.initialValues).reduce((acc, k) => {
                 const v = fromCall[k as keyof typeof fromCall];
                 return v !== null && v !== undefined ? { ...acc, [k as keyof FormData]: v } : acc;
@@ -90,7 +102,7 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
         this.schema.check(this.state.formData);
 
         if (call !== null)
-            this.tryUpdateFt().then((res: boolean) =>
+            this.tryUpdateMft().then((res: boolean) =>
                 this.setFormData({
                     amount: res
                         ? arx
@@ -104,51 +116,63 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
     }
 
     static override inferOwnType(json: Call): boolean {
-        return !!json && arx.string().address().isValidSync(json.address) && json.actions[0].func === "ft_transfer";
+        return !!json && json.actions[0].func === "mft_transfer_call";
     }
 
     public override toCall(): Call {
-        const { addr, gas, gasUnit, receiverId, amount, memo } = this.state.formData;
+        const { addr, func, tokenId, receiverId, memo, msg, amount, gas, gasUnit, depo, depoUnit } =
+            this.state.formData;
         const { token } = this.state;
 
         if (!arx.big().isValidSync(gas)) throw new CallError("Failed to parse gas input value", this.props.id);
-        if (!arx.big().isValidSync(amount)) throw new CallError("Failed to parse amount input value", this.props.id);
+        if (!arx.big().isValidSync(depo)) throw new CallError("Failed to parse deposit input value", this.props.id);
         if (!token.ready) throw new CallError("Lacking token metadata", this.props.id);
 
         return {
             address: addr,
             actions: [
                 {
-                    func: "ft_transfer",
-                    args: {
-                        receiver_id: receiverId,
-                        amount: arx.big().intoParsed(token.metadata.decimals).cast(amount).toFixed(),
-                        memo,
-                    },
+                    func,
+                    args:
+                        memo !== null
+                            ? {
+                                  token_id: tokenId,
+                                  receiver_id: receiverId,
+                                  amount: arx.big().intoParsed(token.metadata.decimals).cast(amount).toFixed(),
+                                  msg,
+                              }
+                            : {
+                                  receiver_id: receiverId,
+                                  amount: arx.big().intoParsed(token.metadata.decimals).cast(amount).toFixed(),
+                                  memo,
+                                  msg,
+                              },
                     gas: arx.big().intoParsed(gasUnit).cast(gas).toFixed(),
-                    depo: "1",
+                    depo: arx.big().intoParsed(depoUnit).cast(depo).toFixed(),
                 },
             ],
         };
     }
 
-    private tryUpdateFt(): Promise<boolean> {
+    private tryUpdateMft(): Promise<boolean> {
         return new Promise<boolean>((resolve) => {
             this.schema.check(this.state.formData).then(() => {
                 const { addr } = fields(this.schema);
                 if (!addr.isBad()) {
-                    this.confidentlyUpdateFt().then((ready) => resolve(ready));
+                    this.confidentlyUpdateMft().then((ready) => resolve(ready));
                 } else {
-                    this.setState({ token: new FungibleToken(this.state.formData.addr) }); // will be invalid
+                    this.setState({
+                        token: new MultiFungibleToken(this.state.formData.addr, this.state.formData.tokenId),
+                    }); // will be invalid
                     resolve(false);
                 }
             });
         });
     }
 
-    private async confidentlyUpdateFt(): Promise<boolean> {
-        const { addr } = this.state.formData;
-        const newToken = await FungibleToken.init(addr);
+    private async confidentlyUpdateMft(): Promise<boolean> {
+        const { addr, tokenId } = this.state.formData;
+        const newToken = await MultiFungibleToken.init(addr, tokenId);
         this.setState({ token: newToken });
         window.EDITOR.forceUpdate();
         return newToken.ready;
@@ -157,7 +181,7 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
     public override async validateForm(values: FormData): Promise<FormikErrors<FormData>> {
         this.setFormData(values);
         await new Promise((resolve) => this.resolveDebounced(resolve));
-        await this.tryUpdateFt();
+        await this.tryUpdateMft();
         await this.schema
             .transform(({ amount, ...rest }) => ({
                 ...rest,
@@ -199,6 +223,10 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
                     roundtop
                 />
                 <TextField
+                    name="tokenId"
+                    label="Token ID"
+                />
+                <TextField
                     name="receiverId"
                     label="Receiver Address"
                 />
@@ -214,6 +242,12 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
                 <TextField
                     name="memo"
                     label="Memo"
+                    multiline
+                />
+                <TextField
+                    name="msg"
+                    label="Message"
+                    multiline
                 />
                 <UnitField
                     name="gas"
