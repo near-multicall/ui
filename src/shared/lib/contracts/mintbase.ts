@@ -1,5 +1,3 @@
-// TODO: use token functions in proposeMulticallFT
-
 import { view, viewAccount } from "../wallet";
 import { toGas, Big } from "../converter";
 import { STORAGE } from "../persistent";
@@ -11,196 +9,22 @@ import type { Tx } from "../wallet";
 import { args } from "../args/args";
 
 const FACTORY_ADDRESS_SELECTOR: Record<string, string> = {
-    mainnet: "sputnik-dao.near",
-    testnet: "sputnikv2.testnet",
+    mainnet: "mintbase1.near",
+    testnet: "mintspace2.testnet",
 };
-// base URLs for SputnikDAO reference UI. See: https://github.com/near-daos/sputnik-dao-2-ui-reference
-const REFERENCE_UI_URL_SELECTOR: Record<string, string> = {
-    mainnet: "https://v2.sputnik.fund/#",
-    testnet: "https://testnet-v2.sputnik.fund/#",
-};
-// base URLs for AstroDAO UI. See: https://github.com/near-daos/astro-ui
-const ASTRO_UI_URL_SELECTOR: Record<string, string> = {
-    mainnet: "https://app.astrodao.com",
-    testnet: "https://testnet.app.astrodao.com",
-};
-// what SputnikDAO UIs are supported? (P.S.: do NOT use const or string enum here)
-enum SputnikUI {
-    REFERENCE_UI,
-    ASTRO_UI,
-}
-// SputnikDAO contract mapping: version <-> code hashes
-const CONTRACT_CODE_HASHES_SELECTOR: Record<string, string[]> = {
-    mainnet: [
-        "8RMeZ5cXDap6TENxaJKtigRYf3n139iHmTRe8ZUNey6N", // v2.0
-        "8jmhwSkNeAWCRqsr2KoD7d8BzDYorEz3a3iHuM9Gykrg", // v2.1 (with gas fix)
-        "2Zof1Tyy4pMeJM48mDSi5ww2QQhTz97b9S8h6W6r4HnK", // v3.0
-    ],
-    testnet: [
-        "ZGdM2TFdQpcXrxPxvq25514EViyi9xBSboetDiB3Uiq", // 2.0
-        "8LN56HLNjvwtiNb6pRVNSTMtPgJYqGjAgkVSHRiK5Wfv", // v2.1 (with gas fix)
-        "783vth3Fg8MBBGGFmRqrytQCWBpYzUcmHoCq4Mo8QqF5", // v3.0
-    ],
+// base URLs for Mintbase UI
+const UI_URL_SELECTOR: Record<string, string> = {
+    mainnet: "https://www.mintbase.io",
+    testnet: "https://testnet.mintbase.io",
 };
 
-type AstroApiDaoInfo = {
-    createdAt: string;
-    transactionHash: string;
-    id: string;
-    config: object;
-    numberOfMembers: number;
-    numberOfGroups: number;
-    council: string[];
-    accountIds: string[];
-    status: string;
-    activeProposalCount: number;
-    totalProposalCount: number;
-    totalDaoFunds: number;
-    isCouncil: boolean;
-};
+const BASE_URI_ARWEAVE = "https://arweave.net";
 
-// Define structure of a SputnikDAO policy
-type Policy = {
-    // List of roles and permissions for them in the current policy.
-    roles: any[];
-    // Default vote policy. Used when given proposal kind doesn't have special policy.
-    default_vote_policy: object;
-    // Proposal bond. (u128 as a string)
-    proposal_bond: string;
-    // Expiration period for proposals in nanoseconds. (u64)
-    proposal_period: string;
-    // Bond for claiming a bounty. (u128 as a string)
-    bounty_bond: string;
-    // Period in which giving up on bounty is not punished. (u64)
-    bounty_forgiveness_period: string;
-};
-
-// structure returned by contract when fetching proposals.
-type ProposalOutput = { id: number } & Proposal;
-type Vote = "Approve" | "Reject" | "Remove";
-type ProposalKind =
-    | "ChangeConfig"
-    | "ChangePolicy"
-    | "AddMemberToRole"
-    | "RemoveMemberFromRole"
-    | "FunctionCall"
-    | "UpgradeSelf"
-    | "UpgradeRemote"
-    | "Transfer"
-    | "SetStakingContract"
-    | "AddBounty"
-    | "BountyDone"
-    | "Vote"
-    | "FactoryInfoUpdate"
-    | "ChangePolicyAddOrUpdateRole"
-    | "ChangePolicyRemoveRole"
-    | "ChangePolicyUpdateDefaultVotePolicy"
-    | "ChangePolicyUpdateParameters";
-
-type ProposalAction =
-    // Action to add proposal. Used internally.
-    | "AddProposal"
-    // Action to remove given proposal. Used for immediate deletion in special cases.
-    | "RemoveProposal"
-    // Vote to approve given proposal or bounty.
-    | "VoteApprove"
-    // Vote to reject given proposal or bounty.
-    | "VoteReject"
-    // Vote to remove given proposal or bounty (because it's spam).
-    | "VoteRemove"
-    // Finalize proposal, called when it's expired to return the funds
-    // (or in the future can be used for early proposal closure).
-    | "Finalize"
-    // Move a proposal to the hub to shift into another DAO.
-    | "MoveToHub";
-
-// Define structure of a proposal
-type Proposal = {
-    // Original proposer.
-    proposer: string;
-    // Description of this proposal.
-    description: string;
-    // Kind of proposal with relevant information.
-    kind: Record<ProposalKind, any>;
-    // Current status of the proposal.
-    status: ProposalStatus;
-    // Count of votes per role per decision: yes / no / spam.
-    vote_counts: Record<string, [number, number, number]>;
-    // Map of who voted and how.
-    votes: Record<string, Vote>;
-    // Submission time (for voting period). (u64 as a string)
-    submission_time: string;
-};
-
-const ProposalKindPolicyLabel: Record<ProposalKind, string> = {
-    ChangeConfig: "config",
-    ChangePolicy: "policy",
-    AddMemberToRole: "add_member_to_role",
-    RemoveMemberFromRole: "remove_member_from_role",
-    FunctionCall: "call",
-    UpgradeSelf: "upgrade_self",
-    UpgradeRemote: "upgrade_remote",
-    Transfer: "transfer",
-    SetStakingContract: "set_vote_token",
-    AddBounty: "add_bounty",
-    BountyDone: "bounty_done",
-    Vote: "vote",
-    FactoryInfoUpdate: "factory_info_update",
-    ChangePolicyAddOrUpdateRole: "policy_add_or_update_role",
-    ChangePolicyRemoveRole: "policy_remove_role",
-    ChangePolicyUpdateDefaultVotePolicy: "policy_update_default_vote_policy",
-    ChangePolicyUpdateParameters: "policy_update_parameters",
-};
-
-// Status of a proposal.
-enum ProposalStatus {
-    InProgress = "InProgress",
-    // If quorum voted yes, this proposal is successfully approved.
-    Approved = "Approved",
-    // If quorum voted no, this proposal is rejected. Bond is returned.
-    Rejected = "Rejected",
-    // If quorum voted to remove (e.g. spam), this proposal is rejected and bond is not returned.
-    // Interfaces shouldn't show removed proposals.
-    Removed = "Removed",
-    // Expired after period of time.
-    Expired = "Expired",
-    // If proposal was moved to Hub or somewhere else.
-    Moved = "Moved",
-    // If proposal has failed when finalizing. Allowed to re-finalize again to either expire or approved.
-    Failed = "Failed",
-}
-
-// SputnikDAO FunctionCall structure
-type FunctionCall = {
-    receiver_id: string;
-    actions: FunctionCallAction[];
-};
-
-type FunctionCallAction = {
-    method_name: string;
-    args: object;
-    deposit: string; // (u128 as a string)
-    gas: string; // (u64 as a string)
-};
-
-class SputnikDAO {
+class MintbaseStore {
     static FACTORY_ADDRESS: string = FACTORY_ADDRESS_SELECTOR[window.NEAR_ENV];
-    static REFERENCE_UI_BASE_URL: string = REFERENCE_UI_URL_SELECTOR[window.NEAR_ENV];
-    static ASTRO_UI_BASE_URL: string = ASTRO_UI_URL_SELECTOR[window.NEAR_ENV];
-    static CONTRACT_CODE_HASHES: string[] = CONTRACT_CODE_HASHES_SELECTOR[window.NEAR_ENV];
+    static UI_BASE_URL: string = UI_URL_SELECTOR[window.NEAR_ENV];
 
     address: string;
-    // needs initialization, but start with an empty policy
-    policy: Policy = {
-        roles: [],
-        default_vote_policy: {},
-        proposal_bond: "",
-        proposal_period: "",
-        bounty_bond: "",
-        bounty_forgiveness_period: "",
-    };
-    // needs initialization, but start with -1 because it's distinguishable from a real ID ( >= 0 )
-    lastProposalId: number = -1;
     // DAO instance is ready when info (policy...) are fetched & assigned correctly
     ready: boolean = false;
 
@@ -209,43 +33,46 @@ class SputnikDAO {
         this.address = daoAddress;
     }
 
-    // create and initialize a DAO instance
-    static async init(daoAddress: string): Promise<SputnikDAO> {
+    // create and initialize a Mintbase store instance
+    static async init(daoAddress: string): Promise<MintbaseStore> {
         // verify address is a SputnikDAO, fetch DAO info and mark it ready
-        const newDAO = new SputnikDAO(daoAddress);
-        const [isDAO, daoPolicy, daoLastProposalId] = await Promise.all([
+        const newStore = new MintbaseStore(daoAddress);
+        const [isStore, daoPolicy, daoLastProposalId] = await Promise.all([
             // on failure set isDAO to false
-            SputnikDAO.isSputnikDAO(daoAddress).catch((err) => {
-                return false;
-            }),
+            MintbaseStore.isMintbaseStore(daoAddress).catch(() => false),
             // on failure set policy to default policy (empty)
-            newDAO.getPolicy().catch((err) => {
+            newStore.getPolicy().catch((err) => {
                 return newDAO.policy;
             }),
             // on failure set last proposal ID to default (-1)
-            newDAO.getLastProposalId().catch((err) => {
+            newStore.getLastProposalId().catch((err) => {
                 return newDAO.lastProposalId;
             }),
         ]);
         newDAO.policy = daoPolicy;
         newDAO.lastProposalId = daoLastProposalId;
         // set DAO to ready if address is a DAO and lastProposalID + policy got updated.
-        if (isDAO === true && newDAO.lastProposalId >= 0 && newDAO.policy.roles.length >= 1) {
+        if (isStore === true && newDAO.lastProposalId >= 0 && newDAO.policy.roles.length >= 1) {
             newDAO.ready = true;
         }
-        return newDAO;
+        return newStore;
     }
 
     /**
-     * check of given accountId is a sputnikDAO instance.
-     * uses code_hash of the contract deployed on accountId.
+     * check of given storeId is a Mintbase store.
      *
-     * @param accountId
+     * @param storeId
      */
-    static async isSputnikDAO(accountId: string): Promise<boolean> {
-        const accountInfo = await viewAccount(accountId);
-        const codeHash: string = accountInfo.code_hash;
-        return SputnikDAO.CONTRACT_CODE_HASHES.includes(codeHash);
+    static async isMintbaseStore(storeId: string): Promise<boolean> {
+        return MintbaseStore.checkContainsStore(storeId);
+    }
+
+    static async checkContainsStore(storeId: string): Promise<boolean> {
+        return view(MintbaseStore.FACTORY_ADDRESS, "check_contains_store", { store_id: storeId });
+    }
+
+    static async getFactoryFee(): Promise<string> {
+        return view(MintbaseStore.FACTORY_ADDRESS, "get_factory_fee", {});
     }
 
     static async getUserDaosInfo(accountId: string): Promise<AstroApiDaoInfo[]> {
@@ -621,5 +448,5 @@ class SputnikDAO {
     }
 }
 
-export { SputnikDAO, SputnikUI, ProposalKindPolicyLabel, ProposalStatus };
+export { MintbaseStore, BASE_URI_ARWEAVE };
 export type { FunctionCall, FunctionCallAction, ProposalOutput, ProposalKind, ProposalAction };
