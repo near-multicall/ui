@@ -2,12 +2,13 @@ export const initialData = {
     tasks: {
         "task-i1": { id: "task-i1", addr: "", func: "" },
         "task-i2": { id: "task-i2", addr: "near", func: "ft_transfer" },
-        "task-i3": { id: "task-i3", addr: "multicall", func: "near_transfer" },
+        "task-i3": { id: "task-i3", addr: "near", func: "ft_transfer_call" },
         "task-i4": { id: "task-i4", addr: "near", func: "mft_transfer" },
         "task-i5": { id: "task-i5", addr: "near", func: "mft_transfer_call" },
         "task-i6": { id: "task-i6", addr: "near", func: "deposit_and_stake" },
         "task-i7": { id: "task-i7", addr: "near", func: "unstake" },
         "task-i8": { id: "task-i8", addr: "near", func: "withdraw" },
+        "task-i9": { id: "task-i9", addr: "multicall", func: "near_transfer" },
     },
     columns: {
         "column-0": {
@@ -18,7 +19,17 @@ export const initialData = {
         menu: {
             id: "menu",
             title: "Infinite Column",
-            taskIds: ["task-i1", "task-i2", "task-i3", "task-i4", "task-i5", "task-i6", "task-i7", "task-i8"],
+            taskIds: [
+                "task-i1",
+                "task-i2",
+                "task-i3",
+                "task-i4",
+                "task-i5",
+                "task-i6",
+                "task-i7",
+                "task-i8",
+                "task-i9",
+            ],
         },
     },
     columnOrder: ["column-0"],

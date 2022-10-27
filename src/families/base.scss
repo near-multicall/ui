@@ -154,7 +154,7 @@ form.edit {
     @include mixin.full;
     @include mixin.center-items(flex-start);
     @include mixin.no-scrollbar;
-    flex-flow: column wrap;
+    flex-flow: column nowrap;
     padding: 0 size.$gap;
     width: calc(100% - 2 * size.$gap);
     overflow-y: scroll;
