@@ -94,6 +94,7 @@ addMethod(_StringSchema, "multicall", function multicall(message = locale.string
         test: async (value) => {
             if (value == null) return true;
             try {
+                // TODO store and expose query results in retained data for later use
                 return !!(await Multicall.isMulticall(value));
             } catch (e) {
                 // TODO check reason for error
@@ -151,9 +152,7 @@ addMethod(_StringSchema, "intoUrl", function intoUrl() {
 addMethod(
     _StringSchema,
     "intoBaseAddress",
-    function intoBaseAddress(
-        postfixes: string[] = [SputnikDAO.FACTORY_ADDRESS, window.nearConfig.MULTICALL_FACTORY_ADDRESS]
-    ) {
+    function intoBaseAddress(postfixes: string[] = [SputnikDAO.FACTORY_ADDRESS, Multicall.FACTORY_ADDRESS]) {
         return this.address().transform((value) => {
             let res = value;
             for (let pf of postfixes) {
