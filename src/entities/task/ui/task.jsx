@@ -93,6 +93,54 @@ export class Task extends Component {
                                 json={json}
                             />
                         );
+                    case "ft_transfer_call":
+                        return (
+                            <Family.Near.FtTransferCall
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
+                    case "mft_transfer":
+                        return (
+                            <Family.Near.MftTransfer
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
+                    case "mft_transfer_call":
+                        return (
+                            <Family.Near.MftTransferCall
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
+                    case "deposit_and_stake":
+                        return (
+                            <Family.Near.DepositAndStake
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
+                    case "unstake":
+                        return (
+                            <Family.Near.Unstake
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
+                    case "withdraw":
+                        return (
+                            <Family.Near.Withdraw
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
                     case "storage_deposit":
                         return (
                             <Family.Near.StorageDeposit

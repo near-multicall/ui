@@ -29,6 +29,7 @@ export class Transfer extends BaseTask<FormData> {
         .transform(({ gas, gasUnit, amount, amountUnit, transferAll, ...rest }) => ({
             ...rest,
             gas: arx.big().intoParsed(gasUnit).cast(gas),
+            // If transferAll, then amount takes a valid dummy value to silence errors.
             amount: transferAll ? 0 : arx.big().intoParsed(amountUnit).cast(amount),
         }))
         .requireAll()
@@ -93,8 +94,7 @@ export class Transfer extends BaseTask<FormData> {
     }
 
     public override toCall(): Call {
-        const { addr, func, gas, gasUnit, depo, depoUnit, accountId, amount, amountUnit, transferAll } =
-            this.state.formData;
+        const { addr, func, gas, gasUnit, depo, accountId, amount, amountUnit, transferAll } = this.state.formData;
 
         if (!arx.big().isValidSync(gas)) throw new CallError("Failed to parse gas input value", this.props.id);
         if (!arx.big().isValidSync(amount)) throw new CallError("Failed to parse amount input value", this.props.id);
@@ -113,7 +113,7 @@ export class Transfer extends BaseTask<FormData> {
                               amount: arx.big().intoParsed(amountUnit).cast(amount).toFixed(),
                           },
                     gas: arx.big().intoParsed(gasUnit).cast(gas).toFixed(),
-                    depo: arx.big().intoParsed(depoUnit).cast(depo).toFixed(),
+                    depo,
                 },
             ],
         };

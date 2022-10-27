@@ -5,7 +5,13 @@
 .near-ft-transfer-task,
 .near-storage-withdraw-task,
 .near-storage-deposit-task,
-.near-storage-unregister-task {
+.near-storage-unregister-task,
+.near-ft-transfer-call-task,
+.near-mft-transfer-task,
+.near-mft-transfer-call-task,
+.near-deposit-and-stake-task,
+.near-unstake-task,
+.near-withdraw-task {
     background: color.$lightest;
     .name {
         color: color.$text !important;
