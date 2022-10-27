@@ -141,6 +141,30 @@ export class Task extends Component {
                                 json={json}
                             />
                         );
+                    case "storage_deposit":
+                        return (
+                            <Family.Near.StorageDeposit
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
+                    case "storage_withdraw":
+                        return (
+                            <Family.Near.StorageWithdraw
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
+                    case "storage_unregister":
+                        return (
+                            <Family.Near.StorageUnregister
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
                 }
 
             default:

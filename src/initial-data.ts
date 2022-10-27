@@ -8,7 +8,10 @@ export const initialData = {
         "task-i6": { id: "task-i6", addr: "near", func: "deposit_and_stake" },
         "task-i7": { id: "task-i7", addr: "near", func: "unstake" },
         "task-i8": { id: "task-i8", addr: "near", func: "withdraw" },
-        "task-i9": { id: "task-i9", addr: "multicall", func: "near_transfer" },
+        "task-i9": { id: "task-i9", addr: "near", func: "storage_withdraw" },
+        "task-i10": { id: "task-i10", addr: "near", func: "storage_unregister" },
+        "task-i11": { id: "task-i11", addr: "near", func: "storage_deposit" },
+        "task-i12": { id: "task-i12", addr: "multicall", func: "near_transfer" },
     },
     columns: {
         "column-0": {
@@ -29,6 +32,9 @@ export const initialData = {
                 "task-i7",
                 "task-i8",
                 "task-i9",
+                "task-i10",
+                "task-i11",
+                "task-i12",
             ],
         },
     },

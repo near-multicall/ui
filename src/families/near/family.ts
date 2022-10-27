@@ -1,4 +1,7 @@
 export { FtTransfer } from "./ft-transfer";
+export { StorageWithdraw } from "./storage-withdraw";
+export { StorageUnregister } from "./storage-unregister";
+export { StorageDeposit } from "./storage-deposit";
 export { FtTransferCall } from "./ft-transfer-call";
 export { MftTransfer } from "./mft-transfer";
 export { MftTransferCall } from "./mft-transfer-call";
