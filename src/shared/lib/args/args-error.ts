@@ -17,7 +17,9 @@ const locale = {
         contract: "value must have a contract deployed",
         sputnikDao: "address must belong to a sputnik dao contract",
         multicall: "address must belong to a multicall contract",
-        tokenContract: "address must belong to a token contract",
+        ft: "address must belong to a token contract",
+        mft: "token id must belong to a multi-token contract",
+        stakingPool: "address must belong to a staking pool",
     },
 };
 
@@ -88,14 +90,14 @@ function retain(this: any, options?: Partial<RetainOptions>) {
  * @returns
  */
 function checkSync(this: any, value: any, validateOptions?: ValidateOptions): void {
-    return this._checkSync(this.cast(value), validateOptions);
+    return this._checkSync(this.cast(value), null, validateOptions);
 }
 
-function _checkSync(this: any, value: any, validateOptions?: ValidateOptions): void {
+function _checkSync(this: any, value: any, parent: any, validateOptions?: ValidateOptions): void {
     if (this.type === "object" && !this.spec.meta?.retained?.ignoreAll) {
         const ret = this.spec.meta?.retained;
         const fields = Object.entries(this.fields).filter(([k, v]) => !ret?.ignoreFields?.includes(k));
-        fields.forEach(([k, v]) => (v as any)._checkSync(value[k], validateOptions));
+        fields.forEach(([k, v]) => (v as any)._checkSync(value[k], value, validateOptions));
         const errors = fields.map(([k, v]) => (v as any).errors()).flat();
         const messages = fields
             .map(([k, v]) => (v as any).messages())
@@ -114,7 +116,7 @@ function _checkSync(this: any, value: any, validateOptions?: ValidateOptions): v
     } else {
         try {
             const ret = this.spec.meta?.retained;
-            this.validateSync(ret?.customValue ?? value, validateOptions);
+            this.validateSync(ret?.customValue ?? value, { ...validateOptions, parent });
             if (!!ret && !ret.dummy)
                 this.spec.meta.retained = {
                     ...ret,
@@ -152,14 +154,14 @@ function _checkSync(this: any, value: any, validateOptions?: ValidateOptions): v
  * @returns
  */
 async function check(this: any, value: any, validateOptions?: ValidateOptions): Promise<void> {
-    return await this._check(this.cast(value), validateOptions);
+    return await this._check(this.cast(value), null, validateOptions);
 }
 
-async function _check(this: any, value: any, validateOptions?: ValidateOptions): Promise<void> {
+async function _check(this: any, value: any, parent: any, validateOptions?: ValidateOptions): Promise<void> {
     if (this.type === "object" && !this.spec.meta?.retained?.ignoreAll) {
         const ret = this.spec.meta?.retained;
         const fields = Object.entries(this.fields).filter(([k, v]) => !ret?.ignoreFields?.includes(k));
-        await Promise.all(fields.map(async ([k, v]) => await (v as any)._check(value[k], validateOptions)));
+        await Promise.all(fields.map(async ([k, v]) => await (v as any)._check(value[k], value, validateOptions)));
         const errors = fields.map(([k, v]) => (v as any).errors()).flat();
         const messages = fields
             .map(([k, v]) => (v as any).messages())
@@ -178,7 +180,7 @@ async function _check(this: any, value: any, validateOptions?: ValidateOptions):
     } else {
         try {
             const ret = this.spec.meta?.retained;
-            await this.validate(ret?.customValue ?? value, validateOptions);
+            await this.validate(ret?.customValue ?? value, { ...validateOptions, parent });
             if (!!ret && !ret.dummy)
                 this.spec.meta.retained = {
                     ...ret,

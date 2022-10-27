@@ -13,8 +13,9 @@ class BigSchema extends MixedSchema<Big> {
             let failed = false;
             const message = locale.big.invalid;
             return this.transform((value) => {
+                if (value == null) return null;
                 try {
-                    return Big(value.toString());
+                    return Big(value);
                 } catch (e) {
                     failed = true;
                     return null;

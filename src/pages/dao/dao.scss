@@ -82,7 +82,7 @@
         background-color: color.$light;
     }
 
-    &-body {
+    &-content {
         @include mixin.full;
         gap: size.$gap;
         padding: size.$gap;

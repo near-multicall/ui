@@ -1,13 +1,23 @@
-import { TokenLabel } from "../../../shared/ui/components";
-import type { DaoContracts } from "../../types";
-import { NearTokenBalancesModel } from "../model/near-balances";
+import { IconLabel, NearIcons } from "../../../shared/ui/components";
 
-interface NearTokenBalancesRenderProps {
-    contracts: DaoContracts;
-}
+import { NearTokenBalancesModel } from "../model/near-balances";
+import { type NearTokenEntity } from "../config";
+
+interface NearTokenBalancesRenderProps extends NearTokenEntity.Dependencies {}
 
 export const nearTokenBalancesRender = ({ contracts }: NearTokenBalancesRenderProps) => {
-    const { data } = NearTokenBalancesModel.useData(contracts);
+    const { data } = NearTokenBalancesModel.useTokenFrom(contracts);
 
-    return !data ? null : [<TokenLabel native />, data.multicall, data.dao, data.total];
+    return !data
+        ? null
+        : [
+              <IconLabel
+                  icon={<NearIcons.NativeTokenFilled />}
+                  label="NEAR"
+              />,
+
+              data.multicall,
+              data.dao,
+              data.total,
+          ];
 };

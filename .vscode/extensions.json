@@ -3,6 +3,8 @@
         "dbaeumer.vscode-eslint",
         "esbenp.prettier-vscode",
         "gruntfuggly.todo-tree",
-        "aaron-bond.better-comments"
+        "aaron-bond.better-comments",
+        "streetsidesoftware.code-spell-checker-scientific-terms",
+        "streetsidesoftware.code-spell-checker"
     ]
 }

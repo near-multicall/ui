@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { HTMLAttributes, PropsWithChildren } from "react";
 
-import "./facet.scss";
+import "./tile.scss";
 
 const _Tile = "Tile";
 

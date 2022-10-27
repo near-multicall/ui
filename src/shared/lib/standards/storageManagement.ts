@@ -1,5 +1,7 @@
-import { tx, view } from "../wallet";
-import { toGas, toYocto } from "../converter";
+import { view } from "../wallet";
+import { toGas } from "../converter";
+
+import type { Tx } from "../wallet";
 
 // Storage management standard follow NEP-145. See: https://nomicon.io/Standards/StorageManagement
 class StorageManagement {
@@ -47,17 +49,24 @@ class StorageManagement {
     //
     // Returns the StorageBalance structure showing updated balances.
     // IMPORTANT!!! This method has an extra parameter "amount" to control the amount in attached deposit
-    async storageDeposit(accountId: string, registrationOnly: boolean, amount: string): Promise<StorageBalance> {
-        return tx(
-            this.address,
-            "storage_deposit",
-            {
-                account_id: accountId,
-                registration_only: registrationOnly,
-            },
-            toGas("5"), // 5 Tgas
-            amount
-        );
+    async storageDeposit(accountId: string, registrationOnly: boolean, amount: string): Promise<Tx> {
+        return {
+            receiverId: this.address,
+            actions: [
+                {
+                    type: "FunctionCall",
+                    params: {
+                        methodName: "storage_deposit",
+                        args: {
+                            account_id: accountId,
+                            registration_only: registrationOnly,
+                        },
+                        gas: toGas("5"), // 5 Tgas;
+                        deposit: amount,
+                    },
+                },
+            ],
+        };
     }
 
     // Withdraw specified amount of available Ⓝ for predecessor account.

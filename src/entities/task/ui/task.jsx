@@ -58,8 +58,12 @@ export class Task extends Component {
     }
 
     componentWillUnmount() {
-        TASKS.splice(TASKS.indexOf(this), 1);
-        EDITOR.forceUpdate();
+        const index = window.TASKS.indexOf(this);
+
+        if (index === -1) return;
+
+        window.TASKS.splice(index, 1);
+        window.EDITOR.forceUpdate();
     }
 
     getTaskType() {
@@ -92,6 +96,46 @@ export class Task extends Component {
                     case "ft_transfer_call":
                         return (
                             <Family.Near.FtTransferCall
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
+                    case "mft_transfer":
+                        return (
+                            <Family.Near.MftTransfer
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
+                    case "mft_transfer_call":
+                        return (
+                            <Family.Near.MftTransferCall
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
+                    case "deposit_and_stake":
+                        return (
+                            <Family.Near.DepositAndStake
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
+                    case "unstake":
+                        return (
+                            <Family.Near.Unstake
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
+                    case "withdraw":
+                        return (
+                            <Family.Near.Withdraw
                                 ref={this.instance}
                                 id={this.id}
                                 json={json}
