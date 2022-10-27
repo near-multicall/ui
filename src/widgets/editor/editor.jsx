@@ -32,6 +32,7 @@ export class Editor extends Component {
                 initialValues={editing.state.formData}
                 validate={(values) => editing.validateForm(values)}
                 onSubmit={() => {}}
+                key={editingID}
             >
                 <>
                     <editing.Editor />
