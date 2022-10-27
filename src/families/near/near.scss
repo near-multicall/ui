@@ -3,10 +3,12 @@
 @use "sass/size";
 
 .near-ft-transfer-task,
-.near-ft-transfer-task,
 .near-ft-transfer-call-task,
+.near-mft-transfer-task,
 .near-mft-transfer-call-task,
-.near-mft-transfer-task {
+.near-deposit-and-stake-task,
+.near-unstake-task,
+.near-withdraw-task {
     background: color.$lightest;
     .name {
         color: color.$text !important;

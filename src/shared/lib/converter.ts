@@ -77,6 +77,7 @@ export {
     unitToDecimals,
     parseTokenAmount,
     formatTokenAmount,
+    removeTrailingZeros,
     toTGas,
     toGas,
     toNEAR,

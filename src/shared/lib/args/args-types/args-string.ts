@@ -3,6 +3,7 @@ import Reference from "yup/lib/Reference";
 import { hasContract } from "../../contracts/generic";
 import { Multicall } from "../../contracts/multicall";
 import { SputnikDAO } from "../../contracts/sputnik-dao";
+import { StakingPool } from "../../contracts/staking-pool";
 import { FungibleToken } from "../../standards/fungibleToken";
 import { MultiFungibleToken } from "../../standards/multiFungibleToken";
 import { locale, addErrorMethods, ErrorMethods } from "../args-error";
@@ -16,6 +17,7 @@ declare module "yup" {
         multicall(message?: string): this;
         ft(message?: string): this;
         mft(addressKey: string, message?: string): this;
+        stakingPool(message?: string): this;
         intoUrl(): this;
         intoBaseAddress(prefixes?: string[]): this;
         append(appendStr: string): this;
@@ -124,7 +126,7 @@ addMethod(_StringSchema, "ft", function ft(message = locale.string.ft) {
     });
 });
 
-// ensure string is a valid NEAR address with a token contract
+// ensure string is a valid NEAR address with a multi token contract
 addMethod(_StringSchema, "mft", function mft(addressKey: string, message = locale.string.mft) {
     return this.test({
         name: "mft",
@@ -134,6 +136,25 @@ addMethod(_StringSchema, "mft", function mft(addressKey: string, message = local
             try {
                 const multiFungibleToken = await MultiFungibleToken.init(context.parent[addressKey], value);
                 return multiFungibleToken.ready;
+            } catch (e) {
+                // TODO check reason for error
+                // console.warn("error occured while checking for multicall instance at", value);
+                return false;
+            }
+        },
+    });
+});
+
+// ensure string is a valid NEAR address with a staking pool contract
+addMethod(_StringSchema, "stakingPool", function stakingPool(message = locale.string.stakingPool) {
+    return this.address().test({
+        name: "stakingPool",
+        message,
+        test: async (value) => {
+            if (value == null) return true;
+            try {
+                const stakingPool = await StakingPool.init(value);
+                return stakingPool.ready;
             } catch (e) {
                 // TODO check reason for error
                 // console.warn("error occured while checking for multicall instance at", value);
