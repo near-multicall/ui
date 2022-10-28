@@ -169,10 +169,15 @@
         }
 
         &--compact &-slot {
+            display: flex;
+            align-items: center;
+
             &--start {
+                justify-content: start;
             }
 
             &--end {
+                justify-content: end;
             }
         }
     }

@@ -77,7 +77,12 @@ export const TableRowCompact = ({
                     )}
 
                     {slots?.Start && (
-                        <div className={_TableRow + "-content" + "-slot" + "--start"}>
+                        <div
+                            className={clsx(
+                                _TableRow + "-content" + "-slot",
+                                _TableRow + "-content" + "-slot" + "--start"
+                            )}
+                        >
                             <slots.Start rowId={id} />
                         </div>
                     )}
@@ -86,7 +91,12 @@ export const TableRowCompact = ({
                     <span>{cells ? cells[headerCellIndex] : "No data"}</span>
 
                     {slots?.End && (
-                        <div className={_TableRow + "-content" + "-slot" + "--end"}>
+                        <div
+                            className={clsx(
+                                _TableRow + "-content" + "-slot",
+                                _TableRow + "-content" + "-slot" + "--end"
+                            )}
+                        >
                             <slots.End rowId={id} />
                         </div>
                     )}
