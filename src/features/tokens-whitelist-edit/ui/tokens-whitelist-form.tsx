@@ -18,20 +18,20 @@ export const TokensWhitelistForm = ({
 }: TokensWhitelistFormProps) => {
     const [editModeEnabled, editModeSwitch] = useState(!disabled);
 
-    const [addTokens, markForAddition] = useState<TokensWhitelistEditFeature.FormState["addTokens"]>([]),
-        [removeTokens, markForRemoval] = useState<TokensWhitelistEditFeature.FormState["removeTokens"]>([]);
+    const [addTokens, markForAddition] = useState<TokensWhitelistEditFeature.FormStates["addTokens"]>(new Set()),
+        [removeTokens, markForRemoval] = useState<TokensWhitelistEditFeature.FormStates["removeTokens"]>(new Set());
 
     const tokenToAddAddress = useMemo(() => new ArgsString(""), []);
 
     const onAdditionRequest = useCallback(
         (input: string) => {
-            if (removeTokens.includes(input)) {
-                markForRemoval((markedForRemoval) => markedForRemoval.filter((address) => address !== input));
+            if (removeTokens.has(input)) {
+                markForRemoval(
+                    (markedForRemoval) => new Set(Array.from(markedForRemoval).filter((address) => address !== input))
+                );
             } else {
                 markForAddition((markedForAddition) =>
-                    markedForAddition.concat(
-                        [input].filter((address) => !markedForAddition.includes(address) && address.length > 0)
-                    )
+                    input.length > 0 ? new Set(markedForAddition.add(input)) : markedForAddition
                 );
             }
 
@@ -41,40 +41,46 @@ export const TokensWhitelistForm = ({
         [markForAddition, markForRemoval, removeTokens]
     );
 
-    const [selected, onSelected] = useState<string[]>([]);
-
-    const onRemovalRequest = useCallback(() => {
-        if (selected.some((address) => addTokens.includes(address))) {
-            markForAddition((markedForAddition) => markedForAddition.filter((address) => !selected.includes(address)));
-        }
-
-        markForRemoval((markedForRemoval) =>
-            markedForRemoval.concat(
-                selected.filter((address) => !markedForRemoval.includes(address) && !addTokens.includes(address))
-            )
-        );
-
-        editModeSwitch(false);
-    }, [addTokens, editModeSwitch, markForAddition, markForRemoval, selected]);
+    const onRemovalRequest = useCallback(
+        (input: string) => {
+            if (addTokens.has(input)) {
+                markForAddition(
+                    (markedForAddition) => new Set(Array.from(markedForAddition).filter((address) => address !== input))
+                );
+            } else {
+                markForRemoval((markedForRemoval) => new Set(markedForRemoval.add(input)));
+            }
+        },
+        [addTokens, editModeSwitch, markForAddition, markForRemoval]
+    );
 
     const formReset = useCallback(() => {
-        markForAddition([]);
-        markForRemoval([]);
+        markForAddition(new Set());
+        markForRemoval(new Set());
         editModeSwitch(false);
     }, [editModeSwitch, markForAddition, markForRemoval]);
 
     useEffect(disabled ? formReset : Fn.returnVoid, [disabled, formReset]);
 
-    useEffect(() => onEdit({ addTokens, removeTokens }), [addTokens, removeTokens, onEdit]);
+    useEffect(
+        () => onEdit({ addTokens: Array.from(addTokens), removeTokens: Array.from(removeTokens) }),
+        [addTokens, removeTokens, onEdit]
+    );
 
     return (
         <MulticallInstance.TokensWhitelistTable
             ItemProps={{
                 slots: {
-                    End: ({ rowId }) => <></>,
+                    End: editModeEnabled
+                        ? ({ rowId }) => (
+                              <IconButton onClick={() => onRemovalRequest(rowId)}>
+                                  <DeleteOutlined fontSize="large" />
+                              </IconButton>
+                          )
+                        : void null,
                 },
             }}
-            additionalItems={addTokens}
+            additionalItems={Array.from(addTokens)}
             footer={
                 editModeEnabled ? (
                     <TextInput
@@ -93,24 +99,15 @@ export const TokensWhitelistForm = ({
             }
             headingCorners={{
                 end: editModeEnabled ? (
-                    <>
-                        {selected.length > 0 && (
-                            <IconButton onClick={onRemovalRequest}>
-                                <DeleteOutlined />
-                            </IconButton>
-                        )}
-
-                        <IconButton onClick={formReset}>
-                            <CancelOutlined />
-                        </IconButton>
-                    </>
+                    <IconButton onClick={formReset}>
+                        <CancelOutlined />
+                    </IconButton>
                 ) : (
                     <IconButton onClick={() => editModeSwitch(true)}>
                         <EditOutlined />
                     </IconButton>
                 ),
             }}
-            onItemsSelected={editModeEnabled ? onSelected : null}
             {...{ className, controllerContractAddress }}
         />
     );

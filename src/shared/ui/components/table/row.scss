@@ -108,7 +108,7 @@
                             display: none;
                         }
 
-                        &:last-child {
+                        &:last-of-type {
                             font-size: size.$large-text;
                         }
                     }
@@ -178,6 +178,10 @@
 
             &--end {
                 justify-content: end;
+            }
+
+            > * {
+                position: absolute;
             }
         }
     }
