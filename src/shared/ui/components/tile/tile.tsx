@@ -10,7 +10,7 @@ const _Tile = "Tile";
 export interface TileProps extends PropsWithChildren, Omit<HTMLAttributes<HTMLDivElement>, "className"> {
     classes?: Partial<Record<"root" | "content" | "footer" | "heading", HTMLAttributes<HTMLDivElement>["className"]>>;
     error?: Error | null;
-    footer?: JSX.Element | null;
+    footer?: JSX.Element;
     heading?: string | null;
     headingCorners?: { left?: JSX.Element; right?: JSX.Element };
     loading?: boolean;
