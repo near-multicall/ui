@@ -6,6 +6,7 @@ import { JobSettingsEdit, TokensWhitelistEdit } from "../../../features";
 import { ArgsString } from "../../../shared/lib/args";
 import { MulticallContract, type MulticallConfigChanges } from "../../../shared/lib/contracts/multicall";
 import { SputnikDAOContract } from "../../../shared/lib/contracts/sputnik-dao";
+import { signAndSendTxs } from "../../../shared/lib/wallet";
 import { Button, ButtonGroup, TextInput, Tile } from "../../../shared/ui/components";
 import { type MulticallConfigEditorWidget } from "../config";
 
@@ -50,7 +51,8 @@ export const MulticallConfigEditorUI = ({
                 Object.values(Object.assign(formState, update)).filter(({ length }) => length > 0).length > 0
             );
 
-            console.log(formState, proposalDescription);
+            console.log(proposalDescription);
+            console.table(formState);
         },
 
         [editModeSwitch, formState, formStateUpdate, proposalDescription]
@@ -59,11 +61,13 @@ export const MulticallConfigEditorUI = ({
     const onSubmit = useCallback(() => {
         SputnikDAOContract.init(controllerContractAddress)
             .then((instanceController) =>
-                instanceController.proposeFunctionCall(
-                    proposalDescription,
-                    multicallContract.address,
-                    MulticallContract.configDiffToProposalActions(formState)
-                )
+                instanceController
+                    .proposeFunctionCall(
+                        proposalDescription,
+                        multicallContract.address,
+                        MulticallContract.configDiffToProposalActions(formState)
+                    )
+                    .then((someTx) => signAndSendTxs([someTx]))
             )
             .catch(console.error);
 
