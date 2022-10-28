@@ -71,7 +71,7 @@ export const Table = ({
             {classicModeRequired && (
                 <TableContainer className={clsx(_Table, className)}>
                     <table>
-                        <TableHead className={`${_Table}-head`}>
+                        <TableHead className={_Table + "-head"}>
                             <MuiTableRow>
                                 {header.map((headerCell, index) => (
                                     <TableCell key={index}>{headerCell}</TableCell>
@@ -96,7 +96,7 @@ export const Table = ({
             )}
 
             {compactModeRequired && (
-                <div className={clsx(`${_Table}--compact`, className)}>
+                <div className={clsx(_Table + "--compact", { [_Table + "--dense"]: dense }, className)}>
                     {rows &&
                         rows.map((row, index) => (
                             <TableRowCompact

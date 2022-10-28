@@ -39,4 +39,8 @@
         flex-flow: column nowrap;
         gap: size.$gap;
     }
+
+    &--compact.Table--dense {
+        gap: calc(size.$gap / 2);
+    }
 }

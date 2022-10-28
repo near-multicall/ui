@@ -27,14 +27,10 @@
     &--compact {
         display: flex;
         flex-direction: column;
-        gap: 0.5 * size.$gap;
+        gap: calc(size.$gap / 2);
         border-radius: size.$task-radius;
-        padding: size.$gap * 0.5;
+        padding: calc(size.$gap / 2);
         background-color: color.$white;
-
-        &--dense {
-            padding: calc(size.$gap * 0.4) calc(size.$gap * 0.6);
-        }
     }
 
     &-content {
@@ -52,7 +48,7 @@
 
             &:not(&--dense) {
                 &:first-of-type {
-                    padding: size.$gap * 0.5;
+                    padding: calc(size.$gap / 2);
                 }
             }
 
