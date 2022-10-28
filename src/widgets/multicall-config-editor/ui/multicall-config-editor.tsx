@@ -30,8 +30,8 @@ export const MulticallConfigEditorUI = ({
         croncatManager: "",
     };
 
-    const [formState, formStateUpdate] = useState<MulticallConfigChanges>(changesDiffInitialState),
-        [proposalDescription, proposalDescriptionUpdate] = useState("");
+    const [formState, formStateUpdate] = useState<MulticallConfigChanges>(changesDiffInitialState);
+    const [proposalDescription, proposalDescriptionUpdate] = useState("");
 
     const formReset = useCallback(
         () => formStateUpdate(changesDiffInitialState),
@@ -59,21 +59,23 @@ export const MulticallConfigEditorUI = ({
         [editModeSwitch, formState, formStateUpdate, proposalDescription]
     );
 
-    const onSubmit = useCallback(() => {
-        SputnikDAOContract.init(controllerContractAddress)
-            .then((instanceController) =>
-                instanceController
-                    .proposeFunctionCall(
-                        proposalDescription,
-                        multicallContract.address,
-                        MulticallContract.configDiffToProposalActions(formState)
-                    )
-                    .then((someTx) => signAndSendTxs([someTx]))
-            )
-            .catch(console.error);
-
-        editModeSwitch(false);
-    }, [controllerContractAddress, editModeSwitch]);
+    const onSubmit = useCallback(
+        (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+            event.preventDefault();
+            SputnikDAOContract.init(controllerContractAddress)
+                .then((instanceController) =>
+                    instanceController
+                        .proposeFunctionCall(
+                            proposalDescription,
+                            multicallContract.address,
+                            MulticallContract.configDiffToProposalActions(formState)
+                        )
+                        .then((someTx) => signAndSendTxs([someTx]))
+                )
+                .catch(console.error);
+        },
+        [controllerContractAddress, proposalDescription]
+    );
 
     return (
         <div className={clsx(_MulticallConfigEditor, className)}>
@@ -129,6 +131,8 @@ export const MulticallConfigEditorUI = ({
                                 proposalDescription.length === 0
                             }
                             label="Submit"
+                            // clicking buttons inside a from element can lead to page refresh.
+                            // IMPORTANT: call event.preventDefault() inside the click handler.
                             onClick={onSubmit}
                         />
                     </ButtonGroup>
