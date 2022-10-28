@@ -4,7 +4,7 @@ import { ChangeEvent, useCallback } from "react";
 
 import "./row.scss";
 
-const _TableRow = "Table-row";
+const _TableRow = "TableRow";
 
 export type TableHeader = string[];
 
@@ -21,6 +21,10 @@ export interface TableRowProps {
     noKeys?: boolean;
     onSelect?: (selectedRow: { id: TableRowProps["id"]; checked: boolean }) => void;
     selectable: boolean;
+    /**
+     * Components that will be rendered inside the target slots of each row with row's id passed as prop
+     */
+    slots?: Partial<Record<"Start" | "End", ({ rowId }: { rowId: TableRowProps["id"] }) => JSX.Element>>;
 }
 
 export const TableRow = ({ cells, header }: TableRowProps) => (
@@ -43,6 +47,7 @@ export const TableRowCompact = ({
     noKeys,
     onSelect,
     selectable,
+    slots,
 }: TableRowProps) => {
     const onSelectMemoized = useCallback(
         (_event: ChangeEvent, checked: boolean) => onSelect?.({ checked, id }),
@@ -66,13 +71,25 @@ export const TableRowCompact = ({
                     key={headerCellIndex}
                 >
                     {selectable && (
-                        <div className={_TableRow + "-content" + "-slot" + "--start"}>
+                        <div className={_TableRow + "-content" + "-checkbox"}>
                             <Checkbox onChange={onSelectMemoized} />
+                        </div>
+                    )}
+
+                    {slots?.Start && (
+                        <div className={_TableRow + "-content" + "-slot" + "--start"}>
+                            <slots.Start rowId={id} />
                         </div>
                     )}
 
                     <span>{headerCell}</span>
                     <span>{cells ? cells[headerCellIndex] : "No data"}</span>
+
+                    {slots?.End && (
+                        <div className={_TableRow + "-content" + "-slot" + "--end"}>
+                            <slots.End rowId={id} />
+                        </div>
+                    )}
                 </div>
             ))}
         </div>

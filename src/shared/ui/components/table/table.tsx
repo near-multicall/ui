@@ -14,8 +14,9 @@ import { TableRowCompact, TableRow, type TableRowProps, TableHeader } from "./ro
 import "./table.scss";
 
 export interface TableProps extends HTMLAttributes<HTMLDivElement>, Pick<TableRowProps, "dense"> {
-    RowComponent?: typeof TableRow;
-    RowCompactComponent?: typeof TableRowCompact;
+    /**
+     * Props to bypass into **each** row
+     */
     RowProps?: Omit<TableRowProps, "cells" | "dense" | "header" | "id" | "selectable">;
     /**
      * `"classic"` mode is a classic table view.
@@ -37,8 +38,6 @@ export interface TableProps extends HTMLAttributes<HTMLDivElement>, Pick<TableRo
 const _Table = "Table";
 
 export const Table = ({
-    RowComponent = TableRow,
-    RowCompactComponent = TableRowCompact,
     RowProps,
     className,
     dense = false,
@@ -82,7 +81,7 @@ export const Table = ({
 
                         <TableBody>
                             {(rows ?? header).map((row, index) => (
-                                <RowComponent
+                                <TableRow
                                     cells={typeof row !== "string" ? row.content : null}
                                     id={typeof row !== "string" ? row.id : index.toString()}
                                     key={`row-${index}`}
@@ -100,7 +99,7 @@ export const Table = ({
                 <div className={clsx(`${_Table}--compact`, className)}>
                     {rows &&
                         rows.map((row, index) => (
-                            <RowCompactComponent
+                            <TableRowCompact
                                 cells={row.content}
                                 id={row.id}
                                 key={index}

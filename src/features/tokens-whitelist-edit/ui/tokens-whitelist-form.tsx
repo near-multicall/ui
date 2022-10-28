@@ -69,6 +69,11 @@ export const TokensWhitelistForm = ({
 
     return (
         <MulticallInstance.TokensWhitelistTable
+            ItemProps={{
+                slots: {
+                    End: ({ rowId }) => <></>,
+                },
+            }}
             additionalItems={addTokens}
             footer={
                 editModeEnabled ? (
@@ -87,7 +92,7 @@ export const TokensWhitelistForm = ({
                 )
             }
             headingCorners={{
-                right: editModeEnabled ? (
+                end: editModeEnabled ? (
                     <>
                         {selected.length > 0 && (
                             <IconButton onClick={onRemovalRequest}>

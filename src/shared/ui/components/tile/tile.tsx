@@ -12,7 +12,7 @@ export interface TileProps extends PropsWithChildren, Omit<HTMLAttributes<HTMLDi
     error?: Error | null;
     footer?: JSX.Element;
     heading?: string | null;
-    headingCorners?: { left?: JSX.Element; right?: JSX.Element };
+    headingCorners?: { start?: JSX.Element; end?: JSX.Element };
     loading?: boolean;
     noData?: boolean;
 }
@@ -30,15 +30,12 @@ export const Tile = ({
     <div className={clsx(_Tile, classes?.root)}>
         {heading && (
             <span className={clsx(`${_Tile}-heading`, classes?.heading)}>
-                {headingCorners?.left && (
-                    <span className={`${_Tile}-heading-corner--left`}>{headingCorners?.left}</span>
+                {headingCorners?.start && (
+                    <span className={`${_Tile}-heading-corner--start`}>{headingCorners?.start}</span>
                 )}
 
                 <h1 className={`${_Tile}-heading-text`}>{heading}</h1>
-
-                {headingCorners?.right && (
-                    <span className={`${_Tile}-heading-corner--right`}>{headingCorners?.right}</span>
-                )}
+                {headingCorners?.end && <span className={`${_Tile}-heading-corner--end`}>{headingCorners?.end}</span>}
             </span>
         )}
 

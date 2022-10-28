@@ -23,14 +23,14 @@
         }
 
         &-corner {
-            &--left,
-            &--right {
+            &--start,
+            &--end {
                 .MuiButtonBase-root {
                     padding: 4px;
                 }
             }
 
-            &--right {
+            &--end {
                 margin-left: auto;
             }
         }

@@ -51,7 +51,8 @@ export const MulticallConfigEditorUI = ({
                 Object.values(Object.assign(formState, update)).filter(({ length }) => length > 0).length > 0
             );
 
-            console.log(proposalDescription);
+            // TODO: Remove before release. This is for debug purposes only
+            console.table({ proposalDescription });
             console.table(formState);
         },
 
@@ -77,25 +78,25 @@ export const MulticallConfigEditorUI = ({
     return (
         <div className={clsx(_MulticallConfigEditor, className)}>
             <MulticallInstance.AdminsTable
-                className={`${_MulticallConfigEditor}-admins`}
+                className={_MulticallConfigEditor + "-admins"}
                 {...{ controllerContractAddress }}
             />
 
             <TokensWhitelistEdit.Form
-                className={`${_MulticallConfigEditor}-tokensWhitelist`}
+                className={_MulticallConfigEditor + "-tokensWhitelist"}
                 disabled={!editMode}
                 {...{ controllerContractAddress, onEdit }}
             />
 
             <JobSettingsEdit.Form
-                className={`${_MulticallConfigEditor}-jobsSettings`}
+                className={_MulticallConfigEditor + "-jobsSettings"}
                 disabled={!editMode}
                 {...{ controllerContractAddress, multicallContract, onEdit }}
             />
 
             <Tile
                 classes={{
-                    content: clsx(`${_MulticallConfigEditor}-proposalForm`, { "is-inEditMode": editMode }),
+                    content: clsx(_MulticallConfigEditor + "-proposalForm", { "is-inEditMode": editMode }),
                 }}
                 heading={editMode ? "Changes proposal" : null}
             >

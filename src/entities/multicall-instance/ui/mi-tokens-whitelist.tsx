@@ -8,16 +8,14 @@ import { multicallInstanceWhitelistedTokenToTableRow } from "./mi-whitelisted-to
 interface MulticallInstanceTokensWhitelistTableProps
     extends MulticallInstanceEntity.Dependencies,
         Pick<TileProps, "footer" | "headingCorners"> {
-    ItemComponent?: TableProps["RowComponent"];
-    ItemCompactComponent?: TableProps["RowCompactComponent"];
+    ItemProps?: TableProps["RowProps"];
     additionalItems?: FungibleToken["address"][];
     className?: string;
     onItemsSelected?: TableProps["onRowsSelected"];
 }
 
 export const MulticallInstanceTokensWhitelistTable = ({
-    ItemComponent,
-    ItemCompactComponent,
+    ItemProps,
     additionalItems,
     className,
     controllerContractAddress,
@@ -36,9 +34,7 @@ export const MulticallInstanceTokensWhitelistTable = ({
         >
             <Scrollable>
                 <Table
-                    RowComponent={ItemComponent}
-                    RowCompactComponent={ItemCompactComponent}
-                    RowProps={{ centeredTitle: true, entitled: true, noKeys: true }}
+                    RowProps={{ centeredTitle: true, entitled: true, noKeys: true, ...ItemProps }}
                     dense
                     displayMode="compact"
                     header={["Contract address"]}

@@ -2,7 +2,7 @@
 @use "sass/size";
 @use "sass/font";
 
-.Table-row {
+.TableRow {
     overflow: hidden;
     position: relative;
     white-space: pre;
@@ -160,13 +160,19 @@
             }
         }
 
+        &--compact &-checkbox {
+            display: flex;
+
+            .MuiCheckbox-root {
+                padding: calc(size.$text / 4);
+            }
+        }
+
         &--compact &-slot {
             &--start {
-                display: flex;
+            }
 
-                .MuiCheckbox-root {
-                    padding: calc(size.$text / 4);
-                }
+            &--end {
             }
         }
     }
