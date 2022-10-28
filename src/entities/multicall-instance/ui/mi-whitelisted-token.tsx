@@ -1,27 +1,19 @@
-import { ArgsAccount } from "../../../shared/lib/args";
 import { FungibleToken } from "../../../shared/lib/standards/fungibleToken";
+import { NearLink } from "../../../shared/ui/components";
 
 interface MulticallInstanceWhitelistedTokenProps {
     address: FungibleToken["address"];
 }
 
-const MulticallInstanceWhitelistedTokenEntry = ({ address }: MulticallInstanceWhitelistedTokenProps) => {
-    const addr = new ArgsAccount(address);
+const MulticallInstanceWhitelistedToken = ({ address }: MulticallInstanceWhitelistedTokenProps) => (
+    <span>
+        <NearLink {...{ address }} />
+    </span>
+);
 
-    return (
-        <span>
-            <a
-                href={addr.toUrl()}
-                target="_blank"
-                rel="noopener noreferrer"
-            >
-                {addr.value}
-            </a>
-        </span>
-    );
-};
-
-export const miWhitelistedTokenTableRowRender = (item: MulticallInstanceWhitelistedTokenProps["address"]) => ({
-    content: [<MulticallInstanceWhitelistedTokenEntry address={item} />],
+export const multicallInstanceWhitelistedTokenToTableRow = (
+    item: MulticallInstanceWhitelistedTokenProps["address"]
+) => ({
+    content: [<MulticallInstanceWhitelistedToken address={item} />],
     id: item,
 });

@@ -2,7 +2,7 @@ import { Scrollable, Table, Tile } from "../../../shared/ui/components";
 import { MulticallInstanceAdminsModel } from "../model/mi-admins";
 import { type MulticallInstanceEntity } from "../config";
 
-import { multicallAdminTableRow } from "./mi-admin-entry";
+import { multicallInstanceAdminToTableRow } from "./mi-admin";
 
 interface MulticallInstanceAdminsTableProps extends MulticallInstanceEntity.Dependencies {
     className?: string;
@@ -27,7 +27,7 @@ export const MulticallInstanceAdminsTable = ({
                     dense
                     displayMode="compact"
                     header={["Account address"]}
-                    rows={data?.map(multicallAdminTableRow)}
+                    rows={data?.map(multicallInstanceAdminToTableRow)}
                 />
             </Scrollable>
         </Tile>

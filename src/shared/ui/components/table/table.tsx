@@ -61,6 +61,7 @@ export const Table = ({
                     ? latestState.concat([id].filter((rowId) => !latestState.includes(rowId)))
                     : latestState.filter((rowId) => rowId !== id)
             ),
+
         [selectedRowsIdsUpdate]
     );
 

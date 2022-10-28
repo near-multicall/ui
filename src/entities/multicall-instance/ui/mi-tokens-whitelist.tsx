@@ -3,7 +3,7 @@ import { Scrollable, Table, type TableProps, Tile, TileProps } from "../../../sh
 import { MulticallInstanceTokensModel } from "../model/mi-tokens";
 import { type MulticallInstanceEntity } from "../config";
 
-import { miWhitelistedTokenTableRowRender } from "./mi-whitelisted-token";
+import { multicallInstanceWhitelistedTokenToTableRow } from "./mi-whitelisted-token";
 
 interface MulticallInstanceTokensWhitelistTableProps
     extends MulticallInstanceEntity.Dependencies,
@@ -43,7 +43,7 @@ export const MulticallInstanceTokensWhitelistTable = ({
                     displayMode="compact"
                     header={["Contract address"]}
                     onRowsSelected={onItemsSelected}
-                    rows={data?.concat(additionalItems ?? []).map(miWhitelistedTokenTableRowRender)}
+                    rows={data?.concat(additionalItems ?? []).map(multicallInstanceWhitelistedTokenToTableRow)}
                 />
             </Scrollable>
         </Tile>
