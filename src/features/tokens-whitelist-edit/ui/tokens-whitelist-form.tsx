@@ -75,10 +75,16 @@ export const TokensWhitelistForm = ({
                     <TextInput
                         fullWidth
                         label="New token address"
-                        onBlur={(event) => onAdditionRequest(event.target.value)}
+                        onKeyUp={({ key, target }) =>
+                            key === "Enter" && Object.hasOwn(target, "value")
+                                ? onAdditionRequest((target as HTMLInputElement).value)
+                                : void null
+                        }
                         value={tokenToAddAddress}
                     />
-                ) : null
+                ) : (
+                    void null
+                )
             }
             headingCorners={{
                 right: editModeEnabled ? (
