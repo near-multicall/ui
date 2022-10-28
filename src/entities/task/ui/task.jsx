@@ -12,7 +12,7 @@ export class Task extends Component {
         super(props);
 
         this.state = {
-            addr: this.props.task.addr,
+            family: this.props.task.family,
             func: this.props.task.func,
         };
 
@@ -67,10 +67,10 @@ export class Task extends Component {
     }
 
     getTaskType() {
-        const { addr, func } = this.state;
+        const { family, func } = this.state;
         const { json } = this.props;
 
-        switch (addr) {
+        switch (family) {
             case "multicall":
                 switch (func) {
                     case "near_transfer":
@@ -88,6 +88,18 @@ export class Task extends Component {
                     case "ft_transfer":
                         return (
                             <Family.Near.FtTransfer
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
+                }
+
+            case "mintbase":
+                switch (func) {
+                    case "create_store":
+                        return (
+                            <Family.Mintbase.CreateStore
                                 ref={this.instance}
                                 id={this.id}
                                 json={json}

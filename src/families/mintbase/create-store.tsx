@@ -1,21 +1,31 @@
 import { Form, useFormikContext } from "formik";
 import { useEffect } from "react";
-import { string } from "yup";
 import { args as arx } from "../../shared/lib/args/args";
 import { Call, CallError } from "../../shared/lib/call";
-import { Multicall } from "../../shared/lib/contracts/multicall";
-import { MintbaseStore } from "../../shared/lib/contracts/mintbase";
-import { unit } from "../../shared/lib/converter";
+import { MintbaseStore, BASE_URI_ARWEAVE } from "../../shared/lib/contracts/mintbase";
 import { STORAGE } from "../../shared/lib/persistent";
-import { CheckboxField, TextField, UnitField } from "../../shared/ui/form-fields";
+import { TextField, UnitField } from "../../shared/ui/form-fields";
 import { BaseTask, BaseTaskProps, DefaultFormData } from "../base";
-import "./multicall.scss";
+import "./mintbase.scss";
 
 type FormData = DefaultFormData & {
     owner: string;
-    name: string;
-    symbol: string;
+    storeName: string;
+    storeSymbol: string;
     icon: string;
+};
+
+type CreateStoreArgs = {
+    owner_id: string;
+    metadata: {
+        spec: string;
+        name: string;
+        symbol: string;
+        icon: string;
+        base_uri: string;
+        reference: string;
+        reference_hash: string;
+    };
 };
 
 export class CreateStore extends BaseTask<FormData> {
@@ -24,12 +34,25 @@ export class CreateStore extends BaseTask<FormData> {
         .object()
         .shape({
             owner: arx.string().address(),
-            name: arx.string().lowercase("must be all lowercase"),
-            symbol: arx.string().max(4, "maximum is 4 letters").lowercase("must be all lowercase"),
+            // TODO: lowercase() not working
+            storeName: arx
+                .string()
+                .lowercase("only small letters")
+                .test("is store name available", "This name is taken already", async (value) => {
+                    if (value == null) return false;
+                    try {
+                        return !(await MintbaseStore.checkContainsStore(value));
+                    } catch (e) {
+                        // TODO check reason for error
+                        // console.warn("error occured while checking for contract instance at", value);
+                        return false;
+                    }
+                }),
+            storeSymbol: arx.string().max(4, "up to 4 letters/numbers").lowercase("only small letters"),
             icon: arx.string(),
             amount: arx.big().token(),
         })
-        .transform(({ gas, gasUnit, amount, amountUnit, transferAll, ...rest }) => ({
+        .transform(({ gas, gasUnit, amount, amountUnit, ...rest }) => ({
             ...rest,
             gas: arx.big().intoParsed(gasUnit).cast(gas),
             amount: arx.big().intoParsed(amountUnit).cast(amount),
@@ -46,13 +69,10 @@ export class CreateStore extends BaseTask<FormData> {
         gasUnit: "Tgas",
         depo: "6.5",
         depoUnit: "NEAR",
-        owner: "",
-        name: "",
-        symbol: "",
-        icon: "",
-        amount: "0",
-        amountUnit: "NEAR",
-        transferAll: false,
+        owner: STORAGE.addresses.multicall,
+        storeName: "",
+        storeSymbol: "",
+        icon: "data:image/x-icon;base64,AAABAAEAEBAQAAEABAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAgAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAJCT/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEQAAEQAAAAEAEAEAEAAAAQAQAQAQAAAAEREREQAAAAAAEAAAAAAAAAAQAAAAAAAAABEQAAEQAAAAEAEAEAEAAAAQAQAQAQAAAAEREREQAAAAAAAAEAAAAAAAAAAQAAAAAAAAERAAAAAAAAEAEAAAAAAAAQAQAAAAAAAAEQAADnnwAA228AANtvAADgHwAA+/8AAPv/AAD48wAA+20AAPttAAD8AwAA/+8AAP/vAAD/jwAA/28AAP9vAAD/nwAA",
     };
 
     constructor(props: BaseTaskProps) {
@@ -60,25 +80,17 @@ export class CreateStore extends BaseTask<FormData> {
         this._constructor();
     }
 
-    protected override init(
-        call: Call<{
-            account_id: string;
-            amount: string;
-        }> | null
-    ): void {
+    protected override init(call: Call<CreateStoreArgs> | null): void {
         if (call !== null) {
             const fromCall = {
                 addr: call.address,
                 func: call.actions[0].func,
+                owner: call.actions[0].args.owner_id,
+                storeName: call.actions[0].args.metadata.name,
+                storeSymbol: call.actions[0].args.metadata.symbol,
+                icon: call.actions[0].args.metadata.icon,
                 gas: arx.big().intoFormatted(this.initialValues.gasUnit).cast(call.actions[0].gas).toFixed(),
-                accountId: call.actions[0].args.account_id,
-                amount:
-                    arx
-                        .big()
-                        .intoFormatted(this.initialValues.amountUnit)
-                        .cast(call.actions[0].args.amount)
-                        ?.toFixed() ?? null,
-                transferAll: call.actions[0].args.amount === undefined,
+                depo: arx.big().intoFormatted(this.initialValues.depoUnit).cast(call.actions[0].depo).toFixed(),
             };
             this.initialValues = Object.keys(this.initialValues).reduce((acc, k) => {
                 const v = fromCall[k as keyof typeof fromCall];
@@ -94,31 +106,35 @@ export class CreateStore extends BaseTask<FormData> {
         return (
             !!json &&
             arx.string().address().isValidSync(json.address) &&
-            json.address.endsWith(Multicall.FACTORY_ADDRESS) &&
-            json.actions[0].func === "near_transfer"
+            json.address === MintbaseStore.FACTORY_ADDRESS &&
+            json.actions[0].func === "create_store"
         );
     }
 
     public override toCall(): Call {
-        const { addr, func, gas, gasUnit, depo, depoUnit, accountId, amount, amountUnit, transferAll } =
-            this.state.formData;
+        const { addr, func, gas, gasUnit, depo, depoUnit, owner, storeName, storeSymbol } = this.state.formData;
 
         if (!arx.big().isValidSync(gas)) throw new CallError("Failed to parse gas input value", this.props.id);
-        if (!arx.big().isValidSync(amount)) throw new CallError("Failed to parse amount input value", this.props.id);
+        if (!arx.big().isValidSync(depo)) throw new CallError("Failed to parse amount input value", this.props.id);
 
         return {
             address: addr,
             actions: [
                 {
                     func,
-                    args: transferAll
-                        ? {
-                              account_id: accountId,
-                          }
-                        : {
-                              account_id: accountId,
-                              amount: arx.big().intoParsed(amountUnit).cast(amount).toFixed(),
-                          },
+                    args: {
+                        owner_id: owner,
+                        metadata: {
+                            spec: "nft-1.0.0",
+                            name: storeName,
+                            symbol: storeSymbol,
+                            // TODO: get Icon from form
+                            icon: "",
+                            base_uri: BASE_URI_ARWEAVE,
+                            reference: null,
+                            reference_hash: null,
+                        },
+                    },
                     gas: arx.big().intoParsed(gasUnit).cast(gas).toFixed(),
                     depo: arx.big().intoParsed(depoUnit).cast(depo).toFixed(),
                 },
@@ -126,10 +142,13 @@ export class CreateStore extends BaseTask<FormData> {
         };
     }
 
-    protected override onAddressesUpdated(e: CustomEvent<{ multicall: string }>): void {
-        this.setFormData({ addr: e.detail.multicall });
-        window.EDITOR.forceUpdate();
-        this.forceUpdate();
+    readStoreImage(file: File) {
+        if (file.type !== "application/json") return;
+
+        let reader = new FileReader();
+        reader.readAsText(file, "UTF-8");
+
+        reader.onload = (e_reader) => callback(JSON.parse(e_reader?.target?.result as string));
     }
 
     public override Editor = (): React.ReactNode => {
@@ -153,28 +172,37 @@ export class CreateStore extends BaseTask<FormData> {
                 />
                 <div className="empty-line" />
                 <TextField
-                    name="accountId"
-                    label="Receiver Address"
+                    name="owner"
+                    label="Owner Address"
                     roundtop
                 />
-                <CheckboxField
-                    name="transferAll"
-                    label="Transfer all available funds"
-                    checked={values.transferAll}
+                <TextField
+                    name="storeName"
+                    label="Store Name"
+                    roundtop
                 />
-                {!values.transferAll && (
-                    <UnitField
-                        name="amount"
-                        unit="amountUnit"
-                        options={["NEAR", "yocto"]}
-                        label="Transfer amount"
-                    />
-                )}
+                <TextField
+                    name="storeSymbol"
+                    label="Symbol"
+                    roundtop
+                />
+                <input
+                    accept=".png,.jpeg,.gif,.svg+xml"
+                    onChange={(event) => uploadedFileUpdate(event.target.files[0])}
+                    type="file"
+                />
                 <UnitField
                     name="gas"
                     unit="gasUnit"
                     options={["Tgas", "gas"]}
-                    label="Allocated gas"
+                    label="Gas"
+                    roundbottom
+                />
+                <UnitField
+                    name="depo"
+                    unit="depoUnit"
+                    options={["NEAR", "yocto"]}
+                    label="Deposit"
                     roundbottom
                 />
             </Form>

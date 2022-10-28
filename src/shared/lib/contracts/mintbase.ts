@@ -449,4 +449,3 @@ class MintbaseStore {
 }
 
 export { MintbaseStore, BASE_URI_ARWEAVE };
-export type { FunctionCall, FunctionCallAction, ProposalOutput, ProposalKind, ProposalAction };
