@@ -1,7 +1,6 @@
 import { CancelOutlined, EditOutlined, VisibilityOutlined } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
-import clsx from "clsx";
-import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { ArgsString } from "../../../shared/lib/args";
 import { toNEAR, toYocto } from "../../../shared/lib/converter";
@@ -10,8 +9,6 @@ import { IconLabel, NearIcons, NearLink, Table, TextInput, Tile } from "../../..
 import { type JobSettingsEditFeature } from "../config";
 
 interface JobSettingsFormProps extends JobSettingsEditFeature.Dependencies {}
-
-const _JobSettings = "JobSettings";
 
 export const JobSettingsForm = ({ className, disabled, multicallContract, onEdit }: JobSettingsFormProps) => {
     const [editModeEnabled, editModeSwitch] = useState(!disabled);
@@ -52,7 +49,7 @@ export const JobSettingsForm = ({ className, disabled, multicallContract, onEdit
             classes={{ root: className }}
             heading="Jobs settings"
             headingCorners={{
-                right: editModeEnabled ? (
+                end: editModeEnabled ? (
                     <>
                         {(croncatManager.length > 0 || jobBond.length > 0) && (
                             <IconButton onClick={() => editModeSwitch(false)}>
