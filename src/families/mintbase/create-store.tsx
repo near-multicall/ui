@@ -48,7 +48,10 @@ export class CreateStore extends BaseTask<FormData> {
                         return false;
                     }
                 }),
-            storeSymbol: arx.string().max(4, "up to 4 letters/numbers").lowercase("only small letters"),
+            storeSymbol: arx
+                .string()
+                .max(4, "maximum length is 4")
+                .matches(/^([a-z]|[0-9])+$/, "only lowercase letters or numbers"),
             icon: arx.string(),
             amount: arx.big().token(),
         })
