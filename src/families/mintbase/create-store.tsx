@@ -89,7 +89,7 @@ export class CreateStore extends BaseTask<FormData> {
                 owner: call.actions[0].args.owner_id,
                 storeName: call.actions[0].args.metadata.name,
                 storeSymbol: call.actions[0].args.metadata.symbol,
-                icon: this.dataUtiToFile(call.actions[0].args.metadata.icon),
+                icon: this.dataUriToFile(call.actions[0].args.metadata.icon),
                 gas: arx.big().intoFormatted(this.initialValues.gasUnit).cast(call.actions[0].gas).toFixed(),
                 depo: arx.big().intoFormatted(this.initialValues.depoUnit).cast(call.actions[0].depo).toFixed(),
             };
@@ -147,7 +147,7 @@ export class CreateStore extends BaseTask<FormData> {
         return "fake data URI";
     }
 
-    private dataUtiToFile(dataUri: string): File {
+    private dataUriToFile(dataUri: string): File {
         // TODO implement
         return new File([], "fake File");
     }
