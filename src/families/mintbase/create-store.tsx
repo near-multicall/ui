@@ -2,9 +2,10 @@ import { Form, useFormikContext } from "formik";
 import { useEffect } from "react";
 import { args as arx } from "../../shared/lib/args/args";
 import { Call, CallError } from "../../shared/lib/call";
-import { MintbaseStore, BASE_URI_ARWEAVE } from "../../shared/lib/contracts/mintbase";
+import { BASE_URI_ARWEAVE, MintbaseStore } from "../../shared/lib/contracts/mintbase";
 import { STORAGE } from "../../shared/lib/persistent";
 import { TextField, UnitField } from "../../shared/ui/form-fields";
+import { FileField } from "../../shared/ui/form-fields/file-field/file-field";
 import { BaseTask, BaseTaskProps, DefaultFormData } from "../base";
 import "./mintbase.scss";
 
@@ -12,7 +13,7 @@ type FormData = DefaultFormData & {
     owner: string;
     storeName: string;
     storeSymbol: string;
-    icon: string;
+    icon: File | null;
 };
 
 type CreateStoreArgs = {
@@ -52,7 +53,7 @@ export class CreateStore extends BaseTask<FormData> {
                 .string()
                 .max(4, "maximum length is 4")
                 .matches(/^([a-z]|[0-9])+$/, "only lowercase letters or numbers"),
-            icon: arx.string(),
+            icon: arx.mixed<File>(),
             amount: arx.big().token(),
         })
         .transform(({ gas, gasUnit, amount, amountUnit, ...rest }) => ({
@@ -75,7 +76,7 @@ export class CreateStore extends BaseTask<FormData> {
         owner: STORAGE.addresses.multicall,
         storeName: "",
         storeSymbol: "",
-        icon: "data:image/x-icon;base64,AAABAAEAEBAQAAEABAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAgAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAJCT/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEQAAEQAAAAEAEAEAEAAAAQAQAQAQAAAAEREREQAAAAAAEAAAAAAAAAAQAAAAAAAAABEQAAEQAAAAEAEAEAEAAAAQAQAQAQAAAAEREREQAAAAAAAAEAAAAAAAAAAQAAAAAAAAERAAAAAAAAEAEAAAAAAAAQAQAAAAAAAAEQAADnnwAA228AANtvAADgHwAA+/8AAPv/AAD48wAA+20AAPttAAD8AwAA/+8AAP/vAAD/jwAA/28AAP9vAAD/nwAA",
+        icon: null,
     };
 
     constructor(props: BaseTaskProps) {
@@ -91,7 +92,7 @@ export class CreateStore extends BaseTask<FormData> {
                 owner: call.actions[0].args.owner_id,
                 storeName: call.actions[0].args.metadata.name,
                 storeSymbol: call.actions[0].args.metadata.symbol,
-                icon: call.actions[0].args.metadata.icon,
+                icon: this.dataUriToFile(call.actions[0].args.metadata.icon),
                 gas: arx.big().intoFormatted(this.initialValues.gasUnit).cast(call.actions[0].gas).toFixed(),
                 depo: arx.big().intoFormatted(this.initialValues.depoUnit).cast(call.actions[0].depo).toFixed(),
             };
@@ -115,7 +116,7 @@ export class CreateStore extends BaseTask<FormData> {
     }
 
     public override toCall(): Call {
-        const { addr, func, gas, gasUnit, depo, depoUnit, owner, storeName, storeSymbol } = this.state.formData;
+        const { addr, func, gas, gasUnit, depo, depoUnit, owner, storeName, storeSymbol, icon } = this.state.formData;
 
         if (!arx.big().isValidSync(gas)) throw new CallError("Failed to parse gas input value", this.props.id);
         if (!arx.big().isValidSync(depo)) throw new CallError("Failed to parse amount input value", this.props.id);
@@ -131,8 +132,7 @@ export class CreateStore extends BaseTask<FormData> {
                             spec: "nft-1.0.0",
                             name: storeName,
                             symbol: storeSymbol,
-                            // TODO: get Icon from form
-                            icon: "",
+                            icon: !!icon ? this.fileToDataUri(icon) : null,
                             base_uri: BASE_URI_ARWEAVE,
                             reference: null,
                             reference_hash: null,
@@ -145,13 +145,14 @@ export class CreateStore extends BaseTask<FormData> {
         };
     }
 
-    readStoreImage(file: File) {
-        if (file.type !== "application/json") return;
+    private fileToDataUri(file: File): string {
+        // TODO implement
+        return "fake data URI";
+    }
 
-        let reader = new FileReader();
-        reader.readAsText(file, "UTF-8");
-
-        reader.onload = (e_reader) => callback(JSON.parse(e_reader?.target?.result as string));
+    private dataUriToFile(dataUri: string): File {
+        // TODO implement
+        return new File([], "fake File");
     }
 
     public override Editor = (): React.ReactNode => {
@@ -182,24 +183,21 @@ export class CreateStore extends BaseTask<FormData> {
                 <TextField
                     name="storeName"
                     label="Store Name"
-                    roundtop
                 />
                 <TextField
                     name="storeSymbol"
                     label="Symbol"
-                    roundtop
                 />
-                <input
+                <FileField
+                    name="icon"
+                    label="Icon"
                     accept=".png,.jpeg,.gif,.svg+xml"
-                    onChange={(event) => uploadedFileUpdate(event.target.files[0])}
-                    type="file"
                 />
                 <UnitField
                     name="gas"
                     unit="gasUnit"
                     options={["Tgas", "gas"]}
                     label="Gas"
-                    roundbottom
                 />
                 <UnitField
                     name="depo"
