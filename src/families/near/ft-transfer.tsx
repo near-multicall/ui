@@ -104,7 +104,7 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
     }
 
     static override inferOwnType(json: Call): boolean {
-        return !!json && arx.string().address().isValidSync(json.address) && json.actions[0].func === "ft_transfer";
+        return !!json && json.actions[0].func === "ft_transfer";
     }
 
     public override toCall(): Call {

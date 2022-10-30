@@ -65,8 +65,6 @@ export class MftTransfer extends BaseTask<FormData, Props, State> {
             ...this.state,
             token: new MultiFungibleToken(this.state.formData.addr, this.state.formData.tokenId),
         };
-
-        this.tryUpdateMft().catch(() => {});
     }
 
     protected override init(
@@ -205,7 +203,7 @@ export class MftTransfer extends BaseTask<FormData, Props, State> {
                 <div className="empty-line" />
                 <TextField
                     name="addr"
-                    label="Token Address"
+                    label="Contract Address"
                     roundtop
                 />
                 <TextField

@@ -1,5 +1,5 @@
 import { InputAdornment } from "@mui/material";
-import { Form, useFormikContext } from "formik";
+import { Form, FormikErrors, useFormikContext } from "formik";
 import { useEffect } from "react";
 import { args as arx } from "../../shared/lib/args/args";
 import { fields } from "../../shared/lib/args/args-types/args-object";
@@ -29,13 +29,13 @@ export class FtTransferCall extends BaseTask<FormData, Props, State> {
         .object()
         .shape({
             addr: arx.string().contract(),
-            gas: arx.big().gas().min(toGas("30")),
+            gas: arx.big().gas().min(toGas("30")).max(toGas("250")),
             receiverId: arx.string().address(),
-            amount: arx.big().token(),
+            amount: arx.big().token().min(0, "amount must be at least ${min}"),
             memo: arx.string().optional(),
             msg: arx.string().optional(),
         })
-        .transform(({ gas, gasUnit, depo, depoUnit, ...rest }) => ({
+        .transform(({ gas, gasUnit, ...rest }) => ({
             ...rest,
             gas: arx.big().intoParsed(gasUnit).cast(gas),
         }))
@@ -44,14 +44,14 @@ export class FtTransferCall extends BaseTask<FormData, Props, State> {
 
     override initialValues: FormData = {
         name: "FT Transfer Call",
-        addr: "",
+        addr: window.nearConfig.WNEAR_ADDRESS,
         func: "ft_transfer_call",
         gas: "150",
         gasUnit: "Tgas",
         depo: "1",
         depoUnit: "yocto",
         receiverId: "",
-        amount: "",
+        amount: "0",
         memo: "",
         msg: "",
     };
@@ -63,8 +63,6 @@ export class FtTransferCall extends BaseTask<FormData, Props, State> {
             ...this.state,
             token: new FungibleToken(this.initialValues.addr),
         };
-
-        this.tryUpdateFt().catch(() => {});
     }
 
     protected override init(
@@ -80,7 +78,6 @@ export class FtTransferCall extends BaseTask<FormData, Props, State> {
                 addr: call.address,
                 func: call.actions[0].func,
                 gas: arx.big().intoFormatted(this.initialValues.gasUnit).cast(call.actions[0].gas).toFixed(),
-                depo: arx.big().intoFormatted(this.initialValues.depoUnit).cast(call.actions[0].depo).toFixed(),
                 receiverId: call.actions[0].args.receiver_id,
                 amount: call.actions[0].args.amount,
                 memo: call.actions[0].args.memo,
@@ -95,16 +92,27 @@ export class FtTransferCall extends BaseTask<FormData, Props, State> {
 
         this.state = { ...this.state, formData: this.initialValues };
         this.schema.check(this.state.formData);
+
+        if (call !== null)
+            this.tryUpdateFt().then((res: boolean) =>
+                this.setFormData({
+                    amount: res
+                        ? arx
+                              .big()
+                              .intoFormatted(this.state.token.metadata.decimals)
+                              .cast(this.state.formData.amount)
+                              .toFixed()
+                        : this.state.formData.amount,
+                })
+            );
     }
 
     static override inferOwnType(json: Call): boolean {
-        return (
-            !!json && arx.string().address().isValidSync(json.address) && json.actions[0].func === "ft_transfer_call"
-        );
+        return !!json && json.actions[0].func === "ft_transfer_call";
     }
 
     public override toCall(): Call {
-        const { addr, func, receiverId, memo, msg, amount, gas, gasUnit, depo, depoUnit } = this.state.formData;
+        const { addr, func, receiverId, memo, msg, amount, gas, gasUnit, depo } = this.state.formData;
         const { token } = this.state;
 
         if (!arx.big().isValidSync(gas)) throw new CallError("Failed to parse gas input value", this.props.id);
@@ -114,35 +122,28 @@ export class FtTransferCall extends BaseTask<FormData, Props, State> {
             actions: [
                 {
                     func,
-                    args:
-                        memo !== null
-                            ? {
-                                  receiver_id: receiverId,
-                                  amount: arx.big().intoParsed(token.metadata.decimals).cast(amount).toFixed(),
-                                  msg,
-                              }
-                            : {
-                                  receiver_id: receiverId,
-                                  amount: arx.big().intoParsed(token.metadata.decimals).cast(amount).toFixed(),
-                                  memo,
-                                  msg,
-                              },
+                    args: {
+                        receiver_id: receiverId,
+                        amount: arx.big().intoParsed(token.metadata.decimals).cast(amount).toFixed(),
+                        memo,
+                        msg,
+                    },
                     gas: arx.big().intoParsed(gasUnit).cast(gas).toFixed(),
-                    depo: arx.big().intoParsed(depoUnit).cast(depo).toFixed(),
+                    depo,
                 },
             ],
         };
     }
 
-    private tryUpdateFt(): Promise<void> {
-        return new Promise<void>((resolve, reject) => {
+    private tryUpdateFt(): Promise<boolean> {
+        return new Promise<boolean>((resolve) => {
             this.schema.check(this.state.formData).then(() => {
                 const { addr } = fields(this.schema);
                 if (!addr.isBad()) {
-                    this.confidentlyUpdateFt().then((ready) => (ready ? resolve() : reject()));
+                    this.confidentlyUpdateFt().then((ready) => resolve(ready));
                 } else {
                     this.setState({ token: new FungibleToken(this.state.formData.addr) }); // will be invalid
-                    reject();
+                    resolve(false);
                 }
             });
         });
@@ -154,6 +155,25 @@ export class FtTransferCall extends BaseTask<FormData, Props, State> {
         this.setState({ token: newToken });
         window.EDITOR.forceUpdate();
         return newToken.ready;
+    }
+
+    public override async validateForm(values: FormData): Promise<FormikErrors<FormData>> {
+        this.setFormData(values);
+        await new Promise((resolve) => this.resolveDebounced(resolve));
+        await this.tryUpdateFt();
+        await this.schema
+            .transform(({ amount, ...rest }) => ({
+                ...rest,
+                amount: this.state.token.ready
+                    ? arx.big().intoParsed(this.state.token.metadata.decimals).cast(amount)?.toFixed() ?? null
+                    : amount,
+            }))
+            .check(values);
+        return Object.fromEntries(
+            Object.entries(fields(this.schema))
+                .map(([k, v]) => [k, v?.message() ?? ""])
+                .filter(([_, v]) => v !== "")
+        );
     }
 
     public override Editor = (): React.ReactNode => {
@@ -195,13 +215,13 @@ export class FtTransferCall extends BaseTask<FormData, Props, State> {
                     }}
                 />
                 <TextField
-                    name="memo"
-                    label="Memo"
+                    name="msg"
+                    label="Message"
                     multiline
                 />
                 <TextField
-                    name="msg"
-                    label="Message"
+                    name="memo"
+                    label="Memo"
                     multiline
                 />
                 <UnitField

@@ -37,7 +37,7 @@ class MultiFungibleToken {
         const newToken = new MultiFungibleToken(tokenAddress, tokenId);
         const [metadata] = await Promise.all([
             // on failure set metadata to default metadata (empty)
-            newToken.ftMetadata().catch((err) => {
+            newToken.mftMetadata().catch((err) => {
                 return newToken.metadata;
             }),
         ]);
@@ -49,7 +49,7 @@ class MultiFungibleToken {
         return newToken;
     }
 
-    async ftMetadata(): Promise<MultiFungibleTokenMetadata> {
+    async mftMetadata(): Promise<MultiFungibleTokenMetadata> {
         return view(this.address, "mft_metadata", { token_id: this.id });
     }
 }

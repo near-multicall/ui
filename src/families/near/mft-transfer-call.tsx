@@ -30,7 +30,7 @@ export class MftTransferCall extends BaseTask<FormData, Props, State> {
         .object()
         .shape({
             addr: arx.string().contract(),
-            gas: arx.big().gas().min(toGas("45")),
+            gas: arx.big().gas().min(toGas("45")).max(toGas("250")),
             receiverId: arx.string().address(),
             tokenId: arx.string().mft("addr"),
             amount: arx.big().token().min(1, "cannot transfer 0 tokens"),
@@ -66,8 +66,6 @@ export class MftTransferCall extends BaseTask<FormData, Props, State> {
             ...this.state,
             token: new MultiFungibleToken(this.state.formData.addr, this.state.formData.tokenId),
         };
-
-        this.tryUpdateMft().catch(() => {});
     }
 
     protected override init(
@@ -84,7 +82,6 @@ export class MftTransferCall extends BaseTask<FormData, Props, State> {
                 addr: call.address,
                 func: call.actions[0].func,
                 gas: arx.big().intoFormatted(this.initialValues.gasUnit).cast(call.actions[0].gas).toFixed(),
-                depo: arx.big().intoFormatted(this.initialValues.depoUnit).cast(call.actions[0].depo).toFixed(),
                 tokenId: call.actions[0].args.token_id,
                 receiverId: call.actions[0].args.receiver_id,
                 amount: call.actions[0].args.amount,
@@ -120,8 +117,7 @@ export class MftTransferCall extends BaseTask<FormData, Props, State> {
     }
 
     public override toCall(): Call {
-        const { addr, func, tokenId, receiverId, memo, msg, amount, gas, gasUnit, depo, depoUnit } =
-            this.state.formData;
+        const { addr, func, tokenId, receiverId, memo, msg, amount, gas, gasUnit, depo } = this.state.formData;
         const { token } = this.state;
 
         if (!arx.big().isValidSync(gas)) throw new CallError("Failed to parse gas input value", this.props.id);
@@ -133,22 +129,15 @@ export class MftTransferCall extends BaseTask<FormData, Props, State> {
             actions: [
                 {
                     func,
-                    args:
-                        memo !== null
-                            ? {
-                                  token_id: tokenId,
-                                  receiver_id: receiverId,
-                                  amount: arx.big().intoParsed(token.metadata.decimals).cast(amount).toFixed(),
-                                  msg,
-                              }
-                            : {
-                                  receiver_id: receiverId,
-                                  amount: arx.big().intoParsed(token.metadata.decimals).cast(amount).toFixed(),
-                                  memo,
-                                  msg,
-                              },
+                    args: {
+                        token_id: tokenId,
+                        receiver_id: receiverId,
+                        amount: arx.big().intoParsed(token.metadata.decimals).cast(amount).toFixed(),
+                        memo,
+                        msg,
+                    },
                     gas: arx.big().intoParsed(gasUnit).cast(gas).toFixed(),
-                    depo: arx.big().intoParsed(depoUnit).cast(depo).toFixed(),
+                    depo,
                 },
             ],
         };
@@ -219,7 +208,7 @@ export class MftTransferCall extends BaseTask<FormData, Props, State> {
                 <div className="empty-line" />
                 <TextField
                     name="addr"
-                    label="Token Address"
+                    label="Contract Address"
                     roundtop
                 />
                 <TextField
@@ -240,13 +229,13 @@ export class MftTransferCall extends BaseTask<FormData, Props, State> {
                     }}
                 />
                 <TextField
-                    name="memo"
-                    label="Memo"
+                    name="msg"
+                    label="Message"
                     multiline
                 />
                 <TextField
-                    name="msg"
-                    label="Message"
+                    name="memo"
+                    label="Memo"
                     multiline
                 />
                 <UnitField
