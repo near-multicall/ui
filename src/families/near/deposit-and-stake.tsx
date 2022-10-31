@@ -120,7 +120,7 @@ export class DepositAndStake extends BaseTask<FormData, Props, State> {
         return stakingPool.ready;
     }
 
-    public async validateForm(values: FormData): Promise<FormikErrors<FormData>> {
+    public override async validateForm(values: FormData): Promise<FormikErrors<FormData>> {
         this.setFormData(values);
         await new Promise((resolve) => this.resolveDebounced(resolve));
         // run promises in parallel as staking pool info isn't needed for form validation

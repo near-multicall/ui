@@ -158,14 +158,14 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
         this.setFormData(values);
         await new Promise((resolve) => this.resolveDebounced(resolve));
         await this.tryUpdateFt();
-        await this.schema
-            .transform(({ amount, ...rest }) => ({
+        await this.schema.check(
+            (({ amount, ...rest }) => ({
                 ...rest,
                 amount: this.state.token.ready
                     ? arx.big().intoParsed(this.state.token.metadata.decimals).cast(amount)?.toFixed() ?? null
                     : amount,
-            }))
-            .check(values);
+            }))(values)
+        );
         return Object.fromEntries(
             Object.entries(fields(this.schema))
                 .map(([k, v]) => [k, v?.message() ?? ""])
