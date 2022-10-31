@@ -35,7 +35,7 @@ export class NftTransfer extends BaseTask<FormData, Props, State> {
                 .nftId("addr")
                 .test({
                     name: "approval",
-                    message: "multicall instance does is not approved to use this nft",
+                    message: "multicall does not have permission to transfer this NFT",
                     test: (value, ctx) =>
                         value == null ||
                         ctx.options.context?.token == null ||
