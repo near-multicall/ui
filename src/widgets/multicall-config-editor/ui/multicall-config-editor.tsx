@@ -25,30 +25,44 @@ export const MulticallConfigEditorUI = ({ className, contracts }: MulticallConfi
         croncatManager: "",
     };
 
-    const [formState, formStateUpdate] = useState<MulticallConfigChanges>(changesDiffInitialState);
-    const [proposalDescription, proposalDescriptionUpdate] = useState("");
+    const [formState, formStateUpdate] = useState<MulticallConfigChanges>(changesDiffInitialState),
+        formValues = { proposalDescription: useMemo(() => new ArgsString(""), []) },
+        [proposalDescription, proposalDescriptionUpdate] = useState(formValues.proposalDescription.value),
+        _childFormsResetRequested = "childFormsResetRequested";
 
-    const formReset = useCallback(
-        () => formStateUpdate(changesDiffInitialState),
-        [formStateUpdate, changesDiffInitialState]
-    );
+    const childFormsResetRequested = {
+        dispatch: () => document.dispatchEvent(new CustomEvent(_childFormsResetRequested)),
+
+        subscribe: (callback: EventListener) => {
+            void document.addEventListener(_childFormsResetRequested, callback);
+
+            return () => void document.removeEventListener(_childFormsResetRequested, callback);
+        },
+    };
+
+    const formReset = useCallback(() => {
+        void childFormsResetRequested.dispatch();
+        void proposalDescriptionUpdate("");
+        void formStateUpdate(changesDiffInitialState);
+
+        formValues.proposalDescription.value = "";
+    }, [formStateUpdate, changesDiffInitialState]);
 
     const onCancel = useCallback(() => {
-        formReset();
-        editModeSwitch(false);
-    }, [editModeSwitch, formReset]);
+        void formReset();
+        void editModeSwitch(false);
+    }, [editMode, editModeSwitch, formReset]);
 
     const onEdit = useCallback(
         (update: Partial<MulticallConfigChanges>) => {
-            formStateUpdate((latestState) => Object.assign(latestState, update));
+            void formStateUpdate((latestState) => Object.assign(latestState, update));
 
-            editModeSwitch(
+            void editModeSwitch(
                 Object.values(Object.assign(formState, update)).filter(({ length }) => length > 0).length > 0
             );
 
             // TODO: Remove before release. This is for debug purposes only
-            console.table({ proposalDescription });
-            console.table(formState);
+            console.table({ proposalDescription, ...formState });
         },
 
         [editModeSwitch, formState, formStateUpdate, proposalDescription]
@@ -56,7 +70,7 @@ export const MulticallConfigEditorUI = ({ className, contracts }: MulticallConfi
 
     const onSubmit = useCallback(
         (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-            event.preventDefault();
+            void event.preventDefault();
 
             void contracts.dao
                 .proposeFunctionCall(
@@ -82,6 +96,7 @@ export const MulticallConfigEditorUI = ({ className, contracts }: MulticallConfi
                 className={_MulticallConfigEditor + "-tokensWhitelist"}
                 daoContractAddress={contracts.dao.address}
                 disabled={!editMode}
+                resetTrigger={childFormsResetRequested.subscribe}
                 {...{ onEdit }}
             />
 
@@ -90,6 +105,7 @@ export const MulticallConfigEditorUI = ({ className, contracts }: MulticallConfi
                 daoContractAddress={contracts.dao.address}
                 disabled={!editMode}
                 multicallContract={contracts.multicall}
+                resetTrigger={childFormsResetRequested.subscribe}
                 {...{ onEdit }}
             />
 
@@ -110,7 +126,7 @@ export const MulticallConfigEditorUI = ({ className, contracts }: MulticallConfi
                             multiline
                             required
                             update={(event) => void proposalDescriptionUpdate(event.target.value)}
-                            value={useMemo(() => new ArgsString(""), [])}
+                            value={formValues.proposalDescription}
                         />
                     </div>
 
@@ -119,6 +135,7 @@ export const MulticallConfigEditorUI = ({ className, contracts }: MulticallConfi
                             color="error"
                             label="Cancel"
                             onClick={onCancel}
+                            type="reset"
                         />
 
                         <Button
@@ -129,6 +146,7 @@ export const MulticallConfigEditorUI = ({ className, contracts }: MulticallConfi
                             }
                             label="Submit"
                             onClick={onSubmit}
+                            type="submit"
                         />
                     </ButtonGroup>
                 </form>

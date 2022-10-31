@@ -4,13 +4,18 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { ArgsString } from "../../../shared/lib/args";
 import { toNEAR, toYocto } from "../../../shared/lib/converter";
-import { Fn } from "../../../shared/lib/fn";
 import { IconLabel, NearIcons, NearLink, Table, TextInput, Tile } from "../../../shared/ui/components";
 import { type JobSettingsEditFeature } from "../config";
 
 interface JobSettingsFormProps extends JobSettingsEditFeature.Dependencies {}
 
-export const JobSettingsForm = ({ className, disabled, multicallContract, onEdit }: JobSettingsFormProps) => {
+export const JobSettingsForm = ({
+    className,
+    disabled,
+    multicallContract,
+    onEdit,
+    resetTrigger,
+}: JobSettingsFormProps) => {
     const [editModeEnabled, editModeSwitch] = useState(!disabled);
 
     const formInitialState = { croncatManager: "", jobBond: "" };
@@ -30,17 +35,15 @@ export const JobSettingsForm = ({ className, disabled, multicallContract, onEdit
     };
 
     const formReset = useCallback(() => {
-        croncatManagerUpdate(formInitialState.croncatManager);
-        jobBondUpdate(formInitialState.jobBond);
-        editModeSwitch(false);
+        formFields.croncatManager.value = multicallContract.croncatManager;
+        formFields.jobBond.value = toNEAR(multicallContract.jobBond);
+
+        void croncatManagerUpdate(formInitialState.croncatManager);
+        void jobBondUpdate(formInitialState.jobBond);
+        void editModeSwitch(false);
     }, [croncatManagerUpdate, editModeSwitch, formInitialState, jobBondUpdate]);
 
-    useEffect(disabled && croncatManager.length > 0 && jobBond.length > 0 ? formReset : Fn.returnVoid, [
-        croncatManager,
-        disabled,
-        formReset,
-        jobBond,
-    ]);
+    useEffect(() => resetTrigger(formReset), [formReset, resetTrigger]);
 
     useEffect(() => onEdit({ croncatManager, jobBond }), [croncatManager, jobBond, onEdit]);
 
@@ -83,7 +86,7 @@ export const JobSettingsForm = ({ className, disabled, multicallContract, onEdit
                             editModeEnabled ? (
                                 <TextInput
                                     fullWidth
-                                    update={(event) => croncatManagerUpdate(event.target.value)}
+                                    update={(event) => void croncatManagerUpdate(event.target.value)}
                                     value={formFields.croncatManager}
                                 />
                             ) : (
@@ -103,7 +106,7 @@ export const JobSettingsForm = ({ className, disabled, multicallContract, onEdit
                                         endAdornment: NearIcons.NATIVE_TOKEN_CHARACTER,
                                         inputProps: { min: 0, step: 0.001 },
                                     }}
-                                    update={(event) => jobBondUpdate(toYocto(event.target.value))}
+                                    update={(event) => void jobBondUpdate(toYocto(event.target.value))}
                                     type="number"
                                     value={formFields.jobBond}
                                 />

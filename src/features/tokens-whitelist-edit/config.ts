@@ -7,6 +7,7 @@ namespace TokensWhitelistEditFeature {
         extends Omit<HTMLProps<HTMLDivElement>, "onChange">,
             MulticallInstanceEntity.Dependencies {
         onEdit: (payload: Pick<MulticallInstanceEntity.ConfigChanges, "addTokens" | "removeTokens">) => void;
+        resetTrigger: (callback: EventListener) => void;
     }
 
     export interface FormStates

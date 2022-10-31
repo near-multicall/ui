@@ -3,14 +3,19 @@ import { IconButton } from "@mui/material";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { TextInput } from "../../../shared/ui/components";
-import { Fn } from "../../../shared/lib/fn";
 import { ArgsString } from "../../../shared/lib/args";
 import { MulticallInstance } from "../../../entities";
 import { type TokensWhitelistEditFeature } from "../config";
 
 interface TokensWhitelistFormProps extends TokensWhitelistEditFeature.Dependencies {}
 
-export const TokensWhitelistForm = ({ className, daoContractAddress, disabled, onEdit }: TokensWhitelistFormProps) => {
+export const TokensWhitelistForm = ({
+    className,
+    daoContractAddress,
+    disabled,
+    onEdit,
+    resetTrigger,
+}: TokensWhitelistFormProps) => {
     const [editModeEnabled, editModeSwitch] = useState(!disabled);
 
     const [addTokens, markForAddition] = useState<TokensWhitelistEditFeature.FormStates["addTokens"]>(new Set()),
@@ -55,7 +60,7 @@ export const TokensWhitelistForm = ({ className, daoContractAddress, disabled, o
         editModeSwitch(false);
     }, [editModeSwitch, markForAddition, markForRemoval]);
 
-    useEffect(disabled ? formReset : Fn.returnVoid, [disabled, formReset]);
+    useEffect(() => resetTrigger(formReset), [formReset, resetTrigger]);
 
     useEffect(
         () => onEdit({ addTokens: Array.from(addTokens), removeTokens: Array.from(removeTokens) }),
