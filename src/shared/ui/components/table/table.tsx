@@ -32,7 +32,14 @@ export interface TableProps extends HTMLAttributes<HTMLDivElement>, Pick<TableRo
     displayMode?: "default" | "compact" | "classic";
     header: TableHeader;
     onRowsSelected?: ((selectedRowsIds: TableRowProps["id"][]) => void) | null;
-    rows?: { id: TableRowProps["id"]; content: TableRowProps["cells"] }[] | null;
+
+    rows?:
+        | {
+              id: TableRowProps["id"];
+              content: TableRowProps["cells"];
+              highlightColor?: TableRowProps["highlightColor"];
+          }[]
+        | null;
 }
 
 const _Table = "Table";

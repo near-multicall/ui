@@ -17,6 +17,7 @@ export interface TableRowProps {
      */
     entitled?: boolean;
     header: TableHeader;
+    highlightColor?: "success" | "error";
     id: string;
     noKeys?: boolean;
     onSelect?: (selectedRow: { id: TableRowProps["id"]; checked: boolean }) => void;
@@ -43,6 +44,7 @@ export const TableRowCompact = ({
     dense,
     entitled,
     header,
+    highlightColor,
     id,
     noKeys,
     onSelect,
