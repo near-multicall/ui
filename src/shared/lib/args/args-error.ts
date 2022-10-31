@@ -18,7 +18,9 @@ const locale = {
         sputnikDao: "address must belong to a sputnik dao contract",
         multicall: "address must belong to a multicall contract",
         ft: "address must belong to a token contract",
-        mft: "token id must belong to a multi-token contract",
+        nft: "address must belong to a nft contract",
+        nftId: "token id must belong to a nft contract",
+        mftId: "token id must belong to a multi-token contract",
         stakingPool: "address must belong to a staking pool",
     },
 };

@@ -31,7 +31,7 @@ class MultiFungibleToken {
         this.id = tokenId;
     }
 
-    // used to create and initialize a FungibleToken instance
+    // used to create and initialize a MultiFungibleToken instance
     static async init(tokenAddress: string, tokenId: string): Promise<MultiFungibleToken> {
         // fetch token info and mark it ready
         const newToken = new MultiFungibleToken(tokenAddress, tokenId);

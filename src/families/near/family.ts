@@ -1,10 +1,11 @@
+export { DepositAndStake } from "./deposit-and-stake";
 export { FtTransfer } from "./ft-transfer";
-export { StorageWithdraw } from "./storage-withdraw";
-export { StorageUnregister } from "./storage-unregister";
-export { StorageDeposit } from "./storage-deposit";
 export { FtTransferCall } from "./ft-transfer-call";
 export { MftTransfer } from "./mft-transfer";
 export { MftTransferCall } from "./mft-transfer-call";
-export { DepositAndStake } from "./deposit-and-stake";
+export { NftTransfer } from "./nft-transfer";
+export { StorageDeposit } from "./storage-deposit";
+export { StorageUnregister } from "./storage-unregister";
+export { StorageWithdraw } from "./storage-withdraw";
 export { Unstake } from "./unstake";
 export { Withdraw } from "./withdraw";

@@ -101,6 +101,14 @@ export class Task extends Component {
                                 json={json}
                             />
                         );
+                    case "nft_transfer":
+                        return (
+                            <Family.Near.NftTransfer
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
                     case "mft_transfer":
                         return (
                             <Family.Near.MftTransfer
