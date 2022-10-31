@@ -26,11 +26,11 @@ export const TokensWhitelistForm = ({
     const onAdditionRequest = useCallback(
         (input: string) => {
             if (removeTokens.has(input)) {
-                markForRemoval(
+                void markForRemoval(
                     (markedForRemoval) => new Set(Array.from(markedForRemoval).filter((address) => address !== input))
                 );
             } else {
-                markForAddition((markedForAddition) =>
+                void markForAddition((markedForAddition) =>
                     input.length > 0 ? new Set(markedForAddition.add(input)) : markedForAddition
                 );
             }
@@ -44,26 +44,26 @@ export const TokensWhitelistForm = ({
     const onRemovalRequest = useCallback(
         (input: string) => {
             if (addTokens.has(input)) {
-                markForAddition(
+                void markForAddition(
                     (markedForAddition) => new Set(Array.from(markedForAddition).filter((address) => address !== input))
                 );
             } else {
-                markForRemoval((markedForRemoval) => new Set(markedForRemoval.add(input)));
+                void markForRemoval((markedForRemoval) => new Set(markedForRemoval.add(input)));
             }
         },
         [addTokens, editModeSwitch, markForAddition, markForRemoval]
     );
 
     const formReset = useCallback(() => {
-        markForAddition(new Set());
-        markForRemoval(new Set());
-        editModeSwitch(false);
+        void markForAddition(new Set());
+        void markForRemoval(new Set());
+        void editModeSwitch(false);
     }, [editModeSwitch, markForAddition, markForRemoval]);
 
-    useEffect(() => resetTrigger(formReset), [formReset, resetTrigger]);
+    useEffect(() => resetTrigger.subscribe(formReset), [formReset, resetTrigger]);
 
     useEffect(
-        () => onEdit({ addTokens: Array.from(addTokens), removeTokens: Array.from(removeTokens) }),
+        () => void onEdit({ addTokens: Array.from(addTokens), removeTokens: Array.from(removeTokens) }),
         [addTokens, removeTokens, onEdit]
     );
 
@@ -73,7 +73,7 @@ export const TokensWhitelistForm = ({
                 slots: {
                     End: editModeEnabled
                         ? ({ rowId }) => (
-                              <IconButton onClick={() => onRemovalRequest(rowId)}>
+                              <IconButton onClick={() => void onRemovalRequest(rowId)}>
                                   <DeleteOutlined fontSize="large" />
                               </IconButton>
                           )
@@ -87,9 +87,9 @@ export const TokensWhitelistForm = ({
                         fullWidth
                         label="New token address"
                         onKeyUp={({ key, target }) =>
-                            key === "Enter" && Object.hasOwn(target, "value")
+                            void (key === "Enter" && Object.hasOwn(target, "value")
                                 ? onAdditionRequest((target as HTMLInputElement).value)
-                                : void null
+                                : null)
                         }
                         value={tokenToAddAddress}
                     />
@@ -103,7 +103,7 @@ export const TokensWhitelistForm = ({
                         <CancelOutlined />
                     </IconButton>
                 ) : (
-                    <IconButton onClick={() => editModeSwitch(true)}>
+                    <IconButton onClick={() => void editModeSwitch(true)}>
                         <EditOutlined />
                     </IconButton>
                 ),

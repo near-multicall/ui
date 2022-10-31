@@ -96,7 +96,7 @@ export const MulticallConfigEditorUI = ({ className, contracts }: MulticallConfi
                 className={_MulticallConfigEditor + "-tokensWhitelist"}
                 daoContractAddress={contracts.dao.address}
                 disabled={!editMode}
-                resetTrigger={childFormsResetRequested.subscribe}
+                resetTrigger={childFormsResetRequested}
                 {...{ onEdit }}
             />
 
@@ -105,7 +105,7 @@ export const MulticallConfigEditorUI = ({ className, contracts }: MulticallConfi
                 daoContractAddress={contracts.dao.address}
                 disabled={!editMode}
                 multicallContract={contracts.multicall}
-                resetTrigger={childFormsResetRequested.subscribe}
+                resetTrigger={childFormsResetRequested}
                 {...{ onEdit }}
             />
 

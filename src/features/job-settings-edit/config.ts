@@ -9,7 +9,7 @@ namespace JobSettingsEditFeature {
             Pick<MulticallInstanceEntity.Dependencies, "daoContractAddress"> {
         multicallContract: MulticallContract;
         onEdit: (payload: FormState) => void;
-        resetTrigger: (callback: EventListener) => void;
+        resetTrigger: { subscribe: (callback: EventListener) => () => void };
     }
 
     export type FormState = Pick<MulticallInstanceEntity.ConfigChanges, "croncatManager" | "jobBond">;

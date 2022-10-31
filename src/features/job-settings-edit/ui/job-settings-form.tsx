@@ -43,9 +43,9 @@ export const JobSettingsForm = ({
         void editModeSwitch(false);
     }, [croncatManagerUpdate, editModeSwitch, formInitialState, jobBondUpdate]);
 
-    useEffect(() => resetTrigger(formReset), [formReset, resetTrigger]);
+    useEffect(() => resetTrigger.subscribe(formReset), [formReset, resetTrigger]);
 
-    useEffect(() => onEdit({ croncatManager, jobBond }), [croncatManager, jobBond, onEdit]);
+    useEffect(() => void onEdit({ croncatManager, jobBond }), [croncatManager, jobBond, onEdit]);
 
     return (
         <Tile
@@ -55,7 +55,7 @@ export const JobSettingsForm = ({
                 end: editModeEnabled ? (
                     <>
                         {(croncatManager.length > 0 || jobBond.length > 0) && (
-                            <IconButton onClick={() => editModeSwitch(false)}>
+                            <IconButton onClick={() => void editModeSwitch(false)}>
                                 <VisibilityOutlined />
                             </IconButton>
                         )}
@@ -65,7 +65,7 @@ export const JobSettingsForm = ({
                         </IconButton>
                     </>
                 ) : (
-                    <IconButton onClick={() => editModeSwitch(true)}>
+                    <IconButton onClick={() => void editModeSwitch(true)}>
                         <EditOutlined />
                     </IconButton>
                 ),
