@@ -1,74 +1,65 @@
-import { InputAdornment } from "@mui/material";
 import { Form, FormikErrors, useFormikContext } from "formik";
 import { useEffect } from "react";
 import { args as arx } from "../../shared/lib/args/args";
 import { fields } from "../../shared/lib/args/args-types/args-object";
 import { Call, CallError } from "../../shared/lib/call";
-import { toGas } from "../../shared/lib/converter";
-import { FungibleToken } from "../../shared/lib/standards/fungibleToken";
-import { InfoField, TextField, UnitField } from "../../shared/ui/form-fields";
-import type { DefaultFormData } from "../base";
-import { BaseTask, BaseTaskProps, BaseTaskState } from "../base";
+import { unit } from "../../shared/lib/converter";
+import { STORAGE } from "../../shared/lib/persistent";
+import { StorageManagement, StorageBalance } from "../../shared/lib/standards/storageManagement";
+import { CheckboxField, InfoField, TextField, UnitField } from "../../shared/ui/form-fields";
+import { BaseTask, BaseTaskProps, BaseTaskState, DefaultFormData } from "../base";
 import "./near.scss";
 
-type FormData = DefaultFormData & {
-    receiverId: string;
-    amount: string;
-    memo: string;
-};
+type FormData = DefaultFormData;
 
 type Props = BaseTaskProps;
 
 type State = BaseTaskState<FormData> & {
-    token: FungibleToken;
+    storageManagement: StorageManagement | null;
+    storageBalance: StorageBalance | null;
 };
 
-export class FtTransfer extends BaseTask<FormData, Props, State> {
-    override uniqueClassName = "near-ft-transfer-task";
+export class StorageUnregister extends BaseTask<FormData, Props, State> {
+    override uniqueClassName = "near-storage-unregister-task";
     override schema = arx
         .object()
         .shape({
-            addr: arx.string().ft(),
-            gas: arx.big().gas().min(toGas("1")).max(toGas("250")),
-            receiverId: arx.string().address(),
-            amount: arx.big().token().min(0, "amount must be at least ${min}"),
-            memo: arx.string().optional(),
+            addr: arx.string().contract(),
+            gas: arx.big().gas(),
         })
-        .transform(({ gas, gasUnit, ...rest }) => ({
+        .transform(({ gas, gasUnit, amount, amountUnit, ...rest }) => ({
             ...rest,
             gas: arx.big().intoParsed(gasUnit).cast(gas),
         }))
-        .requireAll({ ignore: ["memo"] })
+        .requireAll()
         .retainAll();
 
     override initialValues: FormData = {
-        name: "FT Transfer",
+        name: "Storage Unregister",
         addr: window.nearConfig.WNEAR_ADDRESS,
-        func: "ft_transfer",
-        gas: "10",
+        func: "storage_unregister",
+        gas: "8.5",
         gasUnit: "Tgas",
         depo: "1",
         depoUnit: "yocto",
-        receiverId: "",
-        amount: "0",
-        memo: "",
     };
 
-    constructor(props: Props) {
+    constructor(props: BaseTaskProps) {
         super(props);
         this._constructor();
 
         this.state = {
             ...this.state,
-            token: new FungibleToken(this.initialValues.addr),
+            storageManagement: new StorageManagement(this.initialValues.addr),
+            storageBalance: null,
         };
+
+        this.tryUpdateSm().catch(() => {});
     }
 
     protected override init(
         call: Call<{
-            receiver_id: string;
             amount: string;
-            memo: string;
         }> | null
     ): void {
         if (call !== null) {
@@ -76,10 +67,8 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
                 addr: call.address,
                 func: call.actions[0].func,
                 gas: arx.big().intoFormatted(this.initialValues.gasUnit).cast(call.actions[0].gas).toFixed(),
-                receiverId: call.actions[0].args.receiver_id,
-                amount: call.actions[0].args.amount,
-                memo: call.actions[0].args.memo,
             };
+
             this.initialValues = Object.keys(this.initialValues).reduce((acc, k) => {
                 const v = fromCall[k as keyof typeof fromCall];
                 return v !== null && v !== undefined ? { ...acc, [k as keyof FormData]: v } : acc;
@@ -89,42 +78,26 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
         this.state = { ...this.state, formData: this.initialValues };
         this.schema.check(this.state.formData);
 
-        if (call !== null)
-            this.tryUpdateFt().then((res: boolean) =>
-                this.setFormData({
-                    amount: res
-                        ? arx
-                              .big()
-                              .intoFormatted(this.state.token.metadata.decimals)
-                              .cast(this.state.formData.amount)
-                              .toFixed()
-                        : this.state.formData.amount,
-                })
-            );
+        if (call !== null) this.tryUpdateSm();
     }
 
     static override inferOwnType(json: Call): boolean {
-        return !!json && json.actions[0].func === "ft_transfer";
+        return (
+            !!json && arx.string().address().isValidSync(json.address) && json.actions[0].func === "storage_unregister"
+        );
     }
 
     public override toCall(): Call {
-        const { addr, func, depo, gas, gasUnit, receiverId, amount, memo } = this.state.formData;
-        const { token } = this.state;
+        const { addr, func, gas, gasUnit, depo } = this.state.formData;
 
         if (!arx.big().isValidSync(gas)) throw new CallError("Failed to parse gas input value", this.props.id);
-        if (!arx.big().isValidSync(amount)) throw new CallError("Failed to parse amount input value", this.props.id);
-        if (!token.ready) throw new CallError("Lacking token metadata", this.props.id);
 
         return {
             address: addr,
             actions: [
                 {
                     func,
-                    args: {
-                        receiver_id: receiverId,
-                        amount: arx.big().intoParsed(token.metadata.decimals).cast(amount).toFixed(),
-                        memo,
-                    },
+                    args: { force: false },
                     gas: arx.big().intoParsed(gasUnit).cast(gas).toFixed(),
                     depo,
                 },
@@ -132,40 +105,36 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
         };
     }
 
-    private tryUpdateFt(): Promise<boolean> {
+    private tryUpdateSm(): Promise<boolean> {
         return new Promise<boolean>((resolve) => {
             this.schema.check(this.state.formData).then(() => {
                 const { addr } = fields(this.schema);
                 if (!addr.isBad()) {
-                    this.confidentlyUpdateFt().then((ready) => resolve(ready));
+                    this.confidentlyUpdateSm().then(() => resolve(true));
                 } else {
-                    this.setState({ token: new FungibleToken(this.state.formData.addr) }); // will be invalid
+                    this.setState({
+                        storageManagement: null,
+                        storageBalance: null,
+                    });
                     resolve(false);
                 }
             });
         });
     }
 
-    private async confidentlyUpdateFt(): Promise<boolean> {
+    private async confidentlyUpdateSm(): Promise<boolean> {
         const { addr } = this.state.formData;
-        const newToken = await FungibleToken.init(addr);
-        this.setState({ token: newToken });
+        const storageManagement = new StorageManagement(addr);
+        const storageBalance = await storageManagement.storageBalanceOf(STORAGE.addresses.multicall);
+        this.setState({ storageManagement, storageBalance });
         window.EDITOR.forceUpdate();
-        return newToken.ready;
+        return true;
     }
 
     public override async validateForm(values: FormData): Promise<FormikErrors<FormData>> {
         this.setFormData(values);
         await new Promise((resolve) => this.resolveDebounced(resolve));
-        await this.tryUpdateFt();
-        await this.schema.check(
-            (({ amount, ...rest }) => ({
-                ...rest,
-                amount: this.state.token.ready
-                    ? arx.big().intoParsed(this.state.token.metadata.decimals).cast(amount)?.toFixed() ?? null
-                    : amount,
-            }))(values)
-        );
+        await this.tryUpdateSm();
         return Object.fromEntries(
             Object.entries(fields(this.schema))
                 .map(([k, v]) => [k, v?.message() ?? ""])
@@ -175,6 +144,8 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
 
     public override Editor = (): React.ReactNode => {
         const { resetForm, validateForm } = useFormikContext();
+        const { storageBalance } = this.state;
+        const balance = arx.big().intoFormatted("NEAR").cast(storageBalance?.total);
 
         useEffect(() => {
             resetForm({
@@ -198,23 +169,7 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
                     label="Token Address"
                     roundtop
                 />
-                <TextField
-                    name="receiverId"
-                    label="Receiver Address"
-                />
-                <TextField
-                    name="amount"
-                    label="Amount"
-                    InputProps={{
-                        endAdornment: (
-                            <InputAdornment position="end">{this.state.token.metadata.symbol}</InputAdornment>
-                        ),
-                    }}
-                />
-                <TextField
-                    name="memo"
-                    label="Memo"
-                />
+                {!!balance && <InfoField>{`Current available storage balance: ${balance} Ⓝ`}</InfoField>}
                 <UnitField
                     name="gas"
                     unit="gasUnit"
