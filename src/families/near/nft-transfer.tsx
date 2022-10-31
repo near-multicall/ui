@@ -59,7 +59,7 @@ export class NftTransfer extends BaseTask<FormData, Props, State> {
         name: "NFT Transfer",
         addr: "",
         func: "nft_transfer",
-        gas: "8",
+        gas: "15",
         gasUnit: "Tgas",
         depo: "1",
         depoUnit: "yocto",

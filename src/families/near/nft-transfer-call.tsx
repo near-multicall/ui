@@ -1,19 +1,19 @@
-import { InputAdornment } from "@mui/material";
 import { Form, FormikErrors, useFormikContext } from "formik";
 import { useEffect } from "react";
 import { args as arx } from "../../shared/lib/args/args";
 import { fields } from "../../shared/lib/args/args-types/args-object";
 import { Call, CallError } from "../../shared/lib/call";
 import { toGas } from "../../shared/lib/converter";
-import { MultiFungibleToken } from "../../shared/lib/standards/multiFungibleToken";
+import { STORAGE } from "../../shared/lib/persistent";
+import { NonFungibleToken } from "../../shared/lib/standards/nonFungibleToken";
 import { TextField, UnitField } from "../../shared/ui/form-fields";
-import { BaseTask, BaseTaskProps, BaseTaskState, DefaultFormData } from "../base";
+import type { DefaultFormData } from "../base";
+import { BaseTask, BaseTaskProps, BaseTaskState } from "../base";
 import "./near.scss";
 
 type FormData = DefaultFormData & {
     tokenId: string;
     receiverId: string;
-    amount: string;
     memo: string;
     msg: string;
 };
@@ -21,23 +21,36 @@ type FormData = DefaultFormData & {
 type Props = BaseTaskProps;
 
 type State = BaseTaskState<FormData> & {
-    token: MultiFungibleToken;
+    nft: NonFungibleToken;
 };
 
-export class MftTransferCall extends BaseTask<FormData, Props, State> {
-    override uniqueClassName = "near-ft-transfer-call-task";
+export class NftTransferCall extends BaseTask<FormData, Props, State> {
+    override uniqueClassName = "near-nft-transfer-call-task";
     override schema = arx
         .object()
         .shape({
-            addr: arx.string().contract(),
-            gas: arx.big().gas().min(toGas("45")).max(toGas("250")),
+            addr: arx.string().nft(),
+            gas: arx.big().gas().min(toGas("1")).max(toGas("250")),
+            tokenId: arx
+                .string()
+                .nftId("addr")
+                .test({
+                    name: "approval",
+                    message: "multicall does not have permission to transfer this NFT",
+                    test: (value, ctx) =>
+                        value == null ||
+                        ctx.options.context?.token == null ||
+                        ctx.options.context?.multicallAddress == null ||
+                        ctx.options.context.token.owner_id === ctx.options.context.multicallAddress ||
+                        Object.keys(ctx.options.context.token.approved_account_ids).includes(
+                            ctx.options.context.multicallAddress
+                        ),
+                }),
             receiverId: arx.string().address(),
-            tokenId: arx.string().mftId("addr"),
-            amount: arx.big().token().min(1, "cannot transfer 0 tokens"),
             memo: arx.string().optional(),
             msg: arx.string().optional(),
         })
-        .transform(({ gas, gasUnit, depo, depoUnit, ...rest }) => ({
+        .transform(({ gas, gasUnit, ...rest }) => ({
             ...rest,
             gas: arx.big().intoParsed(gasUnit).cast(gas),
         }))
@@ -45,16 +58,15 @@ export class MftTransferCall extends BaseTask<FormData, Props, State> {
         .retainAll();
 
     override initialValues: FormData = {
-        name: "MFT Transfer Call",
-        addr: window.nearConfig.REF_EXCHANGE_ADDRESS,
-        func: "mft_transfer_call",
-        gas: "150",
+        name: "NFT Transfer Call",
+        addr: "",
+        func: "nft_transfer",
+        gas: "75",
         gasUnit: "Tgas",
         depo: "1",
         depoUnit: "yocto",
         tokenId: "",
         receiverId: "",
-        amount: "0",
         memo: "",
         msg: "",
     };
@@ -62,9 +74,10 @@ export class MftTransferCall extends BaseTask<FormData, Props, State> {
     constructor(props: Props) {
         super(props);
         this._constructor();
+
         this.state = {
             ...this.state,
-            token: new MultiFungibleToken(this.state.formData.addr, this.state.formData.tokenId),
+            nft: new NonFungibleToken(this.state.formData.addr),
         };
     }
 
@@ -82,13 +95,11 @@ export class MftTransferCall extends BaseTask<FormData, Props, State> {
                 addr: call.address,
                 func: call.actions[0].func,
                 gas: arx.big().intoFormatted(this.initialValues.gasUnit).cast(call.actions[0].gas).toFixed(),
-                tokenId: call.actions[0].args.token_id,
                 receiverId: call.actions[0].args.receiver_id,
-                amount: call.actions[0].args.amount,
+                tokenId: call.actions[0].args.token_id,
                 memo: call.actions[0].args.memo,
                 msg: call.actions[0].args.msg,
             };
-
             this.initialValues = Object.keys(this.initialValues).reduce((acc, k) => {
                 const v = fromCall[k as keyof typeof fromCall];
                 return v !== null && v !== undefined ? { ...acc, [k as keyof FormData]: v } : acc;
@@ -96,33 +107,29 @@ export class MftTransferCall extends BaseTask<FormData, Props, State> {
         }
 
         this.state = { ...this.state, formData: this.initialValues };
-        this.schema.check(this.state.formData);
+        this.schema.check(this.state.formData, {
+            context: {
+                token: this.state.nft?.token,
+                multicallAddress: STORAGE.addresses.multicall,
+            },
+        });
 
-        if (call !== null)
-            this.tryUpdateMft().then((res: boolean) =>
-                this.setFormData({
-                    amount: res
-                        ? arx
-                              .big()
-                              .intoFormatted(this.state.token.metadata.decimals)
-                              .cast(this.state.formData.amount)
-                              .toFixed()
-                        : this.state.formData.amount,
-                })
-            );
+        if (call !== null) this.tryUpdateNft();
     }
 
     static override inferOwnType(json: Call): boolean {
-        return !!json && json.actions[0].func === "mft_transfer_call";
+        return !!json && json.actions[0].func === "nft_transfer";
     }
 
     public override toCall(): Call {
-        const { addr, func, tokenId, receiverId, memo, msg, amount, gas, gasUnit, depo } = this.state.formData;
-        const { token } = this.state;
+        const { addr, func, depo, gas, gasUnit, tokenId, receiverId, memo, msg } = this.state.formData;
+        const { nft } = this.state;
 
         if (!arx.big().isValidSync(gas)) throw new CallError("Failed to parse gas input value", this.props.id);
-        if (!arx.big().isValidSync(depo)) throw new CallError("Failed to parse deposit input value", this.props.id);
-        if (!token.ready) throw new CallError("Lacking token metadata", this.props.id);
+        if (!nft.ready || !nft.token) throw new CallError("Lacking token metadata", this.props.id);
+
+        const miIsOwner = nft.token.owner_id === STORAGE.addresses.multicall;
+        const approvalId = nft.token.approved_account_ids[STORAGE.addresses.multicall];
 
         return {
             address: addr,
@@ -132,7 +139,7 @@ export class MftTransferCall extends BaseTask<FormData, Props, State> {
                     args: {
                         token_id: tokenId,
                         receiver_id: receiverId,
-                        amount: arx.big().intoParsed(token.metadata.decimals).cast(amount).toFixed(),
+                        ...(miIsOwner && { approval_id: approvalId }),
                         memo,
                         msg,
                     },
@@ -143,26 +150,33 @@ export class MftTransferCall extends BaseTask<FormData, Props, State> {
         };
     }
 
-    private tryUpdateMft(): Promise<boolean> {
+    private tryUpdateNft(): Promise<boolean> {
         return new Promise<boolean>((resolve) => {
-            this.schema.check(this.state.formData).then(() => {
-                const { addr } = fields(this.schema);
-                if (!addr.isBad()) {
-                    this.confidentlyUpdateMft().then((ready) => resolve(ready));
-                } else {
-                    this.setState({
-                        token: new MultiFungibleToken(this.state.formData.addr, this.state.formData.tokenId),
-                    }); // will be invalid
-                    resolve(false);
-                }
-            });
+            this.schema
+                .check(this.state.formData, {
+                    context: {
+                        token: this.state.nft?.token,
+                        multicallAddress: STORAGE.addresses.multicall,
+                    },
+                })
+                .then(() => {
+                    const { addr } = fields(this.schema);
+                    if (!addr.isBad()) {
+                        this.confidentlyUpdateNft().then((ready) => resolve(ready));
+                    } else {
+                        this.setState({
+                            nft: new NonFungibleToken(this.state.formData.addr),
+                        }); // will be invalid
+                        resolve(false);
+                    }
+                });
         });
     }
 
-    private async confidentlyUpdateMft(): Promise<boolean> {
+    private async confidentlyUpdateNft(): Promise<boolean> {
         const { addr, tokenId } = this.state.formData;
-        const newToken = await MultiFungibleToken.init(addr, tokenId);
-        this.setState({ token: newToken });
+        const newToken = await NonFungibleToken.init(addr, tokenId);
+        this.setState({ nft: newToken });
         window.EDITOR.forceUpdate();
         return newToken.ready;
     }
@@ -170,15 +184,13 @@ export class MftTransferCall extends BaseTask<FormData, Props, State> {
     public override async validateForm(values: FormData): Promise<FormikErrors<FormData>> {
         this.setFormData(values);
         await new Promise((resolve) => this.resolveDebounced(resolve));
-        await this.tryUpdateMft();
-        await this.schema.check(
-            (({ amount, ...rest }) => ({
-                ...rest,
-                amount: this.state.token.ready
-                    ? arx.big().intoParsed(this.state.token.metadata.decimals).cast(amount)?.toFixed() ?? null
-                    : amount,
-            }))(values)
-        );
+        await this.tryUpdateNft();
+        await this.schema.check(values, {
+            context: {
+                token: this.state.nft?.token,
+                multicallAddress: STORAGE.addresses.multicall,
+            },
+        });
         return Object.fromEntries(
             Object.entries(fields(this.schema))
                 .map(([k, v]) => [k, v?.message() ?? ""])
@@ -220,15 +232,6 @@ export class MftTransferCall extends BaseTask<FormData, Props, State> {
                     label="Receiver Address"
                 />
                 <TextField
-                    name="amount"
-                    label="Amount"
-                    InputProps={{
-                        endAdornment: (
-                            <InputAdornment position="end">{this.state.token.metadata.symbol}</InputAdornment>
-                        ),
-                    }}
-                />
-                <TextField
                     name="msg"
                     label="Message"
                     multiline
@@ -236,7 +239,6 @@ export class MftTransferCall extends BaseTask<FormData, Props, State> {
                 <TextField
                     name="memo"
                     label="Memo"
-                    multiline
                 />
                 <UnitField
                     name="gas"
