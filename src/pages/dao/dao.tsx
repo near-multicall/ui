@@ -3,7 +3,7 @@ import { Base64 } from "js-base64";
 import debounce from "lodash.debounce";
 import { Component, ContextType } from "react";
 
-import { Wallet } from "../../entities";
+import { MulticallInstance, Wallet } from "../../entities";
 import { signAndSendTxs } from "../../shared/lib/wallet";
 import { ArgsAccount, ArgsError } from "../../shared/lib/args";
 import { SputnikDAO, SputnikUI, ProposalStatus } from "../../shared/lib/contracts/sputnik-dao";
@@ -18,16 +18,10 @@ import { DaoJobsTab } from "./jobs/jobs";
 import { DaoConfigTab } from "./config/config";
 import "./dao.scss";
 
-// minimum balance a multicall instance needs for storage + state.
-const MIN_INSTANCE_BALANCE = toYocto(1); // 1 NEAR
 const Ctx = Wallet.useSelector();
 
 interface Props {}
 
-enum Mode {
-    view = "VIEW",
-    edit = "EDIT",
-}
 interface State {
     name: ArgsAccount;
     dao: SputnikDAO;
@@ -35,7 +29,6 @@ interface State {
     loading: boolean;
     proposed: number;
     proposedInfo: ProposalOutput | null;
-    mode?: Mode;
 }
 
 const _DaoPage = "DaoPage";
@@ -141,7 +134,7 @@ export class DaoPage extends Component<Props, State> {
             return null;
         }
 
-        const depo = Big(this.fee).plus(MIN_INSTANCE_BALANCE);
+        const depo = Big(this.fee).plus(MulticallInstance.MIN_BALANCE);
         const daoSearchInput: HTMLInputElement = document.querySelector(".DaoSearch input")!;
 
         // can user propose a FunctionCall to DAO?
@@ -314,8 +307,10 @@ export class DaoPage extends Component<Props, State> {
         noContract.isBad = false;
         noDao.isBad = false;
 
-        // chosen address violates NEAR AccountId rules.
         if (address.isBad) {
+            /*
+             * Chosen address violates NEAR AccountId rules.
+             */
             noContract.isBad = true;
             noDao.isBad = true;
 
@@ -326,7 +321,9 @@ export class DaoPage extends Component<Props, State> {
 
         this.setState({ loading: true });
 
-        // initialize DAO and multicall objects
+        /*
+         * Initialize DAO and multicall objects
+         */
         Promise.all([
             SputnikDAO.init(daoAddress).catch((e) => new SputnikDAO(daoAddress)),
             Multicall.init(multicallAddress).catch((e) => new Multicall(multicallAddress)),
@@ -343,7 +340,9 @@ export class DaoPage extends Component<Props, State> {
 
                 return;
             } else {
-                // DAO correctly initialized, try to fetch multicall info
+                /*
+                 * DAO correctly initialized, try to fetch multicall info
+                 */
                 Promise.all([this.proposalAlreadyExists(dao).catch(console.error)]).then(([proposalData]) =>
                     this.setState(({ proposed }) => ({
                         dao,
@@ -392,7 +391,9 @@ export class DaoPage extends Component<Props, State> {
 
         if (loading) return <div className="DaoPage-content loader" />;
 
-        // everything should be loaded
+        /*
+         * Everything should be loaded
+         */
         if (!multicall.admins || !multicall.tokensWhitelist || !multicall.jobBond) {
             console.error("multicall infos incomplete", multicall);
             return <div className="DaoPage-content error">Unexpected error! Multicall might be outdated.</div>;
@@ -402,11 +403,7 @@ export class DaoPage extends Component<Props, State> {
             <Tabs
                 classes={{ buttonsPanel: "DaoPage-tabs-buttonsPanel", contentSpace: "DaoPage-tabs-contentSpace" }}
                 items={[
-                    DaoConfigTab.uiConnect({
-                        className: `${_DaoPage}-content`,
-                        controllerContractAddress: dao.address,
-                        multicallContract: multicall,
-                    }),
+                    DaoConfigTab.uiConnect({ className: `${_DaoPage}-content`, contracts: { dao, multicall } }),
                     DaoFundsTab.uiConnect({ className: `${_DaoPage}-content`, contracts: { dao, multicall } }),
                     DaoJobsTab.uiConnect({ className: `${_DaoPage}-content`, contracts: { multicall } }),
                 ]}

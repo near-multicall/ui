@@ -8,11 +8,8 @@ interface MulticallInstanceAdminsTableProps extends MulticallInstanceEntity.Depe
     className?: string;
 }
 
-export const MulticallInstanceAdminsTable = ({
-    className,
-    controllerContractAddress,
-}: MulticallInstanceAdminsTableProps) => {
-    const { data, error, loading } = MulticallInstanceAdminsModel.useAddressList(controllerContractAddress);
+export const MulticallInstanceAdminsTable = ({ className, daoContractAddress }: MulticallInstanceAdminsTableProps) => {
+    const { data, error, loading } = MulticallInstanceAdminsModel.useAddressList(daoContractAddress);
 
     return (
         <Tile

@@ -18,12 +18,12 @@ export const MulticallInstanceTokensWhitelistTable = ({
     ItemProps,
     additionalItems,
     className,
-    controllerContractAddress,
+    daoContractAddress,
     footer,
     headingCorners,
     onItemsSelected,
 }: MulticallInstanceTokensWhitelistTableProps) => {
-    const { data, error, loading } = MulticallInstanceTokensModel.useWhitelist(controllerContractAddress);
+    const { data, error, loading } = MulticallInstanceTokensModel.useWhitelist(daoContractAddress);
 
     return (
         <Tile

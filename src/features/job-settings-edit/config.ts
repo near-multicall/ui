@@ -6,7 +6,7 @@ import { MulticallContract } from "../../shared/lib/contracts/multicall";
 namespace JobSettingsEditFeature {
     export interface Dependencies
         extends Omit<HTMLProps<HTMLDivElement>, "onChange">,
-            Pick<MulticallInstanceEntity.Dependencies, "controllerContractAddress"> {
+            Pick<MulticallInstanceEntity.Dependencies, "daoContractAddress"> {
         multicallContract: MulticallContract;
         onEdit: (payload: FormState) => void;
     }

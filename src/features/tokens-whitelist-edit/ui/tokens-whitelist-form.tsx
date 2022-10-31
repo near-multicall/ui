@@ -10,12 +10,7 @@ import { type TokensWhitelistEditFeature } from "../config";
 
 interface TokensWhitelistFormProps extends TokensWhitelistEditFeature.Dependencies {}
 
-export const TokensWhitelistForm = ({
-    className,
-    controllerContractAddress,
-    disabled,
-    onEdit,
-}: TokensWhitelistFormProps) => {
+export const TokensWhitelistForm = ({ className, daoContractAddress, disabled, onEdit }: TokensWhitelistFormProps) => {
     const [editModeEnabled, editModeSwitch] = useState(!disabled);
 
     const [addTokens, markForAddition] = useState<TokensWhitelistEditFeature.FormStates["addTokens"]>(new Set()),
@@ -108,7 +103,7 @@ export const TokensWhitelistForm = ({
                     </IconButton>
                 ),
             }}
-            {...{ className, controllerContractAddress }}
+            {...{ className, daoContractAddress }}
         />
     );
 };

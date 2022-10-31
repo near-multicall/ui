@@ -5,7 +5,6 @@ import { MulticallInstance } from "../../../entities";
 import { JobSettingsEdit, TokensWhitelistEdit } from "../../../features";
 import { ArgsString } from "../../../shared/lib/args";
 import { MulticallContract, type MulticallConfigChanges } from "../../../shared/lib/contracts/multicall";
-import { SputnikDAOContract } from "../../../shared/lib/contracts/sputnik-dao";
 import { signAndSendTxs } from "../../../shared/lib/wallet";
 import { Button, ButtonGroup, TextInput, Tile } from "../../../shared/ui/components";
 import { type MulticallConfigEditorWidget } from "../config";
@@ -16,11 +15,7 @@ interface MulticallConfigEditorUIProps extends MulticallConfigEditorWidget.Depen
 
 const _MulticallConfigEditor = "MulticallConfigEditor";
 
-export const MulticallConfigEditorUI = ({
-    className,
-    controllerContractAddress,
-    multicallContract,
-}: MulticallConfigEditorUIProps) => {
+export const MulticallConfigEditorUI = ({ className, contracts }: MulticallConfigEditorUIProps) => {
     const [editMode, editModeSwitch] = useState(false);
 
     const changesDiffInitialState: MulticallConfigChanges = {
@@ -62,38 +57,40 @@ export const MulticallConfigEditorUI = ({
     const onSubmit = useCallback(
         (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
             event.preventDefault();
-            SputnikDAOContract.init(controllerContractAddress)
-                .then((instanceController) =>
-                    instanceController
-                        .proposeFunctionCall(
-                            proposalDescription,
-                            multicallContract.address,
-                            MulticallContract.configDiffToProposalActions(formState)
-                        )
-                        .then((someTx) => signAndSendTxs([someTx]))
+
+            void contracts.dao
+                .proposeFunctionCall(
+                    proposalDescription,
+                    contracts.multicall.address,
+                    MulticallContract.configDiffToProposalActions(formState)
                 )
+                .then((someTx) => signAndSendTxs([someTx]))
                 .catch(console.error);
         },
-        [controllerContractAddress, proposalDescription]
+
+        [contracts, proposalDescription]
     );
 
     return (
         <div className={clsx(_MulticallConfigEditor, className)}>
             <MulticallInstance.AdminsTable
                 className={_MulticallConfigEditor + "-admins"}
-                {...{ controllerContractAddress }}
+                daoContractAddress={contracts.dao.address}
             />
 
             <TokensWhitelistEdit.Form
                 className={_MulticallConfigEditor + "-tokensWhitelist"}
+                daoContractAddress={contracts.dao.address}
                 disabled={!editMode}
-                {...{ controllerContractAddress, onEdit }}
+                {...{ onEdit }}
             />
 
             <JobSettingsEdit.Form
                 className={_MulticallConfigEditor + "-jobsSettings"}
+                daoContractAddress={contracts.dao.address}
                 disabled={!editMode}
-                {...{ controllerContractAddress, multicallContract, onEdit }}
+                multicallContract={contracts.multicall}
+                {...{ onEdit }}
             />
 
             <Tile
@@ -131,8 +128,6 @@ export const MulticallConfigEditorUI = ({
                                 proposalDescription.length === 0
                             }
                             label="Submit"
-                            // clicking buttons inside a from element can lead to page refresh.
-                            // IMPORTANT: call event.preventDefault() inside the click handler.
                             onClick={onSubmit}
                         />
                     </ButtonGroup>
