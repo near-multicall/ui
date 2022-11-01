@@ -15,6 +15,7 @@ import { errorMsg } from "../../shared/lib/errors";
 import { STORAGE } from "../../shared/lib/persistent";
 import { signAndSendTxs, view } from "../../shared/lib/wallet";
 import { DateTimePicker, TextInput, TextInputWithUnits } from "../../shared/ui/components";
+import { ChoiceField } from "../../shared/ui/form-fields/choice-field/choice-field";
 import "./export.scss";
 
 const _Export = "Export";
@@ -321,116 +322,116 @@ export class Export extends Component {
                         update={this.update}
                     />
 
-                    <div className={`${_Export}-params-choice`}>
-                        <p>Attach</p>
+                    <ChoiceField
+                        show={(ids) => {
+                            if (ids.includes(0))
+                                return (
+                                    <TextInputWithUnits
+                                        label="Total attached deposit"
+                                        value={depo}
+                                        error={errors.depo}
+                                        options={["NEAR", "yocto"]}
+                                        update={this.update}
+                                    />
+                                );
+                            if (ids.includes(1))
+                                return (
+                                    <>
+                                        <TextInput
+                                            label="Token address"
+                                            value={token}
+                                            error={[errors.token, errors.noToken, errors.notWhitelisted]}
+                                            update={() => {
+                                                this.update();
+                                                this.updateFTDebounced();
+                                            }}
+                                        />
 
-                        <button
-                            className={clsx({ selected: attachNEAR })}
-                            onClick={() => {
-                                this.setState({
-                                    attachNEAR: !attachNEAR,
-                                    attachFT: false,
-                                });
-                            }}
-                        >
-                            NEAR
-                        </button>
+                                        <TextField
+                                            label="Amount"
+                                            value={errors.amount.validOrNull(amount) || errors.amount.intermediate}
+                                            margin="dense"
+                                            size="small"
+                                            onChange={(e) => {
+                                                amount.value = e.target.value;
+                                                errors.amount.validOrNull(amount);
+                                                this.update();
+                                            }}
+                                            error={errors.amount.isBad}
+                                            helperText={errors.amount.isBad && errors.amount.message}
+                                            InputLabelProps={{ shrink: true }}
+                                            InputProps={{
+                                                endAdornment: (
+                                                    <InputAdornment position="end">{amount.unit}</InputAdornment>
+                                                ),
+                                            }}
+                                        />
+                                    </>
+                                );
+                        }}
+                    >
+                        {({ isActive, toggle, remove }) => (
+                            <>
+                                <p>Attach</p>
+                                <button
+                                    className={clsx({ selected: isActive(0) })}
+                                    onClick={() => {
+                                        toggle(0);
+                                        remove(1);
+                                    }}
+                                >
+                                    NEAR
+                                </button>
+                                <p>or</p>
+                                <button
+                                    className={clsx({ selected: isActive(1) })}
+                                    onClick={() => {
+                                        remove(0);
+                                        toggle(1);
+                                    }}
+                                >
+                                    fungible token
+                                </button>
+                            </>
+                        )}
+                    </ChoiceField>
 
-                        <p>or</p>
-
-                        <button
-                            className={clsx({ selected: attachFT })}
-                            onClick={() => {
-                                this.setState({
-                                    attachNEAR: false,
-                                    attachFT: !attachFT,
-                                });
-                            }}
-                        >
-                            fungible token
-                        </button>
-                    </div>
-
-                    {attachNEAR ? (
-                        <TextInputWithUnits
-                            label="Total attached deposit"
-                            value={depo}
-                            error={errors.depo}
-                            options={["NEAR", "yocto"]}
-                            update={this.update}
-                        />
-                    ) : null}
-
-                    {attachFT ? (
-                        <>
-                            <TextInput
-                                label="Token address"
-                                value={token}
-                                error={[errors.token, errors.noToken, errors.notWhitelisted]}
-                                update={() => {
-                                    this.update();
-                                    this.updateFTDebounced();
-                                }}
-                            />
-
-                            <TextField
-                                label="Amount"
-                                value={errors.amount.validOrNull(amount) || errors.amount.intermediate}
-                                margin="dense"
-                                size="small"
-                                onChange={(e) => {
-                                    amount.value = e.target.value;
-                                    errors.amount.validOrNull(amount);
-                                    this.update();
-                                }}
-                                error={errors.amount.isBad}
-                                helperText={errors.amount.isBad && errors.amount.message}
-                                InputLabelProps={{ shrink: true }}
-                                InputProps={{
-                                    endAdornment: <InputAdornment position="end">{amount.unit}</InputAdornment>,
-                                }}
-                            />
-                        </>
-                    ) : null}
-
-                    <div className={clsx(`${_Export}-params-choice`, `${_Export}-params-scheduleMode`)}>
-                        <p>Execute</p>
-
-                        <button
-                            className={clsx({ selected: !isJob })}
-                            onClick={() => {
-                                this.setState({
-                                    isJob: false,
-                                });
-                            }}
-                        >
-                            immediately
-                        </button>
-
-                        <p>or</p>
-
-                        <button
-                            className={clsx({ selected: isJob })}
-                            onClick={() => {
-                                this.setState({
-                                    isJob: true,
-                                });
-                            }}
-                        >
-                            scheduled
-                        </button>
-                    </div>
-
-                    {isJob ? (
-                        <DateTimePicker
-                            classes={{ input: clsx(`${_Export}-params-scheduleTime`) }}
-                            label="Execution date"
-                            value={jobDateTime}
-                            minDateTime={currentDate}
-                            maxDateTime={maxDate}
-                            handleChange={(value) => this.setState({ jobDateTime: value.toJSDate() })}
-                        />
-                    ) : null}
+                    <ChoiceField
+                        roundbottom
+                        initial={[0]}
+                        show={(ids) => {
+                            if (ids.includes(1))
+                                return (
+                                    <DateTimePicker
+                                        classes={{ input: clsx(`${_Export}-params-scheduleTime`) }}
+                                        label="Execution date"
+                                        value={jobDateTime}
+                                        minDateTime={currentDate}
+                                        maxDateTime={maxDate}
+                                        handleChange={(value) => this.setState({ jobDateTime: value.toJSDate() })}
+                                    />
+                                );
+                        }}
+                    >
+                        {({ isActive, choose }) => (
+                            <>
+                                <p>Execute</p>
+                                <button
+                                    className={clsx({ selected: isActive(0) })}
+                                    onClick={() => choose(0)}
+                                >
+                                    immediately
+                                </button>
+                                <p>or</p>
+                                <button
+                                    className={clsx({ selected: isActive(1) })}
+                                    onClick={() => choose(1)}
+                                >
+                                    scheduled
+                                </button>
+                            </>
+                        )}
+                    </ChoiceField>
                 </div>
 
                 {/* Display cards' errors */}
