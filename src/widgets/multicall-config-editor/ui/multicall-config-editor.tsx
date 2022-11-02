@@ -19,10 +19,10 @@ export const MulticallConfigEditorUI = ({ className, contracts }: MulticallConfi
     const [editMode, editModeSwitch] = useState(false);
 
     const changesDiffInitialState: MulticallConfigDiff = {
-        removeTokens: [],
-        addTokens: [],
-        jobBond: "",
-        croncatManager: "",
+        [TokensWhitelistEdit.DiffKey.removeTokens]: [],
+        [TokensWhitelistEdit.DiffKey.addTokens]: [],
+        [JobSettingsEdit.DiffKey.jobBond]: "",
+        [JobSettingsEdit.DiffKey.croncatManager]: "",
     };
 
     const [formState, formStateUpdate] = useState<MulticallConfigDiff>(changesDiffInitialState),

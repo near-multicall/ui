@@ -1,6 +1,6 @@
 import { HTMLProps } from "react";
 
-import { type MulticallTokensWhitelistDiffKey, type MulticallConfigDiff } from "../../shared/lib/contracts/multicall";
+import { MulticallTokensWhitelistDiffKey, type MulticallConfigDiff } from "../../shared/lib/contracts/multicall";
 import { MulticallInstanceEntity } from "../../entities";
 
 namespace TokensWhitelistEditFeature {
@@ -20,4 +20,8 @@ namespace TokensWhitelistEditFeature {
         > {}
 }
 
-export { type TokensWhitelistEditFeature };
+class TokensWhitelistEditConfig {
+    static DiffKey = MulticallTokensWhitelistDiffKey;
+}
+
+export { TokensWhitelistEditConfig, type TokensWhitelistEditFeature };

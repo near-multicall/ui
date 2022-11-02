@@ -1,7 +1,7 @@
-import { type JobSettingsEditFeature } from "./config";
+import { JobSettingsEditConfig, type JobSettingsEditFeature } from "./config";
 import { JobSettingsForm } from "./ui/job-settings-form";
 
-class JobSettingsEdit {
+class JobSettingsEdit extends JobSettingsEditConfig {
     static Form = JobSettingsForm;
 }
 
