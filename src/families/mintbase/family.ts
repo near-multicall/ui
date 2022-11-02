@@ -1,2 +1,2 @@
 export { CreateStore } from "./create-store";
-export {};
+export { TransferStoreOwnership } from "./transfer-store-ownership";

@@ -177,6 +177,14 @@ export class Task extends Component {
                                 json={json}
                             />
                         );
+                    case "transfer_store_ownership":
+                        return (
+                            <Family.Mintbase.TransferStoreOwnership
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
                 }
 
             default:

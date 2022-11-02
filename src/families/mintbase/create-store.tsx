@@ -3,10 +3,11 @@ import { useEffect } from "react";
 import { args as arx } from "../../shared/lib/args/args";
 import { Call, CallError } from "../../shared/lib/call";
 import { BASE_URI_ARWEAVE, MintbaseStore } from "../../shared/lib/contracts/mintbase";
+import { dataUrlToFile, fileToDataUrl } from "../../shared/lib/converter";
 import { STORAGE } from "../../shared/lib/persistent";
 import { TextField, UnitField } from "../../shared/ui/form-fields";
 import { FileField } from "../../shared/ui/form-fields/file-field/file-field";
-import { BaseTask, BaseTaskProps, DefaultFormData } from "../base";
+import { BaseTask, BaseTaskProps, BaseTaskState, DefaultFormData } from "../base";
 import "./mintbase.scss";
 
 type FormData = DefaultFormData & {
@@ -14,6 +15,12 @@ type FormData = DefaultFormData & {
     storeName: string;
     storeSymbol: string;
     icon: File | null;
+};
+
+type Props = BaseTaskProps;
+
+type State = BaseTaskState<FormData> & {
+    iconDataUrl: string;
 };
 
 type CreateStoreArgs = {
@@ -29,7 +36,10 @@ type CreateStoreArgs = {
     };
 };
 
-export class CreateStore extends BaseTask<FormData> {
+const DEFAULT_STORE_ICON =
+    "data:image/x-icon;base64,AAABAAEAEBAQAAEABAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAgAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAJCT/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEQAAEQAAAAEAEAEAEAAAAQAQAQAQAAAAEREREQAAAAAAEAAAAAAAAAAQAAAAAAAAABEQAAEQAAAAEAEAEAEAAAAQAQAQAQAAAAEREREQAAAAAAAAEAAAAAAAAAAQAAAAAAAAERAAAAAAAAEAEAAAAAAAAQAQAAAAAAAAEQAADnnwAA228AANtvAADgHwAA+/8AAPv/AAD48wAA+20AAPttAAD8AwAA/+8AAP/vAAD/jwAA/28AAP9vAAD/nwAA";
+
+export class CreateStore extends BaseTask<FormData, Props, State> {
     override uniqueClassName = "mintbase-create-store-task";
     override schema = arx
         .object()
@@ -38,7 +48,13 @@ export class CreateStore extends BaseTask<FormData> {
             // TODO: lowercase() not working
             storeName: arx
                 .string()
-                .lowercase("only small letters")
+                .matches(/^([a-z]|[0-9])+$/, "only lowercase letters or numbers")
+                .test("is full store address valid", "this name is invalid", async (value) =>
+                    arx
+                        .string()
+                        .address()
+                        .isValidSync(value + MintbaseStore.FACTORY_ADDRESS)
+                )
                 .test("is store name available", "This name is taken already", async (value) => {
                     if (value == null) return false;
                     try {
@@ -76,7 +92,7 @@ export class CreateStore extends BaseTask<FormData> {
         owner: STORAGE.addresses.multicall,
         storeName: "",
         storeSymbol: "",
-        icon: null,
+        icon: dataUrlToFile(DEFAULT_STORE_ICON, "store-icon"),
     };
 
     constructor(props: BaseTaskProps) {
@@ -85,14 +101,16 @@ export class CreateStore extends BaseTask<FormData> {
     }
 
     protected override init(call: Call<CreateStoreArgs> | null): void {
+        let iconDataUrl = DEFAULT_STORE_ICON;
         if (call !== null) {
+            iconDataUrl = call.actions[0].args.metadata.icon;
             const fromCall = {
                 addr: call.address,
                 func: call.actions[0].func,
                 owner: call.actions[0].args.owner_id,
                 storeName: call.actions[0].args.metadata.name,
                 storeSymbol: call.actions[0].args.metadata.symbol,
-                icon: this.dataUriToFile(call.actions[0].args.metadata.icon),
+                icon: dataUrlToFile(iconDataUrl, "store-icon"),
                 gas: arx.big().intoFormatted(this.initialValues.gasUnit).cast(call.actions[0].gas).toFixed(),
                 depo: arx.big().intoFormatted(this.initialValues.depoUnit).cast(call.actions[0].depo).toFixed(),
             };
@@ -102,7 +120,7 @@ export class CreateStore extends BaseTask<FormData> {
             }, this.initialValues);
         }
 
-        this.state = { ...this.state, formData: this.initialValues };
+        this.state = { ...this.state, iconDataUrl, formData: this.initialValues };
         this.schema.check(this.state.formData);
     }
 
@@ -116,7 +134,8 @@ export class CreateStore extends BaseTask<FormData> {
     }
 
     public override toCall(): Call {
-        const { addr, func, gas, gasUnit, depo, depoUnit, owner, storeName, storeSymbol, icon } = this.state.formData;
+        const { addr, func, gas, gasUnit, depo, depoUnit, owner, storeName, storeSymbol } = this.state.formData;
+        const { iconDataUrl } = this.state;
 
         if (!arx.big().isValidSync(gas)) throw new CallError("Failed to parse gas input value", this.props.id);
         if (!arx.big().isValidSync(depo)) throw new CallError("Failed to parse amount input value", this.props.id);
@@ -132,7 +151,7 @@ export class CreateStore extends BaseTask<FormData> {
                             spec: "nft-1.0.0",
                             name: storeName,
                             symbol: storeSymbol,
-                            icon: !!icon ? this.fileToDataUri(icon) : null,
+                            icon: iconDataUrl,
                             base_uri: BASE_URI_ARWEAVE,
                             reference: null,
                             reference_hash: null,
@@ -145,18 +164,9 @@ export class CreateStore extends BaseTask<FormData> {
         };
     }
 
-    private fileToDataUri(file: File): string {
-        // TODO implement
-        return "fake data URI";
-    }
-
-    private dataUriToFile(dataUri: string): File {
-        // TODO implement
-        return new File([], "fake File");
-    }
-
     public override Editor = (): React.ReactNode => {
-        const { resetForm, validateForm, values } = useFormikContext<FormData>();
+        const { resetForm, validateForm } = useFormikContext<FormData>();
+        const { iconDataUrl } = this.state;
 
         useEffect(() => {
             resetForm({
@@ -188,10 +198,27 @@ export class CreateStore extends BaseTask<FormData> {
                     name="storeSymbol"
                     label="Symbol"
                 />
+                {
+                    // make sure we're dealing wiht data URL.
+                    // helpful when user loads from an external proposal.
+                    arx.string().dataUrl().isValidSync(iconDataUrl) ? (
+                        <img
+                            src={iconDataUrl}
+                            alt="store icon"
+                        />
+                    ) : null
+                }
                 <FileField
                     name="icon"
                     label="Icon"
                     accept=".png,.jpeg,.gif,.svg+xml"
+                    onChange={async (event) => {
+                        const file = (event.currentTarget as HTMLInputElement).files?.[0];
+                        if (file) {
+                            const dataUrl = await fileToDataUrl(file);
+                            if (dataUrl) this.setState({ iconDataUrl: dataUrl });
+                        }
+                    }}
                 />
                 <UnitField
                     name="gas"

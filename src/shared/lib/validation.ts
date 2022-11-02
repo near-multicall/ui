@@ -27,4 +27,9 @@ const isSimpleNumberStr = (numberStr: string): boolean => {
     return SIMPLE_NUM_REGEX.test(numberStr);
 };
 
-export const Validation = { isUrl, isNearAccountId, isSimpleNumberStr };
+function isDataURL(s: string): boolean {
+    const DATA_URL_REGEX = /^(data:)([\w\/\+-]*)(;charset=[\w-]+|;base64){0,1},(.*)/gi;
+    return !!s.match(DATA_URL_REGEX);
+}
+
+export const Validation = { isUrl, isNearAccountId, isSimpleNumberStr, isDataURL };

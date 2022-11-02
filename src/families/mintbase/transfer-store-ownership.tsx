@@ -5,34 +5,36 @@ import { useEffect } from "react";
 import { args as arx } from "../../shared/lib/args/args";
 import { fields } from "../../shared/lib/args/args-types/args-object";
 import { Call, CallError } from "../../shared/lib/call";
-import { toGas, unit, formatTokenAmount } from "../../shared/lib/converter";
+import { toGas } from "../../shared/lib/converter";
 import { MintbaseStore } from "../../shared/lib/contracts/mintbase";
 import { CheckboxField, TextField, UnitField } from "../../shared/ui/form-fields";
 import { BaseTask, BaseTaskProps, BaseTaskState } from "../base";
-import "./near.scss";
+import "./mintbase.scss";
 import { STORAGE } from "../../shared/lib/persistent";
 
 import type { DefaultFormData } from "../base";
-import { InfoField } from "../../shared/ui/form-fields/info-field/info-field";
+import type { StoreInfo } from "../../shared/lib/contracts/mintbase";
 
 type FormData = DefaultFormData & {
-    accountId: string;
+    newOwner: string;
+    keepOldMinters: boolean;
 };
 
 type Props = BaseTaskProps;
 
 type State = BaseTaskState<FormData> & {
     mintbaseStore: MintbaseStore;
+    mintbaseStoreInfo: StoreInfo;
 };
 
-export class Unstake extends BaseTask<FormData, Props, State> {
-    override uniqueClassName = "near-unstake-task";
+export class TransferStoreOwnership extends BaseTask<FormData, Props, State> {
+    override uniqueClassName = "mintbase-transfer-store-ownership-task";
     override schema = arx
         .object()
         .shape({
-            addr: arx.string().stakingPool(),
+            addr: arx.string().mintbaseStore(),
             gas: arx.big().gas().min(toGas("3.5")).max(toGas("250")),
-            accountId: arx.string().address(),
+            newOwner: arx.string().address(),
         })
         .transform(({ gas, gasUnit, ...rest }) => ({
             ...rest,
@@ -45,36 +47,31 @@ export class Unstake extends BaseTask<FormData, Props, State> {
         name: "Transfer store ownership",
         addr: "",
         func: "transfer_store_ownership",
-        accountId: "",
+        newOwner: "",
         gas: "30",
         gasUnit: "Tgas",
         depo: "1",
         depoUnit: "yocto",
+        keepOldMinters: true,
     };
 
     constructor(props: Props) {
         super(props);
         this._constructor();
-
-        this.state = {
-            ...this.state,
-            currentOwner: "",
-        };
-
-        // TODO: get store owner/ store data
-        this.tryUpdateStakingPool().catch(() => {});
     }
 
     protected override init(
         call: Call<{
-            account_id: string;
+            new_owner: string;
+            keep_old_minters: boolean;
         }> | null
     ): void {
         if (call !== null) {
             const fromCall = {
                 addr: call.address,
                 func: call.actions[0].func,
-                accountId: call.actions[0].args.account_id,
+                newOwner: call.actions[0].args.new_owner,
+                keepOldMinters: call.actions[0].args.keep_old_minters,
                 gas: arx.big().intoFormatted(this.initialValues.gasUnit).cast(call.actions[0].gas).toFixed(),
             };
             this.initialValues = Object.keys(this.initialValues).reduce((acc, k) => {
@@ -92,7 +89,7 @@ export class Unstake extends BaseTask<FormData, Props, State> {
     }
 
     public override toCall(): Call {
-        const { addr, accountId, gas, gasUnit, depo } = this.state.formData;
+        const { addr, newOwner, keepOldMinters, gas, gasUnit, depo } = this.state.formData;
 
         if (!arx.big().isValidSync(gas)) throw new CallError("Failed to parse gas input value", this.props.id);
         if (!arx.big().isValidSync(depo)) throw new CallError("Failed to parse deposit input value", this.props.id);
@@ -102,7 +99,10 @@ export class Unstake extends BaseTask<FormData, Props, State> {
             actions: [
                 {
                     func: "transfer_store_ownership",
-                    args: { account_id: accountId },
+                    args: {
+                        new_owner: newOwner,
+                        keep_old_minters: keepOldMinters,
+                    },
                     gas: arx.big().intoParsed(gasUnit).cast(gas).toFixed(),
                     depo,
                 },
@@ -111,12 +111,12 @@ export class Unstake extends BaseTask<FormData, Props, State> {
     }
 
     // TODO: fetch store owner/data
-    private tryUpdateStakingPool(): Promise<boolean> {
+    private tryUpdateMintbaseStore(): Promise<boolean> {
         return new Promise<boolean>((resolve) => {
             this.schema.check(this.state.formData).then(() => {
                 const { addr } = fields(this.schema);
                 if (!addr.isBad()) {
-                    this.confidentlyUpdateStakingPool().then((ready) => resolve(ready));
+                    this.confidentlyUpdateMintbaseStore().then((ready) => resolve(ready));
                 } else {
                     this.setState({ mintbaseStore: new MintbaseStore(this.state.formData.addr) }); // will be invalid
                     resolve(false);
@@ -126,34 +126,16 @@ export class Unstake extends BaseTask<FormData, Props, State> {
     }
 
     // fetch store data/owner
-    private async confidentlyUpdateStakingPool(): Promise<boolean> {
+    private async confidentlyUpdateMintbaseStore(): Promise<boolean> {
         const { addr } = this.state.formData;
-        const [store, multicallStakeInfo] = await Promise.all([
-            MintbaseStore.init(addr),
-            new StakingPool(addr).getAccount(STORAGE.addresses.multicall),
-        ]);
-        this.setState({ mintbaseStore: store, stakeInfo: multicallStakeInfo });
+        const [store, storeInfo] = await Promise.all([MintbaseStore.init(addr), new MintbaseStore(addr).getInfo()]);
+        this.setState({ mintbaseStore: store, mintbaseStoreInfo: storeInfo });
         window.EDITOR.forceUpdate();
         return store.ready;
     }
 
-    public async validateForm(values: FormData): Promise<FormikErrors<FormData>> {
-        values.func = values.unstakeAll ? "unstake_all" : "unstake";
-        this.setFormData(values);
-        await new Promise((resolve) => this.resolveDebounced(resolve));
-        await this.tryUpdateStakingPool();
-        // test can't stake more than balance
-        await this.schema.check(values, { context: { stakedAmount: this.state.stakeInfo?.staked_balance } });
-        return Object.fromEntries(
-            Object.entries(fields(this.schema))
-                .map(([k, v]) => [k, v?.message() ?? ""])
-                .filter(([_, v]) => v !== "")
-        );
-    }
-
     public override Editor = (): React.ReactNode => {
         const { resetForm, validateForm, values } = useFormikContext<FormData>();
-        const { mintbaseStore } = this.state;
 
         useEffect(() => {
             resetForm({
@@ -177,22 +159,15 @@ export class Unstake extends BaseTask<FormData, Props, State> {
                     label="Store address"
                     roundtop
                 />
-                {pool.ready ? (
-                    <InfoField>{`Staked balance: ${formatTokenAmount(stakeInfo!.staked_balance, 24, 2)} Ⓝ`}</InfoField>
-                ) : null}
-                <CheckboxField
-                    name="unstakeAll"
-                    label="Unstake all available funds"
-                    checked={values.unstakeAll}
+                <TextField
+                    name="newOwner"
+                    label="New owner"
                 />
-                {!values.unstakeAll && (
-                    <UnitField
-                        name="amount"
-                        unit="amountUnit"
-                        options={["NEAR", "yocto"]}
-                        label="Unstaking amount"
-                    />
-                )}
+                <CheckboxField
+                    name="keepOldMinters"
+                    label="keep old minters"
+                    checked={values.keepOldMinters}
+                />
                 <UnitField
                     name="gas"
                     unit="gasUnit"

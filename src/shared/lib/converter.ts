@@ -73,6 +73,41 @@ const cronToDate = (cronStr: string): Date => {
     return interval.next().toDate();
 };
 
+// convert file to base64 data URI
+const fileToDataUrl = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+            if (typeof reader.result !== "string") return resolve("");
+            else return resolve(reader.result);
+        };
+        reader.onerror = (error) => reject(error);
+    });
+};
+
+// Create Blob file from URL
+const dataUrlToBlob = (dataUri: string): Blob => {
+    // convert base64 to raw binary data held in a string
+    // doesn't handle URLEncoded DataURIs
+    var byteString = window.atob(dataUri.split(",")[1]);
+    // separate out the mime component
+    var mimeString = dataUri.split(",")[0].split(":")[1].split(";")[0];
+    // write the bytes of the string to an ArrayBuffer
+    var ab = new ArrayBuffer(byteString.length);
+    var ia = new Uint8Array(ab);
+    for (var i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+    }
+
+    return new Blob([ab], { type: mimeString });
+};
+
+const dataUrlToFile = (dataUrl: string, fileName: string): File => {
+    const blobObj = dataUrlToBlob(dataUrl);
+    return new File([blobObj], fileName);
+};
+
 export {
     unitToDecimals,
     parseTokenAmount,
@@ -86,4 +121,6 @@ export {
     Big, // re-export Big.js to preserve library config
     dateToCron,
     cronToDate,
+    fileToDataUrl,
+    dataUrlToFile,
 };

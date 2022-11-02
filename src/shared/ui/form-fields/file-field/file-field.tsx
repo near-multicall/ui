@@ -11,9 +11,18 @@ type FileFieldProps = MuiTextFieldProps & {
     roundbottom?: boolean;
     accept: React.HTMLProps<HTMLInputElement>["accept"];
     className?: string;
+    onChangeHandler?: (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) => any;
 };
 
-export const FileField = ({ roundbottom, roundtop, name, className, accept, ...props }: FileFieldProps) => {
+export const FileField = ({
+    roundbottom,
+    roundtop,
+    name,
+    className,
+    accept,
+    onChangeHandler,
+    ...props
+}: FileFieldProps) => {
     const [field, meta, helper] = useField<File | null>(name);
     return (
         <div
@@ -38,7 +47,10 @@ export const FileField = ({ roundbottom, roundtop, name, className, accept, ...p
                 inputProps={{
                     type: "file",
                     accept,
-                    onChange: (e) => helper.setValue((e.currentTarget as HTMLInputElement).files?.[0] ?? null),
+                    onChange: (e) => {
+                        helper.setValue((e.currentTarget as HTMLInputElement).files?.[0] ?? null);
+                        onChangeHandler?.(e);
+                    },
                 }}
                 {...props}
             />
