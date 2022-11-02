@@ -88,12 +88,12 @@ export const MulticallConfigEditorUI = ({ className, contracts }: MulticallConfi
     return (
         <div className={clsx(_MulticallConfigEditor, className)}>
             <MulticallInstance.AdminsTable
-                className={_MulticallConfigEditor + "-admins"}
+                className={`${_MulticallConfigEditor}-admins`}
                 daoContractAddress={contracts.dao.address}
             />
 
             <TokensWhitelistEdit.Form
-                className={_MulticallConfigEditor + "-tokensWhitelist"}
+                className={`${_MulticallConfigEditor}-tokensWhitelist`}
                 daoContractAddress={contracts.dao.address}
                 disabled={!editMode}
                 resetTrigger={childFormsResetRequested}
@@ -101,7 +101,7 @@ export const MulticallConfigEditorUI = ({ className, contracts }: MulticallConfi
             />
 
             <JobSettingsEdit.Form
-                className={_MulticallConfigEditor + "-jobsSettings"}
+                className={`${_MulticallConfigEditor}-jobsSettings`}
                 daoContractAddress={contracts.dao.address}
                 disabled={!editMode}
                 multicallContract={contracts.multicall}
@@ -111,7 +111,7 @@ export const MulticallConfigEditorUI = ({ className, contracts }: MulticallConfi
 
             <Tile
                 classes={{
-                    content: clsx(_MulticallConfigEditor + "-proposalForm", { "is-inEditMode": editMode }),
+                    content: clsx(`${_MulticallConfigEditor}-proposalForm`, { "is-inEditMode": editMode }),
                 }}
                 heading={editMode ? "Changes proposal" : null}
             >

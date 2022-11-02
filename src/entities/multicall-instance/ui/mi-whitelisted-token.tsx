@@ -1,7 +1,7 @@
 import { FungibleToken } from "../../../shared/lib/standards/fungibleToken";
 import { NearLink } from "../../../shared/ui/components";
 
-interface MulticallInstanceWhitelistedTokenProps {
+export interface MulticallInstanceWhitelistedTokenProps {
     address: FungibleToken["address"];
 }
 

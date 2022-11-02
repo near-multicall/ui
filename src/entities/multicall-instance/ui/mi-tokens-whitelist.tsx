@@ -1,26 +1,28 @@
-import { FungibleToken } from "../../../shared/lib/standards/fungibleToken";
 import { Scrollable, Table, type TableProps, Tile, TileProps } from "../../../shared/ui/components";
 import { MulticallInstanceTokensModel } from "../model/mi-tokens";
 import { type MulticallInstanceEntity } from "../config";
 
-import { multicallInstanceWhitelistedTokenToTableRow } from "./mi-whitelisted-token";
+import {
+    type MulticallInstanceWhitelistedTokenProps,
+    multicallInstanceWhitelistedTokenToTableRow,
+} from "./mi-whitelisted-token";
 
 interface MulticallInstanceTokensWhitelistTableProps
     extends MulticallInstanceEntity.Dependencies,
         Pick<TileProps, "footer" | "headingCorners"> {
     ItemProps?: TableProps["RowProps"];
-    additionalItems?: FungibleToken["address"][];
     className?: string;
+    itemsAdditional?: MulticallInstanceWhitelistedTokenProps["address"][];
     onItemsSelected?: TableProps["onRowsSelected"];
 }
 
 export const MulticallInstanceTokensWhitelistTable = ({
     ItemProps,
-    additionalItems,
     className,
     daoContractAddress,
     footer,
     headingCorners,
+    itemsAdditional,
     onItemsSelected,
 }: MulticallInstanceTokensWhitelistTableProps) => {
     const { data, error, loading } = MulticallInstanceTokensModel.useWhitelist(daoContractAddress);
@@ -39,7 +41,7 @@ export const MulticallInstanceTokensWhitelistTable = ({
                     displayMode="compact"
                     header={["Contract address"]}
                     onRowsSelected={onItemsSelected}
-                    rows={data?.concat(additionalItems ?? []).map(multicallInstanceWhitelistedTokenToTableRow)}
+                    rows={data?.concat(itemsAdditional ?? []).map(multicallInstanceWhitelistedTokenToTableRow)}
                 />
             </Scrollable>
         </Tile>
