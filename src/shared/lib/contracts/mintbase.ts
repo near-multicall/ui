@@ -94,9 +94,9 @@ class MintbaseStore {
         return {
             owner: logs[0].split("owner: ")[1],
             minted: JSON.parse(logs[1].split("minted: ")[1]),
-            burned: JSON.parse(logs[1].split("burned: ")[1]),
-            approved: JSON.parse(logs[1].split("approved: ")[1]),
-            allow_moves: JSON.parse(logs[1].split("allow_moves: ")[1]),
+            burned: JSON.parse(logs[2].split("burned: ")[1]),
+            approved: JSON.parse(logs[3].split("approved: ")[1]),
+            allow_moves: JSON.parse(logs[4].split("allow_moves: ")[1]),
         };
     }
 

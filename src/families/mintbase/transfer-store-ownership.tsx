@@ -32,7 +32,17 @@ export class TransferStoreOwnership extends BaseTask<FormData, Props, State> {
     override schema = arx
         .object()
         .shape({
-            addr: arx.string().mintbaseStore(),
+            addr: arx
+                .string()
+                .mintbaseStore()
+                .test({
+                    name: "check owner",
+                    message: "store must be owned by the DAO's multicall",
+                    test: (value, ctx) =>
+                        value == null ||
+                        ctx.options.context?.storeOwner == null ||
+                        ctx.options.context.storeOwner === STORAGE.addresses.multicall,
+                }),
             gas: arx.big().gas().min(toGas("3.5")).max(toGas("250")),
             newOwner: arx.string().address(),
         })
@@ -81,7 +91,7 @@ export class TransferStoreOwnership extends BaseTask<FormData, Props, State> {
         }
 
         this.state = { ...this.state, formData: this.initialValues };
-        this.schema.check(this.state.formData);
+        this.schema.check(this.state.formData, { context: { storeOwner: this.state.mintbaseStoreInfo?.owner } });
     }
 
     static override inferOwnType(json: Call): boolean {
@@ -113,15 +123,17 @@ export class TransferStoreOwnership extends BaseTask<FormData, Props, State> {
     // TODO: fetch store owner/data
     private tryUpdateMintbaseStore(): Promise<boolean> {
         return new Promise<boolean>((resolve) => {
-            this.schema.check(this.state.formData).then(() => {
-                const { addr } = fields(this.schema);
-                if (!addr.isBad()) {
-                    this.confidentlyUpdateMintbaseStore().then((ready) => resolve(ready));
-                } else {
-                    this.setState({ mintbaseStore: new MintbaseStore(this.state.formData.addr) }); // will be invalid
-                    resolve(false);
-                }
-            });
+            this.schema
+                .check(this.state.formData, { context: { storeOwner: this.state.mintbaseStoreInfo?.owner } })
+                .then(() => {
+                    const { addr } = fields(this.schema);
+                    if (!addr.isBad()) {
+                        this.confidentlyUpdateMintbaseStore().then((ready) => resolve(ready));
+                    } else {
+                        this.setState({ mintbaseStore: new MintbaseStore(this.state.formData.addr) }); // will be invalid
+                        resolve(false);
+                    }
+                });
         });
     }
 
@@ -132,6 +144,17 @@ export class TransferStoreOwnership extends BaseTask<FormData, Props, State> {
         this.setState({ mintbaseStore: store, mintbaseStoreInfo: storeInfo });
         window.EDITOR.forceUpdate();
         return store.ready;
+    }
+
+    public override async validateForm(values: FormData): Promise<FormikErrors<FormData>> {
+        this.setFormData(values);
+        await new Promise((resolve) => this.resolveDebounced(resolve));
+        await this.tryUpdateMintbaseStore();
+        return Object.fromEntries(
+            Object.entries(fields(this.schema))
+                .map(([k, v]) => [k, v?.message() ?? ""])
+                .filter(([_, v]) => v !== "")
+        );
     }
 
     public override Editor = (): React.ReactNode => {
