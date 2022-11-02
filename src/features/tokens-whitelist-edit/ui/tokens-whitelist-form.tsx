@@ -1,4 +1,4 @@
-import { CancelOutlined, DeleteOutlined, EditOutlined } from "@mui/icons-material";
+import { CancelOutlined, DeleteOutlined, EditOutlined, SettingsBackupRestoreOutlined } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -73,13 +73,19 @@ export const TokensWhitelistForm = ({
                 idToHighlightColor: (id) => (addTokens.has(id) && "green") || (removeTokens.has(id) && "red") || null,
 
                 slots: {
-                    End: editModeEnabled
-                        ? ({ rowId }) => (
-                              <IconButton onClick={() => void onRemovalRequest(rowId)}>
-                                  <DeleteOutlined fontSize="large" />
-                              </IconButton>
-                          )
-                        : void null,
+                    End:
+                        (editModeEnabled &&
+                            (({ rowId }) =>
+                                removeTokens.has(rowId) ? (
+                                    <IconButton onClick={() => void onAdditionRequest(rowId)}>
+                                        <SettingsBackupRestoreOutlined fontSize="large" />
+                                    </IconButton>
+                                ) : (
+                                    <IconButton onClick={() => void onRemovalRequest(rowId)}>
+                                        <DeleteOutlined fontSize="large" />
+                                    </IconButton>
+                                ))) ||
+                        void null,
                 },
             }}
             footer={
