@@ -7,7 +7,7 @@ import { fields } from "../../shared/lib/args/args-types/args-object";
 import { Call, CallError } from "../../shared/lib/call";
 import { toGas } from "../../shared/lib/converter";
 import { MintbaseStore } from "../../shared/lib/contracts/mintbase";
-import { CheckboxField, TextField, UnitField } from "../../shared/ui/form-fields";
+import { CheckboxField, InfoField, TextField, UnitField } from "../../shared/ui/form-fields";
 import { BaseTask, BaseTaskProps, BaseTaskState } from "../base";
 import "./mintbase.scss";
 import { STORAGE } from "../../shared/lib/persistent";
@@ -24,6 +24,7 @@ type Props = BaseTaskProps;
 type State = BaseTaskState<FormData> & {
     mintbaseStore: MintbaseStore;
     mintbaseStoreInfo: StoreInfo;
+    minters: string[];
 };
 
 export class AddMinter extends BaseTask<FormData, Props, State> {
@@ -125,7 +126,10 @@ export class AddMinter extends BaseTask<FormData, Props, State> {
                     if (!addr.isBad()) {
                         this.confidentlyUpdateMintbaseStore().then((ready) => resolve(ready));
                     } else {
-                        this.setState({ mintbaseStore: new MintbaseStore(this.state.formData.addr) }); // will be invalid
+                        this.setState({
+                            mintbaseStore: new MintbaseStore(this.state.formData.addr),
+                            minters: [],
+                        }); // will be invalid
                         resolve(false);
                     }
                 });
@@ -135,8 +139,12 @@ export class AddMinter extends BaseTask<FormData, Props, State> {
     // fetch store data/owner
     private async confidentlyUpdateMintbaseStore(): Promise<boolean> {
         const { addr } = this.state.formData;
-        const [store, storeInfo] = await Promise.all([MintbaseStore.init(addr), new MintbaseStore(addr).getInfo()]);
-        this.setState({ mintbaseStore: store, mintbaseStoreInfo: storeInfo });
+        const [store, storeInfo, minters] = await Promise.all([
+            MintbaseStore.init(addr),
+            new MintbaseStore(addr).getInfo(),
+            new MintbaseStore(addr).listMinters(),
+        ]);
+        this.setState({ minters, mintbaseStore: store, mintbaseStoreInfo: storeInfo });
         window.EDITOR.forceUpdate();
         return store.ready;
     }
@@ -154,6 +162,7 @@ export class AddMinter extends BaseTask<FormData, Props, State> {
 
     public override Editor = (): React.ReactNode => {
         const { resetForm, validateForm, values } = useFormikContext<FormData>();
+        const { minters } = this.state;
 
         useEffect(() => {
             resetForm({
@@ -177,6 +186,12 @@ export class AddMinter extends BaseTask<FormData, Props, State> {
                     label="Store address"
                     roundtop
                 />
+                {minters?.length > 0 ? (
+                    <InfoField>
+                        <b>Minters: </b>
+                        {minters?.toString()}
+                    </InfoField>
+                ) : null}
                 <TextField
                     name="newMinter"
                     label="New minter"
