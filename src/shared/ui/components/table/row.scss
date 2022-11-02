@@ -33,6 +33,16 @@
         background-color: color.$white;
     }
 
+    &--highlighted {
+        &--success {
+            background-color: color.$green;
+        }
+
+        &--error {
+            background-color: color.$red;
+        }
+    }
+
     &-content {
         &--compact {
             display: flex;

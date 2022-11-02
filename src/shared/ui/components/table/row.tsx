@@ -17,8 +17,8 @@ export interface TableRowProps {
      */
     entitled?: boolean;
     header: TableHeader;
-    highlightColor?: "success" | "error";
     id: string;
+    idToHighlightColor?: (id: TableRowProps["id"]) => "success" | "error" | null;
     noKeys?: boolean;
     onSelect?: (selectedRow: { id: TableRowProps["id"]; checked: boolean }) => void;
     selectable: boolean;
@@ -44,8 +44,8 @@ export const TableRowCompact = ({
     dense,
     entitled,
     header,
-    highlightColor,
     id,
+    idToHighlightColor,
     noKeys,
     onSelect,
     selectable,
@@ -60,31 +60,27 @@ export const TableRowCompact = ({
         <div
             className={clsx(`${_TableRow}--compact`, {
                 [`${_TableRow}--compact--dense`]: dense,
+                [`${_TableRow}--highlighted--${idToHighlightColor?.(id)}`]: Boolean(idToHighlightColor?.(id)),
             })}
         >
             {header.map((headerCell, headerCellIndex) => (
                 <div
-                    className={clsx(_TableRow + "-content" + "--compact", {
-                        [_TableRow + "-content" + "--compact" + "--dense"]: dense,
-                        [_TableRow + "-content" + "--compact" + "--entitled"]: entitled,
-                        [_TableRow + "-content" + "--compact" + "--entitled" + "--centeredTitle"]: centeredTitle,
-                        [_TableRow + "-content" + "--compact" + "--noKeys"]: noKeys,
+                    className={clsx(`${_TableRow}-content--compact`, {
+                        [`${_TableRow}-content--compact--dense`]: dense,
+                        [`${_TableRow}-content--compact--entitled`]: entitled,
+                        [`${_TableRow}-content--compact--entitled--centeredTitle`]: centeredTitle,
+                        [`${_TableRow}-content--compact--noKeys`]: noKeys,
                     })}
                     key={headerCellIndex}
                 >
                     {selectable && (
-                        <div className={_TableRow + "-content" + "-checkbox"}>
+                        <div className={`${_TableRow}-content-checkbox`}>
                             <Checkbox onChange={onSelectMemoized} />
                         </div>
                     )}
 
                     {slots?.Start && (
-                        <div
-                            className={clsx(
-                                _TableRow + "-content" + "-slot",
-                                _TableRow + "-content" + "-slot" + "--start"
-                            )}
-                        >
+                        <div className={clsx(`${_TableRow}-content-slot`, `${_TableRow}-content-slot--start`)}>
                             <slots.Start rowId={id} />
                         </div>
                     )}
@@ -93,12 +89,7 @@ export const TableRowCompact = ({
                     <span>{cells ? cells[headerCellIndex] : "No data"}</span>
 
                     {slots?.End && (
-                        <div
-                            className={clsx(
-                                _TableRow + "-content" + "-slot",
-                                _TableRow + "-content" + "-slot" + "--end"
-                            )}
-                        >
+                        <div className={clsx(`${_TableRow}-content-slot`, `${_TableRow}-content-slot--end`)}>
                             <slots.End rowId={id} />
                         </div>
                     )}

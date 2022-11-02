@@ -15,11 +15,11 @@ interface IconLabelProps {
 export const IconLabel = ({ icon, label, reversed = false }: IconLabelProps) => (
     <span
         className={clsx(_IconLabel, {
-            [_IconLabel + "--reversed"]: reversed,
-            [_IconLabel + "--symbolic"]: typeof icon === "string" && !Validation.isUrl(icon),
+            [`${_IconLabel}--reversed`]: reversed,
+            [`${_IconLabel}--symbolic`]: typeof icon === "string" && !Validation.isUrl(icon),
         })}
     >
-        <span className={_IconLabel + "-icon"}>
+        <span className={`${_IconLabel}-icon`}>
             {typeof icon === "string" && Validation.isUrl(icon) ? (
                 <img
                     loading="lazy"
@@ -30,6 +30,6 @@ export const IconLabel = ({ icon, label, reversed = false }: IconLabelProps) => 
             )}
         </span>
 
-        <span className={_IconLabel + "-label"}>{label}</span>
+        <span className={`${_IconLabel}-label`}>{label}</span>
     </span>
 );

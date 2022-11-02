@@ -70,6 +70,9 @@ export const TokensWhitelistForm = ({
     return (
         <MulticallInstance.TokensWhitelistTable
             ItemProps={{
+                idToHighlightColor: (id) =>
+                    (addTokens.has(id) && "success") || (removeTokens.has(id) && "error") || null,
+
                 slots: {
                     End: editModeEnabled
                         ? ({ rowId }) => (
@@ -80,7 +83,6 @@ export const TokensWhitelistForm = ({
                         : void null,
                 },
             }}
-            additionalItems={Array.from(addTokens)}
             footer={
                 editModeEnabled ? (
                     <TextInput
@@ -108,6 +110,7 @@ export const TokensWhitelistForm = ({
                     </IconButton>
                 ),
             }}
+            itemsAdditional={Array.from(addTokens)}
             {...{ className, daoContractAddress }}
         />
     );
