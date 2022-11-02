@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { type MouseEvent, useCallback, useMemo, useState } from "react";
+import { type MouseEventHandler, useCallback, useMemo, useState } from "react";
 
 import { MulticallInstance } from "../../../entities";
 import { JobSettingsEdit, TokensWhitelistEdit } from "../../../features";
@@ -68,8 +68,8 @@ export const MulticallConfigEditorUI = ({ className, contracts }: MulticallConfi
         [editModeSwitch, formState, formStateUpdate, proposalDescription]
     );
 
-    const onSubmit = useCallback(
-        (event: MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    const onSubmit = useCallback<MouseEventHandler>(
+        (event) => {
             void event.preventDefault();
 
             void contracts.dao
