@@ -78,7 +78,7 @@ addMethod(_StringSchema, "dataUrl", function contract(message = locale.string.da
     return this.test({
         name: "data url",
         message,
-        test: async (value) => value != null && Validation.isDataURL(value),
+        test: (value) => value != null && Validation.isDataURL(value),
     });
 });
 
