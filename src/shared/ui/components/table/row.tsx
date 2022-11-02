@@ -18,7 +18,7 @@ export interface TableRowProps {
     entitled?: boolean;
     header: TableHeader;
     id: string;
-    idToHighlightColor?: (id: TableRowProps["id"]) => "success" | "error" | null;
+    idToHighlightColor?: (id: TableRowProps["id"]) => "blue" | "green" | "red" | "yellow" | null;
     noKeys?: boolean;
     onSelect?: (selectedRow: { id: TableRowProps["id"]; checked: boolean }) => void;
     selectable: boolean;

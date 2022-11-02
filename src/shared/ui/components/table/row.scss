@@ -34,12 +34,20 @@
     }
 
     &--highlighted {
-        &--success {
+        &--blue {
+            background-color: color.$blue;
+        }
+
+        &--green {
             background-color: color.$green;
         }
 
-        &--error {
+        &--red {
             background-color: color.$red;
+        }
+
+        &--yellow {
+            background-color: color.$yellow;
         }
     }
 

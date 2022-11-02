@@ -70,8 +70,7 @@ export const TokensWhitelistForm = ({
     return (
         <MulticallInstance.TokensWhitelistTable
             ItemProps={{
-                idToHighlightColor: (id) =>
-                    (addTokens.has(id) && "success") || (removeTokens.has(id) && "error") || null,
+                idToHighlightColor: (id) => (addTokens.has(id) && "green") || (removeTokens.has(id) && "red") || null,
 
                 slots: {
                     End: editModeEnabled
