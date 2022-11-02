@@ -10,7 +10,7 @@ export { Tooltip } from "./tooltip";
 
 /** Molecules */
 export { IconLabel } from "./icon-label";
-export { TextInput, TextInputWithUnits } from "./text-input";
+export { TextInput, type TextInputProps, TextInputWithUnits, type TextInputWithUnitsProps } from "./text-input";
 export { Tile, type TileProps } from "./tile";
 
 /** Organisms */

@@ -1,1 +1,1 @@
-export { TextInput, TextInputWithUnits } from "./text-input";
+export { TextInput, type TextInputProps, TextInputWithUnits, type TextInputWithUnitsProps } from "./text-input";
