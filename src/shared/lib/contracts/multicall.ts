@@ -57,7 +57,7 @@ type FunctionCall = {
 };
 
 type BatchCall = {
-    address: string;
+    address: Account["accountId"];
     actions: FunctionCall[];
 };
 
@@ -65,12 +65,22 @@ type MulticallArgs = {
     calls: BatchCall[][];
 };
 
-class MulticallConfigChanges {
-    removeTokens: string[] = [];
-    addTokens: string[] = [];
-    jobBond: string = "";
-    croncatManager: string = "";
+enum MulticallConfigParamKey {
+    croncatManager = "croncatManager",
+    jobBond = "jobBond",
 }
+
+enum MulticallTokensWhitelistDiffKey {
+    addTokens = "addTokens",
+    removeTokens = "removeTokens",
+}
+
+type MulticallConfigDiff = {
+    [MulticallTokensWhitelistDiffKey.removeTokens]: string[];
+    [MulticallTokensWhitelistDiffKey.addTokens]: string[];
+    [MulticallConfigParamKey.jobBond]: string;
+    [MulticallConfigParamKey.croncatManager]: string;
+};
 
 class Multicall {
     static FACTORY_ADDRESS: string = FACTORY_ADDRESS_SELECTOR[window.NEAR_ENV];
@@ -78,14 +88,14 @@ class Multicall {
     // 0.025 NEAR is the min required by croncat for a non-recurring task. Assume trigger of 270 Tgas and 0 NEAR.
     static CRONCAT_FEE: string = toYocto("0.0275");
 
-    address: string;
+    address: Account["accountId"];
     admins: MulticallAdminData[] = [];
-    croncatManager: string = "";
+    [MulticallConfigParamKey.croncatManager]: string = "";
     // only whitelisted tokens can be attached to multicalls or job activations.
     tokensWhitelist: WhitelistedTokenData[] = [];
     // job bond amount must be attached as deposit when adding new jobs.
     // needs initialization, but start with "" because it's distinguishable from a real value (string encoded numbers).
-    jobBond: string = "";
+    [MulticallConfigParamKey.jobBond]: string = "";
     // Multicall instance is ready when info (admins...) are fetched & assigned correctly.
     ready: boolean = false;
 
@@ -119,6 +129,7 @@ class Multicall {
                 return "";
             }),
         ]);
+
         newMulticall.admins = admins;
         newMulticall.croncatManager = croncatManager;
         newMulticall.tokensWhitelist = tokensWhitelist;
@@ -163,7 +174,7 @@ class Multicall {
      *
      * @param accountId
      */
-    static async isMulticall(accountId: string): Promise<boolean> {
+    static async isMulticall(accountId: Account["accountId"]): Promise<boolean> {
         const accountInfo = await viewAccount(accountId);
         const codeHash: string = accountInfo.code_hash;
         return Multicall.CONTRACT_CODE_HASHES.includes(codeHash);
@@ -184,8 +195,12 @@ class Multicall {
      * @param configDiff changes to current config of some multicall instance.
      * @returns actions that can be passed to JSON for DAO "add_proposal".
      */
-    static configDiffToProposalActions(configDiff: MulticallConfigChanges): daoFunctionCallAction[] {
-        const { removeTokens, addTokens, jobBond, croncatManager } = configDiff;
+    static configDiffToProposalActions({
+        removeTokens = [],
+        addTokens = [],
+        jobBond = "",
+        croncatManager = "",
+    }: MulticallConfigDiff): daoFunctionCallAction[] {
         const actions: daoFunctionCallAction[] = [];
 
         // action: change croncat manager address
@@ -243,7 +258,7 @@ class Multicall {
     }
 
     /**
-     * get croncat manager address that was regitered on the multicall instance.
+     * get croncat manager address that was registered on the multicall instance.
      */
     async getCroncatManager(): Promise<string> {
         return view(this.address, "get_croncat_manager", {});
@@ -282,7 +297,7 @@ class Multicall {
      * @param triggerGas Gas amount. Will be allocated for every tx in this job.
      * @returns
      */
-    // TODO: currenty budget is hard-coded for jobs with 1 multicall
+    // TODO: currently budget is hard-coded for jobs with 1 multicall
     async addJob(multicalls: MulticallArgs[], triggerDate: Date, triggerGas: string): Promise<Tx> {
         // crontab in CronCat format. See: https://github.com/CronCats/Schedule
         const cadence: string = dateToCron(triggerDate);
@@ -311,5 +326,5 @@ class Multicall {
     }
 }
 
-export { Multicall, Multicall as MulticallContract };
-export type { JobData, MulticallArgs, MulticallConfigChanges };
+export { Multicall, Multicall as MulticallContract, MulticallConfigParamKey, MulticallTokensWhitelistDiffKey };
+export type { JobData, MulticallArgs, MulticallConfigDiff };
