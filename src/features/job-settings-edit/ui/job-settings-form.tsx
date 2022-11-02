@@ -4,8 +4,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { ArgsString } from "../../../shared/lib/args";
 import { toNEAR, toYocto } from "../../../shared/lib/converter";
-import { IconLabel, NearIcons, NearLink, Table, TextInput, Tile } from "../../../shared/ui/components";
-import { type JobSettingsEditFeature } from "../config";
+import { IconLabel, NearIcons, NearLink, Table, TextInput, TextInputProps, Tile } from "../../../shared/ui/components";
+import { JobSettingsEditConfig, type JobSettingsEditFeature } from "../config";
 
 interface JobSettingsFormProps extends JobSettingsEditFeature.Dependencies {}
 
@@ -18,7 +18,10 @@ export const JobSettingsForm = ({
 }: JobSettingsFormProps) => {
     const [editModeEnabled, editModeSwitch] = useState(!disabled);
 
-    const formInitialState = { croncatManager: "", jobBond: "" };
+    const formInitialState: JobSettingsEditFeature.FormState = {
+        [JobSettingsEditConfig.DiffKey.croncatManager]: "",
+        [JobSettingsEditConfig.DiffKey.jobBond]: "",
+    };
 
     const [[croncatManager, croncatManagerUpdate], [jobBond, jobBondUpdate]] = [
         useState<JobSettingsEditFeature.FormState["croncatManager"]>(formInitialState.croncatManager),
@@ -33,6 +36,11 @@ export const JobSettingsForm = ({
             [disabled]
         ),
     };
+
+    const onCroncatManagerChange = useCallback<Required<TextInputProps>["update"]>(
+        (event) => void croncatManagerUpdate(event.target.value),
+        [croncatManagerUpdate]
+    );
 
     const formReset = useCallback(() => {
         formFields.croncatManager.value = multicallContract.croncatManager;
@@ -72,13 +80,24 @@ export const JobSettingsForm = ({
             }}
         >
             <Table
-                RowProps={{ centeredTitle: true, entitled: true, noKeys: true }}
+                RowProps={{
+                    centeredTitle: true,
+
+                    idToHighlightColor: (id) =>
+                        ({ croncatManager, jobBond }[id] === formInitialState[id as JobSettingsEditFeature.DiffKey] ||
+                        { croncatManager, jobBond }[id] === multicallContract[id as JobSettingsEditFeature.DiffKey]
+                            ? null
+                            : "blue"),
+
+                    entitled: true,
+                    noKeys: true,
+                }}
                 displayMode="compact"
                 dense
                 header={["Option", "Value"]}
                 rows={[
                     {
-                        id: "croncatManager",
+                        id: JobSettingsEditConfig.DiffKey.croncatManager,
 
                         content: [
                             "Croncat manager",
@@ -86,7 +105,7 @@ export const JobSettingsForm = ({
                             editModeEnabled ? (
                                 <TextInput
                                     fullWidth
-                                    update={(event) => void croncatManagerUpdate(event.target.value)}
+                                    update={onCroncatManagerChange}
                                     value={formFields.croncatManager}
                                 />
                             ) : (
@@ -95,7 +114,7 @@ export const JobSettingsForm = ({
                         ],
                     },
                     {
-                        id: "jobBond",
+                        id: JobSettingsEditConfig.DiffKey.jobBond,
 
                         content: [
                             "Job bond",
