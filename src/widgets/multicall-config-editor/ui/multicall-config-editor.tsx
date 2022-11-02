@@ -1,10 +1,10 @@
 import clsx from "clsx";
-import { useCallback, useMemo, useState } from "react";
+import { type MouseEvent, useCallback, useMemo, useState } from "react";
 
 import { MulticallInstance } from "../../../entities";
 import { JobSettingsEdit, TokensWhitelistEdit } from "../../../features";
 import { ArgsString } from "../../../shared/lib/args";
-import { MulticallContract, type MulticallConfigChanges } from "../../../shared/lib/contracts/multicall";
+import { MulticallContract, type MulticallConfigDiff } from "../../../shared/lib/contracts/multicall";
 import { signAndSendTxs } from "../../../shared/lib/wallet";
 import { Button, ButtonGroup, TextInput, Tile } from "../../../shared/ui/components";
 import { type MulticallConfigEditorWidget } from "../config";
@@ -18,14 +18,14 @@ const _MulticallConfigEditor = "MulticallConfigEditor";
 export const MulticallConfigEditorUI = ({ className, contracts }: MulticallConfigEditorUIProps) => {
     const [editMode, editModeSwitch] = useState(false);
 
-    const changesDiffInitialState: MulticallConfigChanges = {
+    const changesDiffInitialState: MulticallConfigDiff = {
         removeTokens: [],
         addTokens: [],
         jobBond: "",
         croncatManager: "",
     };
 
-    const [formState, formStateUpdate] = useState<MulticallConfigChanges>(changesDiffInitialState),
+    const [formState, formStateUpdate] = useState<MulticallConfigDiff>(changesDiffInitialState),
         formValues = { proposalDescription: useMemo(() => new ArgsString(""), []) },
         [proposalDescription, proposalDescriptionUpdate] = useState(formValues.proposalDescription.value),
         _childFormsResetRequested = "childFormsResetRequested";
@@ -54,7 +54,7 @@ export const MulticallConfigEditorUI = ({ className, contracts }: MulticallConfi
     }, [editMode, editModeSwitch, formReset]);
 
     const onEdit = useCallback(
-        (update: Partial<MulticallConfigChanges>) => {
+        (update: Partial<MulticallConfigDiff>) => {
             void formStateUpdate((latestState) => Object.assign(latestState, update));
 
             void editModeSwitch(
@@ -69,7 +69,7 @@ export const MulticallConfigEditorUI = ({ className, contracts }: MulticallConfi
     );
 
     const onSubmit = useCallback(
-        (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        (event: MouseEvent<HTMLButtonElement, MouseEvent>) => {
             void event.preventDefault();
 
             void contracts.dao
