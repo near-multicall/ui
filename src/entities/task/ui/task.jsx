@@ -185,6 +185,22 @@ export class Task extends Component {
                                 json={json}
                             />
                         );
+                    case "grant_minter":
+                        return (
+                            <Family.Mintbase.AddMinter
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
+                    case "revoke_minter":
+                        return (
+                            <Family.Mintbase.RemoveMinter
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
                 }
 
             default:

@@ -1,7 +1,9 @@
 @use "sass/color";
 
 .mintbase-create-store-task,
-.mintbase-transfer-store-ownership-task {
+.mintbase-transfer-store-ownership-task,
+.mintbase-add-minter-task,
+.mintbase-remove-minter-task {
     background-image: url("../../app/static/mintbase.png");
     background-position-x: 60rem;
     background-position-y: 60rem;

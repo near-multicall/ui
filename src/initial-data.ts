@@ -14,6 +14,8 @@ export const initialData = {
         "task-i12": { id: "task-i12", family: "multicall", func: "near_transfer" },
         "task-i13": { id: "task-i13", family: "mintbase", func: "create_store" },
         "task-i14": { id: "task-i14", family: "mintbase", func: "transfer_store_ownership" },
+        "task-i15": { id: "task-i15", family: "mintbase", func: "grant_minter" },
+        "task-i16": { id: "task-i16", family: "mintbase", func: "revoke_minter" },
     },
     columns: {
         "column-0": {
@@ -39,6 +41,8 @@ export const initialData = {
                 "task-i12",
                 "task-i13",
                 "task-i14",
+                "task-i15",
+                "task-i16",
             ],
         },
     },
