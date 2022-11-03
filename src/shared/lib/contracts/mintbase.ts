@@ -61,10 +61,21 @@ class MintbaseStore {
         return MintbaseStore.checkContainsStore(storeId);
     }
 
+    /**
+     * Check if a store exists
+     *
+     * @param storeId
+     * @returns
+     */
     static async checkContainsStore(storeId: string): Promise<boolean> {
         return view(MintbaseStore.FACTORY_ADDRESS, "check_contains_store", { store_id: storeId });
     }
 
+    /**
+     * get Mintabse's factory fee
+     *
+     * @returns
+     */
     static async getFactoryFee(): Promise<string> {
         return view(MintbaseStore.FACTORY_ADDRESS, "get_factory_fee", {});
     }
