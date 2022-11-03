@@ -29,17 +29,28 @@ export const JobSettingsForm = ({
     ];
 
     const formFields = {
-        croncatManager: useMemo(() => new ArgsString(multicallContract.croncatManager), [disabled]),
+        croncatManager: useMemo(() => new ArgsString(multicallContract.croncatManager), [disabled, multicallContract]),
 
         jobBond: useMemo(
             () => new ArgsString(multicallContract.jobBond !== "" ? toNEAR(multicallContract.jobBond) : ""),
-            [disabled]
+            [disabled, multicallContract]
         ),
     };
 
     const onCroncatManagerChange = useCallback<Required<TextInputProps>["update"]>(
-        (event) => void croncatManagerUpdate(event.target.value),
+        ({ target: { value } }) =>
+            void croncatManagerUpdate(
+                value !== multicallContract.croncatManager ? value : formInitialState.croncatManager
+            ),
+
         [croncatManagerUpdate]
+    );
+
+    const onJobBondChange = useCallback<Required<TextInputProps>["update"]>(
+        ({ target: { value } }) =>
+            void jobBondUpdate(value !== toNEAR(multicallContract.jobBond) ? toYocto(value) : formInitialState.jobBond),
+
+        [jobBondUpdate]
     );
 
     const formReset = useCallback(() => {
@@ -125,7 +136,7 @@ export const JobSettingsForm = ({
                                         endAdornment: NearIcons.NATIVE_TOKEN_CHARACTER,
                                         inputProps: { min: 0, step: 0.001 },
                                     }}
-                                    update={(event) => void jobBondUpdate(toYocto(event.target.value))}
+                                    update={onJobBondChange}
                                     type="number"
                                     value={formFields.jobBond}
                                 />
