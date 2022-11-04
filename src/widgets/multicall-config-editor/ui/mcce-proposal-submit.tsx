@@ -33,9 +33,13 @@ export const MulticallConfigEditorProposalSubmit = ({
     >
         <p>Start editing to create config changes proposal template</p>
 
-        <form>
-            <div>{JSON.stringify(changesDiff)}</div>
+        <div>
+            {Object.keys(changesDiff).map((key) => (
+                <p>{JSON.stringify(changesDiff[key as keyof MulticallConfigEditorWidget.ChangesDiff])}</p>
+            ))}
+        </div>
 
+        <form>
             <div>
                 <TextInput
                     fullWidth
