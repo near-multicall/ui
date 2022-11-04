@@ -11,11 +11,9 @@ import { MulticallConfigEditorWidget } from "../config";
 import { MulticallConfigEditorProposalSubmit } from "./mcce-proposal-submit";
 import "./mc-config-editor.scss";
 
-interface MulticallConfigEditorUIProps extends MulticallConfigEditorWidget.Dependencies {}
-
 const _MulticallConfigEditor = "MulticallConfigEditor";
 
-export const MulticallConfigEditorUI = ({ className, contracts }: MulticallConfigEditorUIProps) => {
+export const MulticallConfigEditor = ({ className, contracts }: MulticallConfigEditorWidget.Dependencies) => {
     const [editMode, editModeSwitch] = useState(false);
 
     const changesDiffInitialState: MulticallConfigEditorWidget.ChangesDiff = {
