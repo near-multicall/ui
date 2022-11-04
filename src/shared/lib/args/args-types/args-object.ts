@@ -34,14 +34,16 @@ addMethod(
     _ObjectSchema,
     "retainAll",
     function retainAll(options?: Partial<ApplyToAllOptions>, retainOptions?: Partial<RetainOptions>) {
-        Object.entries(this.fields).forEach(([key, field]) =>
-            !options?.ignore?.includes(key)
+        Object.entries(this.fields).forEach(([key, field]) => {
+            console.log(key, field);
+            return !options?.ignore?.includes(key)
                 ? (this.fields[key] =
                       (field as AnySchema).type === "object"
                           ? (this.fields[key] as any).retainAll()
                           : (this.fields[key] as any).retain(retainOptions))
-                : void 0
-        );
+                : void 0;
+        });
+
         return this.retain();
     }
 );

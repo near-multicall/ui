@@ -1,5 +1,6 @@
 import clsx from "clsx";
-import { useEffect, useState } from "react";
+import { useField } from "formik";
+import React, { useEffect, useState } from "react";
 import "./choice-field.scss";
 
 const _ChoiceField = "ChoiceField";
@@ -13,21 +14,24 @@ type Options = {
     isActive: (id: number) => boolean;
 };
 
-type ChoiceFieldProps = React.PropsWithChildren & {
+type ChoiceFieldProps = {
     children: (options: Options) => React.ReactNode;
     show: (ids: number[]) => React.ReactNode;
+    name: string;
     initial?: number[];
     roundtop?: boolean;
     roundbottom?: boolean;
 };
 
-export const ChoiceField = ({ roundbottom, roundtop, children, show, initial, ...props }: ChoiceFieldProps) => {
+export const ChoiceField = ({ roundbottom, roundtop, children, show, initial, name, ...props }: ChoiceFieldProps) => {
+    const [field, meta, helper] = useField(name);
     const [ids, setIds] = useState<number[]>(initial ?? []);
     const choose = (id: number) => setIds((prevIds) => [id]);
     const add = (id: number) => setIds((prevIds) => [...prevIds, id]);
     const remove = (id: number) => setIds((prevIds) => prevIds.filter((x) => x !== id));
     const toggle = (id: number) => (ids.includes(id) ? remove(id) : add(id));
     const isActive = (id: number) => ids.includes(id);
+    field.value = ids;
     return (
         <div
             className={clsx(_ChoiceField, {
