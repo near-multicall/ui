@@ -5,7 +5,7 @@ import { ArgsError, ArgsString } from "../../../lib/args";
 
 export interface TextInputProps extends Omit<TextFieldProps, "error" | "size" | "value" | "variant"> {
     error?: ArgsError;
-    update?: (event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>, component: Component) => void;
+    update?: (event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>, component?: Component) => void;
     value?: ArgsString;
 }
 
