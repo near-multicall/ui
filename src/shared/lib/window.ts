@@ -3,6 +3,7 @@ import type { NetworkId } from "@near-wallet-selector/core";
 import { Component } from "react";
 
 import { Task, Layout, Sidebar, Menu, Editor } from "../../widgets";
+import { WalletComponent } from "../../entities/wallet/ui/wallet";
 
 type CardInfo = {
     formData: object;
@@ -37,7 +38,7 @@ declare global {
         COPY: CardCopy | null;
 
         // Wallet definitions
-        WALLET_COMPONENT: Promise<nearAPI.WalletConnection> | Component;
+        WALLET_COMPONENT: WalletComponent;
         NEAR_ENV: NetworkId;
         nearConfig: any;
     }

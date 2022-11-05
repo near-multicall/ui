@@ -3,7 +3,7 @@
 @use "sass/color";
 
 .Tabs-layout {
-    height: calc(100% - (2 * size.$gap + 0.5 * size.$large-text));
+    height: calc(100% - (2 * size.$gap));
 }
 
 .Tabs-layout-buttonsPanel {

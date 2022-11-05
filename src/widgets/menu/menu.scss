@@ -12,7 +12,7 @@
     min-width: calc(size.$task-width + 2 * size.$gap);
     background-color: color.$black;
     box-shadow: 1px 10px 20px 0 rgba(0, 0, 0, 0.2);
-    border-radius: size.$task-radius;
+    border-radius: 1.75 * size.$task-radius;
     z-index: 2;
     transition: width animation.$menu-expand-time ease-out;
     &-tabs {

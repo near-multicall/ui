@@ -19,4 +19,13 @@
     &-content {
         padding: 8.5px 14px;
     }
+
+    &.roundtop {
+        border-top-left-radius: 0.75 * size.$task-radius !important;
+        border-top-right-radius: 0.75 * size.$task-radius !important;
+    }
+    &.roundbottom {
+        border-bottom-left-radius: 0.75 * size.$task-radius !important;
+        border-bottom-right-radius: 0.75 * size.$task-radius !important;
+    }
 }

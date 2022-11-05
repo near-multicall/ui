@@ -7,6 +7,7 @@ import { unit } from "../../shared/lib/converter";
 import { STORAGE } from "../../shared/lib/persistent";
 import { CheckboxField, TextField, UnitField } from "../../shared/ui/form-fields";
 import { BaseTask, BaseTaskProps, DefaultFormData } from "../base";
+import { DynamicFeedOutlined } from "@mui/icons-material";
 import "./multicall.scss";
 
 type FormData = DefaultFormData & {
@@ -170,6 +171,12 @@ export class Transfer extends BaseTask<FormData> {
                     label="Allocated gas"
                     roundbottom
                 />
+                <a
+                    className="protocol"
+                    href="https://multicall.app"
+                >
+                    powered by <DynamicFeedOutlined className="icon" /> near-multicall
+                </a>
             </Form>
         );
     };
