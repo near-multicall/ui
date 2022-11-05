@@ -5,7 +5,7 @@ import { Call, CallError } from "../../shared/lib/call";
 import { BASE_URI_ARWEAVE, MintbaseStore } from "../../shared/lib/contracts/mintbase";
 import { dataUrlToFile, fileToDataUrl } from "../../shared/lib/converter";
 import { STORAGE } from "../../shared/lib/persistent";
-import { TextField, UnitField } from "../../shared/ui/form-fields";
+import { InfoField, TextField, UnitField } from "../../shared/ui/form-fields";
 import { FileField } from "../../shared/ui/form-fields/file-field/file-field";
 import { BaseTask, BaseTaskProps, BaseTaskState, DefaultFormData } from "../base";
 import MintbaseLogo from "../../app/static/mintbase/Mintbase_logo.svg";
@@ -199,16 +199,6 @@ export class CreateStore extends BaseTask<FormData, Props, State> {
                     name="storeSymbol"
                     label="Symbol"
                 />
-                {
-                    // make sure we're dealing wiht data URL.
-                    // helpful when user loads from an external proposal.
-                    arx.string().dataUrl().isValidSync(iconDataUrl) ? (
-                        <img
-                            src={iconDataUrl}
-                            alt="store icon"
-                        />
-                    ) : null
-                }
                 <FileField
                     name="icon"
                     label="Icon"
@@ -221,6 +211,19 @@ export class CreateStore extends BaseTask<FormData, Props, State> {
                         }
                     }}
                 />
+                {
+                    // make sure we're dealing wiht data URL.
+                    // helpful when user loads from an external proposal.
+                    arx.string().dataUrl().isValidSync(iconDataUrl) ? (
+                        <InfoField>
+                            <img
+                                src={iconDataUrl}
+                                alt="store icon"
+                                onClick={() => window.open(iconDataUrl, "_blank")}
+                            />
+                        </InfoField>
+                    ) : null
+                }
                 <UnitField
                     name="gas"
                     unit="gasUnit"
