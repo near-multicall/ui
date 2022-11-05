@@ -6,15 +6,15 @@ import { Call, CallError } from "../../shared/lib/call";
 import { toGas } from "../../shared/lib/converter";
 import { STORAGE } from "../../shared/lib/persistent";
 import { NonFungibleToken } from "../../shared/lib/standards/nonFungibleToken";
-import { TextField, UnitField } from "../../shared/ui/form-fields";
+import { CheckboxField, TextField, UnitField } from "../../shared/ui/form-fields";
 import type { DefaultFormData } from "../base";
 import { BaseTask, BaseTaskProps, BaseTaskState } from "../base";
 import "./near.scss";
 
 type FormData = DefaultFormData & {
     tokenId: string;
-    receiverId: string;
-    memo: string;
+    accountId: string;
+    addMsg: boolean;
     msg: string;
 };
 
@@ -24,19 +24,20 @@ type State = BaseTaskState<FormData> & {
     nft: NonFungibleToken;
 };
 
-export class NftTransferCall extends BaseTask<FormData, Props, State> {
-    override uniqueClassName = "near-nft-transfer-call-task";
+export class NftApprove extends BaseTask<FormData, Props, State> {
+    override uniqueClassName = "near-nft-approve-task";
     override schema = arx
         .object()
         .shape({
             addr: arx.string().nft(),
             gas: arx.big().gas().min(toGas("1")).max(toGas("250")),
+            depo: arx.big().token().min(1),
             tokenId: arx
                 .string()
                 .nftId("addr")
                 .test({
                     name: "approval",
-                    message: "multicall does not have permission to transfer this NFT",
+                    message: "multicall does not have permission to approve this NFT",
                     test: (value, ctx) =>
                         value == null ||
                         ctx.options.context?.token == null ||
@@ -46,28 +47,29 @@ export class NftTransferCall extends BaseTask<FormData, Props, State> {
                             ctx.options.context.multicallAddress
                         ),
                 }),
-            receiverId: arx.string().address(),
-            memo: arx.string().optional(),
+            accountId: arx.string().address(),
             msg: arx.string().optional(),
         })
-        .transform(({ gas, gasUnit, ...rest }) => ({
+        .transform(({ gas, gasUnit, depo, depoUnit, addMsg, msg, ...rest }) => ({
             ...rest,
             gas: arx.big().intoParsed(gasUnit).cast(gas),
+            depo: arx.big().intoParsed(depoUnit).cast(depo),
+            ...(addMsg && { msg }),
         }))
-        .requireAll({ ignore: ["memo", "msg"] })
+        .requireAll({ ignore: ["msg"] })
         .retainAll();
 
     override initialValues: FormData = {
-        name: "NFT Transfer Call",
+        name: "NFT Approve",
         addr: "",
-        func: "nft_transfer",
-        gas: "75",
+        func: "nft_approve",
+        gas: "0",
         gasUnit: "Tgas",
         depo: "1",
         depoUnit: "yocto",
         tokenId: "",
-        receiverId: "",
-        memo: "",
+        accountId: "",
+        addMsg: false,
         msg: "",
     };
 
@@ -84,8 +86,7 @@ export class NftTransferCall extends BaseTask<FormData, Props, State> {
     protected override init(
         call: Call<{
             token_id: string;
-            receiver_id: string;
-            memo: string;
+            account_id: string;
             msg: string;
         }> | null
     ): void {
@@ -94,10 +95,11 @@ export class NftTransferCall extends BaseTask<FormData, Props, State> {
                 addr: call.address,
                 func: call.actions[0].func,
                 gas: arx.big().intoFormatted(this.initialValues.gasUnit).cast(call.actions[0].gas).toFixed(),
-                receiverId: call.actions[0].args.receiver_id,
+                depo: arx.big().intoFormatted(this.initialValues.depoUnit).cast(call.actions[0].depo).toFixed(),
+                accountId: call.actions[0].args.account_id,
                 tokenId: call.actions[0].args.token_id,
-                memo: call.actions[0].args.memo,
-                msg: call.actions[0].args.msg,
+                addMsg: call.actions[0].args.msg === undefined,
+                msg: call.actions[0].args?.msg ?? null,
             };
             this.initialValues = Object.keys(this.initialValues).reduce((acc, k) => {
                 const v = fromCall[k as keyof typeof fromCall];
@@ -117,14 +119,15 @@ export class NftTransferCall extends BaseTask<FormData, Props, State> {
     }
 
     static override inferOwnType(json: Call): boolean {
-        return !!json && json.actions[0].func === "nft_transfer_call";
+        return !!json && json.actions[0].func === "nft_approve";
     }
 
     public override toCall(): Call {
-        const { addr, func, depo, gas, gasUnit, tokenId, receiverId, memo, msg } = this.state.formData;
+        const { addr, func, depo, gas, gasUnit, tokenId, accountId, msg, addMsg } = this.state.formData;
         const { nft } = this.state;
 
         if (!arx.big().isValidSync(gas)) throw new CallError("Failed to parse gas input value", this.props.id);
+        if (!arx.big().isValidSync(depo)) throw new CallError("Failed to parse deposit input value", this.props.id);
         if (!nft.ready || !nft.token) throw new CallError("Lacking token metadata", this.props.id);
 
         const miIsOwner = nft.token.owner_id === STORAGE.addresses.multicall;
@@ -137,10 +140,9 @@ export class NftTransferCall extends BaseTask<FormData, Props, State> {
                     func,
                     args: {
                         token_id: tokenId,
-                        receiver_id: receiverId,
+                        account_id: accountId,
                         ...(miIsOwner && { approval_id: approvalId }),
-                        memo,
-                        msg,
+                        ...(addMsg && { msg }),
                     },
                     gas: arx.big().intoParsed(gasUnit).cast(gas).toFixed(),
                     depo,
@@ -198,7 +200,7 @@ export class NftTransferCall extends BaseTask<FormData, Props, State> {
     }
 
     public override Editor = (): React.ReactNode => {
-        const { resetForm, validateForm } = useFormikContext();
+        const { resetForm, validateForm, values } = useFormikContext<FormData>();
 
         useEffect(() => {
             resetForm({
@@ -227,23 +229,31 @@ export class NftTransferCall extends BaseTask<FormData, Props, State> {
                     label="Token ID"
                 />
                 <TextField
-                    name="receiverId"
-                    label="Receiver Address"
+                    name="accountId"
+                    label="Address to be approved"
                 />
-                <TextField
-                    name="msg"
-                    label="Message"
-                    multiline
+                <CheckboxField
+                    name="addMsg"
+                    label="Specify msg"
                 />
-                <TextField
-                    name="memo"
-                    label="Memo"
-                />
+                {values.addMsg && (
+                    <TextField
+                        name="msg"
+                        label="msg"
+                        multiline
+                    />
+                )}
                 <UnitField
                     name="gas"
                     unit="gasUnit"
                     options={["Tgas", "gas"]}
                     label="Allocated gas"
+                />
+                <UnitField
+                    name="depo"
+                    unit="depoUnit"
+                    options={["NEAR", "yocto"]}
+                    label="Attached deposit"
                     roundbottom
                 />
             </Form>

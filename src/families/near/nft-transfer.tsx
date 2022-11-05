@@ -82,7 +82,6 @@ export class NftTransfer extends BaseTask<FormData, Props, State> {
         call: Call<{
             token_id: string;
             receiver_id: string;
-            amount: string;
             memo: string;
         }> | null
     ): void {
@@ -131,18 +130,12 @@ export class NftTransfer extends BaseTask<FormData, Props, State> {
             actions: [
                 {
                     func,
-                    args: miIsOwner
-                        ? {
-                              token_id: tokenId,
-                              receiver_id: receiverId,
-                              approval_id: approvalId,
-                              memo,
-                          }
-                        : {
-                              token_id: tokenId,
-                              receiver_id: receiverId,
-                              memo,
-                          },
+                    args: {
+                        token_id: tokenId,
+                        receiver_id: receiverId,
+                        ...(miIsOwner && { approval_id: approvalId }),
+                        memo,
+                    },
                     gas: arx.big().intoParsed(gasUnit).cast(gas).toFixed(),
                     depo,
                 },
