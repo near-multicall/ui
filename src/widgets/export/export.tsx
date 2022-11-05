@@ -466,7 +466,7 @@ export class Export extends Component<Props, State> {
                     onSubmit={() => {}}
                 >
                     {() => (
-                        <Form>
+                        <Form className={`${_Export}-params`}>
                             <TextField
                                 name="description"
                                 label="Proposal Description"
@@ -544,16 +544,20 @@ export class Export extends Component<Props, State> {
                                 show={(ids) => {
                                     if (ids.includes(1))
                                         return (
-                                            <DateTimePicker
-                                                classes={{ input: clsx(`${_Export}-params-scheduleTime`) }}
-                                                label="Execution date"
-                                                value={dateTime}
-                                                minDateTime={currentDate}
-                                                maxDateTime={maxDate}
-                                                handleChange={(value) =>
-                                                    !!value && this.setFormData({ dateTime: value.toJSDate() })
-                                                }
-                                            />
+                                            <div className="spacer">
+                                                <DateTimePicker
+                                                    classes={{
+                                                        input: clsx(`${_Export}-params-scheduleTime`, "roundbottom"),
+                                                    }}
+                                                    label="Execution date"
+                                                    value={dateTime}
+                                                    minDateTime={currentDate}
+                                                    maxDateTime={maxDate}
+                                                    handleChange={(value) =>
+                                                        !!value && this.setFormData({ dateTime: value.toJSDate() })
+                                                    }
+                                                />
+                                            </div>
                                         );
                                 }}
                                 roundbottom
@@ -580,7 +584,6 @@ export class Export extends Component<Props, State> {
                         </Form>
                     )}
                 </Formik>
-                <div className={`${_Export}-params`}></div>
 
                 {/* Display cards' errors */}
 
