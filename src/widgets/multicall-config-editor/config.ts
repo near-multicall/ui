@@ -12,6 +12,8 @@ namespace MulticallConfigEditorWidget {
     export type ProposalDescription = Parameters<SputnikDAOContract["proposeFunctionCall"]>[0];
 }
 
-class MulticallConfigEditorConfig {}
+class MulticallConfigEditorConfig {
+    static classes = { root: "MulticallConfigEditor" };
+}
 
 export { MulticallConfigEditorConfig, type MulticallConfigEditorWidget };

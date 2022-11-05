@@ -3,9 +3,11 @@ import { FormEventHandler, HTMLAttributes } from "react";
 
 import { ArgsString } from "../../../shared/lib/args";
 import { Button, ButtonGroup, TextInput, Tile } from "../../../shared/ui/components";
-import { MulticallConfigEditorWidget } from "../config";
+import { MulticallConfigEditorConfig, MulticallConfigEditorWidget } from "../config";
 
-export interface MulticallConfigEditorProposalSubmitProps extends HTMLAttributes<HTMLDivElement> {
+import "./mce-proposal-summary.scss";
+
+export interface MulticallConfigEditorProposalSummaryProps extends HTMLAttributes<HTMLDivElement> {
     changesDiff: MulticallConfigEditorWidget.ChangesDiff;
     description: MulticallConfigEditorWidget.ProposalDescription;
     formValues: { proposalDescription: ArgsString };
@@ -15,7 +17,7 @@ export interface MulticallConfigEditorProposalSubmitProps extends HTMLAttributes
     onSubmit: FormEventHandler;
 }
 
-export const MulticallConfigEditorProposalSubmit = ({
+export const MulticallConfigEditorProposalSummary = ({
     changesDiff,
     className,
     description,
@@ -24,22 +26,28 @@ export const MulticallConfigEditorProposalSubmit = ({
     onCancel,
     onDescriptionUpdate,
     onSubmit,
-}: MulticallConfigEditorProposalSubmitProps) => (
+}: MulticallConfigEditorProposalSummaryProps) => (
     <Tile
         classes={{
-            content: clsx({ "is-inEditMode": Boolean(editMode) }, className),
+            content: clsx(
+                `${MulticallConfigEditorConfig.classes.root}-proposalSummary`,
+                { "is-inEditMode": Boolean(editMode) },
+                className
+            ),
         }}
         heading={editMode ? "Changes proposal" : null}
     >
-        <p>Start editing to create config changes proposal template</p>
+        <p className={`${MulticallConfigEditorConfig.classes.root}-proposalSummary-hint`}>
+            Start editing to create config changes proposal template
+        </p>
 
-        <div>
+        <div className={`${MulticallConfigEditorConfig.classes.root}-proposalSummary-changes`}>
             {Object.keys(changesDiff).map((key) => (
                 <p>{JSON.stringify(changesDiff[key as keyof MulticallConfigEditorWidget.ChangesDiff])}</p>
             ))}
         </div>
 
-        <form>
+        <form className={`${MulticallConfigEditorConfig.classes.root}-proposalSummary-submit`}>
             <div>
                 <TextInput
                     fullWidth

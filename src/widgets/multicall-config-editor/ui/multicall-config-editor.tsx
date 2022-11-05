@@ -6,12 +6,10 @@ import { JobSettingsEdit, TokensWhitelistEdit } from "../../../features";
 import { ArgsString } from "../../../shared/lib/args";
 import { MulticallContract } from "../../../shared/lib/contracts/multicall";
 import { signAndSendTxs } from "../../../shared/lib/wallet";
-import { MulticallConfigEditorWidget } from "../config";
+import { MulticallConfigEditorConfig, MulticallConfigEditorWidget } from "../config";
 
-import { MulticallConfigEditorProposalSubmit } from "./mcce-proposal-submit";
-import "./mc-config-editor.scss";
-
-const _MulticallConfigEditor = "MulticallConfigEditor";
+import { MulticallConfigEditorProposalSummary } from "./mce-proposal-summary";
+import "./multicall-config-editor.scss";
 
 export const MulticallConfigEditor = ({ className, contracts }: MulticallConfigEditorWidget.Dependencies) => {
     const [editMode, editModeSwitch] = useState(false);
@@ -84,14 +82,14 @@ export const MulticallConfigEditor = ({ className, contracts }: MulticallConfigE
     );
 
     return (
-        <div className={clsx(_MulticallConfigEditor, className)}>
+        <div className={clsx(MulticallConfigEditorConfig.classes.root, className)}>
             <MulticallInstance.AdminsTable
-                className={`${_MulticallConfigEditor}-admins`}
+                className={`${MulticallConfigEditorConfig.classes.root}-admins`}
                 daoContractAddress={contracts.dao.address}
             />
 
             <TokensWhitelistEdit.Form
-                className={`${_MulticallConfigEditor}-tokensWhitelist`}
+                className={`${MulticallConfigEditorConfig.classes.root}-tokensWhitelist`}
                 daoContractAddress={contracts.dao.address}
                 disabled={!editMode}
                 resetTrigger={childFormsResetRequested}
@@ -99,7 +97,7 @@ export const MulticallConfigEditor = ({ className, contracts }: MulticallConfigE
             />
 
             <JobSettingsEdit.Form
-                className={`${_MulticallConfigEditor}-jobsSettings`}
+                className={`${MulticallConfigEditorConfig.classes.root}-jobsSettings`}
                 daoContractAddress={contracts.dao.address}
                 disabled={!editMode}
                 multicallContract={contracts.multicall}
@@ -107,8 +105,7 @@ export const MulticallConfigEditor = ({ className, contracts }: MulticallConfigE
                 {...{ onEdit }}
             />
 
-            <MulticallConfigEditorProposalSubmit
-                className={`${_MulticallConfigEditor}-proposalForm`}
+            <MulticallConfigEditorProposalSummary
                 description={proposalDescription}
                 onDescriptionUpdate={proposalDescriptionUpdate}
                 {...{ changesDiff, editMode, formValues, onCancel, onSubmit }}

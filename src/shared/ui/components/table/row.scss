@@ -159,9 +159,22 @@
                 }
             }
 
+            &--dense {
+                & > span {
+                    font-size: size.$text;
+                }
+            }
+
             &--dense.TableRow-content--compact--entitled {
                 &:not(:first-of-type) {
-                    padding: calc(size.$gap / 2.2) calc(size.$gap / 2);
+                    padding: 0;
+
+                    & > span > a,
+                    & > span > p,
+                    & > span > input,
+                    & > span > span {
+                        padding: size.$gap * 0.4 size.$gap * 0.6;
+                    }
                 }
             }
 

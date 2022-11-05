@@ -37,10 +37,6 @@
     &--compact {
         display: flex;
         flex-flow: column nowrap;
-        gap: size.$gap;
-    }
-
-    &--compact.Table--dense {
-        gap: calc(size.$gap / 2);
+        gap: size.$gap * 0.6;
     }
 }

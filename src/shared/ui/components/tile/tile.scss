@@ -6,7 +6,7 @@
     flex-flow: column nowrap;
     position: relative;
     border-radius: size.$task-radius;
-    padding: size.$gap;
+    padding: size.$gap * 0.6;
     background-color: color.$lightest;
     font-size: size.$small-text;
 
@@ -15,7 +15,7 @@
         flex-flow: row nowrap;
         align-items: center;
         gap: size.$gap;
-        padding-bottom: calc(size.$gap * 1);
+        padding: size.$gap * 0.2 size.$gap * 0.2 size.$gap * 0.8;
 
         &-text,
         svg {

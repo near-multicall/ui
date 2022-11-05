@@ -1,0 +1,38 @@
+@use "sass/mixin";
+@use "sass/size";
+
+.MulticallConfigEditor-proposalSummary {
+    grid-area: MCEProposalSummary;
+
+    &-hint {
+        @include mixin.center-items();
+        text-align: center;
+        font-size: size.$large-text;
+    }
+
+    &-changes {
+        display: none;
+    }
+
+    &-submit {
+        display: none;
+    }
+
+    &-hint,
+    &-submit {
+        flex-flow: inherit;
+        height: inherit;
+    }
+
+    &.is-inEditMode &-hint {
+        display: none;
+    }
+
+    &.is-inEditMode &-changes {
+        display: inherit;
+    }
+
+    &.is-inEditMode &-submit {
+        display: inherit;
+    }
+}

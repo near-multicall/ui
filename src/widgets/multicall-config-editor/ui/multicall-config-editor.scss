@@ -1,0 +1,25 @@
+@use "sass/size";
+
+.MulticallConfigEditor {
+    grid-area: MulticallConfigEditor;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 6fr 4fr;
+    gap: size.$gap;
+
+    grid-template-areas:
+        "admins tokensWhitelist"
+        "jobsSettings MCCEProposalSummary";
+
+    &-admins {
+        grid-area: admins;
+    }
+
+    &-jobsSettings {
+        grid-area: jobsSettings;
+    }
+
+    &-tokensWhitelist {
+        grid-area: tokensWhitelist;
+    }
+}
