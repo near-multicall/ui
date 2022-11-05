@@ -68,24 +68,28 @@ export class Export extends Component<Props, State> {
                 .test({
                     name: "whitelisted",
                     message: "Token not whitelisted",
-                    test: (value, ctx) =>
+                    test: async (value, ctx) =>
                         value == null ||
+                        !(await args.string().ft().isValid(value)) ||
                         ctx.options.context?.tokensWhitelist == null ||
-                        ctx.options.context?.tokensWhitelist.includes(value),
+                        ctx.options.context.tokensWhitelist.includes(value),
                 })
-                .requiredWhen("attachment", ([attachment]) => attachment.includes(1)),
+                .requiredWhen("attachment", (attachment) => attachment.includes(1)),
             tokenAmount: args
                 .big()
                 .token()
-                .requiredWhen("attachment", ([attachment]) => attachment.includes(1)),
+                .requiredWhen("attachment", (attachment) => {
+                    console.log(attachment);
+                    return attachment.includes(1);
+                }),
             hasErrors: args.boolean().retain({ dummy: true }),
         })
-        .transform(({ attachment, depo, depoUnit, tokenAddress, tokenAmount, ...rest }) => ({
+        .transform(({ attachment, gas, gasUnit, depo, depoUnit, tokenAddress, tokenAmount, ...rest }) => ({
             ...rest,
             attachment,
+            gas: args.big().intoParsed(gasUnit).cast(gas).toFixed(),
             depo: !attachment.includes(0) ? 0 : args.big().intoParsed(depoUnit).cast(depo).toFixed(),
-            tokenAddress: attachment.includes(1) ? tokenAddress : null,
-            tokenAmount: attachment.includes(1) ? tokenAmount : null,
+            ...(attachment.includes(1) && { tokenAddress, tokenAmount }),
         }))
         .requireAll({ ignore: ["tokenAddress", "tokenAmount"] })
         .retainAll();
@@ -200,10 +204,12 @@ export class Export extends Component<Props, State> {
                 })
                 .then(() => {
                     const { tokenAddress } = fields(this.schema);
+                    console.log(tokenAddress, multicall.ready, multicall.tokensWhitelist);
                     if (!tokenAddress.isBad()) {
                         this.confidentlyUpdateFt().then((ready) => resolve(ready));
                     } else {
                         this.setState({ token: new FungibleToken(this.state.formData.tokenAddress) }); // will be invalid
+                        console.log("address invalid");
                         resolve(false);
                     }
                 });
@@ -214,6 +220,7 @@ export class Export extends Component<Props, State> {
         const { tokenAddress } = this.state.formData;
         const newToken = await FungibleToken.init(tokenAddress);
         this.setState({ token: newToken });
+        console.log("address valid, ready?", newToken.ready);
         return newToken.ready;
     }
 
@@ -385,6 +392,8 @@ export class Export extends Component<Props, State> {
             tokenAmount,
             dateTime,
         } = this.state.formData;
+        const multicall = window.WALLET_COMPONENT.state.currentMulticall;
+
         // do not schedule jobs in the past
         const currentDate = new Date();
         // limit job scheduling to one year from now
@@ -443,7 +452,10 @@ export class Export extends Component<Props, State> {
                                           .cast(tokenAmount)
                                           ?.toFixed() ?? null
                                     : tokenAmount,
-                            }))(values)
+                            }))(values),
+                            {
+                                context: { tokensWhitelist: multicall.ready ? multicall.tokensWhitelist : null },
+                            }
                         );
                         return Object.fromEntries(
                             Object.entries(fields(this.schema))
@@ -475,9 +487,8 @@ export class Export extends Component<Props, State> {
                                             <UnitField
                                                 name="depo"
                                                 unit="depoUnit"
+                                                label="Amount"
                                                 options={["NEAR", "yocto"]}
-                                                roundtop
-                                                roundbottom
                                             />
                                         );
                                     if (ids.includes(1))
@@ -486,7 +497,6 @@ export class Export extends Component<Props, State> {
                                                 <TextField
                                                     name="tokenAddress"
                                                     label="Token Address"
-                                                    roundtop
                                                 />
                                                 <TextField
                                                     name="tokenAmount"
@@ -498,7 +508,6 @@ export class Export extends Component<Props, State> {
                                                             </InputAdornment>
                                                         ),
                                                     }}
-                                                    roundbottom
                                                 />
                                             </>
                                         );

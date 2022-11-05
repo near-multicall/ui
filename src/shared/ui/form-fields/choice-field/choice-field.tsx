@@ -26,12 +26,14 @@ type ChoiceFieldProps = {
 export const ChoiceField = ({ roundbottom, roundtop, children, show, initial, name, ...props }: ChoiceFieldProps) => {
     const [field, meta, helper] = useField(name);
     const [ids, setIds] = useState<number[]>(initial ?? []);
+    useEffect(() => {
+        helper.setValue(ids);
+    }, [ids]);
     const choose = (id: number) => setIds((prevIds) => [id]);
     const add = (id: number) => setIds((prevIds) => [...prevIds, id]);
     const remove = (id: number) => setIds((prevIds) => prevIds.filter((x) => x !== id));
     const toggle = (id: number) => (ids.includes(id) ? remove(id) : add(id));
     const isActive = (id: number) => ids.includes(id);
-    field.value = ids;
     return (
         <div
             className={clsx(_ChoiceField, {
