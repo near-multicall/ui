@@ -78,10 +78,7 @@ export class Export extends Component<Props, State> {
             tokenAmount: args
                 .big()
                 .token()
-                .requiredWhen("attachment", (attachment) => {
-                    console.log(attachment);
-                    return attachment.includes(1);
-                }),
+                .requiredWhen("attachment", (attachment) => attachment.includes(1)),
             hasErrors: args.boolean().retain({ dummy: true }),
         })
         .transform(({ attachment, gas, gasUnit, depo, depoUnit, tokenAddress, tokenAmount, ...rest }) => ({
@@ -106,36 +103,6 @@ export class Export extends Component<Props, State> {
         execution: [0],
         dateTime: new Date(),
     };
-
-    // errors = {
-    //     user: new ArgsError(errorMsg.ERR_INVALID_ADDR, (value) => ArgsAccount.isValid(value), true),
-    //     dao: new ArgsError("Invalid address", (value) => ArgsAccount.isValid(value), true),
-    //     multicall: new ArgsError("Invalid address", (value) => ArgsAccount.isValid(value), true),
-    //     gas: new ArgsError(errorMsg.ERR_INVALID_GAS_AMOUNT, (value) => ArgsBig.isValid(value) && value.value !== ""),
-    //     depo: new ArgsError(errorMsg.ERR_INVALID_DEPO_AMOUNT, (value) => ArgsBig.isValid(value) && value.value !== ""),
-    //     amount: new ArgsError("Invalid amount", (value) => ArgsBig.isValid(value) && value.value !== ""),
-    //     token: new ArgsError("Invalid address", (value) => ArgsAccount.isValid(value)),
-    //     desc: new ArgsError("Invalid proposal description", (value) => value.value !== "", true),
-    //     noToken: new ArgsError("Address does not belong to token contract", (value) => this.errors.noToken),
-    //     notWhitelisted: new ArgsError(
-    //         "Token not whitelisted on multicall instance",
-    //         (value) => this.errors.notWhitelisted
-    //     ),
-    //     hasErrors: new ArgsError("Please fix all errors", (value) => this.errors.hasErrors),
-    // };
-
-    // total = {
-    //     // Keep max gas below 270 Tgas, leaves a max of 30 Tgas for DAO operations if users vote with 300 Tgas.
-    //     // Keep max gas below 270 Tgas for jobs (croncat compatibility). See: https://github.com/CronCats/contracts/blob/cafd3caafb91b45abb6e811ce0fa2819980d6f96/manager/src/tasks.rs#L84
-    //     gas: new ArgsBig("267.5", toGas("1"), toGas("270"), "Tgas"),
-    //     depo: new ArgsBig(toNEAR("1"), "1", null, "NEAR"),
-    //     desc: new ArgsString(""),
-    // };
-
-    // ft = {
-    //     amount: new ArgsBig("1", "1", null, "yocto"),
-    //     token: new ArgsAccount(window.nearConfig.WNEAR_ADDRESS),
-    // };
 
     updateFTDebounced = debounce(() => this.tryUpdateFt(), 500);
 
@@ -204,12 +171,10 @@ export class Export extends Component<Props, State> {
                 })
                 .then(() => {
                     const { tokenAddress } = fields(this.schema);
-                    console.log(tokenAddress, multicall.ready, multicall.tokensWhitelist);
                     if (!tokenAddress.isBad()) {
                         this.confidentlyUpdateFt().then((ready) => resolve(ready));
                     } else {
                         this.setState({ token: new FungibleToken(this.state.formData.tokenAddress) }); // will be invalid
-                        console.log("address invalid");
                         resolve(false);
                     }
                 });
@@ -220,7 +185,6 @@ export class Export extends Component<Props, State> {
         const { tokenAddress } = this.state.formData;
         const newToken = await FungibleToken.init(tokenAddress);
         this.setState({ token: newToken });
-        console.log("address valid, ready?", newToken.ready);
         return newToken.ready;
     }
 
@@ -252,7 +216,6 @@ export class Export extends Component<Props, State> {
         }
         // normal propose multicall to DAO functionality
         else {
-            // const { attachNEAR, attachFT, isJob, jobDateTime } = this.state;
             const {
                 attachment,
                 execution,
@@ -266,10 +229,6 @@ export class Export extends Component<Props, State> {
                 dateTime,
             } = this.state.formData;
             const schema = fields(this.schema);
-            // const { gas, depo, desc } = this.total;
-            // const { token, amount } = this.ft;
-            // const errors = this.errors;
-            // check if "propose" button is disabled
             const isProposeDisabled =
                 wallet.schema.isBad() ||
                 schema.depo.isBad() ||
@@ -277,18 +236,6 @@ export class Export extends Component<Props, State> {
                 schema.hasErrors.isBad() ||
                 (this.state.formData.attachment.includes(0) &&
                     (schema.tokenAddress.isBad() || schema.tokenAmount.isBad()));
-            // const isProposeDisabled =
-            //     errors.dao.isBad ||
-            //     errors.multicall.isBad ||
-            //     errors.depo.isBad ||
-            //     errors.desc.isBad ||
-            //     errors.hasErrors.isBad ||
-            //     (attachFT &&
-            //         (errors.amount.isBad ||
-            //             errors.token.isBad ||
-            //             errors.noToken.isBad ||
-            //             errors.notWhitelisted.isBad)) ||
-            //     walletError;
 
             return (
                 <button
@@ -402,12 +349,6 @@ export class Export extends Component<Props, State> {
         // set hasErrors to bad, if there are unresolved errors in the layout
         const allErrors = LAYOUT.toErrors();
         fields(this.schema).hasErrors.isBad(allErrors.length > 0);
-
-        // // update internal state of address errors
-        // Object.entries(STORAGE.addresses).forEach(([k, v]) => {
-        //     const account = new ArgsAccount(v);
-        //     errors[k].validOrNull(account);
-        // });
 
         // Multicall args used in making the proposal
         let multicallArgs: MulticallArgs = { calls: [] };
