@@ -31,6 +31,10 @@
         border-radius: size.$task-radius;
         padding: calc(size.$gap / 2);
         background-color: color.$white;
+
+        &--dense {
+            padding: calc(size.$gap / 2.2);
+        }
     }
 
     &--highlighted {
@@ -57,7 +61,7 @@
             justify-content: space-between;
             align-items: center;
             gap: size.$gap;
-            font-size: 1.1 * size.$text;
+            font-size: size.$small-text;
 
             &:last-of-type {
                 border-bottom-left-radius: 0.8 * size.$task-radius;
@@ -123,7 +127,7 @@
                         }
 
                         &:last-of-type {
-                            font-size: size.$large-text;
+                            font-size: size.$text;
                         }
                     }
                 }
@@ -152,6 +156,12 @@
                             text-align: center;
                         }
                     }
+                }
+            }
+
+            &--dense.TableRow-content--compact--entitled {
+                &:not(:first-of-type) {
+                    padding: calc(size.$gap / 2.2) calc(size.$gap / 2);
                 }
             }
 

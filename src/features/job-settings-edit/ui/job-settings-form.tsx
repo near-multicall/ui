@@ -136,6 +136,7 @@ export const JobSettingsForm = ({
                                         endAdornment: NearIcons.NATIVE_TOKEN_CHARACTER,
                                         inputProps: { min: 0, step: 0.001 },
                                     }}
+                                    fullWidth
                                     update={onJobBondChange}
                                     type="number"
                                     value={formFields.jobBond}
