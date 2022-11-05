@@ -123,6 +123,7 @@ export class CustomTask extends BaseTask<FormData> {
                 <TextField
                     name="args"
                     label="Function Arguments"
+                    multiline
                 />
                 <UnitField
                     name="gas"

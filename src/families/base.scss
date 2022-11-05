@@ -163,6 +163,24 @@ form.edit {
         width: 100%;
         height: 1em;
     }
+
+    .protocol {
+        justify-self: flex-end;
+        @include mixin.center-items;
+        padding: size.$gap;
+        margin-top: auto;
+        gap: 1ch;
+        color: rgba(color.$light-text, 0.5) !important;
+        font-size: size.$small-text;
+        cursor: pointer;
+        .icon {
+            font-size: size.$large-text;
+        }
+        &:hover {
+            text-decoration: underline;
+            color: color.$light-text !important;
+        }
+    }
 }
 
 .MuiMenuItem-root {

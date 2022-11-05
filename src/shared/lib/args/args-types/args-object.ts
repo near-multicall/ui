@@ -42,6 +42,7 @@ addMethod(
                           : (this.fields[key] as any).retain(retainOptions))
                 : void 0
         );
+
         return this.retain();
     }
 );

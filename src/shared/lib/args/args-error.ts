@@ -60,6 +60,7 @@ interface ErrorMethods {
     messages(): string[];
     lastValue(): any;
     combine(errors: this[], options?: Partial<RetainOptions>): this;
+    requiredWhen(this: any, keys: string | string[], condition: (...schemata: any[]) => boolean): this;
 }
 
 /**
@@ -282,6 +283,14 @@ function combine(this: any, errors: any[], options?: Partial<RetainOptions>) {
     });
 }
 
+function requiredWhen(this: any, keys: string | string[], condition: (...schemata: any[]) => boolean) {
+    return this.when(keys, {
+        is: condition,
+        then: (schema: any) => schema.required(),
+        otherwise: (schema: any) => schema.optional(),
+    });
+}
+
 /**
  * add multiple methods at once
  * @param schema
@@ -305,6 +314,7 @@ function addErrorMethods(schema: any): void {
         messages,
         lastValue,
         combine,
+        requiredWhen,
     });
 }
 

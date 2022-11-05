@@ -5,7 +5,7 @@ import { Component } from "react";
 import { Tabs } from "../../shared/ui/components";
 import { Builder } from "../builder/builder.jsx";
 import { Editor } from "../editor/editor.jsx";
-import { Export } from "../export/export.jsx";
+import { Export } from "../export/export";
 import "./menu.scss";
 
 export class Menu extends Component {
