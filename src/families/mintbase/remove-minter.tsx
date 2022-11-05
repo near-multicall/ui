@@ -9,6 +9,7 @@ import { toGas } from "../../shared/lib/converter";
 import { MintbaseStore } from "../../shared/lib/contracts/mintbase";
 import { CheckboxField, InfoField, TextField, UnitField } from "../../shared/ui/form-fields";
 import { BaseTask, BaseTaskProps, BaseTaskState } from "../base";
+import MintbaseLogo from "../../app/static/mintbase/Mintbase_logo.svg";
 import "./mintbase.scss";
 import { STORAGE } from "../../shared/lib/persistent";
 
@@ -203,6 +204,17 @@ export class RemoveMinter extends BaseTask<FormData, Props, State> {
                     label="Allocated gas"
                     roundbottom
                 />
+                <a
+                    className="protocol"
+                    href="https://www.mintbase.io/"
+                >
+                    <span>powered by</span>
+                    <img
+                        src={MintbaseLogo}
+                        alt="Mintbase"
+                        className="logo"
+                    />
+                </a>
             </Form>
         );
     };

@@ -8,6 +8,7 @@ import { STORAGE } from "../../shared/lib/persistent";
 import { TextField, UnitField } from "../../shared/ui/form-fields";
 import { FileField } from "../../shared/ui/form-fields/file-field/file-field";
 import { BaseTask, BaseTaskProps, BaseTaskState, DefaultFormData } from "../base";
+import MintbaseLogo from "../../app/static/mintbase/Mintbase_logo.svg";
 import "./mintbase.scss";
 
 type FormData = DefaultFormData & {
@@ -233,6 +234,17 @@ export class CreateStore extends BaseTask<FormData, Props, State> {
                     label="Deposit"
                     roundbottom
                 />
+                <a
+                    className="protocol"
+                    href="https://www.mintbase.io/"
+                >
+                    <span>powered by</span>
+                    <img
+                        src={MintbaseLogo}
+                        alt="Mintbase"
+                        className="logo"
+                    />
+                </a>
             </Form>
         );
     };

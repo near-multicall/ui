@@ -173,8 +173,12 @@ form.edit {
         color: rgba(color.$light-text, 0.5) !important;
         font-size: size.$small-text;
         cursor: pointer;
-        .icon {
+        .logo {
             font-size: size.$large-text;
+            height: size.$large-text;
+        }
+        span {
+            white-space: nowrap;
         }
         &:hover {
             text-decoration: underline;
