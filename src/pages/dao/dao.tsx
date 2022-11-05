@@ -178,8 +178,6 @@ export class DaoPage extends Component<Props, State> {
         const { loading, dao, proposed, proposedInfo, formData } = this.state;
         const { noMulticall, noDao } = fields(this.schema, "addr");
 
-        console.log(this.state);
-
         if (
             this.fee === "" ||
             // wallet not logged in or DAO object not initialized yet
