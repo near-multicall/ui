@@ -438,6 +438,9 @@ export class Export extends Component<Props, State> {
                                                 <TextField
                                                     name="tokenAddress"
                                                     label="Token Address"
+                                                    autocomplete={
+                                                        multicall.ready ? multicall.tokensWhitelist : undefined
+                                                    }
                                                 />
                                                 <TextField
                                                     name="tokenAmount"
