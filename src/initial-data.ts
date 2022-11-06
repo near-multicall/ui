@@ -48,3 +48,22 @@ export const initialData = {
     },
     columnOrder: ["column-0"],
 };
+
+export const keywords = {
+    "task-i1": ["custom"],
+    "task-i2": ["pay"],
+    "task-i3": ["pay"],
+    "task-i4": [],
+    "task-i5": [],
+    "task-i6": [],
+    "task-i7": ["revoke_all"],
+    "task-i8": ["LP"],
+    "task-i9": ["LP"],
+    "task-i10": ["validator"],
+    "task-i11": ["validator", "unstake_all"],
+    "task-i12": ["validator"],
+    "task-i13": [],
+    "task-i14": [],
+    "task-i15": [],
+    "task-i16": ["pay"],
+};
