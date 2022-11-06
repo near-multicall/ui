@@ -85,6 +85,7 @@ export class NftTransferCall extends BaseTask<FormData, Props, State> {
         call: Call<{
             token_id: string;
             receiver_id: string;
+            amount: string;
             memo: string;
             msg: string;
         }> | null
@@ -117,7 +118,7 @@ export class NftTransferCall extends BaseTask<FormData, Props, State> {
     }
 
     static override inferOwnType(json: Call): boolean {
-        return !!json && json.actions[0].func === "nft_transfer_call";
+        return !!json && json.actions[0].func === "nft_transfer";
     }
 
     public override toCall(): Call {
@@ -138,7 +139,7 @@ export class NftTransferCall extends BaseTask<FormData, Props, State> {
                     args: {
                         token_id: tokenId,
                         receiver_id: receiverId,
-                        ...(miIsOwner && { approval_id: approvalId }),
+                        ...(!miIsOwner && { approval_id: approvalId }),
                         memo,
                         msg,
                     },

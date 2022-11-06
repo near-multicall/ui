@@ -1,3 +1,4 @@
+import { Autocomplete } from "@mui/material";
 import { Form, FormikErrors, useFormikContext } from "formik";
 import { useEffect } from "react";
 import { args as arx } from "../../shared/lib/args/args";
@@ -6,7 +7,7 @@ import { Call, CallError } from "../../shared/lib/call";
 import { toGas } from "../../shared/lib/converter";
 import { STORAGE } from "../../shared/lib/persistent";
 import { NonFungibleToken } from "../../shared/lib/standards/nonFungibleToken";
-import { CheckboxField, TextField, UnitField } from "../../shared/ui/form-fields";
+import { CheckboxField, InfoField, TextField, UnitField } from "../../shared/ui/form-fields";
 import type { DefaultFormData } from "../base";
 import { BaseTask, BaseTaskProps, BaseTaskState } from "../base";
 import "./near.scss";
@@ -98,7 +99,7 @@ export class NftApprove extends BaseTask<FormData, Props, State> {
                 depo: arx.big().intoFormatted(this.initialValues.depoUnit).cast(call.actions[0].depo).toFixed(),
                 accountId: call.actions[0].args.account_id,
                 tokenId: call.actions[0].args.token_id,
-                addMsg: call.actions[0].args.msg === undefined,
+                addMsg: call.actions[0].args.msg !== undefined,
                 msg: call.actions[0].args?.msg ?? null,
             };
             this.initialValues = Object.keys(this.initialValues).reduce((acc, k) => {
@@ -123,15 +124,10 @@ export class NftApprove extends BaseTask<FormData, Props, State> {
     }
 
     public override toCall(): Call {
-        const { addr, func, depo, gas, gasUnit, tokenId, accountId, msg, addMsg } = this.state.formData;
-        const { nft } = this.state;
+        const { addr, func, depo, depoUnit, gas, gasUnit, tokenId, accountId, msg, addMsg } = this.state.formData;
 
         if (!arx.big().isValidSync(gas)) throw new CallError("Failed to parse gas input value", this.props.id);
         if (!arx.big().isValidSync(depo)) throw new CallError("Failed to parse deposit input value", this.props.id);
-        if (!nft.ready || !nft.token) throw new CallError("Lacking token metadata", this.props.id);
-
-        const miIsOwner = nft.token.owner_id === STORAGE.addresses.multicall;
-        const approvalId = nft.token.approved_account_ids[STORAGE.addresses.multicall];
 
         return {
             address: addr,
@@ -141,11 +137,10 @@ export class NftApprove extends BaseTask<FormData, Props, State> {
                     args: {
                         token_id: tokenId,
                         account_id: accountId,
-                        ...(miIsOwner && { approval_id: approvalId }),
                         ...(addMsg && { msg }),
                     },
                     gas: arx.big().intoParsed(gasUnit).cast(gas).toFixed(),
-                    depo,
+                    depo: arx.big().intoParsed(depoUnit).cast(depo).toFixed(),
                 },
             ],
         };
@@ -201,6 +196,7 @@ export class NftApprove extends BaseTask<FormData, Props, State> {
 
     public override Editor = (): React.ReactNode => {
         const { resetForm, validateForm, values } = useFormikContext<FormData>();
+        const approvedAccountIds = this.state.nft?.token?.approved_account_ids;
 
         useEffect(() => {
             resetForm({
@@ -211,7 +207,7 @@ export class NftApprove extends BaseTask<FormData, Props, State> {
         }, []);
 
         return (
-            <Form className="edit">
+            <Form className={`edit ${this.uniqueClassName}-edit`}>
                 <TextField
                     name="name"
                     label="Card Name"
@@ -228,6 +224,22 @@ export class NftApprove extends BaseTask<FormData, Props, State> {
                     name="tokenId"
                     label="Token ID"
                 />
+                {!!approvedAccountIds && (
+                    <InfoField>
+                        <b>Approved account ids</b>
+                        {Object.keys(approvedAccountIds).map((id) => (
+                            <a
+                                className="approved-account-id"
+                                href={arx.string().intoUrl().cast(id)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                key={id}
+                            >
+                                {id}
+                            </a>
+                        ))}
+                    </InfoField>
+                )}
                 <TextField
                     name="accountId"
                     label="Address to be approved"
@@ -235,6 +247,7 @@ export class NftApprove extends BaseTask<FormData, Props, State> {
                 <CheckboxField
                     name="addMsg"
                     label="Specify msg"
+                    checked={values.addMsg}
                 />
                 {values.addMsg && (
                     <TextField

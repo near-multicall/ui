@@ -6,15 +6,15 @@ import { Call, CallError } from "../../shared/lib/call";
 import { toGas } from "../../shared/lib/converter";
 import { STORAGE } from "../../shared/lib/persistent";
 import { NonFungibleToken } from "../../shared/lib/standards/nonFungibleToken";
-import { TextField, UnitField } from "../../shared/ui/form-fields";
+import { CheckboxField, InfoField, TextField, UnitField } from "../../shared/ui/form-fields";
 import type { DefaultFormData } from "../base";
 import { BaseTask, BaseTaskProps, BaseTaskState } from "../base";
 import "./near.scss";
 
 type FormData = DefaultFormData & {
     tokenId: string;
-    receiverId: string;
-    memo: string;
+    accountId: string;
+    revokeAll: boolean;
 };
 
 type Props = BaseTaskProps;
@@ -23,49 +23,52 @@ type State = BaseTaskState<FormData> & {
     nft: NonFungibleToken;
 };
 
-export class NftTransfer extends BaseTask<FormData, Props, State> {
-    override uniqueClassName = "near-nft-transfer-task";
+export class NftRevoke extends BaseTask<FormData, Props, State> {
+    override uniqueClassName = "near-nft-revoke-task";
     override schema = arx
         .object()
         .shape({
             addr: arx.string().nft(),
             gas: arx.big().gas().min(toGas("1")).max(toGas("250")),
+            depo: arx.big().token(),
             tokenId: arx
                 .string()
                 .nftId("addr")
                 .test({
                     name: "approval",
-                    message: "multicall does not have permission to transfer this NFT",
+                    message: "multicall must own the NFT",
                     test: (value, ctx) =>
                         value == null ||
                         ctx.options.context?.token == null ||
                         ctx.options.context?.multicallAddress == null ||
-                        ctx.options.context.token.owner_id === ctx.options.context.multicallAddress ||
-                        Object.keys(ctx.options.context.token.approved_account_ids).includes(
-                            ctx.options.context.multicallAddress
-                        ),
+                        ctx.options.context.token.owner_id === ctx.options.context.multicallAddress,
                 }),
-            receiverId: arx.string().address(),
-            memo: arx.string().optional(),
+            accountId: arx
+                .string()
+                .address()
+                .requiredWhen("revokeAll", (revokeAll) => !revokeAll),
+            revokeAll: arx.boolean(),
         })
-        .transform(({ gas, gasUnit, ...rest }) => ({
+        .transform(({ gas, gasUnit, accountId, revokeAll, ...rest }) => ({
             ...rest,
+            revokeAll,
             gas: arx.big().intoParsed(gasUnit).cast(gas),
+            ...(!revokeAll && { accountId }),
         }))
-        .requireAll({ ignore: ["memo"] })
+        .requireAll({ ignore: ["accountId"] })
         .retainAll();
 
     override initialValues: FormData = {
-        name: "NFT Transfer",
+        name: "NFT Revoke",
         addr: "",
-        func: "nft_transfer",
-        gas: "15",
+        func: "nft_revoke",
+        gas: "0",
         gasUnit: "Tgas",
         depo: "1",
         depoUnit: "yocto",
         tokenId: "",
-        receiverId: "",
-        memo: "",
+        accountId: "",
+        revokeAll: false,
     };
 
     constructor(props: Props) {
@@ -81,8 +84,7 @@ export class NftTransfer extends BaseTask<FormData, Props, State> {
     protected override init(
         call: Call<{
             token_id: string;
-            receiver_id: string;
-            memo: string;
+            account_id: string;
         }> | null
     ): void {
         if (call !== null) {
@@ -90,9 +92,9 @@ export class NftTransfer extends BaseTask<FormData, Props, State> {
                 addr: call.address,
                 func: call.actions[0].func,
                 gas: arx.big().intoFormatted(this.initialValues.gasUnit).cast(call.actions[0].gas).toFixed(),
-                receiverId: call.actions[0].args.receiver_id,
+                accountId: call.actions[0].args.account_id,
                 tokenId: call.actions[0].args.token_id,
-                memo: call.actions[0].args.memo,
+                revokeAll: call.address === "nft_revoke_all",
             };
             this.initialValues = Object.keys(this.initialValues).reduce((acc, k) => {
                 const v = fromCall[k as keyof typeof fromCall];
@@ -112,18 +114,14 @@ export class NftTransfer extends BaseTask<FormData, Props, State> {
     }
 
     static override inferOwnType(json: Call): boolean {
-        return !!json && json.actions[0].func === "nft_transfer";
+        return !!json && (json.actions[0].func === "nft_revoke" || json.actions[0].func === "nft_revoke_all");
     }
 
     public override toCall(): Call {
-        const { addr, func, depo, gas, gasUnit, tokenId, receiverId, memo } = this.state.formData;
+        const { addr, func, depo, gas, gasUnit, tokenId, accountId, revokeAll } = this.state.formData;
         const { nft } = this.state;
 
         if (!arx.big().isValidSync(gas)) throw new CallError("Failed to parse gas input value", this.props.id);
-        if (!nft.ready || !nft.token) throw new CallError("Lacking token metadata", this.props.id);
-
-        const miIsOwner = nft.token.owner_id === STORAGE.addresses.multicall;
-        const approvalId = nft.token.approved_account_ids[STORAGE.addresses.multicall];
 
         return {
             address: addr,
@@ -132,9 +130,7 @@ export class NftTransfer extends BaseTask<FormData, Props, State> {
                     func,
                     args: {
                         token_id: tokenId,
-                        receiver_id: receiverId,
-                        ...(!miIsOwner && { approval_id: approvalId }),
-                        memo,
+                        ...(!revokeAll && { account_id: accountId }),
                     },
                     gas: arx.big().intoParsed(gasUnit).cast(gas).toFixed(),
                     depo,
@@ -175,6 +171,7 @@ export class NftTransfer extends BaseTask<FormData, Props, State> {
     }
 
     public override async validateForm(values: FormData): Promise<FormikErrors<FormData>> {
+        values.func = values.revokeAll ? "nft_revoke_all" : "nft_revoke";
         this.setFormData(values);
         await new Promise((resolve) => this.resolveDebounced(resolve));
         await this.tryUpdateNft();
@@ -192,7 +189,8 @@ export class NftTransfer extends BaseTask<FormData, Props, State> {
     }
 
     public override Editor = (): React.ReactNode => {
-        const { resetForm, validateForm } = useFormikContext();
+        const { resetForm, validateForm, values } = useFormikContext<FormData>();
+        const approvedAccountIds = this.state.nft?.token?.approved_account_ids;
 
         useEffect(() => {
             resetForm({
@@ -203,7 +201,7 @@ export class NftTransfer extends BaseTask<FormData, Props, State> {
         }, []);
 
         return (
-            <Form className="edit">
+            <Form className={`edit ${this.uniqueClassName}-edit`}>
                 <TextField
                     name="name"
                     label="Card Name"
@@ -220,14 +218,32 @@ export class NftTransfer extends BaseTask<FormData, Props, State> {
                     name="tokenId"
                     label="Token ID"
                 />
-                <TextField
-                    name="receiverId"
-                    label="Receiver Address"
+                {!!approvedAccountIds && (
+                    <InfoField>
+                        <b>Approved account ids</b>
+                        {Object.keys(approvedAccountIds).map((id) => (
+                            <a
+                                className="approved-account-id"
+                                href={arx.string().intoUrl().cast(id)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                {id}
+                            </a>
+                        ))}
+                    </InfoField>
+                )}
+                <CheckboxField
+                    name="revokeAll"
+                    label="Revoke All"
                 />
-                <TextField
-                    name="memo"
-                    label="Memo"
-                />
+                {!values.revokeAll && (
+                    <TextField
+                        name="accountId"
+                        label="Address to be revoked"
+                        autocomplete={approvedAccountIds ? Object.keys(approvedAccountIds) : undefined}
+                    />
+                )}
                 <UnitField
                     name="gas"
                     unit="gasUnit"
