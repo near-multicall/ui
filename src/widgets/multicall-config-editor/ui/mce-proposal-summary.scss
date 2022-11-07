@@ -13,7 +13,15 @@
 
     &-changes {
         display: none;
-        padding: size.$gap * 0.6;
+        padding: 0 size.$gap * 0.6;
+
+        &-data {
+            display: flex;
+            flex-flow: row wrap;
+            gap: 1rem;
+            padding: 0;
+            list-style: none;
+        }
     }
 
     &-submit {

@@ -43,9 +43,9 @@ export const MulticallConfigEditorProposalSummary = ({
             (changesKey) =>
                 changesDiff[changesKey].length > 0 && (
                     <div className={`${classNameRoot}-proposalSummary-changes`}>
-                        <h2>{MulticallConfigEditorConfig.ChangesDiffKeyDescription[changesKey] + ":"}</h2>
+                        <h3>{MulticallConfigEditorConfig.ChangesDiffKeyDescription[changesKey] + ":"}</h3>
 
-                        <ul>
+                        <ul className={`${classNameRoot}-proposalSummary-changes-data`}>
                             {(Array.isArray(changesDiff[changesKey])
                                 ? Array.from(changesDiff[changesKey])
                                 : [changesDiff[changesKey]]
