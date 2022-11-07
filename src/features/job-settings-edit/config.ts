@@ -1,21 +1,16 @@
 import { HTMLProps } from "react";
 
-import { MulticallInstanceEntity } from "../../entities";
-
-import {
-    type MulticallConfigDiff,
-    MulticallConfigParamKey,
-    MulticallContract,
-} from "../../shared/lib/contracts/multicall";
+import { MulticallInstance, MulticallInstanceEntity } from "../../entities";
+import { MulticallConfigDiff, MulticallContract } from "../../shared/lib/contracts/multicall";
 
 namespace JobSettingsEditFeature {
-    export type DiffKey = MulticallConfigParamKey;
+    export type ChangesDiffKey = MulticallInstanceEntity.ParamKey;
 
-    export type FormState = Pick<MulticallConfigDiff, MulticallConfigParamKey>;
+    export type FormState = Pick<MulticallConfigDiff, MulticallInstanceEntity.ParamKey>;
 
-    export interface Dependencies
+    export interface Inputs
         extends Omit<HTMLProps<HTMLDivElement>, "onChange">,
-            Pick<MulticallInstanceEntity.Dependencies, "daoContractAddress"> {
+            Pick<MulticallInstanceEntity.Inputs, "daoContractAddress"> {
         multicallContract: MulticallContract;
         onEdit: (payload: FormState) => void;
         resetTrigger: { subscribe: (callback: EventListener) => () => void };
@@ -23,7 +18,12 @@ namespace JobSettingsEditFeature {
 }
 
 class JobSettingsEditConfig {
-    static DiffKey = MulticallConfigParamKey;
+    public static readonly ChangesDiffKey = MulticallInstance.ParamKey;
+
+    public static readonly ChangesDiffKeyDescription = {
+        [JobSettingsEditConfig.ChangesDiffKey.croncatManager]: "Croncat manager",
+        [JobSettingsEditConfig.ChangesDiffKey.jobBond]: "Job bond",
+    };
 }
 
 export { JobSettingsEditConfig, type JobSettingsEditFeature };

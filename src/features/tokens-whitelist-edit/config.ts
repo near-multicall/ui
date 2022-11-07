@@ -1,27 +1,30 @@
 import { HTMLProps } from "react";
 
-import { MulticallTokensWhitelistDiffKey, type MulticallConfigDiff } from "../../shared/lib/contracts/multicall";
+import { MulticallTokensWhitelistChangesDiffKey, type MulticallConfigDiff } from "../../shared/lib/contracts/multicall";
 import { MulticallInstanceEntity } from "../../entities";
 
 namespace TokensWhitelistEditFeature {
-    export type DiffKey = MulticallTokensWhitelistDiffKey;
+    export type ChangesDiffKey = MulticallTokensWhitelistChangesDiffKey;
 
-    export interface Dependencies
-        extends Omit<HTMLProps<HTMLDivElement>, "onChange">,
-            MulticallInstanceEntity.Dependencies {
-        onEdit: (payload: Pick<MulticallConfigDiff, DiffKey>) => void;
+    export interface Inputs extends Omit<HTMLProps<HTMLDivElement>, "onChange">, MulticallInstanceEntity.Inputs {
+        onEdit: (payload: Pick<MulticallConfigDiff, ChangesDiffKey>) => void;
         resetTrigger: { subscribe: (callback: EventListener) => () => void };
     }
 
     export interface FormStates
         extends Record<
-            keyof Pick<MulticallConfigDiff, DiffKey>,
-            Set<MulticallConfigDiff[keyof Pick<MulticallConfigDiff, DiffKey>][number]>
+            keyof Pick<MulticallConfigDiff, ChangesDiffKey>,
+            Set<MulticallConfigDiff[keyof Pick<MulticallConfigDiff, ChangesDiffKey>][number]>
         > {}
 }
 
 class TokensWhitelistEditConfig {
-    static DiffKey = MulticallTokensWhitelistDiffKey;
+    public static readonly ChangesDiffKey = MulticallTokensWhitelistChangesDiffKey;
+
+    public static readonly ChangesDiffKeyDescription = {
+        [TokensWhitelistEditConfig.ChangesDiffKey.addTokens]: "Tokens to add to whitelist",
+        [TokensWhitelistEditConfig.ChangesDiffKey.removeTokens]: "Tokens to remove from whitelist",
+    };
 }
 
 export { TokensWhitelistEditConfig, type TokensWhitelistEditFeature };
