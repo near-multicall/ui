@@ -7,7 +7,7 @@ import { type JobEntity } from "../config";
 import { jobTableRowRender } from "./job";
 import "./jobs-table.scss";
 
-interface JobsTableProps extends JobEntity.Dependencies {}
+interface JobsTableProps extends JobEntity.Inputs {}
 
 const _JobsTable = "JobsTable";
 

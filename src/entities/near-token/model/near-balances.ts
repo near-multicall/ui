@@ -11,7 +11,7 @@ type NearTokenDataFxResponse = {
 };
 
 const nearTokenDataFx = async (
-    { dao, multicall }: NearTokenEntity.Dependencies["contracts"],
+    { dao, multicall }: NearTokenEntity.Inputs["contracts"],
     callback: (result: NearTokenDataFxResponse) => void
 ) => {
     const [daoAccInfo, multicallAccInfo] = await Promise.all([
@@ -38,7 +38,7 @@ const nearTokenDataFx = async (
     });
 };
 
-const useNearTokenData = (contracts: NearTokenEntity.Dependencies["contracts"]) => {
+const useNearTokenData = (contracts: NearTokenEntity.Inputs["contracts"]) => {
     const [state, stateUpdate] = useState<NearTokenDataFxResponse>({ data: null, loading: true });
 
     useEffect(() => void nearTokenDataFx(contracts, stateUpdate), [contracts, stateUpdate]);

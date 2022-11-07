@@ -11,7 +11,7 @@ type FungibleTokensDataFxResponse = {
 };
 
 const fungibleTokensDataFx = async (
-    { dao, multicall }: FungibleTokenEntity.Dependencies["contracts"],
+    { dao, multicall }: FungibleTokenEntity.Inputs["contracts"],
     callback: (result: FungibleTokensDataFxResponse) => void
 ) => {
     /* Get LikelyTokens list on DAO and its Multicall instance */
@@ -54,7 +54,7 @@ const fungibleTokensDataFx = async (
     });
 };
 
-const useAllFungibleTokensData = (contracts: FungibleTokenEntity.Dependencies["contracts"]) => {
+const useAllFungibleTokensData = (contracts: FungibleTokenEntity.Inputs["contracts"]) => {
     const [state, stateUpdate] = useState<FungibleTokensDataFxResponse>({ data: null, loading: true });
 
     useEffect(() => void fungibleTokensDataFx(contracts, stateUpdate), [contracts, stateUpdate]);

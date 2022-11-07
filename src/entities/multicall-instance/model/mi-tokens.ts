@@ -14,7 +14,7 @@ export type MulticallInstanceTokensWhitelist = {
 
 export class MulticallInstanceTokensModel {
     static whitelistFetchFx = async (
-        daoContractAddress: MulticallInstanceEntity.Dependencies["daoContractAddress"],
+        daoContractAddress: MulticallInstanceEntity.Inputs["daoContractAddress"],
         callback: (result: MulticallInstanceTokensWhitelist) => void
     ) =>
         await MulticallContract.instanceDataFetchFx(
@@ -24,7 +24,7 @@ export class MulticallInstanceTokensModel {
                 callback(Props.evolve({ data: ({ tokensWhitelist }) => tokensWhitelist }, multicallInstanceData))
         );
 
-    static useWhitelist = (daoContractAddress: MulticallInstanceEntity.Dependencies["daoContractAddress"]) => {
+    static useWhitelist = (daoContractAddress: MulticallInstanceEntity.Inputs["daoContractAddress"]) => {
         const [state, stateUpdate] = useState<MulticallInstanceTokensWhitelist>({
             data: null,
             error: null,

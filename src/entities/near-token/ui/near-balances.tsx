@@ -3,7 +3,7 @@ import { IconLabel, NearIcons } from "../../../shared/ui/components";
 import { NearTokenBalancesModel } from "../model/near-balances";
 import { type NearTokenEntity } from "../config";
 
-interface NearTokenBalancesRenderProps extends NearTokenEntity.Dependencies {}
+interface NearTokenBalancesRenderProps extends NearTokenEntity.Inputs {}
 
 export const nearTokenBalancesRender = ({ contracts }: NearTokenBalancesRenderProps) => {
     const { data } = NearTokenBalancesModel.useTokenFrom(contracts);

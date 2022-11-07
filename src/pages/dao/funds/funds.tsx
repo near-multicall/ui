@@ -5,7 +5,7 @@ import { TokensBalances, type TokensBalancesWidget } from "../../../widgets";
 
 import "./funds.scss";
 
-interface DaoFundsTabUIProps extends HTMLProps<HTMLDivElement>, TokensBalancesWidget.Dependencies {}
+interface DaoFundsTabUIProps extends HTMLProps<HTMLDivElement>, TokensBalancesWidget.Inputs {}
 
 const _DaoFundsTab = "DaoFundsTab";
 

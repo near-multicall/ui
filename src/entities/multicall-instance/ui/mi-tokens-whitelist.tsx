@@ -8,7 +8,7 @@ import {
 } from "./mi-whitelisted-token";
 
 interface MulticallInstanceTokensWhitelistTableProps
-    extends MulticallInstanceEntity.Dependencies,
+    extends MulticallInstanceEntity.Inputs,
         Pick<TileProps, "footer" | "headingCorners"> {
     ItemProps?: TableProps["RowProps"];
     className?: string;

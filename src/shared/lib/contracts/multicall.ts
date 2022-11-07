@@ -70,16 +70,16 @@ enum MulticallConfigParamKey {
     jobBond = "jobBond",
 }
 
-enum MulticallTokensWhitelistDiffKey {
+enum MulticallTokensWhitelistChangesDiffKey {
     addTokens = "addTokens",
     removeTokens = "removeTokens",
 }
 
 type MulticallConfigDiff = {
-    [MulticallTokensWhitelistDiffKey.removeTokens]: string[];
-    [MulticallTokensWhitelistDiffKey.addTokens]: string[];
-    [MulticallConfigParamKey.jobBond]: string;
+    [MulticallTokensWhitelistChangesDiffKey.addTokens]: string[];
     [MulticallConfigParamKey.croncatManager]: string;
+    [MulticallConfigParamKey.jobBond]: string;
+    [MulticallTokensWhitelistChangesDiffKey.removeTokens]: string[];
 };
 
 class Multicall {
@@ -326,5 +326,5 @@ class Multicall {
     }
 }
 
-export { Multicall, Multicall as MulticallContract, MulticallConfigParamKey, MulticallTokensWhitelistDiffKey };
+export { Multicall, Multicall as MulticallContract, MulticallConfigParamKey, MulticallTokensWhitelistChangesDiffKey };
 export type { JobData, MulticallArgs, MulticallConfigDiff };

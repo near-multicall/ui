@@ -7,7 +7,7 @@ import { type TokensBalancesWidget } from "../config";
 
 import "./tokens-balances.scss";
 
-interface TokensBalancesUIProps extends TokensBalancesWidget.Dependencies {}
+interface TokensBalancesUIProps extends TokensBalancesWidget.Inputs {}
 
 const _TokensBalances = "TokensBalances";
 

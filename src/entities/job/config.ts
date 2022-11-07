@@ -1,7 +1,7 @@
 import { type JobData, type Multicall } from "../../shared/lib/contracts/multicall";
 
 namespace JobEntity {
-    export interface Dependencies {
+    export interface Inputs {
         className?: string;
         contracts: { multicall: Multicall };
     }

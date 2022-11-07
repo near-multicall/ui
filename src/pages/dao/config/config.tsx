@@ -1,11 +1,11 @@
 import clsx from "clsx";
 import { HTMLProps } from "react";
 
-import { MulticallConfigEditor, type MulticallConfigEditorWidget } from "../../../widgets";
+import { MulticallConfigEditor, MulticallConfigEditorWidget } from "../../../widgets";
 
 import "./config.scss";
 
-interface DaoConfigTabUIProps extends HTMLProps<HTMLDivElement>, MulticallConfigEditorWidget.Dependencies {}
+interface DaoConfigTabUIProps extends HTMLProps<HTMLDivElement>, MulticallConfigEditorWidget.Inputs {}
 
 const _DaoConfigTab = "DaoConfigTab";
 

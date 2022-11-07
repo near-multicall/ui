@@ -4,7 +4,7 @@ import { type MulticallInstanceEntity } from "../config";
 
 import { multicallInstanceAdminToTableRow } from "./mi-admin";
 
-interface MulticallInstanceAdminsTableProps extends MulticallInstanceEntity.Dependencies {
+interface MulticallInstanceAdminsTableProps extends MulticallInstanceEntity.Inputs {
     className?: string;
 }
 

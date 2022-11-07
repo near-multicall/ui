@@ -4,7 +4,7 @@ import { FungibleTokenFormat } from "../lib/ft-format";
 import { FungibleTokenBalancesModel } from "../model/ft-balances";
 import { type FungibleTokenEntity } from "../config";
 
-interface FungibleTokensBalancesRenderProps extends FungibleTokenEntity.Dependencies {}
+interface FungibleTokensBalancesRenderProps extends FungibleTokenEntity.Inputs {}
 
 export const fungibleTokensBalancesRender = ({ contracts }: FungibleTokensBalancesRenderProps) => {
     const { data } = FungibleTokenBalancesModel.useAllTokensFrom(contracts);

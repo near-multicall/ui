@@ -2,7 +2,7 @@ import { Multicall } from "../../shared/lib/contracts/multicall";
 import { SputnikDAO } from "../../shared/lib/contracts/sputnik-dao";
 
 namespace FungibleTokenEntity {
-    export interface Dependencies {
+    export interface Inputs {
         contracts: {
             dao: SputnikDAO;
             multicall: Multicall;

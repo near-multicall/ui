@@ -7,7 +7,7 @@ import { ArgsString } from "../../../shared/lib/args";
 import { MulticallInstance } from "../../../entities";
 import { type TokensWhitelistEditFeature } from "../config";
 
-interface TokensWhitelistFormProps extends TokensWhitelistEditFeature.Dependencies {}
+interface TokensWhitelistFormProps extends TokensWhitelistEditFeature.Inputs {}
 
 export const TokensWhitelistForm = ({
     className,

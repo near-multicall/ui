@@ -12,7 +12,7 @@ type JobAllEntries = {
 
 export class JobModel {
     static allEntriesFetchFx = async (
-        { multicall }: JobEntity.Dependencies["contracts"],
+        { multicall }: JobEntity.Inputs["contracts"],
         callback: (result: JobAllEntries) => void
     ) =>
         callback(
@@ -37,7 +37,7 @@ export class JobModel {
                 }))
         );
 
-    static useAllEntries = (contracts: JobEntity.Dependencies["contracts"]) => {
+    static useAllEntries = (contracts: JobEntity.Inputs["contracts"]) => {
         const [state, stateUpdate] = useState<JobAllEntries>({ data: null, error: null, loading: true });
 
         useEffect(() => void JobModel.allEntriesFetchFx(contracts, stateUpdate), [contracts, stateUpdate]);

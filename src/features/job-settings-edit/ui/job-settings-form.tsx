@@ -7,7 +7,7 @@ import { toNEAR, toYocto } from "../../../shared/lib/converter";
 import { IconLabel, NearIcons, NearLink, Table, TextInput, TextInputProps, Tile } from "../../../shared/ui/components";
 import { JobSettingsEditConfig, type JobSettingsEditFeature } from "../config";
 
-interface JobSettingsFormProps extends JobSettingsEditFeature.Dependencies {}
+interface JobSettingsFormProps extends JobSettingsEditFeature.Inputs {}
 
 export const JobSettingsForm = ({
     className,
@@ -19,8 +19,8 @@ export const JobSettingsForm = ({
     const [editModeEnabled, editModeSwitch] = useState(!disabled);
 
     const formInitialState: JobSettingsEditFeature.FormState = {
-        [JobSettingsEditConfig.DiffKey.croncatManager]: "",
-        [JobSettingsEditConfig.DiffKey.jobBond]: "",
+        [JobSettingsEditConfig.ChangesDiffKey.croncatManager]: "",
+        [JobSettingsEditConfig.ChangesDiffKey.jobBond]: "",
     };
 
     const [[croncatManager, croncatManagerUpdate], [jobBond, jobBondUpdate]] = [
@@ -95,8 +95,10 @@ export const JobSettingsForm = ({
                     centeredTitle: true,
 
                     idToHighlightColor: (id) =>
-                        ({ croncatManager, jobBond }[id] === formInitialState[id as JobSettingsEditFeature.DiffKey] ||
-                        { croncatManager, jobBond }[id] === multicallContract[id as JobSettingsEditFeature.DiffKey]
+                        ({ croncatManager, jobBond }[id] ===
+                            formInitialState[id as JobSettingsEditFeature.ChangesDiffKey] ||
+                        { croncatManager, jobBond }[id] ===
+                            multicallContract[id as JobSettingsEditFeature.ChangesDiffKey]
                             ? null
                             : "blue"),
 
@@ -108,10 +110,12 @@ export const JobSettingsForm = ({
                 header={["Option", "Value"]}
                 rows={[
                     {
-                        id: JobSettingsEditConfig.DiffKey.croncatManager,
+                        id: JobSettingsEditConfig.ChangesDiffKey.croncatManager,
 
                         content: [
-                            "Croncat manager",
+                            JobSettingsEditConfig.ChangesDiffKeyDescription[
+                                JobSettingsEditConfig.ChangesDiffKey.croncatManager
+                            ],
 
                             editModeEnabled ? (
                                 <TextInput
@@ -125,10 +129,12 @@ export const JobSettingsForm = ({
                         ],
                     },
                     {
-                        id: JobSettingsEditConfig.DiffKey.jobBond,
+                        id: JobSettingsEditConfig.ChangesDiffKey.jobBond,
 
                         content: [
-                            "Job bond",
+                            JobSettingsEditConfig.ChangesDiffKeyDescription[
+                                JobSettingsEditConfig.ChangesDiffKey.jobBond
+                            ],
 
                             editModeEnabled ? (
                                 <TextInput
