@@ -19,8 +19,6 @@ class MulticallConfigEditorConfig {
         TokensWhitelistEdit.ChangesDiffKey
     );
 
-    static test = this.ChangesDiffKey.addTokens;
-
     public static readonly ChangesDiffKeyDescription = Object.assign(
         JobSettingsEdit.ChangesDiffKeyDescription,
         TokensWhitelistEdit.ChangesDiffKeyDescription
