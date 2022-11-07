@@ -1,9 +1,10 @@
 import { HTMLProps } from "react";
+import { JobSettingsEdit, TokensWhitelistEdit } from "../../features";
 import { MulticallConfigDiff, MulticallContract } from "../../shared/lib/contracts/multicall";
 import { SputnikDAOContract } from "../../shared/lib/contracts/sputnik-dao";
 
 namespace MulticallConfigEditorWidget {
-    export interface Dependencies extends HTMLProps<HTMLDivElement> {
+    export interface Inputs extends HTMLProps<HTMLDivElement> {
         contracts: { dao: SputnikDAOContract; multicall: MulticallContract };
     }
 
@@ -13,7 +14,17 @@ namespace MulticallConfigEditorWidget {
 }
 
 class MulticallConfigEditorConfig {
-    static classes = { root: "MulticallConfigEditor" };
+    public static readonly ChangesDiffKey = Object.assign(
+        JobSettingsEdit.ChangesDiffKey,
+        TokensWhitelistEdit.ChangesDiffKey
+    );
+
+    static test = this.ChangesDiffKey.addTokens;
+
+    public static readonly ChangesDiffKeyDescription = Object.assign(
+        JobSettingsEdit.ChangesDiffKeyDescription,
+        TokensWhitelistEdit.ChangesDiffKeyDescription
+    );
 }
 
 export { MulticallConfigEditorConfig, type MulticallConfigEditorWidget };

@@ -9,6 +9,7 @@ import "./mce-proposal-summary.scss";
 
 export interface MulticallConfigEditorProposalSummaryProps extends HTMLAttributes<HTMLDivElement> {
     changesDiff: MulticallConfigEditorWidget.ChangesDiff;
+    classNameRoot: Required<HTMLAttributes<HTMLDivElement>>["className"];
     description: MulticallConfigEditorWidget.ProposalDescription;
     formValues: { proposalDescription: ArgsString };
     editMode: boolean;
@@ -20,6 +21,7 @@ export interface MulticallConfigEditorProposalSummaryProps extends HTMLAttribute
 export const MulticallConfigEditorProposalSummary = ({
     changesDiff,
     className,
+    classNameRoot,
     description,
     formValues,
     editMode,
@@ -29,29 +31,33 @@ export const MulticallConfigEditorProposalSummary = ({
 }: MulticallConfigEditorProposalSummaryProps) => (
     <Tile
         classes={{
-            content: clsx(
-                `${MulticallConfigEditorConfig.classes.root}-proposalSummary`,
-                { "is-inEditMode": Boolean(editMode) },
-                className
-            ),
+            content: clsx(`${classNameRoot}-proposalSummary`, { "is-inEditMode": Boolean(editMode) }, className),
         }}
         heading={editMode ? "Changes proposal" : null}
     >
-        <p className={`${MulticallConfigEditorConfig.classes.root}-proposalSummary-hint`}>
+        <p className={`${classNameRoot}-proposalSummary-hint`}>
             Start editing to create config changes proposal template
         </p>
 
-        <div className={`${MulticallConfigEditorConfig.classes.root}-proposalSummary-changes`}>
-            {Object.keys(changesDiff).map((key) => (
-                <p>{JSON.stringify(changesDiff[key as keyof MulticallConfigEditorWidget.ChangesDiff])}</p>
+        <div className={`${classNameRoot}-proposalSummary-changes`}>
+            <h2>{MulticallConfigEditorConfig.ChangesDiffKeyDescription.addTokens + ":"}</h2>
+
+            {changesDiff.addTokens.map((tokenAddress) => (
+                <p>{tokenAddress}</p>
+            ))}
+
+            <h2>{MulticallConfigEditorConfig.ChangesDiffKeyDescription.removeTokens + ":"}</h2>
+
+            {changesDiff.removeTokens.map((tokenAddress) => (
+                <p>{tokenAddress}</p>
             ))}
         </div>
 
-        <form className={`${MulticallConfigEditorConfig.classes.root}-proposalSummary-submit`}>
+        <form className={`${classNameRoot}-proposalSummary-submit`}>
             <div>
                 <TextInput
                     fullWidth
-                    label="Description"
+                    label="Description:"
                     minRows={3}
                     multiline
                     required
