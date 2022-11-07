@@ -39,19 +39,23 @@ export const MulticallConfigEditorProposalSummary = ({
             Start editing to create config changes proposal template
         </p>
 
-        <div className={`${classNameRoot}-proposalSummary-changes`}>
-            <h2>{MulticallConfigEditorConfig.ChangesDiffKeyDescription.addTokens + ":"}</h2>
+        {Object.values(MulticallConfigEditorConfig.ChangesDiffKey).map(
+            (changesKey) =>
+                changesDiff[changesKey].length > 0 && (
+                    <div className={`${classNameRoot}-proposalSummary-changes`}>
+                        <h2>{MulticallConfigEditorConfig.ChangesDiffKeyDescription[changesKey] + ":"}</h2>
 
-            {changesDiff.addTokens.map((tokenAddress) => (
-                <p>{tokenAddress}</p>
-            ))}
-
-            <h2>{MulticallConfigEditorConfig.ChangesDiffKeyDescription.removeTokens + ":"}</h2>
-
-            {changesDiff.removeTokens.map((tokenAddress) => (
-                <p>{tokenAddress}</p>
-            ))}
-        </div>
+                        <ul>
+                            {(Array.isArray(changesDiff[changesKey])
+                                ? Array.from(changesDiff[changesKey])
+                                : [changesDiff[changesKey]]
+                            ).map((tokenAddress) => (
+                                <li>{tokenAddress}</li>
+                            ))}
+                        </ul>
+                    </div>
+                )
+        )}
 
         <form className={`${classNameRoot}-proposalSummary-submit`}>
             <div>

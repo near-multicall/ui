@@ -3,6 +3,7 @@
 
 .MulticallConfigEditor-proposalSummary {
     grid-area: MCEProposalSummary;
+    gap: size.$gap * 0.6;
 
     &-hint {
         @include mixin.center-items();
@@ -12,10 +13,17 @@
 
     &-changes {
         display: none;
+        padding: size.$gap * 0.6;
     }
 
     &-submit {
         display: none;
+        justify-content: end;
+    }
+
+    &-changes,
+    &-submit {
+        gap: inherit;
     }
 
     &-hint,
