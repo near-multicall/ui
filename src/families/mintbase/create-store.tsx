@@ -240,6 +240,8 @@ export class CreateStore extends BaseTask<FormData, Props, State> {
                 <a
                     className="protocol"
                     href="https://www.mintbase.io/"
+                    target="_blank"
+                    rel="noopener noreferrer"
                 >
                     <span>powered by</span>
                     <img
