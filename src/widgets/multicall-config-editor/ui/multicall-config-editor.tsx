@@ -8,12 +8,12 @@ import { MulticallContract } from "../../../shared/lib/contracts/multicall";
 import { signAndSendTxs } from "../../../shared/lib/wallet";
 import { MulticallConfigEditorConfig, MulticallConfigEditorWidget } from "../config";
 
-import { MulticallConfigEditorProposalSummary } from "./mce-proposal-summary";
+import { MCEChangesProposal } from "./mce-changes-proposal";
 import "./multicall-config-editor.scss";
 
 const _MulticallConfigEditor = "MulticallConfigEditor";
 
-export const MulticallConfigEditor = ({ className, contracts }: MulticallConfigEditorWidget.Inputs) => {
+export const MulticallConfigEditorUI = ({ className, contracts }: MulticallConfigEditorWidget.Inputs) => {
     const [editMode, editModeSwitch] = useState(false);
 
     const changesDiffInitialState: MulticallConfigEditorWidget.ChangesDiff = {
@@ -107,7 +107,7 @@ export const MulticallConfigEditor = ({ className, contracts }: MulticallConfigE
                 {...{ onEdit }}
             />
 
-            <MulticallConfigEditorProposalSummary
+            <MCEChangesProposal
                 classNameRoot={_MulticallConfigEditor}
                 description={proposalDescription}
                 onDescriptionUpdate={proposalDescriptionUpdate}

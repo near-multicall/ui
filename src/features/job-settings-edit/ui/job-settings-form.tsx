@@ -113,9 +113,9 @@ export const JobSettingsForm = ({
                         id: JobSettingsEditConfig.ChangesDiffKey.croncatManager,
 
                         content: [
-                            JobSettingsEditConfig.ChangesDiffKeyDescription[
+                            JobSettingsEditConfig.ChangesDiffMetadata[
                                 JobSettingsEditConfig.ChangesDiffKey.croncatManager
-                            ],
+                            ].description,
 
                             editModeEnabled ? (
                                 <TextInput
@@ -132,9 +132,8 @@ export const JobSettingsForm = ({
                         id: JobSettingsEditConfig.ChangesDiffKey.jobBond,
 
                         content: [
-                            JobSettingsEditConfig.ChangesDiffKeyDescription[
-                                JobSettingsEditConfig.ChangesDiffKey.jobBond
-                            ],
+                            JobSettingsEditConfig.ChangesDiffMetadata[JobSettingsEditConfig.ChangesDiffKey.jobBond]
+                                .description,
 
                             editModeEnabled ? (
                                 <TextInput

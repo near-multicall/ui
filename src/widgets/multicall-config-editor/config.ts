@@ -19,9 +19,9 @@ class MulticallConfigEditorConfig {
         TokensWhitelistEdit.ChangesDiffKey
     );
 
-    public static readonly ChangesDiffKeyDescription = Object.assign(
-        JobSettingsEdit.ChangesDiffKeyDescription,
-        TokensWhitelistEdit.ChangesDiffKeyDescription
+    public static readonly ChangesDiffMetadata = Object.assign(
+        JobSettingsEdit.ChangesDiffMetadata,
+        TokensWhitelistEdit.ChangesDiffMetadata
     );
 }
 

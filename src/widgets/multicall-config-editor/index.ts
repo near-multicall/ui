@@ -1,8 +1,8 @@
 import { MulticallConfigEditorConfig, type MulticallConfigEditorWidget } from "./config";
-import { MulticallConfigEditor as UI } from "./ui/multicall-config-editor";
+import { MulticallConfigEditorUI } from "./ui/multicall-config-editor";
 
 class MulticallConfigEditor extends MulticallConfigEditorConfig {
-    static UI = UI;
+    static UI = MulticallConfigEditorUI;
 }
 
 export { MulticallConfigEditor, type MulticallConfigEditorWidget };

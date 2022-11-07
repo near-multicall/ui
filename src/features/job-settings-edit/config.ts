@@ -2,6 +2,7 @@ import { HTMLProps } from "react";
 
 import { MulticallInstance, MulticallInstanceEntity } from "../../entities";
 import { MulticallConfigDiff, MulticallContract } from "../../shared/lib/contracts/multicall";
+import { DesignKitConfigType } from "../../shared/ui/components";
 
 namespace JobSettingsEditFeature {
     export type ChangesDiffKey = MulticallInstanceEntity.ParamKey;
@@ -20,9 +21,16 @@ namespace JobSettingsEditFeature {
 class JobSettingsEditConfig {
     public static readonly ChangesDiffKey = MulticallInstance.ParamKey;
 
-    public static readonly ChangesDiffKeyDescription = {
-        [JobSettingsEditConfig.ChangesDiffKey.croncatManager]: "Croncat manager",
-        [JobSettingsEditConfig.ChangesDiffKey.jobBond]: "Job bond",
+    public static readonly ChangesDiffMetadata = {
+        [JobSettingsEditConfig.ChangesDiffKey.croncatManager]: {
+            color: "blue" as DesignKitConfigType.Color,
+            description: "Croncat manager",
+        },
+
+        [JobSettingsEditConfig.ChangesDiffKey.jobBond]: {
+            color: "blue" as DesignKitConfigType.Color,
+            description: "Job bond",
+        },
     };
 }
 

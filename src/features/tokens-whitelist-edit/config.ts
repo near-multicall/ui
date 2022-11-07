@@ -2,6 +2,7 @@ import { HTMLProps } from "react";
 
 import { MulticallTokensWhitelistChangesDiffKey, type MulticallConfigDiff } from "../../shared/lib/contracts/multicall";
 import { MulticallInstanceEntity } from "../../entities";
+import { DesignKitConfigType } from "../../shared/ui/components";
 
 namespace TokensWhitelistEditFeature {
     export type ChangesDiffKey = MulticallTokensWhitelistChangesDiffKey;
@@ -21,9 +22,16 @@ namespace TokensWhitelistEditFeature {
 class TokensWhitelistEditConfig {
     public static readonly ChangesDiffKey = MulticallTokensWhitelistChangesDiffKey;
 
-    public static readonly ChangesDiffKeyDescription = {
-        [TokensWhitelistEditConfig.ChangesDiffKey.addTokens]: "Tokens to add to whitelist",
-        [TokensWhitelistEditConfig.ChangesDiffKey.removeTokens]: "Tokens to remove from whitelist",
+    public static readonly ChangesDiffMetadata = {
+        [TokensWhitelistEditConfig.ChangesDiffKey.addTokens]: {
+            color: "green" as DesignKitConfigType.Color,
+            description: "Tokens to add to whitelist",
+        },
+
+        [TokensWhitelistEditConfig.ChangesDiffKey.removeTokens]: {
+            color: "red" as DesignKitConfigType.Color,
+            description: "Tokens to remove from whitelist",
+        },
     };
 }
 

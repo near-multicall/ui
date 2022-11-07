@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { TextInput } from "../../../shared/ui/components";
 import { ArgsString } from "../../../shared/lib/args";
 import { MulticallInstance } from "../../../entities";
-import { type TokensWhitelistEditFeature } from "../config";
+import { TokensWhitelistEditConfig, type TokensWhitelistEditFeature } from "../config";
 
 interface TokensWhitelistFormProps extends TokensWhitelistEditFeature.Inputs {}
 
@@ -70,7 +70,10 @@ export const TokensWhitelistForm = ({
     return (
         <MulticallInstance.TokensWhitelistTable
             ItemProps={{
-                idToHighlightColor: (id) => (addTokens.has(id) && "green") || (removeTokens.has(id) && "red") || null,
+                idToHighlightColor: (id) =>
+                    (addTokens.has(id) && TokensWhitelistEditConfig.ChangesDiffMetadata.addTokens.color) ||
+                    (removeTokens.has(id) && TokensWhitelistEditConfig.ChangesDiffMetadata.removeTokens.color) ||
+                    null,
 
                 slots: {
                     End:

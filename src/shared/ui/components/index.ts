@@ -1,3 +1,5 @@
+export { type DesignKitConfigType } from "./config";
+
 /** Atoms */
 export { Button } from "./button";
 export { ButtonGroup } from "./button-group";

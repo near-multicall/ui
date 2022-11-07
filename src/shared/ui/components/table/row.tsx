@@ -1,6 +1,7 @@
 import { Checkbox, TableCell, TableRow as MuiTableRow } from "@mui/material";
 import clsx from "clsx";
 import { ChangeEvent, useCallback } from "react";
+import { DesignKitConfigType } from "../config";
 
 import "./row.scss";
 
@@ -18,7 +19,7 @@ export interface TableRowProps {
     entitled?: boolean;
     header: TableHeader;
     id: string;
-    idToHighlightColor?: (id: TableRowProps["id"]) => "blue" | "green" | "red" | "yellow" | null;
+    idToHighlightColor?: (id: TableRowProps["id"]) => DesignKitConfigType.Color | null;
     noKeys?: boolean;
     onSelect?: (selectedRow: { id: TableRowProps["id"]; checked: boolean }) => void;
     selectable: boolean;

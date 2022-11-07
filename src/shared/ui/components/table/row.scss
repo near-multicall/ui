@@ -27,13 +27,14 @@
     &--compact {
         display: flex;
         flex-direction: column;
-        gap: calc(size.$gap / 2);
+        gap: size.$gap * 0.5;
         border-radius: size.$task-radius;
-        padding: calc(size.$gap / 2);
+        padding: size.$gap * 0.5;
         background-color: color.$white;
 
         &--dense {
-            padding: calc(size.$gap / 2.2);
+            gap: size.$gap * 0.4;
+            padding: size.$gap * 0.4;
         }
     }
 
@@ -64,8 +65,8 @@
             font-size: size.$small-text;
 
             &:last-of-type {
-                border-bottom-left-radius: 0.8 * size.$task-radius;
-                border-bottom-right-radius: 0.8 * size.$task-radius;
+                border-bottom-left-radius: size.$task-radius;
+                border-bottom-right-radius: size.$task-radius;
             }
 
             &:not(&--dense) {
@@ -79,8 +80,8 @@
                 background-color: rgba(color.$lightest, 0.7);
 
                 :first-of-type {
-                    border-top-left-radius: 0.8 * size.$task-radius;
-                    border-top-right-radius: 0.8 * size.$task-radius;
+                    border-top-left-radius: size.$task-radius;
+                    border-top-right-radius: size.$task-radius;
                 }
 
                 & > span {
@@ -146,8 +147,8 @@
                 }
 
                 &:nth-of-type(2) {
-                    border-top-left-radius: 0.8 * size.$task-radius;
-                    border-top-right-radius: 0.8 * size.$task-radius;
+                    border-top-left-radius: size.$task-radius;
+                    border-top-right-radius: size.$task-radius;
                 }
 
                 &--centeredTitle {
