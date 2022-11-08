@@ -242,7 +242,7 @@ export class Task extends Component {
                             zIndex: snapshot.isDragging ? 10 : 1,
                         }}
                     >
-                        <h1 style={{ paddingLeft: "20px" }}>{this.id}</h1>
+                        {/* <h1 style={{ paddingLeft: "20px" }}>{this.id}</h1> */}
                         {this.child}
                     </div>
                 )}

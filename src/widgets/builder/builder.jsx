@@ -21,7 +21,6 @@ export class Builder extends Component {
 
     componentDidMount() {
         document.addEventListener("onlayoutupdated", (e) => {
-            console.log(e.detail.columns["menu"].taskIds.map((taskId) => e.detail.tasks[taskId]));
             this.setState({
                 tasks: this.filterTasks(
                     e.detail.columns["menu"].taskIds.map((taskId) => e.detail.tasks[taskId]),
