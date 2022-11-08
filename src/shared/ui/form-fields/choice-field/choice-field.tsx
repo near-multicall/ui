@@ -6,34 +6,34 @@ import "./choice-field.scss";
 const _ChoiceField = "ChoiceField";
 
 type Options = {
-    ids: number[];
-    choose: (id: number) => void;
-    add: (id: number) => void;
-    remove: (id: number) => void;
-    toggle: (id: number) => void;
-    isActive: (id: number) => boolean;
+    ids: string[];
+    choose: (id: string) => void;
+    add: (id: string) => void;
+    remove: (id: string) => void;
+    toggle: (id: string) => void;
+    isActive: (id: string) => boolean;
 };
 
 type ChoiceFieldProps = {
     children: (options: Options) => React.ReactNode;
-    show: (ids: number[]) => React.ReactNode;
+    show: (ids: string[]) => React.ReactNode;
     name: string;
-    initial?: number[];
+    initial?: string[];
     roundtop?: boolean;
     roundbottom?: boolean;
 };
 
 export const ChoiceField = ({ roundbottom, roundtop, children, show, initial, name, ...props }: ChoiceFieldProps) => {
     const [field, meta, helper] = useField(name);
-    const [ids, setIds] = useState<number[]>(initial ?? []);
+    const [ids, setIds] = useState<string[]>(initial ?? []);
     useEffect(() => {
         helper.setValue(ids);
     }, [ids]);
-    const choose = (id: number) => setIds((prevIds) => [id]);
-    const add = (id: number) => setIds((prevIds) => [...prevIds, id]);
-    const remove = (id: number) => setIds((prevIds) => prevIds.filter((x) => x !== id));
-    const toggle = (id: number) => (ids.includes(id) ? remove(id) : add(id));
-    const isActive = (id: number) => ids.includes(id);
+    const choose = (id: string) => setIds((prevIds) => [id]);
+    const add = (id: string) => setIds((prevIds) => [...prevIds, id]);
+    const remove = (id: string) => setIds((prevIds) => prevIds.filter((x) => x !== id));
+    const toggle = (id: string) => (ids.includes(id) ? remove(id) : add(id));
+    const isActive = (id: string) => ids.includes(id);
     return (
         <div
             className={clsx(_ChoiceField, {
