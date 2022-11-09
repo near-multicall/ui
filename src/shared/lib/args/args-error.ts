@@ -283,6 +283,12 @@ function combine(this: any, errors: any[], options?: Partial<RetainOptions>) {
     });
 }
 
+/**
+ * mark field as optional if condition is not met
+ * @param keys
+ * @param condition
+ * @returns
+ */
 function requiredWhen(this: any, keys: string | string[], condition: (...schemata: any[]) => boolean) {
     return this.when(keys, {
         is: condition,

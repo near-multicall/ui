@@ -4,10 +4,10 @@ import { useEffect } from "react";
 import { args as arx } from "../../shared/lib/args/args";
 import { fields } from "../../shared/lib/args/args-types/args-object";
 import { Call, CallError } from "../../shared/lib/call";
-import { toGas } from "../../shared/lib/converter";
+import { Big, toGas, unit } from "../../shared/lib/converter";
 import { FungibleToken } from "../../shared/lib/standards/fungibleToken";
-import { InfoField, TextField, UnitField } from "../../shared/ui/form-fields";
-import type { DefaultFormData } from "../base";
+import { CheckboxField, InfoField, TextField, UnitField } from "../../shared/ui/form-fields";
+import type { DefaultFormData, DisplayData } from "../base";
 import { BaseTask, BaseTaskProps, BaseTaskState } from "../base";
 import "./near.scss";
 
@@ -15,12 +15,16 @@ type FormData = DefaultFormData & {
     receiverId: string;
     amount: string;
     memo: string;
+    payStorageDeposit: boolean;
+    sdGas: string;
+    sdGasUnit: number | unit;
 };
 
 type Props = BaseTaskProps;
 
 type State = BaseTaskState<FormData> & {
     token: FungibleToken;
+    needsSd: boolean;
 };
 
 export class FtTransfer extends BaseTask<FormData, Props, State> {
@@ -33,10 +37,16 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
             receiverId: arx.string().address(),
             amount: arx.big().token().min(0, "amount must be at least ${min}"),
             memo: arx.string().optional(),
+            payStorageDeposit: arx.boolean(),
+            sdGas: arx
+                .big()
+                .gas()
+                .requiredWhen("payStorageDeposit", (payStorageDeposit) => payStorageDeposit),
         })
-        .transform(({ gas, gasUnit, ...rest }) => ({
+        .transform(({ gas, gasUnit, sdGas, sdGasUnit, ...rest }) => ({
             ...rest,
-            gas: arx.big().intoParsed(gasUnit).cast(gas),
+            gas: arx.big().intoParsed(gasUnit).cast(gas).toFixed(),
+            sdGas: arx.big().intoParsed(sdGasUnit).cast(sdGas).toFixed(),
         }))
         .requireAll({ ignore: ["memo"] })
         .retainAll();
@@ -52,6 +62,9 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
         receiverId: "",
         amount: "0",
         memo: "",
+        payStorageDeposit: false,
+        sdGas: "7.5",
+        sdGasUnit: "Tgas",
     };
 
     constructor(props: Props) {
@@ -61,24 +74,29 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
         this.state = {
             ...this.state,
             token: new FungibleToken(this.initialValues.addr),
+            needsSd: false,
         };
     }
 
-    protected override init(
-        call: Call<{
-            receiver_id: string;
-            amount: string;
-            memo: string;
-        }> | null
-    ): void {
+    protected override init(call: Call<any> | null): void {
         if (call !== null) {
+            const hasSd =
+                call.actions.length === 2 &&
+                call.actions[0].func === "storage_deposit" &&
+                call.actions[1].func === "ft_transfer";
             const fromCall = {
                 addr: call.address,
-                func: call.actions[0].func,
-                gas: arx.big().intoFormatted(this.initialValues.gasUnit).cast(call.actions[0].gas).toFixed(),
-                receiverId: call.actions[0].args.receiver_id,
-                amount: call.actions[0].args.amount,
-                memo: call.actions[0].args.memo,
+                func: call.actions[hasSd ? 1 : 0].func,
+                gas: arx
+                    .big()
+                    .intoFormatted(this.initialValues.gasUnit)
+                    .cast(call.actions[hasSd ? 1 : 0].gas)
+                    .toFixed(),
+                receiverId: call.actions[hasSd ? 1 : 0].args.receiver_id,
+                amount: call.actions[hasSd ? 1 : 0].args.amount,
+                memo: call.actions[hasSd ? 1 : 0].args.memo,
+                payStorageDeposit: hasSd,
+                ...(hasSd && { sdGas: call.actions[0].args.gas }),
             };
             this.initialValues = Object.keys(this.initialValues).reduce((acc, k) => {
                 const v = fromCall[k as keyof typeof fromCall];
@@ -103,21 +121,44 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
             );
     }
 
-    static override inferOwnType(json: Call): boolean {
-        return !!json && json.actions[0].func === "ft_transfer";
+    static override inferOwnType(json: Call<any>): boolean {
+        return (
+            !!json &&
+            ((json.actions.length === 1 && json.actions[0].func === "ft_transfer") ||
+                (json.actions.length === 2 &&
+                    json.actions[0].func === "storage_deposit" &&
+                    json.actions[1].func === "ft_transfer" &&
+                    json.actions[0].args.account_id === json.actions[1].args.receiver_id &&
+                    json.actions[0].args.register_only === true))
+        );
     }
 
     public override toCall(): Call {
-        const { addr, func, depo, gas, gasUnit, receiverId, amount, memo } = this.state.formData;
+        const { addr, func, depo, gas, gasUnit, receiverId, amount, memo, payStorageDeposit, sdGas, sdGasUnit } =
+            this.state.formData;
         const { token } = this.state;
 
         if (!arx.big().isValidSync(gas)) throw new CallError("Failed to parse gas input value", this.props.id);
         if (!arx.big().isValidSync(amount)) throw new CallError("Failed to parse amount input value", this.props.id);
+        if (!arx.big().isValidSync(sdGas)) throw new CallError("Failed to parse amount input value", this.props.id);
         if (!token.ready) throw new CallError("Lacking token metadata", this.props.id);
 
         return {
             address: addr,
             actions: [
+                ...(payStorageDeposit
+                    ? [
+                          {
+                              func: "storage_deposit",
+                              args: {
+                                  account_id: receiverId,
+                                  register_only: true,
+                              },
+                              gas: arx.big().intoParsed(sdGasUnit).cast(sdGas).toFixed(),
+                              depo: token.storageBounds.min,
+                          },
+                      ]
+                    : []),
                 {
                     func,
                     args: {
@@ -147,9 +188,15 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
     }
 
     private async confidentlyUpdateFt(): Promise<boolean> {
-        const { addr } = this.state.formData;
+        const { addr, receiverId } = this.state.formData;
         const newToken = await FungibleToken.init(addr);
-        this.setState({ token: newToken });
+        const storageBalance = !fields(this.schema).receiverId.isBad()
+            ? await newToken.storageBalanceOf(receiverId)
+            : null;
+        this.setState({
+            token: newToken,
+            needsSd: !!storageBalance && Big(storageBalance.total).lt(newToken.storageBounds.min),
+        });
         window.EDITOR.forceUpdate();
         return newToken.ready;
     }
@@ -174,7 +221,8 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
     }
 
     public override Editor = (): React.ReactNode => {
-        const { resetForm, validateForm } = useFormikContext();
+        const { resetForm, validateForm, values } = useFormikContext<FormData>();
+        const sdAmount = arx.big().intoFormatted("NEAR").cast(this.state.token.storageBounds.min).toFixed();
 
         useEffect(() => {
             resetForm({
@@ -183,6 +231,11 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
             });
             validateForm(this.state.formData);
         }, []);
+
+        useEffect(() => {
+            if (values.addr !== this.initialValues.addr || values.receiverId !== this.initialValues.receiverId)
+                values.payStorageDeposit = this.state.needsSd;
+        }, [values.addr, values.receiverId]);
 
         return (
             <Form className="edit">
@@ -202,6 +255,24 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
                     name="receiverId"
                     label="Receiver Address"
                 />
+                <InfoField>
+                    {this.state.needsSd && (
+                        <b className="warn">{`${values.receiverId} is missing a storage deposit to receive this token!`}</b>
+                    )}
+                    <CheckboxField
+                        name="payStorageDeposit"
+                        label={"Pay Storage Deposit" + (!!sdAmount && ` (${sdAmount} Ⓝ)`)}
+                        checked={values.payStorageDeposit}
+                    />
+                    {!!values.payStorageDeposit && (
+                        <UnitField
+                            name="sdGas"
+                            label="Gas for Storage Deposit"
+                            unit="sdGasUnit"
+                            options={["Tgas", "gas"]}
+                        />
+                    )}
+                </InfoField>
                 <TextField
                     name="amount"
                     label="Amount"
@@ -225,4 +296,47 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
             </Form>
         );
     };
+
+    protected override getDisplayData(): DisplayData {
+        const { name, addr, func, gas, gasUnit, depo, depoUnit, sdGas, sdGasUnit, payStorageDeposit } =
+            this.state.formData;
+        let args = [""];
+        try {
+            args[0] = JSON.stringify(this.toCall().actions[0].args, null, " ");
+        } catch (e) {
+            if (e instanceof CallError) args[0] = `Error: ${e.message}`;
+        }
+        if (payStorageDeposit)
+            try {
+                args[1] = JSON.stringify(this.toCall().actions[1].args, null, " ");
+            } catch (e) {
+                if (e instanceof CallError) args[1] = `Error: ${e.message}`;
+            }
+        return {
+            name,
+            addr,
+            actions: [
+                ...(payStorageDeposit
+                    ? [
+                          {
+                              func: "storage_deposit",
+                              gas: sdGas.toString(),
+                              gasUnit: sdGasUnit.toString(),
+                              depo: arx.big().intoFormatted("NEAR").cast(this.state.token.storageBounds.min).toFixed(),
+                              depoUnit: "NEAR",
+                              args: args[0],
+                          },
+                      ]
+                    : []),
+                {
+                    func,
+                    gas,
+                    gasUnit: gasUnit.toString(),
+                    depo,
+                    depoUnit: depoUnit.toString(),
+                    args: payStorageDeposit ? args[1] : args[0],
+                },
+            ],
+        };
+    }
 }

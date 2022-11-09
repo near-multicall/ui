@@ -1,16 +1,9 @@
 @use "sass/color";
+@use "./base";
 
 .custom-task {
     background: color.$lightest;
-    .name {
-        color: color.$text !important;
-        h3 {
-            color: color.$text;
-        }
-        .icon {
-            fill: color.$text !important;
-        }
-    }
+    @include base.task-theme(color.$text);
     * > a {
         color: darken(color.$blue, 20%) !important;
     }

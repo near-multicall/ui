@@ -150,7 +150,12 @@ export class StorageDeposit extends BaseTask<FormData, Props, State> {
     }
 
     static override inferOwnType(json: Call): boolean {
-        return !!json && arx.string().address().isValidSync(json.address) && json.actions[0].func === "storage_deposit";
+        return (
+            !!json &&
+            arx.string().address().isValidSync(json.address) &&
+            json.actions.length === 1 &&
+            json.actions[0].func === "storage_deposit"
+        );
     }
 
     public override toCall(): Call {
