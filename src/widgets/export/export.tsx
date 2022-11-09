@@ -379,6 +379,7 @@ export class Export extends Component<Props, State> {
             <div className={_Export}>
                 <Formik
                     initialValues={this.initialValues}
+                    initialTouched={Object.keys(this.state.formData).reduce((acc, k) => ({ ...acc, [k]: true }), {})}
                     validate={async (values) => {
                         this.setFormData(values);
                         await new Promise((resolve) => this.resolveDebounced(resolve));
