@@ -3,7 +3,7 @@ import { Component } from "react";
 import { Droppable } from "react-beautiful-dnd";
 import { TextField } from "../../shared/ui/form-fields";
 import { Column } from "../column/column.jsx";
-import { keywords } from "../../initial-data";
+import { keywords } from "../../keywords";
 import { Formik, Form } from "formik";
 import "./builder.scss";
 
@@ -13,25 +13,30 @@ export class Builder extends Component {
 
     constructor(props) {
         super(props);
-        this.allKeywords = [...new Set(Object.values(keywords).flat())];
         this.state = {
             searchTerm: "",
             tasks: this.props.layout.getColumns()["menu"].taskIds.map((taskId) => this.props.layout.getTasks()[taskId]),
         };
     }
 
-    filterTasks(searchTerm) {
-        const LAYOUT = this.props.layout;
+    componentDidMount() {
+        document.addEventListener("onlayoutupdated", (e) => {
+            this.setState({
+                tasks: this.filterTasks(
+                    e.detail.columns["menu"].taskIds.map((taskId) => e.detail.tasks[taskId]),
+                    this.state.searchTerm
+                ),
+            });
+        });
+    }
 
-        const menuColumn = LAYOUT.getColumns()["menu"];
-        const menuTasks = menuColumn.taskIds.map((taskId) => LAYOUT.getTasks()[taskId]);
-
-        return menuTasks.filter((task) => {
+    filterTasks(tasks, searchTerm) {
+        return tasks.filter((task) => {
             const normalize = (str) => str.replace("_", " ").replace("-", " ").toLowerCase();
 
             return (
                 searchTerm === "" ||
-                keywords[task.id]
+                (keywords[task.addr]?.[task.func] ?? [])
                     .concat(task.addr, task.func)
                     .some((kw) => normalize(kw).includes(normalize(searchTerm)))
             );
@@ -49,7 +54,13 @@ export class Builder extends Component {
                     initialValues={{ search: this.state.searchTerm }}
                     validate={async (values) => {
                         await new Promise((resolve) => this.resolveDebounced(resolve));
-                        this.setState({ searchTerm: values.search, tasks: this.filterTasks(values.search) });
+                        this.setState({
+                            searchTerm: values.search,
+                            tasks: this.filterTasks(
+                                menuColumn.taskIds.map((taskId) => LAYOUT.getTasks()[taskId]),
+                                values.search
+                            ),
+                        });
                     }}
                     onSubmit={() => {}}
                 >
@@ -78,7 +89,8 @@ export class Builder extends Component {
                                 <Column
                                     key={"menu"}
                                     column={menuColumn}
-                                    tasks={this.state.tasks}
+                                    tasks={menuColumn.taskIds.map((taskId) => LAYOUT.getTasks()[taskId])}
+                                    show={this.state.tasks.map((task) => task.id)}
                                     index={LAYOUT.getColumnID()}
                                 />
                             </div>

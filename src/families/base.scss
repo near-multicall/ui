@@ -26,7 +26,7 @@
     transform-origin: center center; /* Standard Property */
 }
 
-.task-container {
+@mixin task-theme($contrast) {
     position: relative;
     display: flex;
     flex-flow: column nowrap;
@@ -35,7 +35,7 @@
     border-radius: size.$task-radius;
     overflow: hidden;
     * {
-        color: color.$text;
+        color: $contrast;
     }
     .name {
         @include mixin.center-items;
@@ -43,11 +43,11 @@
         padding-top: 0.25 * size.$gap;
         padding-bottom: 0.25 * size.$gap;
         * {
-            color: color.$light-text;
+            color: $contrast;
         }
         .icon {
             @include mixin.icon;
-            fill: color.$light-text;
+            fill: $contrast;
             cursor: pointer;
             opacity: 0;
             transition: opacity 100ms ease;
@@ -103,22 +103,12 @@
         max-height: 100%;
         overflow-y: scroll;
         padding: 0.5 * size.$gap;
-        padding-bottom: size.$gap;
-        background-color: rgba(color.$light, 0.5);
+        background-color: rgba(color.$light, 0.25);
         z-index: 1;
-        pre.code {
-            @include mixin.no-scrollbar;
-            padding: 0.5rem;
-            margin: 0.5rem;
-            background-color: rgba(color.$lightest, 1);
-            border-radius: 0.5 * size.$task-radius;
-            font-family: font.$code;
-            font-size: size.$smaller-text;
-            overflow-x: scroll;
-        }
-        p {
+        .addr {
             display: flex;
-            width: 100%;
+            width: calc(100% - size.$gap);
+            padding: 0 0.5 * size.$gap;
             flex-flow: row nowrap;
             justify-content: space-between;
             margin-bottom: -0.3rem;
@@ -133,8 +123,51 @@
                 font-family: font.$code;
                 font-size: size.$smaller-text;
             }
-            &.expandable {
-                flex-wrap: wrap;
+        }
+        .action-data-container {
+            margin-top: 0.5 * size.$gap;
+            padding: 0.5 * size.$gap;
+            border: 1px solid rgba($contrast, 0.2);
+            border-radius: 0.25 * size.$task-radius;
+            pre.code {
+                @include mixin.no-scrollbar;
+                padding: 0.5rem;
+                margin: 0.5rem 0;
+                background-color: rgba(color.$lightest, 1);
+                border-radius: 0.25 * size.$task-radius;
+                font-family: font.$code;
+                font-size: size.$smaller-text;
+                overflow-x: scroll;
+                color: color.$text;
+            }
+            p {
+                display: flex;
+                width: 100%;
+                flex-flow: row nowrap;
+                justify-content: space-between;
+                margin-bottom: -0.3rem;
+                font-size: size.$small-text;
+                span {
+                    white-space: nowrap;
+                }
+                .code {
+                    @include mixin.no-wrap;
+                    padding-left: 1.5rem;
+                    line-height: 1.85rem;
+                    font-family: font.$code;
+                    font-size: size.$smaller-text;
+                }
+                &.expandable {
+                    flex-wrap: wrap;
+                }
+            }
+            &:first-of-type {
+                border-top-left-radius: 0.75 * size.$task-radius !important;
+                border-top-right-radius: 0.75 * size.$task-radius !important;
+            }
+            &:last-of-type {
+                border-bottom-left-radius: 0.75 * size.$task-radius !important;
+                border-bottom-right-radius: 0.75 * size.$task-radius !important;
             }
         }
     }
@@ -148,6 +181,10 @@
         outline-offset: -4px;
         border-radius: size.$task-radius;
     }
+}
+
+.task-container {
+    @include task-theme(color.$text);
 }
 
 form.edit {

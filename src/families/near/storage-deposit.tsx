@@ -1,5 +1,3 @@
-// TODO adjust lower and upper bounds by existing balance
-
 import { Form, FormikErrors, useFormikContext } from "formik";
 import { useEffect } from "react";
 import { args as arx } from "../../shared/lib/args/args";
@@ -15,6 +13,7 @@ import "./near.scss";
 type FormData = DefaultFormData & {
     amount: string;
     amountUnit: unit | number;
+    accountId: string;
     registration_only: boolean;
 };
 
@@ -58,12 +57,13 @@ export class StorageDeposit extends BaseTask<FormData, Props, State> {
                             .add(ctx.options.context.storageBalance.total)
                             .lte(ctx.options.context.upperStorageBalanceBound),
                 }),
+            accountId: arx.string().address(),
         })
         .transform(({ gas, gasUnit, depo, amount, ...rest }) => ({
             ...rest,
             amount,
             depo: amount,
-            gas: arx.big().intoParsed(gasUnit).cast(gas),
+            gas: arx.big().intoParsed(gasUnit).cast(gas).toFixed(),
         }))
         .requireAll()
         .retainAll();
@@ -78,6 +78,7 @@ export class StorageDeposit extends BaseTask<FormData, Props, State> {
         depoUnit: "yocto",
         amount: "0",
         amountUnit: "NEAR",
+        accountId: STORAGE.addresses.multicall,
         registration_only: true,
     };
 
@@ -105,7 +106,7 @@ export class StorageDeposit extends BaseTask<FormData, Props, State> {
 
     protected override init(
         call: Call<{
-            amount: string | null;
+            account_id: string | null;
             registration_only: boolean | null;
         }> | null
     ): void {
@@ -114,7 +115,8 @@ export class StorageDeposit extends BaseTask<FormData, Props, State> {
                 addr: call.address,
                 func: call.actions[0].func,
                 gas: arx.big().intoFormatted(this.initialValues.gasUnit).cast(call.actions[0].gas).toFixed(),
-                amount: call.actions[0].args?.amount ?? "",
+                amount: call.actions[0].depo,
+                accountId: call.actions[0].args?.account_id ?? STORAGE.addresses.multicall,
                 registration_only: call.actions[0].args?.registration_only ?? true,
             };
 
@@ -148,11 +150,16 @@ export class StorageDeposit extends BaseTask<FormData, Props, State> {
     }
 
     static override inferOwnType(json: Call): boolean {
-        return !!json && arx.string().address().isValidSync(json.address) && json.actions[0].func === "storage_deposit";
+        return (
+            !!json &&
+            arx.string().address().isValidSync(json.address) &&
+            json.actions.length === 1 &&
+            json.actions[0].func === "storage_deposit"
+        );
     }
 
     public override toCall(): Call {
-        const { addr, func, gas, gasUnit, amount, amountUnit, registration_only } = this.state.formData;
+        const { addr, func, gas, gasUnit, amount, amountUnit, accountId, registration_only } = this.state.formData;
 
         if (!arx.big().isValidSync(gas)) throw new CallError("Failed to parse gas input value", this.props.id);
         if (!arx.big().isValidSync(amount)) throw new CallError("Failed to parse amount input value", this.props.id);
@@ -168,8 +175,7 @@ export class StorageDeposit extends BaseTask<FormData, Props, State> {
                 {
                     func,
                     args: {
-                        amount: amt,
-
+                        account_id: accountId,
                         ...(registration_only !== null && { registration_only }),
                     },
                     gas: arx.big().intoParsed(gasUnit).cast(gas).toFixed(),
@@ -190,8 +196,8 @@ export class StorageDeposit extends BaseTask<FormData, Props, State> {
                     },
                 })
                 .then(() => {
-                    const { addr } = fields(this.schema);
-                    if (!addr.isBad()) {
+                    const { addr, accountId } = fields(this.schema);
+                    if (!addr.isBad() && !accountId.isBad()) {
                         this.confidentlyUpdateSm().then(() => resolve(true));
                     } else {
                         this.setState({
@@ -206,10 +212,10 @@ export class StorageDeposit extends BaseTask<FormData, Props, State> {
     }
 
     private async confidentlyUpdateSm(): Promise<boolean> {
-        const { addr } = this.state.formData;
+        const { addr, accountId } = this.state.formData;
         const storageManagement = new StorageManagement(addr);
         const [storageBalance, storageBalanceBounds] = await Promise.all([
-            storageManagement.storageBalanceOf(STORAGE.addresses.multicall),
+            storageManagement.storageBalanceOf(accountId),
             storageManagement.storageBalanceBounds(),
         ]);
         this.setState({ storageManagement, storageBalance, storageBalanceBounds });
@@ -258,6 +264,10 @@ export class StorageDeposit extends BaseTask<FormData, Props, State> {
                     name="addr"
                     label="Token Address"
                     roundtop
+                />
+                <TextField
+                    name="accountId"
+                    label="Account ID"
                 />
                 {!!balance && !!lowerStorageBalanceBound && (
                     <InfoField>

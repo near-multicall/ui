@@ -30,10 +30,10 @@ type FormData = {
     gasUnit: unit | number;
     depo: string;
     depoUnit: unit | number;
-    attachment: number[];
+    attachment: ("ft" | "near")[];
     tokenAddress: string;
     tokenAmount: string;
-    execution: number[];
+    execution: ("immediate" | "scheduled")[];
     dateTime: Date;
 };
 
@@ -74,19 +74,19 @@ export class Export extends Component<Props, State> {
                         ctx.options.context?.tokensWhitelist == null ||
                         ctx.options.context.tokensWhitelist.includes(value),
                 })
-                .requiredWhen("attachment", (attachment) => attachment.includes(1)),
+                .requiredWhen("attachment", (attachment) => attachment.includes("ft")),
             tokenAmount: args
                 .big()
                 .token()
-                .requiredWhen("attachment", (attachment) => attachment.includes(1)),
+                .requiredWhen("attachment", (attachment) => attachment.includes("ft")),
             hasErrors: args.boolean().retain({ dummy: true }),
         })
         .transform(({ attachment, gas, gasUnit, depo, depoUnit, tokenAddress, tokenAmount, ...rest }) => ({
             ...rest,
             attachment,
             gas: args.big().intoParsed(gasUnit).cast(gas).toFixed(),
-            depo: !attachment.includes(0) ? 0 : args.big().intoParsed(depoUnit).cast(depo).toFixed(),
-            ...(attachment.includes(1) && { tokenAddress, tokenAmount }),
+            depo: !attachment.includes("near") ? 0 : args.big().intoParsed(depoUnit).cast(depo).toFixed(),
+            ...(attachment.includes("ft") && { tokenAddress, tokenAmount }),
         }))
         .requireAll({ ignore: ["tokenAddress", "tokenAmount"] })
         .retainAll();
@@ -100,7 +100,7 @@ export class Export extends Component<Props, State> {
         attachment: [],
         tokenAddress: window.nearConfig.WNEAR_ADDRESS,
         tokenAmount: "1",
-        execution: [0],
+        execution: ["immediate"],
         dateTime: new Date(),
     };
 
@@ -234,7 +234,7 @@ export class Export extends Component<Props, State> {
                 schema.depo.isBad() ||
                 schema.description.isBad() ||
                 schema.hasErrors.isBad() ||
-                (this.state.formData.attachment.includes(0) &&
+                (this.state.formData.attachment.includes("ft") &&
                     (schema.tokenAddress.isBad() || schema.tokenAmount.isBad()));
 
             return (
@@ -244,9 +244,9 @@ export class Export extends Component<Props, State> {
                     onClick={async () => {
                         const { currentDao: dao, currentMulticall: multicall } = window.WALLET_COMPONENT.state;
                         // Case 1: immediate execution => basic multicall
-                        if (!execution.includes(1)) {
+                        if (!execution.includes("scheduled")) {
                             // multicall with attached FT
-                            if (attachment.includes(1)) {
+                            if (attachment.includes("ft")) {
                                 const tx = await dao.proposeMulticallFT(
                                     description,
                                     multicallArgs,
@@ -266,7 +266,9 @@ export class Export extends Component<Props, State> {
                                     description,
                                     multicallArgs,
                                     // if attach NEAR disabled, ignore depo amount and attach 1 yocto.
-                                    attachment.includes(0) ? args.big().intoParsed(depoUnit).cast(depo).toFixed() : "1",
+                                    attachment.includes("near")
+                                        ? args.big().intoParsed(depoUnit).cast(depo).toFixed()
+                                        : "1",
                                     args.big().intoParsed(gasUnit).cast(gas).toFixed()
                                 );
                                 signAndSendTxs([tx]);
@@ -275,7 +277,7 @@ export class Export extends Component<Props, State> {
                         // Case2: scheduled execution => use jobs
                         else {
                             // Job with attached FT
-                            if (attachment.includes(1)) {
+                            if (attachment.includes("ft")) {
                                 const jobCount = await multicall.getJobCount();
                                 const [addJobTx, proposeJobTx] = await Promise.all([
                                     multicall.addJob(
@@ -299,7 +301,7 @@ export class Export extends Component<Props, State> {
                             }
                             // Job with attached NEAR
                             else {
-                                const jobCost = attachment.includes(0)
+                                const jobCost = attachment.includes("near")
                                     ? args.big().intoParsed(depoUnit).cast(depo).add(Multicall.CRONCAT_FEE).toFixed()
                                     : Multicall.CRONCAT_FEE;
                                 const jobCount = await multicall.getJobCount();
@@ -358,7 +360,7 @@ export class Export extends Component<Props, State> {
         // toBase64 might throw on failure
         try {
             multicallArgs = { calls: LAYOUT.toBase64() };
-            multicallArgsText = !attachment.includes(1)
+            multicallArgsText = !attachment.includes("ft")
                 ? JSON.stringify(multicallArgs)
                 : JSON.stringify({
                       receiver_id: STORAGE.addresses.multicall,
@@ -423,7 +425,7 @@ export class Export extends Component<Props, State> {
                             <ChoiceField
                                 name="attachment"
                                 show={(ids) => {
-                                    if (ids.includes(0))
+                                    if (ids.includes("near"))
                                         return (
                                             <UnitField
                                                 name="depo"
@@ -432,7 +434,7 @@ export class Export extends Component<Props, State> {
                                                 options={["NEAR", "yocto"]}
                                             />
                                         );
-                                    if (ids.includes(1))
+                                    if (ids.includes("ft"))
                                         return (
                                             <>
                                                 <TextField
@@ -461,20 +463,22 @@ export class Export extends Component<Props, State> {
                                     <>
                                         <p>Attach</p>
                                         <button
-                                            className={clsx({ selected: isActive(0) })}
+                                            type="button"
+                                            className={clsx({ selected: isActive("near") })}
                                             onClick={() => {
-                                                toggle(0);
-                                                remove(1);
+                                                toggle("near");
+                                                remove("ft");
                                             }}
                                         >
                                             NEAR
                                         </button>
                                         <p>or</p>
                                         <button
-                                            className={clsx({ selected: isActive(1) })}
+                                            type="button"
+                                            className={clsx({ selected: isActive("ft") })}
                                             onClick={() => {
-                                                remove(0);
-                                                toggle(1);
+                                                remove("near");
+                                                toggle("ft");
                                             }}
                                         >
                                             fungible token
@@ -484,9 +488,9 @@ export class Export extends Component<Props, State> {
                             </ChoiceField>
                             <ChoiceField
                                 name="execution"
-                                initial={[0]}
+                                initial={["immediate"]}
                                 show={(ids) => {
-                                    if (ids.includes(1))
+                                    if (ids.includes("scheduled"))
                                         return (
                                             <div className="spacer">
                                                 <DateTimePicker
@@ -500,6 +504,7 @@ export class Export extends Component<Props, State> {
                                                     handleChange={(value) =>
                                                         !!value && this.setFormData({ dateTime: value.toJSDate() })
                                                     }
+                                                    disableMaskedInput
                                                 />
                                             </div>
                                         );
@@ -510,15 +515,17 @@ export class Export extends Component<Props, State> {
                                     <>
                                         <p>Execute</p>
                                         <button
-                                            className={clsx({ selected: isActive(0) })}
-                                            onClick={() => choose(0)}
+                                            type="button"
+                                            className={clsx({ selected: isActive("immediate") })}
+                                            onClick={() => choose("immediate")}
                                         >
                                             immediately
                                         </button>
                                         <p>or</p>
                                         <button
-                                            className={clsx({ selected: isActive(1) })}
-                                            onClick={() => choose(1)}
+                                            type="button"
+                                            className={clsx({ selected: isActive("scheduled") })}
+                                            onClick={() => choose("scheduled")}
                                         >
                                             scheduled
                                         </button>
