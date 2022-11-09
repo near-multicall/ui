@@ -180,7 +180,7 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
                 if (!addr.isBad()) {
                     this.confidentlyUpdateFt().then((ready) => resolve(ready));
                 } else {
-                    this.setState({ token: new FungibleToken(this.state.formData.addr) }); // will be invalid
+                    this.setState({ token: new FungibleToken(this.state.formData.addr), needsSd: false }); // will be invalid
                     resolve(false);
                 }
             });
@@ -190,9 +190,10 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
     private async confidentlyUpdateFt(): Promise<boolean> {
         const { addr, receiverId } = this.state.formData;
         const newToken = await FungibleToken.init(addr);
-        const storageBalance = !fields(this.schema).receiverId.isBad()
-            ? await newToken.storageBalanceOf(receiverId)
-            : null;
+        const storageBalance =
+            !fields(this.schema).receiverId.isBad() && receiverId !== ""
+                ? await newToken.storageBalanceOf(receiverId)
+                : null;
         this.setState({
             token: newToken,
             needsSd: !!storageBalance && Big(storageBalance.total).lt(newToken.storageBounds.min),
@@ -221,7 +222,7 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
     }
 
     public override Editor = (): React.ReactNode => {
-        const { resetForm, validateForm, values } = useFormikContext<FormData>();
+        const { resetForm, validateForm, values, setFieldValue } = useFormikContext<FormData>();
         const sdAmount = arx.big().intoFormatted("NEAR").cast(this.state.token.storageBounds.min).toFixed();
 
         useEffect(() => {
@@ -234,7 +235,7 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
 
         useEffect(() => {
             if (values.addr !== this.initialValues.addr || values.receiverId !== this.initialValues.receiverId)
-                values.payStorageDeposit = this.state.needsSd;
+                setFieldValue("payStorageDeposit", this.state.needsSd);
         }, [values.addr, values.receiverId]);
 
         return (
@@ -312,6 +313,8 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
             } catch (e) {
                 if (e instanceof CallError) args[1] = `Error: ${e.message}`;
             }
+
+        console.log("get display data", payStorageDeposit);
         return {
             name,
             addr,
