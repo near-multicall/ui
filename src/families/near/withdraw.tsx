@@ -34,7 +34,7 @@ export class Withdraw extends BaseTask<FormData, Props, State> {
         .object()
         .shape({
             addr: arx.string().stakingPool(),
-            gas: arx.big().gas().min(toGas("3.5")).max(toGas("250")),
+            gas: arx.big().gas().min(toGas("3.5"), "minimum 3.5 Tgas").max(toGas("250"), "maximum 250 Tgas"),
             withdrawAll: arx.boolean(),
             amount: arx
                 .big()

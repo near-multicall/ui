@@ -33,7 +33,7 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
         .object()
         .shape({
             addr: arx.string().ft(),
-            gas: arx.big().gas().min(toGas("1")).max(toGas("250")),
+            gas: arx.big().gas().min(toGas("1"), "minimum 1 Tgas").max(toGas("250"), "maximum 250 Tgas"),
             receiverId: arx.string().address(),
             amount: arx.big().token().min(0, "amount must be at least ${min}"),
             memo: arx.string().optional(),
@@ -129,7 +129,7 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
                     json.actions[0].func === "storage_deposit" &&
                     json.actions[1].func === "ft_transfer" &&
                     json.actions[0].args.account_id === json.actions[1].args.receiver_id &&
-                    json.actions[0].args.register_only === true))
+                    json.actions[0].args.registration_only === true))
         );
     }
 
@@ -152,7 +152,7 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
                               func: "storage_deposit",
                               args: {
                                   account_id: receiverId,
-                                  register_only: true,
+                                  registration_only: true,
                               },
                               gas: arx.big().intoParsed(sdGasUnit).cast(sdGas).toFixed(),
                               depo: token.storageBounds.min,
