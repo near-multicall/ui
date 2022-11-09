@@ -14,15 +14,15 @@ namespace MulticallConfigEditorWidget {
 }
 
 class MulticallConfigEditorConfig {
-    public static readonly ChangesDiffKey = Object.assign(
-        JobSettingsEdit.ChangesDiffKey,
-        TokensWhitelistEdit.ChangesDiffKey
-    );
+    public static readonly ChangesDiffKey = {
+        ...JobSettingsEdit.ChangesDiffKey,
+        ...TokensWhitelistEdit.ChangesDiffKey,
+    };
 
-    public static readonly ChangesDiffMetadata = Object.assign(
-        JobSettingsEdit.ChangesDiffMetadata,
-        TokensWhitelistEdit.ChangesDiffMetadata
-    );
+    public static readonly ChangesDiffMetadata = {
+        ...JobSettingsEdit.ChangesDiffMetadata,
+        ...TokensWhitelistEdit.ChangesDiffMetadata,
+    };
 }
 
 export { MulticallConfigEditorConfig, type MulticallConfigEditorWidget };

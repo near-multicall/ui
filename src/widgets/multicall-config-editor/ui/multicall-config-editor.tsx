@@ -53,10 +53,10 @@ export const MulticallConfigEditorUI = ({ className, contracts }: MulticallConfi
 
     const onEdit = useCallback(
         (update: Partial<MulticallConfigEditorWidget.ChangesDiff>) => {
-            void changesDiffUpdate((latestState) => Object.assign(latestState, update));
+            void changesDiffUpdate((latestState) => ({ ...latestState, ...update }));
 
             void editModeSwitch(
-                Object.values(Object.assign(changesDiff, update)).filter(({ length }) => length > 0).length > 0
+                Object.values({ ...changesDiff, ...update }).filter(({ length }) => length > 0).length > 0
             );
 
             // TODO: Remove before release. This is for debug purposes only
@@ -65,6 +65,8 @@ export const MulticallConfigEditorUI = ({ className, contracts }: MulticallConfi
 
         [editModeSwitch, changesDiff, changesDiffUpdate, proposalDescription]
     );
+
+    console.log(changesDiff);
 
     const onSubmit = useCallback<FormEventHandler>(
         (event) => {
