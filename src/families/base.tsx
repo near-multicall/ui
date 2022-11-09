@@ -21,10 +21,17 @@ export interface DefaultFormData {
     depoUnit: number | unit;
 }
 
-export interface DisplayData extends Omit<DefaultFormData, "gasUnit" | "depoUnit"> {
-    gasUnit: string;
-    depoUnit: string;
-    args: string;
+export interface DisplayData {
+    name: string;
+    addr: string;
+    actions: {
+        func: string;
+        gas: string;
+        gasUnit: string;
+        depo: string;
+        depoUnit: string;
+        args: string;
+    }[];
 }
 
 export interface BaseTaskProps {
@@ -157,19 +164,23 @@ export abstract class BaseTask<
         return {
             name,
             addr,
-            func,
-            gas,
-            gasUnit: gasUnit.toString(),
-            depo,
-            depoUnit: depoUnit.toString(),
-            args,
+            actions: [
+                {
+                    func,
+                    gas,
+                    gasUnit: gasUnit.toString(),
+                    depo,
+                    depoUnit: depoUnit.toString(),
+                    args,
+                },
+            ],
         };
     }
 
     render() {
         const { showArgs, isEdited } = this.state;
 
-        const { name, addr, func, gas, gasUnit, depo, depoUnit, args } = this.getDisplayData();
+        const { name, addr, actions } = this.getDisplayData();
 
         const hasErrors = this.schema.isBad();
 
@@ -224,7 +235,7 @@ export abstract class BaseTask<
                     <div className="delete-pseudo"></div>
                 </div>
                 <div className="data-container">
-                    <p>
+                    <p className="addr">
                         <span>Contract address</span>
                         <a
                             className="code"
@@ -235,31 +246,38 @@ export abstract class BaseTask<
                             {addr}
                         </a>
                     </p>
-                    <p>
-                        <span>Function name</span>
-                        <span className="code">{func}</span>
-                    </p>
-                    <p className="expandable">
-                        <span>Function arguments</span>
-                        {showArgs ? (
-                            <a onClick={() => this.setState({ showArgs: false })}>hide</a>
-                        ) : (
-                            <a onClick={() => this.setState({ showArgs: true })}>show</a>
-                        )}
-                    </p>
-                    {showArgs && <pre className="code">{args}</pre>}
-                    <p>
-                        <span>Allocated gas</span>
-                        <span className="code">
-                            {gas} <span>{gasUnit}</span>
-                        </span>
-                    </p>
-                    <p>
-                        <span>Attached deposit</span>
-                        <span className="code">
-                            {depo} <span>{depoUnit}</span>
-                        </span>
-                    </p>
+                    {actions.map(({ func, args, gas, gasUnit, depo, depoUnit }, i) => (
+                        <div
+                            className="action-data-container"
+                            key={i}
+                        >
+                            <p>
+                                <span>Function name</span>
+                                <span className="code">{func}</span>
+                            </p>
+                            <p className="expandable">
+                                <span>Function arguments</span>
+                                {showArgs ? (
+                                    <a onClick={() => this.setState({ showArgs: false })}>hide</a>
+                                ) : (
+                                    <a onClick={() => this.setState({ showArgs: true })}>show</a>
+                                )}
+                            </p>
+                            {showArgs && <pre className="code">{args}</pre>}
+                            <p>
+                                <span>Allocated gas</span>
+                                <span className="code">
+                                    {gas} <span>{gasUnit}</span>
+                                </span>
+                            </p>
+                            <p>
+                                <span>Attached deposit</span>
+                                <span className="code">
+                                    {depo} <span>{depoUnit}</span>
+                                </span>
+                            </p>
+                        </div>
+                    ))}
                 </div>
             </div>
         );

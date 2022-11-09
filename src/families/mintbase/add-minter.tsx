@@ -174,7 +174,7 @@ export class AddMinter extends BaseTask<FormData, Props, State> {
         }, []);
 
         return (
-            <Form className="edit">
+            <Form className={`edit ${this.uniqueClassName}-edit`}>
                 <TextField
                     name="name"
                     label="Card Name"
@@ -189,8 +189,17 @@ export class AddMinter extends BaseTask<FormData, Props, State> {
                 />
                 {minters?.length > 0 ? (
                     <InfoField>
-                        <b>Minters: </b>
-                        {minters?.toString()}
+                        <b>Minter</b>
+                        {minters.map((id) => (
+                            <a
+                                className="minter-account-id"
+                                href={arx.string().intoUrl().cast(id)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                {id}
+                            </a>
+                        ))}
                     </InfoField>
                 ) : null}
                 <TextField

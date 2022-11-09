@@ -147,12 +147,16 @@ export class CustomTask extends BaseTask<FormData> {
         return {
             name,
             addr,
-            func,
-            gas,
-            gasUnit: gasUnit.toString(),
-            depo,
-            depoUnit: depoUnit.toString(),
-            args: arx.string().json().isValidSync(args) ? JSON.stringify(JSON.parse(args), null, "  ") : args,
+            actions: [
+                {
+                    func,
+                    gas,
+                    gasUnit: gasUnit.toString(),
+                    depo,
+                    depoUnit: depoUnit.toString(),
+                    args: arx.string().json().isValidSync(args) ? JSON.stringify(JSON.parse(args), null, "  ") : args,
+                },
+            ],
         };
     }
 }

@@ -1,5 +1,7 @@
 @use "sass/color";
+@use "../base";
 
 .multicall-transfer-task {
     background: color.$darkest;
+    @include base.task-theme(color.$light-text);
 }

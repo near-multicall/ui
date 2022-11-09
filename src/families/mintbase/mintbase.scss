@@ -1,3 +1,6 @@
+@use "sass/color";
+@use "../base";
+
 $mintbase-blue: #070c2b;
 $mintbase-red: #ff2424;
 
@@ -10,4 +13,16 @@ $mintbase-red: #ff2424;
     background-position-x: 42rem;
     background-position-y: 239rem;
     background-size: 77rem;
+    @include base.task-theme(color.$light-text);
+}
+
+.mintbase-add-minter-task-edit,
+.mintbase-remove-minter-task-edit {
+    .InfoField-content {
+        display: flex;
+        flex-flow: column nowrap;
+        .minter-account-id {
+            align-self: flex-end;
+        }
+    }
 }

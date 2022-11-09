@@ -7,6 +7,7 @@ import { SputnikDAO } from "../../contracts/sputnik-dao";
 import { StakingPool } from "../../contracts/staking-pool";
 import { FungibleToken } from "../../standards/fungibleToken";
 import { MultiFungibleToken } from "../../standards/multiFungibleToken";
+import { NonFungibleToken } from "../../standards/nonFungibleToken";
 import { locale, addErrorMethods, ErrorMethods } from "../args-error";
 
 declare module "yup" {
@@ -18,7 +19,9 @@ declare module "yup" {
         sputnikDao(message?: string): this;
         multicall(message?: string): this;
         ft(message?: string): this;
-        mft(addressKey: string, message?: string): this;
+        nft(message?: string): this;
+        nftId(addressKey: string, message?: string): this;
+        mftId(addressKey: string, message?: string): this;
         stakingPool(message?: string): this;
         mintbaseStore(message?: string): this;
         intoUrl(): this;
@@ -138,10 +141,41 @@ addMethod(_StringSchema, "ft", function ft(message = locale.string.ft) {
     });
 });
 
-// ensure string is a valid NEAR address with a multi token contract
-addMethod(_StringSchema, "mft", function mft(addressKey: string, message = locale.string.mft) {
+// ensure string is a valid NEAR address with a non fungible token contract
+addMethod(_StringSchema, "nft", function nft(message = locale.string.nft) {
+    return this.address().test({
+        name: "nft",
+        message,
+        test: async (value) => {
+            if (value == null) return true;
+            return await NonFungibleToken.isNft(value);
+        },
+    });
+});
+
+// ensure string is a valid NEAR address with a multi token contract and belonging id
+addMethod(_StringSchema, "nftId", function nftId(addressKey: string, message = locale.string.nftId) {
     return this.test({
-        name: "mft",
+        name: "nftId",
+        message,
+        test: async (value, context) => {
+            if (value == null) return true;
+            try {
+                const nonFungibleToken = await NonFungibleToken.init(context.parent[addressKey], value);
+                return nonFungibleToken.ready;
+            } catch (e) {
+                // TODO check reason for error
+                // console.warn("error occured while checking for multicall instance at", value);
+                return false;
+            }
+        },
+    });
+});
+
+// ensure string is a valid NEAR address with a multi token contract and belonging id
+addMethod(_StringSchema, "mftId", function mftId(addressKey: string, message = locale.string.mftId) {
+    return this.test({
+        name: "mftId",
         message,
         test: async (value, context) => {
             if (value == null) return true;

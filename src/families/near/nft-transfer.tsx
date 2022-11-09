@@ -1,86 +1,98 @@
-// TODO: add checkbox and support "unstake_all".
-
 import { Form, FormikErrors, useFormikContext } from "formik";
 import { useEffect } from "react";
 import { args as arx } from "../../shared/lib/args/args";
 import { fields } from "../../shared/lib/args/args-types/args-object";
 import { Call, CallError } from "../../shared/lib/call";
 import { toGas } from "../../shared/lib/converter";
-import { MintbaseStore } from "../../shared/lib/contracts/mintbase";
-import { CheckboxField, InfoField, TextField, UnitField } from "../../shared/ui/form-fields";
-import { BaseTask, BaseTaskProps, BaseTaskState } from "../base";
-import MintbaseLogo from "../../app/static/mintbase/Mintbase_logo.svg";
-import "./mintbase.scss";
 import { STORAGE } from "../../shared/lib/persistent";
-
+import { NonFungibleToken } from "../../shared/lib/standards/nonFungibleToken";
+import { TextField, UnitField } from "../../shared/ui/form-fields";
 import type { DefaultFormData } from "../base";
-import type { StoreInfo } from "../../shared/lib/contracts/mintbase";
+import { BaseTask, BaseTaskProps, BaseTaskState } from "../base";
+import "./near.scss";
 
 type FormData = DefaultFormData & {
-    removedMinter: string;
+    tokenId: string;
+    receiverId: string;
+    memo: string;
 };
 
 type Props = BaseTaskProps;
 
 type State = BaseTaskState<FormData> & {
-    mintbaseStore: MintbaseStore;
-    mintbaseStoreInfo: StoreInfo;
-    minters: string[];
+    nft: NonFungibleToken;
 };
 
-export class RemoveMinter extends BaseTask<FormData, Props, State> {
-    override uniqueClassName = "mintbase-remove-minter-task";
+export class NftTransfer extends BaseTask<FormData, Props, State> {
+    override uniqueClassName = "near-nft-transfer-task";
     override schema = arx
         .object()
         .shape({
-            addr: arx
+            addr: arx.string().nft(),
+            gas: arx.big().gas().min(toGas("1")).max(toGas("250")),
+            tokenId: arx
                 .string()
-                .mintbaseStore()
+                .nftId("addr")
                 .test({
-                    name: "check owner",
-                    message: "store must be owned by the DAO's multicall",
+                    name: "approval",
+                    message: "multicall does not have permission to transfer this NFT",
                     test: (value, ctx) =>
                         value == null ||
-                        ctx.options.context?.storeOwner == null ||
-                        ctx.options.context.storeOwner === STORAGE.addresses.multicall,
+                        ctx.options.context?.token == null ||
+                        ctx.options.context?.multicallAddress == null ||
+                        ctx.options.context.token.owner_id === ctx.options.context.multicallAddress ||
+                        Object.keys(ctx.options.context.token.approved_account_ids).includes(
+                            ctx.options.context.multicallAddress
+                        ),
                 }),
-            gas: arx.big().gas().min(toGas("3.5")).max(toGas("250")),
-            removedMinter: arx.string().address(),
+            receiverId: arx.string().address(),
+            memo: arx.string().optional(),
         })
         .transform(({ gas, gasUnit, ...rest }) => ({
             ...rest,
             gas: arx.big().intoParsed(gasUnit).cast(gas),
         }))
-        .requireAll()
+        .requireAll({ ignore: ["memo"] })
         .retainAll();
 
     override initialValues: FormData = {
-        name: "Remove Minter",
+        name: "NFT Transfer",
         addr: "",
-        func: "revoke_minter",
-        removedMinter: "",
-        gas: "30",
+        func: "nft_transfer",
+        gas: "15",
         gasUnit: "Tgas",
         depo: "1",
         depoUnit: "yocto",
+        tokenId: "",
+        receiverId: "",
+        memo: "",
     };
 
     constructor(props: Props) {
         super(props);
         this._constructor();
+
+        this.state = {
+            ...this.state,
+            nft: new NonFungibleToken(this.state.formData.addr),
+        };
     }
 
     protected override init(
         call: Call<{
-            account_id: string;
+            token_id: string;
+            receiver_id: string;
+            memo: string;
         }> | null
     ): void {
         if (call !== null) {
             const fromCall = {
                 addr: call.address,
                 func: call.actions[0].func,
-                removedMinter: call.actions[0].args.account_id,
                 gas: arx.big().intoFormatted(this.initialValues.gasUnit).cast(call.actions[0].gas).toFixed(),
+                receiverId: call.actions[0].args.receiver_id,
+                tokenId: call.actions[0].args.token_id,
+                memo: call.actions[0].args.memo,
             };
             this.initialValues = Object.keys(this.initialValues).reduce((acc, k) => {
                 const v = fromCall[k as keyof typeof fromCall];
@@ -89,26 +101,40 @@ export class RemoveMinter extends BaseTask<FormData, Props, State> {
         }
 
         this.state = { ...this.state, formData: this.initialValues };
-        this.schema.check(this.state.formData, { context: { storeOwner: this.state.mintbaseStoreInfo?.owner } });
+        this.schema.check(this.state.formData, {
+            context: {
+                token: this.state.nft?.token,
+                multicallAddress: STORAGE.addresses.multicall,
+            },
+        });
+
+        if (call !== null) this.tryUpdateNft();
     }
 
     static override inferOwnType(json: Call): boolean {
-        return !!json && json.actions[0].func === "revoke_minter";
+        return !!json && json.actions[0].func === "nft_transfer";
     }
 
     public override toCall(): Call {
-        const { addr, removedMinter, gas, gasUnit, depo } = this.state.formData;
+        const { addr, func, depo, gas, gasUnit, tokenId, receiverId, memo } = this.state.formData;
+        const { nft } = this.state;
 
         if (!arx.big().isValidSync(gas)) throw new CallError("Failed to parse gas input value", this.props.id);
-        if (!arx.big().isValidSync(depo)) throw new CallError("Failed to parse deposit input value", this.props.id);
+        if (!nft.ready || !nft.token) throw new CallError("Lacking token metadata", this.props.id);
+
+        const miIsOwner = nft.token.owner_id === STORAGE.addresses.multicall;
+        const approvalId = nft.token.approved_account_ids[STORAGE.addresses.multicall];
 
         return {
             address: addr,
             actions: [
                 {
-                    func: "revoke_minter",
+                    func,
                     args: {
-                        account_id: removedMinter,
+                        token_id: tokenId,
+                        receiver_id: receiverId,
+                        ...(!miIsOwner && { approval_id: approvalId }),
+                        memo,
                     },
                     gas: arx.big().intoParsed(gasUnit).cast(gas).toFixed(),
                     depo,
@@ -117,19 +143,22 @@ export class RemoveMinter extends BaseTask<FormData, Props, State> {
         };
     }
 
-    // TODO: fetch store owner/data
-    private tryUpdateMintbaseStore(): Promise<boolean> {
+    private tryUpdateNft(): Promise<boolean> {
         return new Promise<boolean>((resolve) => {
             this.schema
-                .check(this.state.formData, { context: { storeOwner: this.state.mintbaseStoreInfo?.owner } })
+                .check(this.state.formData, {
+                    context: {
+                        token: this.state.nft?.token,
+                        multicallAddress: STORAGE.addresses.multicall,
+                    },
+                })
                 .then(() => {
                     const { addr } = fields(this.schema);
                     if (!addr.isBad()) {
-                        this.confidentlyUpdateMintbaseStore().then((ready) => resolve(ready));
+                        this.confidentlyUpdateNft().then((ready) => resolve(ready));
                     } else {
                         this.setState({
-                            mintbaseStore: new MintbaseStore(this.state.formData.addr),
-                            minters: [],
+                            nft: new NonFungibleToken(this.state.formData.addr),
                         }); // will be invalid
                         resolve(false);
                     }
@@ -137,23 +166,24 @@ export class RemoveMinter extends BaseTask<FormData, Props, State> {
         });
     }
 
-    // fetch store data/owner
-    private async confidentlyUpdateMintbaseStore(): Promise<boolean> {
-        const { addr } = this.state.formData;
-        const [store, storeInfo, minters] = await Promise.all([
-            MintbaseStore.init(addr),
-            new MintbaseStore(addr).getInfo(),
-            new MintbaseStore(addr).listMinters(),
-        ]);
-        this.setState({ minters, mintbaseStore: store, mintbaseStoreInfo: storeInfo });
+    private async confidentlyUpdateNft(): Promise<boolean> {
+        const { addr, tokenId } = this.state.formData;
+        const newToken = await NonFungibleToken.init(addr, tokenId);
+        this.setState({ nft: newToken });
         window.EDITOR.forceUpdate();
-        return store.ready;
+        return newToken.ready;
     }
 
     public override async validateForm(values: FormData): Promise<FormikErrors<FormData>> {
         this.setFormData(values);
         await new Promise((resolve) => this.resolveDebounced(resolve));
-        await this.tryUpdateMintbaseStore();
+        await this.tryUpdateNft();
+        await this.schema.check(values, {
+            context: {
+                token: this.state.nft?.token,
+                multicallAddress: STORAGE.addresses.multicall,
+            },
+        });
         return Object.fromEntries(
             Object.entries(fields(this.schema))
                 .map(([k, v]) => [k, v?.message() ?? ""])
@@ -162,8 +192,7 @@ export class RemoveMinter extends BaseTask<FormData, Props, State> {
     }
 
     public override Editor = (): React.ReactNode => {
-        const { resetForm, validateForm, values } = useFormikContext<FormData>();
-        const { minters } = this.state;
+        const { resetForm, validateForm } = useFormikContext();
 
         useEffect(() => {
             resetForm({
@@ -174,7 +203,7 @@ export class RemoveMinter extends BaseTask<FormData, Props, State> {
         }, []);
 
         return (
-            <Form className={`edit ${this.uniqueClassName}-edit`}>
+            <Form className="edit">
                 <TextField
                     name="name"
                     label="Card Name"
@@ -184,27 +213,20 @@ export class RemoveMinter extends BaseTask<FormData, Props, State> {
                 <div className="empty-line" />
                 <TextField
                     name="addr"
-                    label="Store address"
+                    label="Contract Address"
                     roundtop
                 />
-                {minters?.length > 0 ? (
-                    <InfoField>
-                        <b>Minter</b>
-                        {minters.map((id) => (
-                            <a
-                                className="minter-account-id"
-                                href={arx.string().intoUrl().cast(id)}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                            >
-                                {id}
-                            </a>
-                        ))}
-                    </InfoField>
-                ) : null}
                 <TextField
-                    name="removedMinter"
-                    label="Removed minter"
+                    name="tokenId"
+                    label="Token ID"
+                />
+                <TextField
+                    name="receiverId"
+                    label="Receiver Address"
+                />
+                <TextField
+                    name="memo"
+                    label="Memo"
                 />
                 <UnitField
                     name="gas"
@@ -213,17 +235,6 @@ export class RemoveMinter extends BaseTask<FormData, Props, State> {
                     label="Allocated gas"
                     roundbottom
                 />
-                <a
-                    className="protocol"
-                    href="https://www.mintbase.io/"
-                >
-                    <span>powered by</span>
-                    <img
-                        src={MintbaseLogo}
-                        alt="Mintbase"
-                        className="logo"
-                    />
-                </a>
             </Form>
         );
     };

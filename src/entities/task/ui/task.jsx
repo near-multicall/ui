@@ -101,6 +101,38 @@ export class Task extends Component {
                                 json={json}
                             />
                         );
+                    case "nft_transfer":
+                        return (
+                            <Family.Near.NftTransfer
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
+                    case "nft_transfer_call":
+                        return (
+                            <Family.Near.NftTransferCall
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
+                    case "nft_approve":
+                        return (
+                            <Family.Near.NftApprove
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
+                    case "nft_revoke":
+                        return (
+                            <Family.Near.NftRevoke
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
                     case "mft_transfer":
                         return (
                             <Family.Near.MftTransfer

@@ -19,7 +19,9 @@ const locale = {
         sputnikDao: "address must belong to a sputnik dao contract",
         multicall: "address must belong to a multicall contract",
         ft: "address must belong to a token contract",
-        mft: "token id must belong to a multi-token contract",
+        nft: "address must belong to an nft contract",
+        nftId: "token id must belong to an nft contract",
+        mftId: "token id must belong to a multi-token contract",
         stakingPool: "address must belong to a staking pool",
         mintbaseStore: "address must belong to a mintbase store",
     },
@@ -283,6 +285,12 @@ function combine(this: any, errors: any[], options?: Partial<RetainOptions>) {
     });
 }
 
+/**
+ * mark field as optional if condition is not met
+ * @param keys
+ * @param condition
+ * @returns
+ */
 function requiredWhen(this: any, keys: string | string[], condition: (...schemata: any[]) => boolean) {
     return this.when(keys, {
         is: condition,

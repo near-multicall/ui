@@ -1,12 +1,17 @@
 @use "sass/color";
 @use "sass/mixin";
 @use "sass/size";
+@use "sass/font";
 
-.near-ft-transfer-task,
 .near-storage-withdraw-task,
 .near-storage-deposit-task,
 .near-storage-unregister-task,
+.near-ft-transfer-task,
 .near-ft-transfer-call-task,
+.near-nft-transfer-task,
+.near-nft-transfer-call-task,
+.near-nft-approve-task,
+.near-nft-revoke-task,
 .near-mft-transfer-task,
 .near-mft-transfer-call-task,
 .near-deposit-and-stake-task,
@@ -24,6 +29,17 @@
     }
     * > a {
         color: darken(color.$blue, 20%) !important;
+    }
+}
+
+.near-nft-approve-task-edit,
+.near-nft-revoke-task-edit {
+    .InfoField-content {
+        display: flex;
+        flex-flow: column nowrap;
+        .approved-account-id {
+            align-self: flex-end;
+        }
     }
 }
 

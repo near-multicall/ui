@@ -1,6 +1,7 @@
 import Icon from "@mui/material/Icon";
 import hash from "object-hash";
 import React, { Component } from "react";
+import clsx from "clsx";
 import { Droppable, Draggable } from "react-beautiful-dnd";
 
 import { Task } from "../../entities";
@@ -54,14 +55,17 @@ export class Column extends Component {
                                     ref={provided.innerRef}
                                     {...provided.droppableProps}
                                 >
-                                    {this.props.tasks.map((task, index) => (
-                                        <Task
-                                            key={hash(task, { algorithm: "md5", encoding: "base64" })}
-                                            task={task}
-                                            index={index}
-                                            json={task.json}
-                                        />
-                                    ))}
+                                    {this.props.tasks.map(
+                                        (task, index) =>
+                                            (!menuColumn || this.props.show.includes(task.id)) && (
+                                                <Task
+                                                    key={hash(task, { algorithm: "md5", encoding: "base64" })}
+                                                    task={task}
+                                                    index={index}
+                                                    json={task.json}
+                                                />
+                                            )
+                                    )}
                                     {provided.placeholder}
                                 </div>
                             )}

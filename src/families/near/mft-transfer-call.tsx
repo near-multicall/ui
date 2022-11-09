@@ -14,7 +14,7 @@ type FormData = DefaultFormData & {
     tokenId: string;
     receiverId: string;
     amount: string;
-    memo: string | null;
+    memo: string;
     msg: string;
 };
 
@@ -32,7 +32,7 @@ export class MftTransferCall extends BaseTask<FormData, Props, State> {
             addr: arx.string().contract(),
             gas: arx.big().gas().min(toGas("45")).max(toGas("250")),
             receiverId: arx.string().address(),
-            tokenId: arx.string().mft("addr"),
+            tokenId: arx.string().mftId("addr"),
             amount: arx.big().token().min(1, "cannot transfer 0 tokens"),
             memo: arx.string().optional(),
             msg: arx.string().optional(),
@@ -122,6 +122,7 @@ export class MftTransferCall extends BaseTask<FormData, Props, State> {
 
         if (!arx.big().isValidSync(gas)) throw new CallError("Failed to parse gas input value", this.props.id);
         if (!arx.big().isValidSync(depo)) throw new CallError("Failed to parse deposit input value", this.props.id);
+        if (!arx.big().isValidSync(amount)) throw new CallError("Failed to parse amount input value", this.props.id);
         if (!token.ready) throw new CallError("Lacking token metadata", this.props.id);
 
         return {
