@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { useCallback, useMemo, useState, FormEventHandler } from "react";
+import { useCallback, useMemo, useState, FormEventHandler, useEffect } from "react";
 
 import { MulticallInstance } from "../../../entities";
 import { JobSettingsEdit, TokensWhitelistEdit } from "../../../features";
@@ -52,15 +52,10 @@ export const MulticallConfigEditorUI = ({ className, contracts }: MulticallConfi
     }, [editMode, editModeSwitch, formReset]);
 
     const onEdit = useCallback(
-        (update: Partial<MulticallConfigEditorWidget.ChangesDiff>) => {
-            void changesDiffUpdate((latestState) => ({ ...latestState, ...update }));
+        (update: Partial<MulticallConfigEditorWidget.ChangesDiff>) =>
+            void changesDiffUpdate((latestState) => ({ ...latestState, ...update })),
 
-            void editModeSwitch(
-                Object.values({ ...changesDiff, ...update }).filter(({ length }) => length > 0).length > 0
-            );
-        },
-
-        [editModeSwitch, changesDiffUpdate, proposalDescription]
+        [changesDiffUpdate]
     );
 
     const onSubmit = useCallback<FormEventHandler>(
@@ -78,6 +73,11 @@ export const MulticallConfigEditorUI = ({ className, contracts }: MulticallConfi
         },
 
         [contracts, proposalDescription]
+    );
+
+    useEffect(
+        () => void editModeSwitch(Object.values(changesDiff).filter(({ length }) => length > 0).length > 0),
+        [changesDiff, editModeSwitch]
     );
 
     // TODO: Remove before release. This is for debug purposes only
