@@ -1,10 +1,10 @@
 import { CancelOutlined, EditOutlined, VisibilityOutlined } from "@mui/icons-material";
-import { IconButton } from "@mui/material";
+import { IconButton, TextField, TextFieldProps } from "@mui/material";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { ArgsString } from "../../../shared/lib/args";
 import { toNEAR, toYocto } from "../../../shared/lib/converter";
-import { IconLabel, NearIcons, NearLink, Table, TextInput, TextInputProps, Tile } from "../../../shared/ui/components";
+import { IconLabel, NearIcons, NearLink, Table, Tile } from "../../../shared/ui/components";
 import { JobSettingsEditConfig, type JobSettingsEditFeature } from "../config";
 
 interface JobSettingsFormProps extends JobSettingsEditFeature.Inputs {}
@@ -37,7 +37,7 @@ export const JobSettingsForm = ({
         ),
     };
 
-    const onCroncatManagerChange = useCallback<Required<TextInputProps>["update"]>(
+    const onCroncatManagerChange = useCallback<Required<TextFieldProps>["onChange"]>(
         ({ target: { value } }) =>
             void croncatManagerUpdate(
                 value !== multicallContract.croncatManager ? value : formInitialState.croncatManager
@@ -46,7 +46,7 @@ export const JobSettingsForm = ({
         [croncatManagerUpdate]
     );
 
-    const onJobBondChange = useCallback<Required<TextInputProps>["update"]>(
+    const onJobBondChange = useCallback<Required<TextFieldProps>["onChange"]>(
         ({ target: { value } }) =>
             void jobBondUpdate(value !== toNEAR(multicallContract.jobBond) ? toYocto(value) : formInitialState.jobBond),
 
@@ -118,10 +118,10 @@ export const JobSettingsForm = ({
                             ].description,
 
                             editModeEnabled ? (
-                                <TextInput
+                                <TextField
                                     fullWidth
-                                    update={onCroncatManagerChange}
-                                    value={formFields.croncatManager}
+                                    onChange={onCroncatManagerChange}
+                                    value={croncatManager || multicallContract.croncatManager}
                                 />
                             ) : (
                                 <NearLink address={croncatManager || multicallContract.croncatManager} />
@@ -136,15 +136,15 @@ export const JobSettingsForm = ({
                                 .description,
 
                             editModeEnabled ? (
-                                <TextInput
+                                <TextField
                                     InputProps={{
                                         endAdornment: NearIcons.NATIVE_TOKEN_CHARACTER,
                                         inputProps: { min: 0, step: 0.001 },
                                     }}
                                     fullWidth
-                                    update={onJobBondChange}
+                                    onChange={onJobBondChange}
                                     type="number"
-                                    value={formFields.jobBond}
+                                    value={toNEAR(jobBond || multicallContract.jobBond)}
                                 />
                             ) : (
                                 <IconLabel
