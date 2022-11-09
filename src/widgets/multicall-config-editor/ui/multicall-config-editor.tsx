@@ -58,15 +58,10 @@ export const MulticallConfigEditorUI = ({ className, contracts }: MulticallConfi
             void editModeSwitch(
                 Object.values({ ...changesDiff, ...update }).filter(({ length }) => length > 0).length > 0
             );
-
-            // TODO: Remove before release. This is for debug purposes only
-            console.table({ proposalDescription, ...changesDiff });
         },
 
-        [editModeSwitch, changesDiff, changesDiffUpdate, proposalDescription]
+        [editModeSwitch, changesDiffUpdate, proposalDescription]
     );
-
-    console.log(changesDiff);
 
     const onSubmit = useCallback<FormEventHandler>(
         (event) => {
@@ -84,6 +79,9 @@ export const MulticallConfigEditorUI = ({ className, contracts }: MulticallConfi
 
         [contracts, proposalDescription]
     );
+
+    // TODO: Remove before release. This is for debug purposes only
+    console.table({ proposalDescription, ...changesDiff });
 
     return (
         <div className={clsx(_MulticallConfigEditor, className)}>
