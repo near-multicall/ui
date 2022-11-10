@@ -33,7 +33,7 @@ interface WalletSelectorContextValue {
     accountId: string | null;
 }
 
-const WalletSelectorContext = React.createContext<WalletSelectorContextValue | null>(null);
+export const WalletSelectorContext = React.createContext<WalletSelectorContextValue | null>(null);
 
 export const WalletSelectorContextProvider: React.FC<any> = ({ children }) => {
     const [selector, setSelector] = useState<WalletSelector | null>(null);
@@ -114,9 +114,9 @@ export const WalletSelectorContextProvider: React.FC<any> = ({ children }) => {
     );
 };
 
-export const useWalletSelector = () => {
+export const tryWalletSelectorContext = () => {
     if (!WalletSelectorContext) {
-        throw new Error("useWalletSelector must be used within a WalletSelectorContextProvider");
+        throw new Error("tryWalletSelectorContext must be used within a WalletSelectorContextProvider");
     }
 
     return WalletSelectorContext;
