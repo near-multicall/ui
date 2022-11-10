@@ -62,7 +62,7 @@ export class NftRevoke extends BaseTask<FormData, Props, State> {
         name: "NFT Revoke",
         addr: "",
         func: "nft_revoke",
-        gas: "0",
+        gas: "10",
         gasUnit: "Tgas",
         depo: "1",
         depoUnit: "yocto",
