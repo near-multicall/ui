@@ -225,7 +225,7 @@ export class FtTransferCall extends BaseTask<FormData, Props, State> {
     }
 
     public override Editor = (): React.ReactNode => {
-        const { resetForm, validateForm, values } = useFormikContext<FormData>();
+        const { resetForm, validateForm, values, setFieldValue } = useFormikContext<FormData>();
         const sdAmount = arx.big().intoFormatted("NEAR").cast(this.state.token.storageBounds.min).toFixed();
 
         useEffect(() => {
@@ -238,7 +238,7 @@ export class FtTransferCall extends BaseTask<FormData, Props, State> {
 
         useEffect(() => {
             if (values.addr !== this.initialValues.addr || values.receiverId !== this.initialValues.receiverId)
-                values.payStorageDeposit = this.state.needsSd;
+                this.tryUpdateFt().then(() => setFieldValue("payStorageDeposit", this.state.needsSd));
         }, [values.addr, values.receiverId]);
 
         return (

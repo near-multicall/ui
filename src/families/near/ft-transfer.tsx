@@ -235,7 +235,7 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
 
         useEffect(() => {
             if (values.addr !== this.initialValues.addr || values.receiverId !== this.initialValues.receiverId)
-                setFieldValue("payStorageDeposit", this.state.needsSd);
+                this.tryUpdateFt().then(() => setFieldValue("payStorageDeposit", this.state.needsSd));
         }, [values.addr, values.receiverId]);
 
         return (
