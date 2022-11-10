@@ -7,7 +7,7 @@ import { keywords } from "../../keywords";
 import { Formik, Form } from "formik";
 import "./builder.scss";
 
-normalize = (str) => str.replace("_", " ").replace("-", " ").toLowerCase();
+const normalize = (str) => str.replace("_", " ").replace("-", " ").toLowerCase();
 
 const _Builder = "Builder";
 export class Builder extends Component {
