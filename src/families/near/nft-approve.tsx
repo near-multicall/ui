@@ -31,7 +31,14 @@ export class NftApprove extends BaseTask<FormData, Props, State> {
         .object()
         .shape({
             addr: arx.string().nft(),
-            gas: arx.big().gas().min(toGas("1"), "minimum 1 Tgas").max(toGas("250"), "maximum 250 Tgas"),
+            gas: arx
+                .big()
+                .gas()
+                .when("msg", {
+                    is: (msg: string | undefined | null) => msg !== null && msg !== undefined,
+                    then: (s) => s.min(toGas("15"), "Minimum 15 Tgas"),
+                    otherwise: (s) => s,
+                }),
             depo: arx.big().token().min(1),
             tokenId: arx
                 .string()
@@ -64,7 +71,7 @@ export class NftApprove extends BaseTask<FormData, Props, State> {
         name: "NFT Approve",
         addr: "",
         func: "nft_approve",
-        gas: "0",
+        gas: "30",
         gasUnit: "Tgas",
         depo: "1",
         depoUnit: "yocto",
