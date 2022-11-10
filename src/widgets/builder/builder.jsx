@@ -7,6 +7,8 @@ import { keywords } from "../../keywords";
 import { Formik, Form } from "formik";
 import "./builder.scss";
 
+normalize = (str) => str.replace("_", " ").replace("-", " ").toLowerCase();
+
 const _Builder = "Builder";
 export class Builder extends Component {
     resolveDebounced = debounce((resolve) => resolve(), 400);
@@ -32,8 +34,6 @@ export class Builder extends Component {
 
     filterTasks(tasks, searchTerm) {
         return tasks.filter((task) => {
-            const normalize = (str) => str.replace("_", " ").replace("-", " ").toLowerCase();
-
             return (
                 searchTerm === "" ||
                 (keywords[task.addr]?.[task.func] ?? [])
