@@ -11,7 +11,7 @@ export const keywords = {
         nft_revoke: ["revoke_all", "token", "non fungible"],
         mft_transfer: ["LP", "token"],
         mft_transfer_call: ["LP", "token"],
-        deposit_and_stake: ["validator", "token"],
+        deposit_and_stake: ["validator"],
         unstake: ["validator", "unstake_all"],
         withdraw: ["validator"],
         storage_withdraw: [],
