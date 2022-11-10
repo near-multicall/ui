@@ -80,9 +80,6 @@ export const MulticallConfigEditorUI = ({ className, contracts }: MulticallConfi
         [changesDiff, editModeSwitch]
     );
 
-    // TODO: Remove before release. This is for debug purposes only
-    console.table({ proposalDescription, ...changesDiff });
-
     return (
         <div className={clsx(_MulticallConfigEditor, className)}>
             <MulticallInstance.AdminsTable
