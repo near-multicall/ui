@@ -84,7 +84,7 @@ export const JobSettingsForm = ({
                         </IconButton>
                     </>
                 ) : (
-                    <Tooltip title={disabled ? "Read-only mode" : "Propose changes"}>
+                    <Tooltip title={disabled ? "You are in read-only mode" : "Propose changes"}>
                         <span>
                             <IconButton
                                 onClick={() => void editModeSwitch(true)}
