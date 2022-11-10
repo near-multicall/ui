@@ -1,7 +1,7 @@
 import clsx from "clsx";
-import { useCallback, useMemo, useState, FormEventHandler, useEffect } from "react";
+import { useCallback, useMemo, useState, FormEventHandler, useEffect, useContext } from "react";
 
-import { MulticallInstance } from "../../../entities";
+import { MulticallInstance, Wallet } from "../../../entities";
 import { JobSettingsEdit, TokensWhitelistEdit } from "../../../features";
 import { ArgsString } from "../../../shared/lib/args";
 import { MulticallContract } from "../../../shared/lib/contracts/multicall";
@@ -14,6 +14,11 @@ import "./multicall-config-editor.scss";
 const _MulticallConfigEditor = "MulticallConfigEditor";
 
 export const MulticallConfigEditorUI = ({ className, contracts }: MulticallConfigEditorWidget.Inputs) => {
+    const wallet = useContext(Wallet.SelectorContext);
+
+    const proposalCreationPermitted =
+        !wallet?.accountId || contracts.dao.checkUserPermission(wallet?.accountId, "AddProposal", "FunctionCall");
+
     const [editMode, editModeSwitch] = useState(false);
 
     const changesDiffInitialState: MulticallConfigEditorWidget.ChangesDiff = {
@@ -90,7 +95,7 @@ export const MulticallConfigEditorUI = ({ className, contracts }: MulticallConfi
             <TokensWhitelistEdit.Form
                 className={`${_MulticallConfigEditor}-tokensWhitelist`}
                 daoContractAddress={contracts.dao.address}
-                disabled={!editMode}
+                disabled={!proposalCreationPermitted}
                 resetTrigger={childFormsResetRequested}
                 {...{ onEdit }}
             />
@@ -98,7 +103,7 @@ export const MulticallConfigEditorUI = ({ className, contracts }: MulticallConfi
             <JobSettingsEdit.Form
                 className={`${_MulticallConfigEditor}-jobsSettings`}
                 daoContractAddress={contracts.dao.address}
-                disabled={!editMode}
+                disabled={!proposalCreationPermitted}
                 multicallContract={contracts.multicall}
                 resetTrigger={childFormsResetRequested}
                 {...{ onEdit }}
@@ -107,6 +112,7 @@ export const MulticallConfigEditorUI = ({ className, contracts }: MulticallConfi
             <MCEChangesProposal
                 classNameRoot={_MulticallConfigEditor}
                 description={proposalDescription}
+                disabled={!proposalCreationPermitted}
                 onDescriptionUpdate={proposalDescriptionUpdate}
                 {...{ changesDiff, editMode, formValues, onCancel, onSubmit }}
             />

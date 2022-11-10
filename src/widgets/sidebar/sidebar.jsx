@@ -40,7 +40,7 @@ export class Sidebar extends Component {
         };
     }
 
-    static walletContext = Wallet.useSelector();
+    static walletContext = Wallet.trySelectorContext();
 
     featureFlagsCalc() {
         viewAccount(STORAGE.addresses.multicall)

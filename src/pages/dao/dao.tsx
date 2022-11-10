@@ -18,7 +18,7 @@ import { DaoJobsTab } from "./jobs/jobs";
 import { DaoConfigTab } from "./config/config";
 import "./dao.scss";
 
-const Ctx = Wallet.useSelector();
+const Ctx = Wallet.trySelectorContext();
 
 interface Props {}
 
@@ -137,10 +137,14 @@ export class DaoPage extends Component<Props, State> {
         const depo = Big(this.fee).plus(MulticallInstance.MIN_BALANCE);
         const daoSearchInput: HTMLInputElement = document.querySelector(".DaoSearch input")!;
 
-        // can user propose a FunctionCall to DAO?
+        /**
+         * Can user propose a FunctionCall to DAO?
+         */
         const canPropose = dao.checkUserPermission(accountId!, "AddProposal", "FunctionCall");
 
-        // can user vote approve a FunctionCall on the DAO?
+        /**
+         * Can user vote approve a FunctionCall on the DAO?
+         */
         const canApprove = dao.checkUserPermission(accountId!, "VoteApprove", "FunctionCall");
 
         const args = {

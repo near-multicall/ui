@@ -1,4 +1,4 @@
-// TODO: use Multical helper class to fetch & store infos, like admins, tokens etc...
+// TODO: use Multicall helper class to fetch & store infos, like admins, tokens etc...
 
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
@@ -11,10 +11,10 @@ import { SputnikDAO } from "../../../shared/lib/contracts/sputnik-dao";
 import { Multicall } from "../../../shared/lib/contracts/multicall";
 import { STORAGE } from "../../../shared/lib/persistent";
 import { errorMsg } from "../../../shared/lib/errors";
-import { useWalletSelector } from "./providers";
+import { tryWalletSelectorContext } from "./providers";
 import "./wallet.scss";
 
-const Ctx = useWalletSelector();
+const Ctx = tryWalletSelectorContext();
 
 interface Props {}
 

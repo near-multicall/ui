@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { ArgsString } from "../../../shared/lib/args";
 import { toNEAR, toYocto } from "../../../shared/lib/converter";
-import { IconLabel, NearIcons, NearLink, Table, Tile } from "../../../shared/ui/components";
+import { IconLabel, NearIcons, NearLink, Table, Tile, Tooltip } from "../../../shared/ui/components";
 import { JobSettingsEditConfig, type JobSettingsEditFeature } from "../config";
 
 interface JobSettingsFormProps extends JobSettingsEditFeature.Inputs {}
@@ -16,7 +16,7 @@ export const JobSettingsForm = ({
     onEdit,
     resetTrigger,
 }: JobSettingsFormProps) => {
-    const [editModeEnabled, editModeSwitch] = useState(!disabled);
+    const [editModeEnabled, editModeSwitch] = useState(false);
 
     const formInitialState: JobSettingsEditFeature.FormState = {
         [JobSettingsEditConfig.ChangesDiffKey.croncatManager]: "",
@@ -29,11 +29,11 @@ export const JobSettingsForm = ({
     ];
 
     const formFields = {
-        croncatManager: useMemo(() => new ArgsString(multicallContract.croncatManager), [disabled, multicallContract]),
+        croncatManager: useMemo(() => new ArgsString(multicallContract.croncatManager), [multicallContract]),
 
         jobBond: useMemo(
             () => new ArgsString(multicallContract.jobBond !== "" ? toNEAR(multicallContract.jobBond) : ""),
-            [disabled, multicallContract]
+            [multicallContract]
         ),
     };
 
@@ -84,9 +84,16 @@ export const JobSettingsForm = ({
                         </IconButton>
                     </>
                 ) : (
-                    <IconButton onClick={() => void editModeSwitch(true)}>
-                        <EditOutlined />
-                    </IconButton>
+                    <Tooltip title={disabled ? "Read-only mode" : "Propose changes"}>
+                        <span>
+                            <IconButton
+                                onClick={() => void editModeSwitch(true)}
+                                {...{ disabled }}
+                            >
+                                <EditOutlined />
+                            </IconButton>
+                        </span>
+                    </Tooltip>
                 ),
             }}
         >

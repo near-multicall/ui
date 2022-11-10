@@ -19,7 +19,7 @@ import "./export.scss";
 const _Export = "Export";
 
 export class Export extends Component {
-    static contextType = Wallet.useSelector();
+    static contextType = Wallet.trySelectorContext();
 
     errors = {
         user: new ArgsError(errorMsg.ERR_INVALID_ADDR, (value) => ArgsAccount.isValid(value), true),

@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { FormEventHandler, HTMLAttributes } from "react";
+import { FormEventHandler, HTMLProps } from "react";
 
 import { ArgsString } from "../../../shared/lib/args";
 import { Button, ButtonGroup, TextInput, Tile } from "../../../shared/ui/components";
@@ -7,9 +7,9 @@ import { MulticallConfigEditorConfig, MulticallConfigEditorWidget } from "../con
 
 import "./mce-changes-proposal.scss";
 
-export interface MCEChangesProposalProps extends HTMLAttributes<HTMLDivElement> {
+export interface MCEChangesProposalProps extends HTMLProps<HTMLDivElement> {
     changesDiff: MulticallConfigEditorWidget.ChangesDiff;
-    classNameRoot: Required<HTMLAttributes<HTMLDivElement>>["className"];
+    classNameRoot: Required<HTMLProps<HTMLDivElement>>["className"];
     description: MulticallConfigEditorWidget.ProposalDescription;
     formValues: { proposalDescription: ArgsString };
     editMode: boolean;
@@ -23,6 +23,7 @@ export const MCEChangesProposal = ({
     className,
     classNameRoot,
     description,
+    disabled,
     formValues,
     editMode,
     onCancel,
@@ -36,7 +37,9 @@ export const MCEChangesProposal = ({
         heading={editMode ? "Changes proposal" : null}
     >
         <p className={`${classNameRoot}-changesProposal-hint`}>
-            Start editing to create config changes proposal template
+            {disabled
+                ? "Current account has no permission to propose changes"
+                : "Start editing to create config changes proposal template"}
         </p>
 
         <div className={`${classNameRoot}-changesProposal-summary`}>
