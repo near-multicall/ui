@@ -314,7 +314,6 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
                 if (e instanceof CallError) args[1] = `Error: ${e.message}`;
             }
 
-        console.log("get display data", payStorageDeposit);
         return {
             name,
             addr,
