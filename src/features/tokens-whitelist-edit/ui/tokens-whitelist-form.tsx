@@ -2,7 +2,7 @@ import { CancelOutlined, DeleteOutlined, EditOutlined, SettingsBackupRestoreOutl
 import { IconButton } from "@mui/material";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { TextInput } from "../../../shared/ui/components";
+import { TextInput, Tooltip } from "../../../shared/ui/components";
 import { ArgsString } from "../../../shared/lib/args";
 import { MulticallInstance } from "../../../entities";
 import { TokensWhitelistEditConfig, type TokensWhitelistEditFeature } from "../config";
@@ -16,7 +16,7 @@ export const TokensWhitelistForm = ({
     onEdit,
     resetTrigger,
 }: TokensWhitelistFormProps) => {
-    const [editModeEnabled, editModeSwitch] = useState(!disabled);
+    const [editModeEnabled, editModeSwitch] = useState(false);
 
     const [addTokens, markForAddition] = useState<TokensWhitelistEditFeature.FormStates["addTokens"]>(new Set()),
         [removeTokens, markForRemoval] = useState<TokensWhitelistEditFeature.FormStates["removeTokens"]>(new Set());
@@ -113,9 +113,16 @@ export const TokensWhitelistForm = ({
                         <CancelOutlined />
                     </IconButton>
                 ) : (
-                    <IconButton onClick={() => void editModeSwitch(true)}>
-                        <EditOutlined />
-                    </IconButton>
+                    <Tooltip title={disabled ? "Read-only mode" : "Propose changes"}>
+                        <span>
+                            <IconButton
+                                onClick={() => void editModeSwitch(true)}
+                                {...{ disabled }}
+                            >
+                                <EditOutlined />
+                            </IconButton>
+                        </span>
+                    </Tooltip>
                 ),
             }}
             itemsAdditional={Array.from(addTokens)}
