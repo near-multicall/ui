@@ -98,7 +98,7 @@ export class WalletComponent extends Component<Props, State> {
         };
 
         this.schema.check({
-            user: accountId,
+            user: accountId ?? "",
             dao: STORAGE.addresses.dao,
         });
 

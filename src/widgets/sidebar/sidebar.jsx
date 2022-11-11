@@ -265,7 +265,7 @@ export class Sidebar extends Component {
                             {
                                 onClick: () =>
                                     window.open(
-                                        `https://${window.NEAR_ENV === "mainnet" ? "testnet" : ""}multicall.app`,
+                                        `https://${window.NEAR_ENV === "mainnet" ? "testnet." : ""}multicall.app`,
                                         "_self"
                                     ),
                                 title: `Switch to ${window.NEAR_ENV === "mainnet" ? "testnet" : "mainnet"}`,
