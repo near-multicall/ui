@@ -57,9 +57,10 @@ export class StorageDeposit extends BaseTask<FormData, Props, State> {
                 }),
             accountId: arx.string().address(),
         })
-        .transform(({ gas, gasUnit, ...rest }) => ({
+        .transform(({ gas, gasUnit, depo, depoUnit, registration_only, ...rest }) => ({
             ...rest,
             gas: arx.big().intoParsed(gasUnit).cast(gas).toFixed(),
+            depo: arx.big().intoParsed(depoUnit).cast(depo).toFixed(),
         }))
         .requireAll()
         .retainAll();
@@ -86,16 +87,6 @@ export class StorageDeposit extends BaseTask<FormData, Props, State> {
             storageBalance: null,
             storageBalanceBounds: null,
         };
-
-        this.schema = this.schema.transform(({ depo, depoUnit, registration_only, ...rest }) => ({
-            ...rest,
-            depo:
-                registration_only && !!this.state.storageBalanceBounds
-                    ? this.state.storageBalanceBounds.min
-                    : arx.big().intoParsed(depoUnit).cast(depo).toFixed(),
-        }));
-
-        this.tryUpdateSm().catch(() => {});
     }
 
     protected override init(
@@ -128,6 +119,8 @@ export class StorageDeposit extends BaseTask<FormData, Props, State> {
                 storageBalance: this.state.storageBalance,
             },
         });
+
+        this.tryUpdateSm().catch(() => {});
     }
 
     static override inferOwnType(json: Call): boolean {
@@ -205,6 +198,17 @@ export class StorageDeposit extends BaseTask<FormData, Props, State> {
     }
 
     public override async validateForm(values: FormData): Promise<FormikErrors<FormData>> {
+        if (this.state.storageBalanceBounds !== null && this.state.storageBalance !== null) {
+            const missing = Big(this.state.storageBalanceBounds.min).sub(this.state.storageBalance.total);
+            values.depo =
+                values.registration_only && !!this.state.storageBalanceBounds
+                    ? arx
+                          .big()
+                          .intoFormatted(values.depoUnit)
+                          .cast(missing.gt(0) ? missing : 0)
+                          .toFixed()
+                    : values.depo;
+        }
         this.setFormData(values);
         await new Promise((resolve) => this.resolveDebounced(resolve));
         await this.tryUpdateSm();
