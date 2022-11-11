@@ -2,6 +2,7 @@ import clsx from "clsx";
 import { FormEventHandler, HTMLProps } from "react";
 
 import { ArgsString } from "../../../shared/lib/args";
+import { toNEAR } from "../../../shared/lib/converter";
 import { Button, ButtonGroup, TextInput, Tile } from "../../../shared/ui/components";
 import { MulticallConfigEditorConfig, MulticallConfigEditorWidget } from "../config";
 
@@ -58,7 +59,7 @@ export const MCEChangesProposal = ({
                                 {(Array.isArray(changesDiff[changesKey])
                                     ? Array.from(changesDiff[changesKey])
                                     : [changesDiff[changesKey]]
-                                ).map((tokenAddress) => (
+                                ).map((data) => (
                                     <li
                                         className={clsx(
                                             `${classNameRoot}-changesProposal-summary-entry-data-chip`,
@@ -67,9 +68,9 @@ export const MCEChangesProposal = ({
                                                 "--" +
                                                 MulticallConfigEditorConfig.ChangesDiffMetadata[changesKey].color
                                         )}
-                                        key={tokenAddress as string}
+                                        key={data as string}
                                     >
-                                        {tokenAddress}
+                                        {isNaN(parseInt(data as string)) ? (data as string) : toNEAR(data as string)}
                                     </li>
                                 ))}
                             </ul>
