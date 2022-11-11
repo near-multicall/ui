@@ -156,7 +156,7 @@ export class WalletComponent extends Component<Props, State> {
                     currentMulticall: newMulticall,
                 });
 
-                this.schema.check({ user: accountId });
+                this.schema.check({ user: accountId ?? "" });
             })
             .finally(() => {
                 let color = Color.RED;
