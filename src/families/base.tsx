@@ -24,14 +24,17 @@ export interface DefaultFormData {
 export interface DisplayData {
     name: string;
     addr: string;
-    actions: {
-        func: string;
-        gas: string;
-        gasUnit: string;
-        depo: string;
-        depoUnit: string;
-        args: string;
-    }[];
+    actions: Record<
+        string,
+        {
+            func: string;
+            gas: string;
+            gasUnit: string;
+            depo: string;
+            depoUnit: string;
+            args: string;
+        }
+    >;
 }
 
 export interface BaseTaskProps {
@@ -41,7 +44,7 @@ export interface BaseTaskProps {
 
 export interface BaseTaskState<TFormData> {
     formData: TFormData;
-    showArgs: boolean;
+    showArgs: Record<string, boolean>;
     isEdited: boolean;
 }
 
@@ -62,7 +65,7 @@ export abstract class BaseTask<
 
     _constructor() {
         this.initState = {
-            showArgs: false,
+            showArgs: { "action-0": false },
             isEdited: false,
         };
 
@@ -164,8 +167,8 @@ export abstract class BaseTask<
         return {
             name,
             addr,
-            actions: [
-                {
+            actions: {
+                "action-0": {
                     func,
                     gas,
                     gasUnit: gasUnit.toString(),
@@ -173,7 +176,7 @@ export abstract class BaseTask<
                     depoUnit: depoUnit.toString(),
                     args,
                 },
-            ],
+            },
         };
     }
 
@@ -246,10 +249,10 @@ export abstract class BaseTask<
                             {addr}
                         </a>
                     </p>
-                    {actions.map(({ func, args, gas, gasUnit, depo, depoUnit }, i) => (
+                    {Object.entries(actions).map(([actionId, { func, args, gas, gasUnit, depo, depoUnit }]) => (
                         <div
                             className="action-data-container"
-                            key={i}
+                            key={actionId}
                         >
                             <p>
                                 <span>Function name</span>
@@ -257,13 +260,25 @@ export abstract class BaseTask<
                             </p>
                             <p className="expandable">
                                 <span>Function arguments</span>
-                                {showArgs ? (
-                                    <a onClick={() => this.setState({ showArgs: false })}>hide</a>
+                                {showArgs?.[actionId] ? (
+                                    <a
+                                        onClick={() =>
+                                            this.setState({ showArgs: { ...this.state.showArgs, [actionId]: false } })
+                                        }
+                                    >
+                                        hide
+                                    </a>
                                 ) : (
-                                    <a onClick={() => this.setState({ showArgs: true })}>show</a>
+                                    <a
+                                        onClick={() =>
+                                            this.setState({ showArgs: { ...this.state.showArgs, [actionId]: true } })
+                                        }
+                                    >
+                                        show
+                                    </a>
                                 )}
                             </p>
-                            {showArgs && <pre className="code">{args}</pre>}
+                            {showArgs?.[actionId] && <pre className="code">{args}</pre>}
                             <p>
                                 <span>Allocated gas</span>
                                 <span className="code">

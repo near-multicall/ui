@@ -146,8 +146,8 @@ export class CustomTask extends BaseTask<FormData> {
         return {
             name,
             addr,
-            actions: [
-                {
+            actions: {
+                "action-0": {
                     func,
                     gas,
                     gasUnit: gasUnit.toString(),
@@ -155,7 +155,7 @@ export class CustomTask extends BaseTask<FormData> {
                     depoUnit: depoUnit.toString(),
                     args: arx.string().json().isValidSync(args) ? JSON.stringify(JSON.parse(args), null, "  ") : args,
                 },
-            ],
+            },
         };
     }
 }

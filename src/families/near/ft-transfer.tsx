@@ -317,20 +317,18 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
         return {
             name,
             addr,
-            actions: [
-                ...(payStorageDeposit
-                    ? [
-                          {
-                              func: "storage_deposit",
-                              gas: sdGas.toString(),
-                              gasUnit: sdGasUnit.toString(),
-                              depo: arx.big().intoFormatted("NEAR").cast(this.state.token.storageBounds.min).toFixed(),
-                              depoUnit: "NEAR",
-                              args: args[0],
-                          },
-                      ]
-                    : []),
-                {
+            actions: {
+                ...(payStorageDeposit && {
+                    "action-1": {
+                        func: "storage_deposit",
+                        gas: sdGas.toString(),
+                        gasUnit: sdGasUnit.toString(),
+                        depo: arx.big().intoFormatted("NEAR").cast(this.state.token.storageBounds.min).toFixed(),
+                        depoUnit: "NEAR",
+                        args: args[0],
+                    },
+                }),
+                "action-0": {
                     func,
                     gas,
                     gasUnit: gasUnit.toString(),
@@ -338,7 +336,7 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
                     depoUnit: depoUnit.toString(),
                     args: payStorageDeposit ? args[1] : args[0],
                 },
-            ],
+            },
         };
     }
 }
