@@ -17,7 +17,7 @@
     flex-flow: column nowrap;
     gap: 0.5 * size.$gap;
     margin-bottom: size.$gap;
-    margin-top: auto;
+    margin-top: size.$gap;
     font-size: size.$text;
     color: color.$light-text;
     .icon {
