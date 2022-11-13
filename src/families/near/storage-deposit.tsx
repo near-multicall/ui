@@ -285,7 +285,7 @@ export class StorageDeposit extends BaseTask<FormData, Props, State> {
                 )}
                 <CheckboxField
                     name="registration_only"
-                    label="Register only"
+                    label="Registration only"
                     checked={values.registration_only}
                 />
                 {!values.registration_only && (
