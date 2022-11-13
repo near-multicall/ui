@@ -30,3 +30,7 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# vscode config
+.vscode/settings.json
+.vscode/extensions.json
