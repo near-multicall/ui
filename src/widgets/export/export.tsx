@@ -381,7 +381,7 @@ export class Export extends Component<Props, State> {
                     initialValues={this.initialValues}
                     initialTouched={Object.keys(this.state.formData).reduce((acc, k) => ({ ...acc, [k]: true }), {})}
                     validate={async (values) => {
-                        this.setFormData(values);
+                        this.setFormData({ ...values, dateTime: this.state.formData.dateTime });
                         await new Promise((resolve) => this.resolveDebounced(resolve));
                         await this.tryUpdateFt();
                         await this.schema.check(
