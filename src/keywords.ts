@@ -21,4 +21,7 @@ export const keywords = {
     multicall: {
         near_transfer: ["pay"],
     },
+    token_farm: {
+        create_token: ["TokenFarm", "treasury"],
+    },
 };

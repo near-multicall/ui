@@ -39,10 +39,10 @@ export class TknFarm {
     // }
 
     async getRequiredDeposit(args: TokenArgs, accountId: string): Promise<string> {
-        return view(this.address, "get_required_deposit", { args, accountId });
+        return view(this.address, "get_required_deposit", { args, account_id: accountId });
     }
 
     async getToken(tokenId: string): Promise<TokenArgs> {
-        return view(this.address, "get_token", { tokenId });
+        return view(this.address, "get_token", { token_id: tokenId });
     }
 }

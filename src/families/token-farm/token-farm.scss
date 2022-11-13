@@ -1,13 +1,13 @@
 @use "../base";
 @use "sass/color";
 
-.tkn-farm-create-token-task {
+.token-farm-create-token-task {
     background-color: color.$yellow;
-    background-image: url("../../app/static/tkn-farm/symbol.png");
+    background-image: url("../../app/static/token-farm/TokenFarm_symbol.png");
     background-size: 60rem;
     // background-blend-mode: luminosity;
     @include base.task-theme(color.$text);
     * > a {
-        color: darken(color.$blue, 20%) !important;
+        color: darken(color.$blue, 30%) !important;
     }
 }

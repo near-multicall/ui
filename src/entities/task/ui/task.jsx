@@ -235,7 +235,7 @@ export class Task extends Component {
                         );
                 }
 
-            case "tkn-farm":
+            case "token_farm":
                 switch (func) {
                     case "create_token":
                         return (
