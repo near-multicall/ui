@@ -1,6 +1,7 @@
 import { addMethod, StringSchema as _StringSchema } from "yup";
-import Reference from "yup/lib/Reference";
+import { Validation } from "../../validation";
 import { hasContract } from "../../contracts/generic";
+import { MintbaseStore } from "../../contracts/mintbase";
 import { Multicall } from "../../contracts/multicall";
 import { SputnikDAO } from "../../contracts/sputnik-dao";
 import { StakingPool } from "../../contracts/staking-pool";
@@ -12,6 +13,7 @@ import { locale, addErrorMethods, ErrorMethods } from "../args-error";
 declare module "yup" {
     interface StringSchema extends ErrorMethods {
         json(message?: string): this;
+        dataUrl(message?: string): this;
         address(message?: string): this;
         contract(message?: string): this;
         sputnikDao(message?: string): this;
@@ -21,6 +23,7 @@ declare module "yup" {
         nftId(addressKey: string, message?: string): this;
         mftId(addressKey: string, message?: string): this;
         stakingPool(message?: string): this;
+        mintbaseStore(message?: string): this;
         intoUrl(): this;
         intoBaseAddress(prefixes?: string[]): this;
         append(appendStr: string): this;
@@ -73,6 +76,15 @@ addMethod(_StringSchema, "contract", function contract(message = locale.string.c
     });
 });
 
+// ensure string is a valid NEAR address with a contract
+addMethod(_StringSchema, "dataUrl", function contract(message = locale.string.dataUrl) {
+    return this.test({
+        name: "data url",
+        message,
+        test: (value) => value != null && Validation.isDataURL(value),
+    });
+});
+
 // ensure string is a valid NEAR address with a SputnikDAO contract
 addMethod(_StringSchema, "sputnikDao", function sputnikDao(message = locale.string.sputnikDao) {
     return this.address().test({
@@ -122,7 +134,7 @@ addMethod(_StringSchema, "ft", function ft(message = locale.string.ft) {
                 return fungibleToken.ready;
             } catch (e) {
                 // TODO check reason for error
-                // console.warn("error occured while checking for multicall instance at", value);
+                // console.warn("error occured while checking for fungible token at", value);
                 return false;
             }
         },
@@ -172,7 +184,7 @@ addMethod(_StringSchema, "mftId", function mftId(addressKey: string, message = l
                 return multiFungibleToken.ready;
             } catch (e) {
                 // TODO check reason for error
-                // console.warn("error occured while checking for multicall instance at", value);
+                // console.warn("error occured while checking for MFT at", value);
                 return false;
             }
         },
@@ -191,7 +203,30 @@ addMethod(_StringSchema, "stakingPool", function stakingPool(message = locale.st
                 return stakingPool.ready;
             } catch (e) {
                 // TODO check reason for error
-                // console.warn("error occured while checking for multicall instance at", value);
+                // console.warn("error occured while checking for staking pool at", value);
+                return false;
+            }
+        },
+    });
+});
+
+// ensure string is a valid NEAR address with a mintbase store contract
+addMethod(_StringSchema, "mintbaseStore", function mintbaseStore(message = locale.string.mintbaseStore) {
+    return this.address().test({
+        name: "mintbaseStore",
+        message,
+        test: async (value) => {
+            if (value == null) return true;
+            const addrParts = value.split(".");
+            const storeName = addrParts[0];
+            const storeFactory = addrParts.slice(1).join(".");
+            if (storeFactory !== MintbaseStore.FACTORY_ADDRESS) return false;
+            try {
+                const isMintbaseStore = await MintbaseStore.isMintbaseStore(storeName);
+                return isMintbaseStore;
+            } catch (e) {
+                // TODO check reason for error
+                // console.warn("error occured while checking for mintbase store at", value);
                 return false;
             }
         },

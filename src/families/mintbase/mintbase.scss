@@ -1,0 +1,28 @@
+@use "sass/color";
+@use "../base";
+
+$mintbase-blue: #070c2b;
+$mintbase-red: #ff2424;
+
+.mintbase-create-store-task,
+.mintbase-transfer-store-ownership-task,
+.mintbase-add-minter-task,
+.mintbase-remove-minter-task {
+    background-color: $mintbase-blue;
+    background-image: url("../../app/static/mintbase/Mintbase_symbol.svg");
+    background-position-x: 42rem;
+    background-position-y: 239rem;
+    background-size: 77rem;
+    @include base.task-theme(color.$light-text);
+}
+
+.mintbase-add-minter-task-edit,
+.mintbase-remove-minter-task-edit {
+    .InfoField-content {
+        display: flex;
+        flex-flow: column nowrap;
+        .minter-account-id {
+            align-self: flex-end;
+        }
+    }
+}

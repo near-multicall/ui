@@ -12,7 +12,7 @@ export class Task extends Component {
         super(props);
 
         this.state = {
-            addr: this.props.task.addr,
+            family: this.props.task.family,
             func: this.props.task.func,
         };
 
@@ -67,10 +67,10 @@ export class Task extends Component {
     }
 
     getTaskType() {
-        const { addr, func } = this.state;
+        const { family, func } = this.state;
         const { json } = this.props;
 
-        switch (addr) {
+        switch (family) {
             case "multicall":
                 switch (func) {
                     case "near_transfer":
@@ -192,6 +192,42 @@ export class Task extends Component {
                     case "storage_unregister":
                         return (
                             <Family.Near.StorageUnregister
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
+                }
+
+            case "mintbase":
+                switch (func) {
+                    case "create_store":
+                        return (
+                            <Family.Mintbase.CreateStore
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
+                    case "transfer_store_ownership":
+                        return (
+                            <Family.Mintbase.TransferStoreOwnership
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
+                    case "grant_minter":
+                        return (
+                            <Family.Mintbase.AddMinter
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
+                    case "revoke_minter":
+                        return (
+                            <Family.Mintbase.RemoveMinter
                                 ref={this.instance}
                                 id={this.id}
                                 json={json}

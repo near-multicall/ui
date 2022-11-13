@@ -13,6 +13,7 @@ const locale = {
     },
     string: {
         json: "value must be a valid json string",
+        dataUrl: "value must be a data URL",
         address: "value must be a valid address",
         contract: "value must have a contract deployed",
         sputnikDao: "address must belong to a sputnik dao contract",
@@ -22,6 +23,7 @@ const locale = {
         nftId: "token id must belong to an nft contract",
         mftId: "token id must belong to a multi-token contract",
         stakingPool: "address must belong to a staking pool",
+        mintbaseStore: "address must belong to a mintbase store",
     },
 };
 
