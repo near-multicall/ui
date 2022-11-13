@@ -16,6 +16,7 @@ export const initialData = {
         "task-i14": { id: "task-i14", addr: "near", func: "storage_unregister" },
         "task-i15": { id: "task-i15", addr: "near", func: "storage_deposit" },
         "task-i16": { id: "task-i16", addr: "multicall", func: "near_transfer" },
+        "task-i17": { id: "task-i17", addr: "tkn-farm", func: "create_token" },
     },
     columns: {
         "column-0": {
@@ -43,6 +44,7 @@ export const initialData = {
                 "task-i14",
                 "task-i15",
                 "task-i16",
+                "task-i17",
             ],
         },
     },

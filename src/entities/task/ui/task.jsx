@@ -199,6 +199,18 @@ export class Task extends Component {
                         );
                 }
 
+            case "tkn-farm":
+                switch (func) {
+                    case "create_token":
+                        return (
+                            <Family.TknFarm.CreateToken
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
+                }
+
             default:
                 for (let family in Family) {
                     if (family === "BaseTask") continue;
