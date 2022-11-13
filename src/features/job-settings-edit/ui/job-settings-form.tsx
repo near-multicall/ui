@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { ArgsString } from "../../../shared/lib/args";
 import { toNEAR, toYocto } from "../../../shared/lib/converter";
-import { IconLabel, NearIcons, NearLink, Table, Tile, Tooltip } from "../../../shared/ui/components";
+import { IconLabel, NearIcon, NearLink, Table, Tile, Tooltip } from "../../../shared/ui/components";
 import { JobSettingsEditConfig, type JobSettingsEditFeature } from "../config";
 
 interface JobSettingsFormProps extends JobSettingsEditFeature.Inputs {}
@@ -145,7 +145,7 @@ export const JobSettingsForm = ({
                             editModeEnabled ? (
                                 <TextField
                                     InputProps={{
-                                        endAdornment: NearIcons.NATIVE_TOKEN_CHARACTER,
+                                        endAdornment: NearIcon.NATIVE_TOKEN_CHARACTER,
                                         inputProps: { min: 0, step: 0.001 },
                                     }}
                                     fullWidth
@@ -155,7 +155,7 @@ export const JobSettingsForm = ({
                                 />
                             ) : (
                                 <IconLabel
-                                    icon={NearIcons.NATIVE_TOKEN_CHARACTER}
+                                    icon={NearIcon.NATIVE_TOKEN_CHARACTER}
                                     label={
                                         jobBond || multicallContract.jobBond !== ""
                                             ? toNEAR(jobBond || multicallContract.jobBond)

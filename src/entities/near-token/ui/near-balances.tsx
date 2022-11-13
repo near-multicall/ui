@@ -1,4 +1,4 @@
-import { IconLabel, NearIcons } from "../../../shared/ui/components";
+import { IconLabel, NearIcon } from "../../../shared/ui/components";
 
 import { NearTokenBalancesModel } from "../model/near-balances";
 import { type NearTokenEntity } from "../config";
@@ -13,7 +13,7 @@ export const nearTokenBalancesRender = ({ contracts }: NearTokenBalancesRenderPr
         : {
               content: [
                   <IconLabel
-                      icon={<NearIcons.NativeTokenFilled />}
+                      icon={<NearIcon.NativeTokenFilled />}
                       label="NEAR"
                   />,
 

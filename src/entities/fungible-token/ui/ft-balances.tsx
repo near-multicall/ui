@@ -1,4 +1,4 @@
-import { IconLabel, NearIcons } from "../../../shared/ui/components";
+import { IconLabel, NearIcon } from "../../../shared/ui/components";
 
 import { FungibleTokenFormat } from "../lib/ft-format";
 import { FungibleTokenBalancesModel } from "../model/ft-balances";
@@ -14,7 +14,7 @@ export const fungibleTokensBalancesRender = ({ contracts }: FungibleTokensBalanc
         : data.map(({ dao, metadata, multicall, total }) => ({
               content: [
                   <IconLabel
-                      icon={metadata.icon ?? <NearIcons.GenericTokenFilled />}
+                      icon={metadata.icon ?? <NearIcon.GenericTokenFilled />}
                       label={metadata.symbol}
                   />,
 

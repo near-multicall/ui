@@ -1,1 +1,1 @@
-export { NearIcons } from "./near/near";
+export { NearIcon } from "./near/near";

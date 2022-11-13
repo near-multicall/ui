@@ -3,7 +3,7 @@ import { FormEventHandler, HTMLProps } from "react";
 
 import { ArgsString } from "../../../shared/lib/args";
 import { toNEAR } from "../../../shared/lib/converter";
-import { Button, ButtonGroup, TextInput, Tile } from "../../../shared/ui/components";
+import { Button, ButtonGroup, NearIcon, TextInput, Tile } from "../../../shared/ui/components";
 import { MulticallConfigEditorConfig, MulticallConfigEditorWidget } from "../config";
 
 import "./mce-changes-proposal.scss";
@@ -45,20 +45,20 @@ export const MCEChangesProposal = ({
 
         <div className={`${classNameRoot}-changesProposal-summary`}>
             {Object.values(MulticallConfigEditorConfig.ChangesDiffKey).map(
-                (changesKey) =>
-                    changesDiff[changesKey].length > 0 && (
+                (ChangesDiffKey) =>
+                    changesDiff[ChangesDiffKey].length > 0 && (
                         <div
                             className={`${classNameRoot}-changesProposal-summary-entry`}
-                            key={changesKey}
+                            key={ChangesDiffKey}
                         >
                             <h3 className={`${classNameRoot}-changesProposal-summary-entry-description`}>
-                                {MulticallConfigEditorConfig.ChangesDiffMetadata[changesKey].description + ":"}
+                                {MulticallConfigEditorConfig.ChangesDiffMetadata[ChangesDiffKey].description + ":"}
                             </h3>
 
                             <ul className={`${classNameRoot}-changesProposal-summary-entry-data`}>
-                                {(Array.isArray(changesDiff[changesKey])
-                                    ? Array.from(changesDiff[changesKey])
-                                    : [changesDiff[changesKey]]
+                                {(Array.isArray(changesDiff[ChangesDiffKey])
+                                    ? Array.from(changesDiff[ChangesDiffKey])
+                                    : [changesDiff[ChangesDiffKey]]
                                 ).map((data) => (
                                     <li
                                         className={clsx(
@@ -66,11 +66,14 @@ export const MCEChangesProposal = ({
 
                                             `${classNameRoot}-changesProposal-summary-entry-data-chip` +
                                                 "--" +
-                                                MulticallConfigEditorConfig.ChangesDiffMetadata[changesKey].color
+                                                MulticallConfigEditorConfig.ChangesDiffMetadata[ChangesDiffKey].color
                                         )}
                                         key={data as string}
                                     >
-                                        {isNaN(parseInt(data as string)) ? (data as string) : toNEAR(data as string)}
+                                        {!isNaN(parseInt(data as string)) &&
+                                        ChangesDiffKey === MulticallConfigEditorConfig.ChangesDiffKey.jobBond
+                                            ? `${toNEAR(data as string)} ${NearIcon.NATIVE_TOKEN_CHARACTER}`
+                                            : (data as string)}
                                     </li>
                                 ))}
                             </ul>
