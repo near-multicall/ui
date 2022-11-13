@@ -4,6 +4,10 @@
 .PopupMenu {
     position: relative;
 
+    svg {
+        display: block;
+    }
+
     &:hover &-content {
         visibility: visible !important;
     }
@@ -12,9 +16,16 @@
         visibility: hidden;
         position: absolute;
         left: size.$sidebar-width;
-        top: 0;
         padding-left: 0.5 * size.$gap;
         width: max-content;
+
+        &.align-top {
+            top: 0;
+        }
+
+        &.align-bottom {
+            bottom: 0;
+        }
 
         ul {
             padding: 0;

@@ -6,20 +6,26 @@ import "./popup-menu.scss";
 
 interface PopupMenuProps {
     icon: ReactNode;
+    align: "top" | "bottom";
     items: { disabled?: boolean; label?: string; onClick?: VoidFunction; title: string }[];
     triggerClassName: string;
 }
 
-export const PopupMenu = ({ icon, items, triggerClassName }: PopupMenuProps) => (
+export const PopupMenu = ({ icon, align = "top", items, triggerClassName }: PopupMenuProps) => (
     <div className={clsx("PopupMenu", triggerClassName)}>
         {icon}
 
-        <div className="PopupMenu-content">
+        <div
+            className={clsx("PopupMenu-content", {
+                "align-top": align === "top",
+                "align-bottom": align === "bottom",
+            })}
+        >
             <ul>
-                {items.map(({ disabled = false, label, onClick, title }) => (
+                {items.map(({ disabled = false, label, onClick, title }, i) => (
                     <li
                         className={clsx({ disabled })}
-                        key={title}
+                        key={i}
                         /*
                          * `undefined` is being used here because native HTML elements
                          * doesn't accept `null` as onClick prop

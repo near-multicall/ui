@@ -1,4 +1,10 @@
-import { DeleteForeverOutlined, FileDownloadOutlined, FileUploadOutlined, ScienceOutlined } from "@mui/icons-material";
+import {
+    DeleteForeverOutlined,
+    FileDownloadOutlined,
+    FileUploadOutlined,
+    MoreHorizOutlined,
+    ScienceOutlined,
+} from "@mui/icons-material";
 import { Icon } from "@mui/material";
 import { Component } from "react";
 import { NavLink } from "react-router-dom";
@@ -213,43 +219,69 @@ export class Sidebar extends Component {
                                     />
                                 </Tooltip>
                             </div>
-
-                            <hr />
                         </>
                     ) : null}
 
-                    <a
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        href="https://twitter.com/near_multicall"
-                    >
-                        <img
-                            src={Twitter}
-                            alt="Twitter"
-                        />
-                    </a>
-                    <a
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        href="https://discord.gg/wc6T6bPvdr"
-                    >
-                        <img
-                            src={Discord}
-                            alt="Discord"
-                        />
-                    </a>
-                    <a
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        href="https://github.com/near-multicall"
-                    >
-                        <img
-                            src={Github}
-                            alt="Github"
-                        />
-                    </a>
-
-                    {/* <img src={Telegram}/> */}
+                    <PopupMenu
+                        icon={<MoreHorizOutlined />}
+                        align="bottom"
+                        items={[
+                            {
+                                title: (
+                                    <div className="socials">
+                                        <a
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            href="https://twitter.com/near_multicall"
+                                        >
+                                            <img
+                                                src={Twitter}
+                                                alt="Twitter"
+                                            />
+                                        </a>
+                                        <a
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            href="https://discord.gg/wc6T6bPvdr"
+                                        >
+                                            <img
+                                                src={Discord}
+                                                alt="Discord"
+                                            />
+                                        </a>
+                                        <a
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            href="https://github.com/near-multicall"
+                                        >
+                                            <img
+                                                src={Github}
+                                                alt="Github"
+                                            />
+                                        </a>
+                                    </div>
+                                ),
+                            },
+                            {
+                                onClick: () =>
+                                    window.open(
+                                        `https://${window.NEAR_ENV === "mainnet" ? "testnet." : ""}multicall.app`,
+                                        "_self"
+                                    ),
+                                title: `Switch to ${window.NEAR_ENV === "mainnet" ? "testnet" : "mainnet"}`,
+                            },
+                            {
+                                title: (
+                                    <div className="legal-disclaimer">
+                                        The software is an open source and provided “as is”, without warranty of any
+                                        kind. Community developed. Not audited. Use at your own risk.
+                                    </div>
+                                ),
+                            },
+                        ]}
+                        triggerClassName="sidebar-button extras"
+                    />
+                    <hr />
                     <Wallet.Selector />
                 </div>
 
