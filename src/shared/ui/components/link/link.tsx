@@ -1,3 +1,5 @@
+import { CopyAllOutlined } from "@mui/icons-material";
+import { IconButton } from "@mui/material";
 import { HTMLProps } from "react";
 import { Tooltip } from "../tooltip";
 
@@ -11,7 +13,14 @@ export interface LinkProps extends Omit<HTMLProps<HTMLAnchorElement>, "children"
 const _Link = "Link";
 
 export const Link = ({ noTooltip = false, title, ...props }: LinkProps) => (
-    <Tooltip content="">
+    <Tooltip
+        arrow
+        content={
+            <IconButton onClick={() => {}}>
+                <CopyAllOutlined fontSize="large" />
+            </IconButton>
+        }
+    >
         <a
             className={_Link}
             target="_blank"
