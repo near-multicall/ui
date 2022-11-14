@@ -17,7 +17,15 @@
     line-height: size.$text;
 
     &-content {
+        display: flex;
         padding: 8.5px 14px;
+        img,
+        svg {
+            margin: auto;
+            max-height: size.$task-height;
+            max-width: 100%;
+            cursor: pointer;
+        }
     }
 
     &.roundtop {

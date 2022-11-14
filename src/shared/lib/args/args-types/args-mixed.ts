@@ -5,6 +5,8 @@ declare module "yup" {
     interface MixedSchema extends ErrorMethods {}
 }
 
-addErrorMethods(_MixedSchema);
+class MixedSchema<T> extends _MixedSchema<T> {}
 
-export { _MixedSchema as MixedSchema };
+addErrorMethods(MixedSchema);
+
+export { MixedSchema };

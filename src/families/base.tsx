@@ -160,7 +160,7 @@ export abstract class BaseTask<
         const { name, addr, func, gas, gasUnit, depo, depoUnit } = this.state.formData;
         let args = "";
         try {
-            args = JSON.stringify(this.toCall().actions[0].args, null, " ");
+            args = JSON.stringify(this.toCall().actions[0].args, null, "  ");
         } catch (e) {
             if (e instanceof CallError) args = `Error: ${e.message}`;
         }

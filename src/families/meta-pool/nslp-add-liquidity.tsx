@@ -1,4 +1,3 @@
-import { DynamicFeedOutlined } from "@mui/icons-material";
 import { Form, useFormikContext } from "formik";
 import { useEffect } from "react";
 import { args as arx } from "../../shared/lib/args/args";
@@ -6,7 +5,7 @@ import { Call, CallError } from "../../shared/lib/call";
 import { MetaPool } from "../../shared/lib/contracts/meta-pool";
 import { TextField, UnitField } from "../../shared/ui/form-fields";
 import { BaseTask, BaseTaskProps, DefaultFormData } from "../base";
-import * as MetaPoolLogo from "../../app/static/meta-pool/MetaPool_symbol.png";
+import * as MetaPoolLogo from "../../app/static/meta-pool/MetaPool_logo.png";
 import "./meta-pool.scss";
 
 type FormData = DefaultFormData;
@@ -28,7 +27,7 @@ export class NslpAddLiquidity extends BaseTask<FormData> {
         .retainAll();
 
     override initialValues: FormData = {
-        name: "Add Liquitiy",
+        name: "Add Liquidity",
         addr: MetaPool.FACTORY_ADDRESS,
         func: "nslp_add_liquidity",
         gas: "0",
@@ -61,7 +60,12 @@ export class NslpAddLiquidity extends BaseTask<FormData> {
     }
 
     static override inferOwnType(json: Call): boolean {
-        return !!json && json.address === MetaPool.FACTORY_ADDRESS && json.actions[0].func === "nslp_add_liquidity";
+        return (
+            !!json &&
+            json.actions.length === 1 &&
+            json.address === MetaPool.FACTORY_ADDRESS &&
+            json.actions[0].func === "nslp_add_liquidity"
+        );
     }
 
     public override toCall(): Call {
@@ -84,7 +88,7 @@ export class NslpAddLiquidity extends BaseTask<FormData> {
     }
 
     public override Editor = (): React.ReactNode => {
-        const { resetForm, validateForm, values } = useFormikContext<FormData>();
+        const { resetForm, validateForm } = useFormikContext();
 
         useEffect(() => {
             resetForm({
@@ -119,7 +123,9 @@ export class NslpAddLiquidity extends BaseTask<FormData> {
                 />
                 <a
                     className="protocol"
-                    href="https://multicall.app"
+                    href="https://metapool.app/"
+                    target="_blank"
+                    rel="noopener noreferrer"
                 >
                     <span>powered by</span>
                     <img

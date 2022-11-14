@@ -1,7 +1,14 @@
 @use "sass/color";
 @use "../base";
 
+$meta-pool-purple: #735de9;
+
 .meta-pool-nslp-add-liquidity-task {
-    background: color.$darkest;
+    background-color: $meta-pool-purple;
+    background-image: url("../../app/static/meta-pool/MetaPool_symbol.svg");
+    background-position-x: 0rem;
+    background-position-y: -2rem;
+    background-repeat: no-repeat;
+    background-size: 12rem;
     @include base.task-theme(color.$light-text);
 }
