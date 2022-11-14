@@ -117,10 +117,6 @@
                 font-size: size.$text;
                 color: color.$dark;
                 max-width: 40em;
-
-                a {
-                    color: darken(color.$blue, 20%) !important;
-                }
             }
 
             .create-multicall {

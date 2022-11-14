@@ -1,2 +1,7 @@
+@use "sass/color";
+
 .Link {
+    color: darken(color.$blue, 30%);
+    text-decoration: none;
+    cursor: pointer;
 }
