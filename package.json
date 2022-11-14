@@ -29,7 +29,7 @@
     "devDependencies": {
         "@babel/core": "^7.17.7",
         "@babel/preset-react": "^7.16.7",
-        "@netlify/plugin-lighthouse": "^3.2.0",
+        "@netlify/plugin-lighthouse": "^4.0.2",
         "@parcel/transformer-sass": "^2.4.1",
         "@types/big.js": "^6.1.5",
         "@types/lodash.debounce": "^4.0.7",
@@ -76,8 +76,8 @@
         "@types/react": "^18.0.0",
         "big.js": "^6.2.1",
         "clsx": "^1.2.1",
-        "formik": "^2.2.9",
         "cron-parser": "^4.6.0",
+        "formik": "^2.2.9",
         "js-base64": "^3.7.2",
         "lodash.debounce": "^4.0.8",
         "luxon": "^3.0.4",
