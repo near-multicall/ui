@@ -2,7 +2,7 @@ import { CancelOutlined, EditOutlined, VisibilityOutlined } from "@mui/icons-mat
 import { IconButton, TextField, TextFieldProps } from "@mui/material";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { ArgsString } from "../../../shared/lib/args";
+import { ArgsString } from "../../../shared/lib/args-old";
 import { toNEAR, toYocto } from "../../../shared/lib/converter";
 import { IconLabel, NearIcon, NearLink, Table, Tile, Tooltip } from "../../../shared/ui/components";
 import { JobSettingsEditConfig, type JobSettingsEditFeature } from "../config";

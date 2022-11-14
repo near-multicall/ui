@@ -1,9 +1,9 @@
 import { Account } from "near-api-js";
 
-import { type Tx, viewAccount, viewState, view } from "../wallet";
+import { ArgsAccount } from "../args-old";
 import { Big, toGas, dateToCron, toYocto } from "../converter";
-import { ArgsAccount } from "../args";
 import { FungibleToken } from "../standards/fungibleToken";
+import { type Tx, viewAccount, viewState, view } from "../wallet";
 
 import type { FunctionCallAction as daoFunctionCallAction, SputnikDAOContract } from "./sputnik-dao";
 

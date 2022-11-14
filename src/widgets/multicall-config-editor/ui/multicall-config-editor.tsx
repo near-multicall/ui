@@ -3,7 +3,7 @@ import { useCallback, useMemo, useState, FormEventHandler, useEffect, useContext
 
 import { MulticallInstance, Wallet } from "../../../entities";
 import { JobSettingsEdit, TokensWhitelistEdit } from "../../../features";
-import { ArgsString } from "../../../shared/lib/args";
+import { ArgsString } from "../../../shared/lib/args-old";
 import { MulticallContract } from "../../../shared/lib/contracts/multicall";
 import { signAndSendTxs } from "../../../shared/lib/wallet";
 import { MulticallConfigEditorConfig, MulticallConfigEditorWidget } from "../config";

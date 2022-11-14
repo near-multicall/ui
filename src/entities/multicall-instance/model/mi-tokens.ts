@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { ArgsAccount } from "../../../shared/lib/args";
+import { ArgsAccount } from "../../../shared/lib/args-old";
 import { MulticallContract } from "../../../shared/lib/contracts/multicall";
 import { Props } from "../../../shared/lib/props";
 
