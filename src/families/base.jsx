@@ -210,7 +210,7 @@ export class BaseTask extends Component {
             >
                 <div className="name">
                     <Tooltip
-                        title="Edit"
+                        content="Edit"
                         disableInteractive
                     >
                         <EditOutlined
@@ -223,7 +223,7 @@ export class BaseTask extends Component {
                     </Tooltip>
                     <div className="edit-pseudo"></div>
                     <Tooltip
-                        title={"Clone card"}
+                        content={"Clone card"}
                         disableInteractive
                     >
                         <MoveDown
@@ -236,7 +236,7 @@ export class BaseTask extends Component {
                     <div className="duplicate-pseudo"></div>
                     <h3>{name.toString()}</h3>
                     <Tooltip
-                        title={"Delete"}
+                        content={"Delete"}
                         disableInteractive
                     >
                         <DeleteOutline

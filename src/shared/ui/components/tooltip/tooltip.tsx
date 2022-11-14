@@ -4,13 +4,19 @@ import "./tooltip.scss";
 
 const _Tooltip = "Tooltip";
 
-interface TooltipProps extends MuiTooltipProps {
-    title: string;
+interface TooltipProps extends Omit<MuiTooltipProps, "title"> {
+    content: MuiTooltipProps["title"];
 }
 
-export const Tooltip = ({ children, title, ...props }: TooltipProps) => (
+export const Tooltip = ({ children, content, ...props }: TooltipProps) => (
     <MuiTooltip
-        title={<h1 className={`${_Tooltip}-title`}>{title}</h1>}
+        title={
+            typeof content === "string" && content.length > 0 ? (
+                <h1 className={`${_Tooltip}-title`}>{content}</h1>
+            ) : (
+                content
+            )
+        }
         {...props}
     >
         {children}

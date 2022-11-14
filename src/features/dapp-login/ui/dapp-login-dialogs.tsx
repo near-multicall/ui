@@ -53,8 +53,8 @@ const DappLoginDialog = ({ className, method, onClose, open, title }: DappLoginD
 
                             {step.hint && (
                                 <Tooltip
+                                    content={step.hint}
                                     placement="right"
-                                    title={step.hint}
                                 >
                                     <InfoOutlined />
                                 </Tooltip>

@@ -204,8 +204,8 @@ export class Sidebar extends Component {
 
                             <div className="sidebar-button">
                                 <Tooltip
+                                    content="Clear All"
                                     placement="right"
-                                    title="Clear All"
                                 >
                                     <DeleteForeverOutlined
                                         className="icon"
