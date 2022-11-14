@@ -3,14 +3,22 @@ import { useEffect } from "react";
 import { args as arx } from "../../shared/lib/args/args";
 import { Call, CallError } from "../../shared/lib/call";
 import { MetaPool } from "../../shared/lib/contracts/meta-pool";
-import { TextField, UnitField } from "../../shared/ui/form-fields";
-import { BaseTask, BaseTaskProps, DefaultFormData } from "../base";
+import { InfoField, TextField, UnitField } from "../../shared/ui/form-fields";
+import { BaseTask, BaseTaskProps, BaseTaskState, DefaultFormData } from "../base";
 import * as MetaPoolLogo from "../../app/static/meta-pool/MetaPool_logo.png";
 import "./meta-pool.scss";
+import { HumanReadableAccount } from "../../shared/lib/contracts/staking-pool";
+import { STORAGE } from "../../shared/lib/persistent";
 
 type FormData = DefaultFormData;
 
-export class NslpAddLiquidity extends BaseTask<FormData> {
+type Props = BaseTaskProps;
+
+type State = BaseTaskState<FormData> & {
+    metaPoolAccount: HumanReadableAccount | null;
+};
+
+export class NslpAddLiquidity extends BaseTask<FormData, Props, State> {
     override uniqueClassName = "meta-pool-nslp-add-liquidity-task";
     override schema = arx
         .object()
@@ -39,6 +47,12 @@ export class NslpAddLiquidity extends BaseTask<FormData> {
     constructor(props: BaseTaskProps) {
         super(props);
         this._constructor();
+        this.state = {
+            ...this.state,
+            metaPoolAccount: null,
+        };
+
+        this.confidentlyUpdateMetaPoolAccount();
     }
 
     protected override init(call: Call<{}> | null): void {
@@ -87,8 +101,17 @@ export class NslpAddLiquidity extends BaseTask<FormData> {
         };
     }
 
+    private async confidentlyUpdateMetaPoolAccount(): Promise<boolean> {
+        const { addr } = this.state.formData;
+        const metaPoolAccount = await new MetaPool(addr).getAccount(STORAGE.addresses.multicall);
+        this.setState({ metaPoolAccount: metaPoolAccount ?? null });
+        window.EDITOR.forceUpdate();
+        return !!metaPoolAccount;
+    }
+
     public override Editor = (): React.ReactNode => {
         const { resetForm, validateForm } = useFormikContext();
+        const { metaPoolAccount } = this.state;
 
         useEffect(() => {
             resetForm({
@@ -99,7 +122,7 @@ export class NslpAddLiquidity extends BaseTask<FormData> {
         }, []);
 
         return (
-            <Form className="edit">
+            <Form className={`edit ${this.uniqueClassName}-edit`}>
                 <TextField
                     name="name"
                     label="Card Name"
@@ -107,12 +130,40 @@ export class NslpAddLiquidity extends BaseTask<FormData> {
                     autoFocus
                 />
                 <div className="empty-line" />
+                {!!metaPoolAccount && (
+                    <InfoField roundtop>
+                        <p className="entry">
+                            <span className="key">Account Id</span>
+                            <a
+                                className="value"
+                                href={arx.string().intoUrl().cast(metaPoolAccount.account_id)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                {metaPoolAccount.account_id}
+                            </a>
+                        </p>
+                        <p className="entry">
+                            <span className="key">Unstaked Balance</span>
+                            <span className="value">{`${arx
+                                .big()
+                                .intoFormatted("NEAR")
+                                .cast(metaPoolAccount.unstaked_balance)} \u24C3`}</span>
+                        </p>
+                        <p className="entry">
+                            <span className="key">Staked Balance</span>
+                            <span className="value">{`${arx
+                                .big()
+                                .intoFormatted("NEAR")
+                                .cast(metaPoolAccount.staked_balance)} \u24C3`}</span>
+                        </p>
+                    </InfoField>
+                )}
                 <UnitField
                     name="depo"
                     unit="depoUnit"
                     options={["NEAR", "yocto"]}
                     label="Amount"
-                    roundtop
                 />
                 <UnitField
                     name="gas"
