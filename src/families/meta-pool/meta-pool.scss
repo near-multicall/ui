@@ -1,0 +1,7 @@
+@use "sass/color";
+@use "../base";
+
+.meta-pool-nslp-add-liquidity-task {
+    background: color.$darkest;
+    @include base.task-theme(color.$light-text);
+}
