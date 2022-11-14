@@ -3,8 +3,8 @@ export { type DesignKitConfigType } from "./config";
 /** Atoms */
 export { Button } from "./button";
 export { ButtonGroup } from "./button-group";
+export { Link, type LinkProps } from "./link";
 export { NearIcon } from "./icons";
-export { NearLink, type NearLinkProps } from "./near-link";
 export { Placeholder } from "./placeholder";
 export { PopupMenu } from "./popup-menu";
 export { Scrollable } from "./scrollable";
@@ -12,6 +12,7 @@ export { Tooltip } from "./tooltip";
 
 /** Molecules */
 export { IconLabel } from "./icon-label";
+export { NearLink, type NearLinkProps } from "./near-link";
 export { TextInput, type TextInputProps, TextInputWithUnits, type TextInputWithUnitsProps } from "./text-input";
 export { Tile, type TileProps } from "./tile";
 
