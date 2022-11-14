@@ -1,7 +1,7 @@
 import { ChangeEvent, Component } from "react";
 import { MenuItem, TextField, TextFieldProps } from "@mui/material";
 
-import { ArgsError, ArgsString } from "../../../lib/args";
+import { ArgsError, ArgsString } from "../../../lib/args-old";
 
 interface TextInputProps extends Pick<TextFieldProps, "className" | "label" | "variant"> {
     error: ArgsError;

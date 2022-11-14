@@ -14,32 +14,45 @@
         flex-flow: row nowrap;
         flex-basis: calc(2 * size.$gap + 0.5 * size.$large-text);
         flex-shrink: 0;
-        max-width: 120rem;
+        width: 20%;
+        max-width: 140rem;
+        min-width: 50ch;
         margin: 0 auto;
 
         .DaoSearch {
             @include mixin.center-items;
             flex-flow: row nowrap;
-            width: auto;
+            width: 100%;
             height: 100%;
 
+            form {
+                width: 100%;
+            }
+
             .MuiTextField-root {
-                width: calc(100% - 2 * size.$gap);
+                width: 100%;
                 max-width: 100ch;
-                text-align: left;
-                margin: 0 size.$gap;
 
-                .MuiInputBase-root {
+                .MuiInput-underline {
                     font-size: size.$large-text;
-                    color: color.$darkish;
 
-                    input {
-                        padding: 0;
-                        padding-left: 0.5 * size.$gap;
+                    &:hover::before,
+                    &::before {
+                        border-bottom-color: color.$darkish;
                     }
-
-                    &.Mui-error {
-                        color: darken(color.$red, 10%);
+                    &:hover::after,
+                    &::after {
+                        border-bottom-color: color.$dark;
+                    }
+                    input {
+                        text-align: center;
+                        font-family: font.$text;
+                        font-weight: 500;
+                        color: color.$dark !important;
+                        &:active,
+                        &:focus {
+                            text-align: left;
+                        }
                     }
                 }
 
@@ -53,16 +66,9 @@
                     display: none;
                 }
             }
-
-            .MuiInputAdornment-root {
-                width: fit-content;
-
-                p {
-                    display: block !important;
-                    font-size: size.$large-text !important;
-                    color: color.$darkish;
-                }
-            }
+        }
+        form {
+            z-index: 1;
         }
     }
 

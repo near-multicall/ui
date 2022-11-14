@@ -1,22 +1,25 @@
-import { InputAdornment } from "@mui/material";
+import { DeleteOutline, EditOutlined, PauseOutlined, PlayArrowOutlined } from "@mui/icons-material";
 import { Base64 } from "js-base64";
 import debounce from "lodash.debounce";
 import { Component, ContextType } from "react";
 
+import { Form, Formik } from "formik";
 import { Wallet } from "../../entities";
-import { signAndSendTxs } from "../../shared/lib/wallet";
-import { ArgsAccount, ArgsError } from "../../shared/lib/args";
-import { SputnikDAO, SputnikUI, ProposalStatus } from "../../shared/lib/contracts/sputnik-dao";
+import { args } from "../../shared/lib/args/args";
+import { fields } from "../../shared/lib/args/args-types/args-object";
 import { Multicall } from "../../shared/lib/contracts/multicall";
-import { toYocto, Big, toGas } from "../../shared/lib/converter";
-import { STORAGE } from "../../shared/lib/persistent";
 import type { ProposalOutput } from "../../shared/lib/contracts/sputnik-dao";
-import { Tabs, TextInput } from "../../shared/ui/components";
+import { SputnikDAO, SputnikUI } from "../../shared/lib/contracts/sputnik-dao";
+import { Big, toGas, toYocto } from "../../shared/lib/converter";
+import { STORAGE } from "../../shared/lib/persistent";
+import { signAndSendTxs } from "../../shared/lib/wallet";
+import { Tabs } from "../../shared/ui/components";
 
-import { DaoFundsTab } from "./funds/funds";
-import { DaoJobsTab } from "./jobs/jobs";
+import { TextField } from "../../shared/ui/form-fields";
 import { DaoConfigTab } from "./config/config";
 import "./dao.scss";
+import { DaoFundsTab } from "./funds/funds";
+import { DaoJobsTab } from "./jobs/jobs";
 
 // minimum balance a multicall instance needs for storage + state.
 const MIN_INSTANCE_BALANCE = toYocto(1); // 1 NEAR
@@ -25,7 +28,9 @@ const Ctx = Wallet.useSelector();
 interface Props {}
 
 interface State {
-    name: ArgsAccount;
+    formData: {
+        addr: string;
+    };
     dao: SputnikDAO;
     multicall: Multicall;
     loading: boolean;
@@ -34,50 +39,91 @@ interface State {
 }
 
 const _DaoPage = "DaoPage";
-
 export class DaoPage extends Component<Props, State> {
+    static contextType = Ctx;
+    declare context: ContextType<typeof Ctx>;
+
+    schema = args
+        .object()
+        .shape({
+            addr: args
+                .object()
+                .shape({
+                    noAddress: args.string().address().retain({ initial: true }),
+                    noDao: args.string().sputnikDao().retain({ initial: true }),
+                    noMulticall: args.string().multicall().retain({
+                        customMessage: "DAO does not have a multicall instance",
+                        initial: true,
+                    }),
+                })
+                .transform((_, addr) => ({
+                    noAddress: addr,
+                    noDao: addr,
+                    noMulticall: this.toMulticallAddress(addr),
+                }))
+                .retain(),
+        })
+        .retain();
+
+    tryLoadInfoDebounced = debounce(() => this.tryLoadInfo(), 400);
+
+    lastAddr: string | null;
+    fee: string = "";
+    formikSetValues?: (fields: State["formData"], shouldValidate?: boolean) => void;
+
     constructor(props: Props) {
         super(props);
 
-        // split DAO address into parent address and rest (name).
-        const deconstructedDaoAddress = ArgsAccount.deconstructAddress(STORAGE.addresses.dao);
+        const addr = STORAGE.addresses.dao;
 
         this.state = {
-            name: new ArgsAccount(deconstructedDaoAddress.name),
-            dao: new SputnikDAO(STORAGE.addresses.dao),
-            multicall: new Multicall(`${deconstructedDaoAddress.name}.${Multicall.FACTORY_ADDRESS}`),
+            formData: {
+                addr,
+            },
+
+            dao: new SputnikDAO(addr),
+            multicall: new Multicall(this.toMulticallAddress(addr)),
+
             loading: false,
             proposed: -1,
             proposedInfo: null,
         };
 
-        this.fee = "";
-        this.lastAddr = "";
+        this.schema.check(this.state.formData);
 
         Multicall.getFactoryFee().then((multicallFactoryFee) => {
             this.fee = multicallFactoryFee;
-            this.loadInfo();
+            this.tryLoadInfo();
         });
+
+        this.lastAddr = null;
     }
 
-    static contextType = Ctx;
-    declare context: ContextType<typeof Ctx>;
+    componentDidMount() {
+        window.SIDEBAR.switchPage("dao");
+        document.addEventListener("onaddressesupdated", (e) => this.onAddressesUpdated(e as CustomEvent));
+    }
 
-    lastAddr: string = "";
-    // Multicall factory fee.
-    fee: string = "";
+    setFormData(newFormData: State["formData"], callback?: () => void | undefined) {
+        this.setState(
+            {
+                formData: {
+                    ...this.state.formData,
+                    ...newFormData,
+                },
+            },
+            callback
+        );
+    }
 
-    errors: { [key: string]: ArgsError } = {
-        address: new ArgsError(
-            "Invalid NEAR address",
-            (input) => ArgsAccount.isValid(`${input.value}.${SputnikDAO.FACTORY_ADDRESS}`),
-            !ArgsAccount.isValid(STORAGE.addresses.dao)
-        ),
-        noDao: new ArgsError("Sputnik DAO not found on given address", (value) => this.errors.noDao.isBad),
-        noContract: new ArgsError("DAO has no multicall instance", (value) => this.errors.noContract.isBad),
-    };
-
-    loadInfoDebounced = debounce(() => this.loadInfo(), 400);
+    toMulticallAddress(addr: string): string {
+        return args
+            .string()
+            .ensure()
+            .intoBaseAddress()
+            .append("." + Multicall.FACTORY_ADDRESS)
+            .cast(addr);
+    }
 
     /**
      * check if DAO has a proposal to create multicall instance.
@@ -99,20 +145,15 @@ export class DaoPage extends Component<Props, State> {
             limit: 100,
         });
         // Look for active "Create multicall" proposals
-        const activeProposals = proposals.filter((proposal) => {
-            // discard if not active proposal to create multicall instance
-            if (
-                !(proposal.kind?.FunctionCall?.receiver_id === Multicall.FACTORY_ADDRESS) ||
-                !(proposal.kind?.FunctionCall?.actions?.[0]?.method_name === "create") ||
-                !(proposal.status === ProposalStatus.InProgress)
-            ) {
-                return false;
-            }
-            // calculate proposal expiration timestamp in nanoseconds
-            const expirationTime = Big(proposal.submission_time).add(proposalPeriod);
-            // check if proposal expired
-            return expirationTime.gt(currentTime) ? true : false;
-        });
+        const activeProposals = proposals.filter(
+            (proposal) =>
+                // discard if not active proposal to create multicall instance
+
+                proposal.kind?.FunctionCall?.receiver_id === Multicall.FACTORY_ADDRESS &&
+                proposal.kind?.FunctionCall?.actions?.[0]?.method_name === "create" &&
+                proposal.status === "InProgress" &&
+                Big(proposal.submission_time).add(proposalPeriod).gt(currentTime)
+        );
 
         // If there many "Create multicall" proposals, return latest.
         if (activeProposals.length > 0) {
@@ -123,10 +164,19 @@ export class DaoPage extends Component<Props, State> {
         else return { proposal_id: -1, proposal_info: null };
     }
 
+    onAddressesUpdated(e: CustomEvent<{ dao: string }>) {
+        if (e.detail.dao !== this.state.formData.addr) {
+            this.setState({
+                multicall: new Multicall(this.toMulticallAddress(e.detail.dao)),
+            });
+            this.formikSetValues?.({ addr: e.detail.dao });
+        }
+    }
+
     createMulticall() {
         const { accountId } = this.context!;
-        const { loading, dao, proposed, proposedInfo } = this.state;
-        const { noContract, noDao } = this.errors;
+        const { loading, dao, proposed, proposedInfo, formData } = this.state;
+        const { noMulticall, noDao } = fields(this.schema, "addr");
 
         if (
             this.fee === "" ||
@@ -135,6 +185,8 @@ export class DaoPage extends Component<Props, State> {
         ) {
             return null;
         }
+
+        const multicallAddress = this.toMulticallAddress(formData.addr);
 
         const depo = Big(this.fee).plus(MIN_INSTANCE_BALANCE);
         const daoSearchInput: HTMLInputElement = document.querySelector(".DaoSearch input")!;
@@ -147,8 +199,7 @@ export class DaoPage extends Component<Props, State> {
 
         const args = {
             proposal: {
-                description: `create multicall instance for this DAO at ${this.state.multicall.address}`,
-
+                description: `create multicall instance for this DAO at ${multicallAddress}`,
                 kind: {
                     FunctionCall: {
                         receiver_id: Multicall.FACTORY_ADDRESS,
@@ -178,9 +229,8 @@ export class DaoPage extends Component<Props, State> {
         };
 
         if (
-            noContract.isBad &&
-            // base.sputnik-dao.near does not exist
-            !noDao.isBad &&
+            noMulticall.isBad() &&
+            !noDao.isBad() && // base.sputnik-dao.near does not exist
             !loading &&
             // disappear while debouncing
             this.lastAddr === daoSearchInput.value
@@ -296,58 +346,119 @@ export class DaoPage extends Component<Props, State> {
         }
     }
 
-    loadInfo() {
-        const { address, noContract, noDao } = this.errors;
-        const { name } = this.state;
+    toLink(address: string, deleteIcon = true) {
+        return (
+            <span>
+                <a
+                    href={args.string().address().intoUrl().cast(address)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    {address}
+                </a>
+                {deleteIcon ? <DeleteOutline /> : null}
+            </span>
+        );
+    }
 
-        const multicallAddress = `${name.value}.${Multicall.FACTORY_ADDRESS}`;
-        const daoAddress = `${name.value}.${SputnikDAO.FACTORY_ADDRESS}`;
+    job(job: any) {
+        return (
+            <div className="JobsList-item">
+                <EditOutlined />
+                <DeleteOutline />
+                {job.is_active ? <PauseOutlined /> : <PlayArrowOutlined />}
+                <pre>{JSON.stringify(job, null, "  ")}</pre>
+            </div>
+        );
+    }
 
-        if (this.lastAddr === name.value) return;
+    tryLoadInfo() {
+        if (this.lastAddr === this.state.formData.addr) return;
+        this.lastAddr = this.state.formData.addr;
+        this.schema.check(this.state.formData).then(() => {
+            const { noDao } = fields(this.schema, "addr");
+            if (!this.schema.isBad()) {
+                // case 0: DAO and Multicall exist
+                this.confidentlyLoadInfo();
+            } else if (!noDao.isBad()) {
+                // case 1: Only DAO exists
+                this.confidentlyLoadOnlyDaoInfo();
+            } else {
+                // case 2: neither exist
+                this.setState({
+                    proposed: -1,
+                    proposedInfo: null,
+                    dao: new SputnikDAO(this.state.formData.addr), // will be invalid
+                });
+            }
+        });
+    }
 
-        this.lastAddr = name.value;
-        noContract.isBad = false;
-        noDao.isBad = false;
+    confidentlyLoadOnlyDaoInfo() {
+        const { addr } = this.state.formData;
 
-        // chosen address violates NEAR AccountId rules.
-        if (address.isBad) {
-            noContract.isBad = true;
-            noDao.isBad = true;
-
-            this.setState({ proposed: -1, proposedInfo: null });
-
-            return;
-        }
+        const multicallAddress = this.toMulticallAddress(addr);
 
         this.setState({ loading: true });
 
-        // initialize DAO and multicall objects
+        // initialize DAO object
+        SputnikDAO.init(addr)
+            .catch((e) => new SputnikDAO(addr))
+            .then((newDao) => {
+                // some error happened during DAO object init.
+                if (!newDao.ready) {
+                    this.setState({
+                        dao: newDao,
+                        multicall: new Multicall(multicallAddress),
+                        loading: false,
+                    });
+                    return;
+                } else {
+                    this.proposalAlreadyExists(newDao)
+                        .catch((e) => {})
+                        .then((proposalData) =>
+                            this.setState({
+                                dao: newDao,
+                                multicall: new Multicall(multicallAddress),
+                                loading: false,
+                                proposed: proposalData?.proposal_id ?? -1,
+                                proposedInfo: (proposalData?.proposal_info as ProposalOutput) ?? null,
+                            })
+                        );
+                }
+            });
+    }
+
+    confidentlyLoadInfo() {
+        const { addr: daoAddress } = this.state.formData;
+
+        const multicallAddress = this.toMulticallAddress(daoAddress);
+
+        this.setState({ loading: true });
+
         Promise.all([
             SputnikDAO.init(daoAddress).catch((e) => new SputnikDAO(daoAddress)),
             Multicall.init(multicallAddress).catch((e) => new Multicall(multicallAddress)),
-        ]).then(([dao, multicall]) => {
-            if (!dao.ready || !multicall.ready) {
-                /*
-                 * DAO or multicall not ready => either no contract on the chosen address
-                 * or some error happened during object initialization.
-                 */
-                noContract.isBad = !multicall.ready;
-                noDao.isBad = !dao.ready;
-
-                this.setState({ dao, multicall, loading: false });
-
-                return;
+        ]).then(([newDao, newMulticall]) => {
+            // some error happened during DAO object init.
+            if (!newDao.ready || !newMulticall.ready) {
+                this.setState({
+                    dao: newDao,
+                    multicall: newMulticall,
+                    loading: false,
+                });
             } else {
-                // DAO correctly initialized, try to fetch multicall info
-                Promise.all([this.proposalAlreadyExists(dao).catch(console.error)]).then(([proposalData]) =>
-                    this.setState(({ proposed }) => ({
-                        dao,
-                        multicall,
-                        loading: false,
-                        proposed: proposalData?.proposal_id || proposed,
-                        proposedInfo: proposalData?.proposal_info || null,
-                    }))
-                );
+                this.proposalAlreadyExists(newDao)
+                    .catch((e) => {})
+                    .then((proposalData) =>
+                        this.setState({
+                            dao: newDao,
+                            multicall: newMulticall,
+                            loading: false,
+                            proposed: proposalData?.proposal_id ?? -1,
+                            proposedInfo: (proposalData?.proposal_info as ProposalOutput) ?? null,
+                        })
+                    );
             }
         });
     }
@@ -356,22 +467,23 @@ export class DaoPage extends Component<Props, State> {
         const { selector: walletSelector } = this.context!;
         const { dao, loading, multicall } = this.state;
 
+        // if user not logged in, remind them to sign in.
         // TODO: only require signIn when DAO has no multicall instance (to know if user can propose or vote on existing proposal to create multicall)
         if (!walletSelector.isSignedIn()) {
             return <div className="DaoPage-content error">Please sign in to continue</div>;
         }
 
-        const displayErrorsList = ["address", "noDao", "noContract"];
-
-        const displayErrors = Object.keys(this.errors)
-            .filter((e) => this.errors[e].isBad && displayErrorsList.includes(e))
-            .map((e) => (
+        // errors to display
+        const displayErrorsList = ["noAddress", "noDao", "noMulticall"];
+        const displayErrors = Object.entries(fields(this.schema, "addr"))
+            .filter(([k, v]) => v.isBad() && displayErrorsList.includes(k))
+            .map(([k, v]) => (
                 <p
-                    key={`p-${e}`}
+                    key={`p-${k}`}
                     className={"red"}
                 >
-                    <span>{this.errors[e].isBad ? "\u2717" : "\u2714"} </span>
-                    {this.errors[e].message}
+                    <span>{v.isBad() ? "\u2717" : "\u2714"} </span>
+                    {v.message()}
                 </p>
             ));
 
@@ -405,56 +517,35 @@ export class DaoPage extends Component<Props, State> {
         );
     }
 
-    onAddressesUpdated() {
-        const { name } = this.state;
-        const daoAccount = new ArgsAccount(STORAGE.addresses.dao);
-
-        if (!(name.value === daoAccount.deconstructAddress().name)) {
-            this.setState(
-                {
-                    name: new ArgsAccount(daoAccount.deconstructAddress().name),
-                    multicall: new Multicall(`${daoAccount.deconstructAddress().name}.${Multicall.FACTORY_ADDRESS}`),
-                },
-
-                () => {
-                    this.errors.address.validOrNull(daoAccount);
-                    this.loadInfo();
-                    this.forceUpdate();
-                }
-            );
-        }
-    }
-
-    componentDidMount(): void {
-        window.SIDEBAR.switchPage("dao");
-        document.addEventListener("onaddressesupdated", () => this.onAddressesUpdated());
-    }
-
     render() {
-        const { name } = this.state;
-
         return (
             <div className="DaoPage">
                 <div className="DaoPage-header">
                     <div className="DaoSearch">
-                        <TextInput
-                            placeholder="Insert DAO name here"
-                            value={name}
-                            error={this.errors.address}
-                            update={() => {
-                                const fullDaoAddr = `${name.value}.${SputnikDAO.FACTORY_ADDRESS}`;
-                                const daoAccount = new ArgsAccount(fullDaoAddr);
-                                if (daoAccount.isValid()) {
-                                    this.loadInfoDebounced();
-                                }
-                                this.forceUpdate();
+                        <Formik
+                            initialValues={{ addr: STORAGE.addresses.dao ?? "" }}
+                            validate={(values) => {
+                                this.setFormData({ addr: values.addr });
+                                this.tryLoadInfoDebounced();
                             }}
-                            InputProps={{
-                                endAdornment: (
-                                    <InputAdornment position="end">{`.${SputnikDAO.FACTORY_ADDRESS}`}</InputAdornment>
-                                ),
+                            onSubmit={() => {}}
+                        >
+                            {({ setValues }) => {
+                                this.formikSetValues = setValues;
+
+                                return (
+                                    <Form>
+                                        <TextField
+                                            name="addr"
+                                            placeholder="Seach for DAOs"
+                                            hiddenLabel={true}
+                                            variant="standard"
+                                            autoFocus
+                                        />
+                                    </Form>
+                                );
                             }}
-                        />
+                        </Formik>
                     </div>
                 </div>
 

@@ -19,8 +19,6 @@ class FungibleToken extends StorageManagement {
     address: string;
     // needs initialization, but start with empty metadata
     metadata: FungibleTokenMetadata = { spec: "", name: "", symbol: "", decimals: -1 };
-    // token total supply
-    totalSupply: string = "";
     // storage balance bounds. Needs initialization, but starts with "0" values
     // Users must have at least the min amount to receive tokens.
     storageBounds: StorageBalanceBounds = { min: "0", max: "0" };
@@ -37,14 +35,10 @@ class FungibleToken extends StorageManagement {
     static async init(tokenAddress: string): Promise<FungibleToken> {
         // fetch token info and mark it ready
         const newToken = new FungibleToken(tokenAddress);
-        const [metadata, totalSupply, storageBounds] = await Promise.all([
+        const [metadata, storageBounds] = await Promise.all([
             // on failure set metadata to default metadata (empty)
             newToken.ftMetadata().catch((err) => {
                 return newToken.metadata;
-            }),
-            // on failure set total supply to default (empty string)
-            newToken.ftTotalSupply().catch((err) => {
-                return newToken.totalSupply;
             }),
             // get storage balance bounds
             newToken.storageBalanceBounds().catch((err) => {
@@ -52,10 +46,9 @@ class FungibleToken extends StorageManagement {
             }),
         ]);
         newToken.metadata = metadata;
-        newToken.totalSupply = totalSupply;
         newToken.storageBounds = storageBounds;
         // set ready to true if token info successfully got updated.
-        if (newToken.totalSupply !== "" && newToken.metadata.decimals >= 0) {
+        if (newToken.metadata.decimals >= 0) {
             newToken.ready = true;
         }
         return newToken;

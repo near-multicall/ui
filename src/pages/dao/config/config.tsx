@@ -1,30 +1,30 @@
-import { AddOutlined, DeleteOutline } from "@mui/icons-material";
+import { DeleteOutline } from "@mui/icons-material";
 import clsx from "clsx";
 import type { HTMLProps } from "react";
+import { args } from "../../../shared/lib/args/args";
 
-import { ArgsAccount } from "../../../shared/lib/args";
 import { Multicall } from "../../../shared/lib/contracts/multicall";
 import { toNEAR } from "../../../shared/lib/converter";
 import { Tile } from "../../../shared/ui/components";
 
 import "./config.scss";
 
-const Link = ({ address, deleteIcon = false }: { address: string; deleteIcon?: boolean }) => {
-    const addr = new ArgsAccount(address);
-
-    return (
-        <span>
+const Link = ({ address, deleteIcon = false }: { address: string; deleteIcon?: boolean }) => (
+    <span>
+        {args.string().address().isValidSync(address) ? (
             <a
-                href={addr.toUrl()}
+                href={args.string().intoUrl().cast(address)}
                 target="_blank"
                 rel="noopener noreferrer"
             >
-                {addr.value}
+                {address}
             </a>
-            {deleteIcon ? <DeleteOutline /> : null}
-        </span>
-    );
-};
+        ) : (
+            <p>{address}</p>
+        )}
+        {deleteIcon ? <DeleteOutline /> : null}
+    </span>
+);
 
 interface DaoConfigTabComponentProps extends HTMLProps<HTMLDivElement> {
     contracts: {

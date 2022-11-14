@@ -2,7 +2,7 @@ import { InfoOutlined } from "@mui/icons-material";
 import clsx from "clsx";
 import { ComponentProps, useCallback, useMemo, useReducer, useState } from "react";
 
-import { ArgsError, ArgsString } from "../../../shared/lib/args";
+import { ArgsError, ArgsString } from "../../../shared/lib/args-old";
 import { STORAGE } from "../../../shared/lib/persistent";
 import { Validation } from "../../../shared/lib/validation";
 import { Dialog, TextInput, Tooltip } from "../../../shared/ui/components";

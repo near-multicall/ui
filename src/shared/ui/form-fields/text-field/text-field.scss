@@ -1,0 +1,111 @@
+@use "sass/font";
+@use "sass/size";
+@use "sass/color";
+@use "sass/mixin";
+
+.TextField {
+    @include mixin.center-items(flex-start);
+    flex-flow: row wrap;
+    width: 100%;
+    &-input {
+        &.MuiTextField-root {
+            p.Mui-error {
+                color: color.$red;
+                font-weight: 800;
+                font-family: font.$text;
+                font-size: size.$small-text;
+                &::before {
+                    content: "Error: ";
+                }
+            }
+            label {
+                font-family: font.$text;
+                font-weight: 800;
+                &.Mui-focused {
+                    color: color.$light-text;
+                }
+                &.Mui-error {
+                    color: color.$red;
+                }
+            }
+            .MuiOutlinedInput-root {
+                .MuiOutlinedInput-input {
+                    color: color.$white;
+                    font-family: font.$code;
+                    font-size: size.$small-text;
+                    line-height: size.$text;
+                }
+                .MuiSelect-select {
+                    height: size.$small-text;
+                }
+                textarea {
+                    @include mixin.no-scrollbar;
+                    white-space: pre;
+                    overflow-x: scroll !important;
+                }
+                fieldset {
+                    border-color: color.$lightish;
+                    border-width: 1px;
+                    box-shadow: inset 0px 0px 30px 0px rgba(color.$white, 0.1);
+                    border-radius: 0.25 * size.$task-radius;
+                    legend {
+                        background-color: color.$black;
+                        margin-left: -2px;
+                        padding: 2px;
+                        border-radius: 20px;
+                        visibility: visible;
+                    }
+                    legend > span {
+                        font-size: 0.75em;
+                        visibility: hidden;
+                    }
+                }
+                &:hover fieldset {
+                    border-color: color.$white;
+                }
+                &.Mui-focused fieldset {
+                    border-color: color.$white;
+                }
+                &.Mui-error fieldset {
+                    border-color: color.$red !important;
+                }
+                &.MuiOutlinedInput-root.MuiInputBase-hiddenLabel legend {
+                    padding: 0;
+                    margin-top: 1px;
+                }
+            }
+            .MuiInput-underline {
+                &:hover::before,
+                &::before {
+                    border-bottom-color: color.$lightish;
+                }
+                &:hover::after,
+                &::after {
+                    border-bottom-color: color.$white;
+                }
+                input {
+                    text-align: center;
+                    font-family: font.$text;
+                    font-weight: 500;
+                    &:active,
+                    &:focus {
+                        text-align: left;
+                    }
+                }
+            }
+            *:not(.MuiOutlinedInput-input) {
+                color: color.$light-text;
+                font-size: 1em;
+            }
+            font-size: size.$text;
+        }
+    }
+    &.roundtop fieldset {
+        border-top-left-radius: 0.75 * size.$task-radius !important;
+        border-top-right-radius: 0.75 * size.$task-radius !important;
+    }
+    &.roundbottom fieldset {
+        border-bottom-left-radius: 0.75 * size.$task-radius !important;
+        border-bottom-right-radius: 0.75 * size.$task-radius !important;
+    }
+}
