@@ -2,28 +2,29 @@ import * as nearAPI from "near-api-js";
 import type { NetworkId } from "@near-wallet-selector/core";
 import { Component } from "react";
 
-import { Task, Layout, Sidebar } from "../../widgets";
+import { Task, Layout, Sidebar, Menu, Editor } from "../../widgets";
+import { WalletComponent } from "../../entities/wallet/ui/wallet";
 
 type CardInfo = {
-    call: object;
+    formData: object;
     showArgs: boolean;
+    isEdited: boolean;
     options: object;
-    errors: object;
 };
 
 type CardCopy = {
     from: string;
     to: string;
-    payload?: CardInfo;
+    payload?: Omit<CardInfo, "isEdited">;
 };
 
 declare global {
     interface Window {
         // Page components
-        DAO: Component;
+        DAO_COMPONENT: Component;
 
-        MENU: Component;
-        EDITOR: Component;
+        MENU: Menu;
+        EDITOR: Editor;
         EXPORT: Component;
 
         LAYOUT: Layout;
@@ -37,7 +38,7 @@ declare global {
         COPY: CardCopy | null;
 
         // Wallet definitions
-        WALLET_COMPONENT: Promise<nearAPI.WalletConnection> | Component;
+        WALLET_COMPONENT: WalletComponent;
         NEAR_ENV: NetworkId;
         nearConfig: any;
     }

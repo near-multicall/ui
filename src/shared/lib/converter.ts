@@ -8,7 +8,9 @@ Big.DP = 40;
 Big.NE = -40;
 Big.PE = 40;
 
-const unitToDecimals: Record<string, number> = {
+export type unit = "NEAR" | "yocto" | "Tgas" | "gas";
+
+const unitToDecimals: Record<unit, number> = {
     NEAR: 24,
     yocto: 0,
     Tgas: 12,
@@ -33,7 +35,7 @@ const toNEAR = (amount: string | number): string => formatTokenAmount(amount.toS
 // NEAR -> yocto
 const toYocto = (amount: string | number): string => parseTokenAmount(amount.toString(), 24);
 
-const convert = (amount: string | number, unit: string, decimals?: number): number | string => {
+const convert = (amount: string | number, unit: unit, decimals?: number): number | string => {
     decimals = decimals ?? unitToDecimals[unit];
 
     return decimals !== undefined && Validation.isSimpleNumberStr(amount.toString())
@@ -75,6 +77,7 @@ export {
     unitToDecimals,
     parseTokenAmount,
     formatTokenAmount,
+    removeTrailingZeros,
     toTGas,
     toGas,
     toNEAR,

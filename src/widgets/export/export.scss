@@ -109,85 +109,9 @@
         flex-direction: column;
         padding-top: size.$smaller-text;
 
-        .unitInput {
-            @include mixin.center-items(center, flex-start);
-            flex-flow: row nowrap;
-
-            .MuiTextField-root {
-                width: unset !important;
-
-                &:first-of-type {
-                    flex: 2 1 auto;
-                }
-
-                &:last-of-type {
-                    flex: 1 0 max-content;
-                    margin-left: 0.25 * size.$gap;
-
-                    .MuiInputBase-root {
-                        width: 100% !important;
-                        font-size: size.$small-text;
-                    }
-                }
-            }
-
-            &:first-of-type .MuiTextField-root {
-                &:first-of-type fieldset {
-                    border-radius: size.$task-radius 0 0 0;
-                }
-
-                &:last-of-type fieldset {
-                    border-radius: 0 size.$task-radius 0 0;
-                }
-            }
-
-            &:last-of-type .MuiTextField-root {
-                &:first-of-type fieldset {
-                    border-radius: 0 0 0 size.$task-radius;
-                }
-
-                &:last-of-type fieldset {
-                    border-radius: 0 0 size.$task-radius 0;
-                }
-            }
-        }
-
-        &-choice {
-            @include mixin.center-items(flex-start, center);
-            flex-flow: row nowrap;
-            width: 100%;
-            margin: 0.25 * size.$gap 0;
-
-            p {
-                color: color.$light-text;
-                font-weight: 800;
-                font-size: size.$small-text;
-            }
-
-            button {
-                height: 2em;
-                margin: 0 0.75ch;
-                padding: 0 1em;
-                border-radius: size.$task-radius;
-                border: 1px solid color.$light;
-                font-size: size.$small-text;
-                font-weight: 800;
-                color: color.$light;
-                background-color: rgba(color.$white, 0.1);
-
-                &.selected {
-                    color: color.$green;
-                    border: 1px solid color.$green;
-                }
-
-                &:hover {
-                    background-color: rgba(color.$white, 0.2);
-                }
-            }
-        }
-
         &-scheduleTime {
-            margin-top: 0.25 * size.$gap !important;
+            // match Mui values
+            margin: 8px 0 4px 0 !important;
         }
 
         .MuiTextField-root {
@@ -233,7 +157,7 @@
                     border-color: color.$lightish;
                     border-width: 1px;
                     box-shadow: inset 0px 0px 30px 0px rgba(color.$white, 0.1);
-                    border-radius: 0;
+                    border-radius: 0.25 * size.$task-radius;
 
                     legend {
                         background-color: color.$black;
@@ -256,20 +180,13 @@
                 }
             }
 
-            .MuiInput-underline {
-                &:hover::before,
-                &::before {
-                    border-bottom-color: color.$lightish;
-                }
-
-                &:hover::after,
-                &::after {
-                    border-bottom-color: color.$white;
-                }
-
-                input {
-                    font-weight: 500;
-                }
+            &.roundtop fieldset {
+                border-top-left-radius: 0.75 * size.$task-radius !important;
+                border-top-right-radius: 0.75 * size.$task-radius !important;
+            }
+            &.roundbottom fieldset {
+                border-bottom-left-radius: 0.75 * size.$task-radius !important;
+                border-bottom-right-radius: 0.75 * size.$task-radius !important;
             }
 
             *:not(input) {
@@ -278,20 +195,6 @@
 
             width: 100%;
             font-size: 1.8rem;
-        }
-
-        & > .MuiTextField-root {
-            &:first-of-type {
-                margin-top: 0;
-            }
-
-            &:first-of-type > .MuiOutlinedInput-root > fieldset {
-                border-radius: size.$task-radius size.$task-radius 0 0;
-            }
-
-            &:last-of-type > .MuiOutlinedInput-root > fieldset {
-                border-radius: 0 0 size.$task-radius size.$task-radius;
-            }
         }
     }
 

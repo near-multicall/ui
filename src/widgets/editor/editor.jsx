@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import AutoAwesomeOutlinedIcon from "@mui/icons-material/AutoAwesomeOutlined";
+import { Formik } from "formik";
 import "./editor.scss";
 
 export class Editor extends Component {
@@ -27,7 +28,19 @@ export class Editor extends Component {
         const editing = window?.TASKS?.find((t) => t.id === editingID)?.instance.current;
 
         return editing ? (
-            <>{editing.renderEditor()}</>
+            <Formik
+                initialValues={editing.state.formData}
+                validate={(values) => editing.validateForm(values)}
+                onSubmit={() => {}}
+                key={editingID}
+            >
+                <>
+                    <editing.Editor />
+                    {/* <h1>
+                        {editing.state.formData.name}, {editingID}
+                    </h1> */}
+                </>
+            </Formik>
         ) : (
             <div className="placeholder">
                 <AutoAwesomeOutlinedIcon className="huge-icon" />

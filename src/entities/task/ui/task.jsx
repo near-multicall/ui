@@ -25,10 +25,9 @@ export class Task extends Component {
 
             if (from) {
                 COPY.payload = {
-                    call: from.call,
+                    formData: from.state.formData,
                     showArgs: from.state.showArgs,
                     options: from.options,
-                    errors: from.errors,
                 };
             }
         }
@@ -40,11 +39,10 @@ export class Task extends Component {
             this.child = existent.child;
 
             window.TEMP = {
-                call: this.instance.current.call,
+                formData: this.instance.current.state.formData,
                 showArgs: this.instance.current.state.showArgs,
                 isEdited: this.instance.current.state.isEdited,
                 options: this.instance.current.options,
-                errors: this.instance.current.errors,
             };
         } else {
             this.instance = React.createRef();
@@ -75,14 +73,6 @@ export class Task extends Component {
         switch (addr) {
             case "multicall":
                 switch (func) {
-                    case "withdraw_from_ref":
-                        return (
-                            <Family.Ref.Withdraw
-                                ref={this.instance}
-                                id={this.id}
-                                json={json}
-                            />
-                        );
                     case "near_transfer":
                         return (
                             <Family.Multicall.Transfer
@@ -97,19 +87,111 @@ export class Task extends Component {
                 switch (func) {
                     case "ft_transfer":
                         return (
-                            <Family.Near.Transfer
+                            <Family.Near.FtTransfer
                                 ref={this.instance}
                                 id={this.id}
                                 json={json}
                             />
                         );
-                }
-
-            case "ref-finance":
-                switch (func) {
-                    case "swap":
+                    case "ft_transfer_call":
                         return (
-                            <Family.Ref.Swap
+                            <Family.Near.FtTransferCall
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
+                    case "nft_transfer":
+                        return (
+                            <Family.Near.NftTransfer
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
+                    case "nft_transfer_call":
+                        return (
+                            <Family.Near.NftTransferCall
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
+                    case "nft_approve":
+                        return (
+                            <Family.Near.NftApprove
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
+                    case "nft_revoke":
+                        return (
+                            <Family.Near.NftRevoke
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
+                    case "mft_transfer":
+                        return (
+                            <Family.Near.MftTransfer
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
+                    case "mft_transfer_call":
+                        return (
+                            <Family.Near.MftTransferCall
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
+                    case "deposit_and_stake":
+                        return (
+                            <Family.Near.DepositAndStake
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
+                    case "unstake":
+                        return (
+                            <Family.Near.Unstake
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
+                    case "withdraw":
+                        return (
+                            <Family.Near.Withdraw
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
+                    case "storage_deposit":
+                        return (
+                            <Family.Near.StorageDeposit
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
+                    case "storage_withdraw":
+                        return (
+                            <Family.Near.StorageWithdraw
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
+                    case "storage_unregister":
+                        return (
+                            <Family.Near.StorageUnregister
                                 ref={this.instance}
                                 id={this.id}
                                 json={json}
@@ -134,7 +216,7 @@ export class Task extends Component {
                 }
 
                 return (
-                    <Family.BaseTask
+                    <Family.CustomTask
                         ref={this.instance}
                         id={this.id}
                         json={json}
@@ -160,7 +242,7 @@ export class Task extends Component {
                             zIndex: snapshot.isDragging ? 10 : 1,
                         }}
                     >
-                        {/* <h1 style={{paddingLeft: "20px"}}>{this.id}</h1> */}
+                        {/* <h1 style={{ paddingLeft: "20px" }}>{this.id}</h1> */}
                         {this.child}
                     </div>
                 )}

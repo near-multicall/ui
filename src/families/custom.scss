@@ -1,0 +1,10 @@
+@use "sass/color";
+@use "./base";
+
+.custom-task {
+    background: color.$lightest;
+    @include base.task-theme(color.$text);
+    * > a {
+        color: darken(color.$blue, 20%) !important;
+    }
+}

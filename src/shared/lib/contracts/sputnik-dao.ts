@@ -2,13 +2,13 @@
 
 import { view, viewAccount } from "../wallet";
 import { toGas, Big } from "../converter";
-import { ArgsAccount } from "../args";
 import { STORAGE } from "../persistent";
 import { Base64 } from "js-base64";
 import { FungibleToken } from "../standards/fungibleToken";
 
 import type { MulticallArgs } from "./multicall";
 import type { Tx } from "../wallet";
+import { args } from "../args/args";
 
 const FACTORY_ADDRESS_SELECTOR: Record<string, string> = {
     mainnet: "sputnik-dao.near",
@@ -40,6 +40,7 @@ const CONTRACT_CODE_HASHES_SELECTOR: Record<string, string[]> = {
         "ZGdM2TFdQpcXrxPxvq25514EViyi9xBSboetDiB3Uiq", // 2.0
         "8LN56HLNjvwtiNb6pRVNSTMtPgJYqGjAgkVSHRiK5Wfv", // v2.1 (with gas fix)
         "783vth3Fg8MBBGGFmRqrytQCWBpYzUcmHoCq4Mo8QqF5", // v3.0
+        "xJQXQqHWiL4d88Df73Dq9JS1BevArkdxLkFWbUfxJMG", // v3.0?? (new factory re-deployment. See: https://explorer.testnet.near.org/transactions/GPu4qHL5X2qCw4bNJS4aJ9BQoBg8sJhujUfutfZ7b3yA )
     ],
 };
 
@@ -67,11 +68,11 @@ type Policy = {
     default_vote_policy: object;
     // Proposal bond. (u128 as a string)
     proposal_bond: string;
-    // Expiration period for proposals in nanoseconds. (u64 as a string)
+    // Expiration period for proposals in nanoseconds. (u64)
     proposal_period: string;
     // Bond for claiming a bounty. (u128 as a string)
     bounty_bond: string;
-    // Period in which giving up on bounty is not punished. (u64 as a string)
+    // Period in which giving up on bounty is not punished. (u64)
     bounty_forgiveness_period: string;
 };
 
@@ -406,7 +407,7 @@ class SputnikDAO {
 
         // check output validity: DAO address is valid NEAR address
         // and proposal ID is a positive number
-        if (ArgsAccount.isValid(daoAddr) && propId >= 0) {
+        if (args.string().address().isValidSync(daoAddr) && propId >= 0) {
             return { dao: daoAddr, proposalId: propId };
         }
         // outputs invalid

@@ -1,0 +1,67 @@
+@use "sass/mixin";
+@use "sass/size";
+@use "sass/color";
+@use "sass/font";
+
+.ChoiceField {
+    display: flex;
+    flex-flow: column nowrap;
+
+    box-shadow: inset 0px 0px 30px 0px rgba(color.$white, 0.1);
+    border-radius: 0.25 * size.$task-radius;
+
+    // match Mui values
+    margin: 8px 0 4px 0;
+    padding: 8.5px 14px;
+
+    color: color.$white;
+    font-family: font.$text;
+    font-size: size.$small-text;
+    line-height: size.$text;
+
+    &-input {
+        @include mixin.center-items(flex-start, center);
+        flex-flow: row nowrap;
+        width: 100%;
+
+        p {
+            color: color.$light-text;
+            font-weight: 800;
+            font-size: size.$small-text;
+        }
+
+        button {
+            height: 2em;
+            margin: 0 0.75ch;
+            padding: 0 1em;
+            border-radius: size.$task-radius;
+            border: 1px solid color.$light;
+            font-size: size.$small-text;
+            font-weight: 800;
+            color: color.$light;
+            background-color: rgba(color.$white, 0.1);
+
+            &.selected {
+                color: color.$green;
+                border: 1px solid color.$green;
+            }
+
+            &:hover {
+                background-color: rgba(color.$white, 0.2);
+            }
+        }
+    }
+
+    &-content > *:first-child {
+        margin-top: 0.5 * size.$gap !important;
+    }
+
+    &.roundtop {
+        border-top-left-radius: 0.75 * size.$task-radius !important;
+        border-top-right-radius: 0.75 * size.$task-radius !important;
+    }
+    &.roundbottom {
+        border-bottom-left-radius: 0.75 * size.$task-radius !important;
+        border-bottom-right-radius: 0.75 * size.$task-radius !important;
+    }
+}
