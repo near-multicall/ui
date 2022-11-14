@@ -74,10 +74,10 @@ export class CreateStore extends BaseTask<FormData, Props, State> {
             gas: arx.big().gas(),
             depo: arx.big().token(),
         })
-        .transform(({ gas, gasUnit, amount, amountUnit, ...rest }) => ({
+        .transform(({ gas, gasUnit, depo, depoUnit, ...rest }) => ({
             ...rest,
             gas: arx.big().intoParsed(gasUnit).cast(gas),
-            amount: arx.big().intoParsed(amountUnit).cast(amount),
+            depo: arx.big().intoParsed(depoUnit).cast(depo),
         }))
         .requireAll()
         .retainAll();
@@ -140,7 +140,7 @@ export class CreateStore extends BaseTask<FormData, Props, State> {
         const { iconDataUrl } = this.state;
 
         if (!arx.big().isValidSync(gas)) throw new CallError("Failed to parse gas input value", this.props.id);
-        if (!arx.big().isValidSync(depo)) throw new CallError("Failed to parse amount input value", this.props.id);
+        if (!arx.big().isValidSync(depo)) throw new CallError("Failed to parse depo input value", this.props.id);
 
         return {
             address: addr,
