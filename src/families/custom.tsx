@@ -1,10 +1,8 @@
-import { DeleteOutline, EditOutlined, MoveDown } from "@mui/icons-material";
-import clsx from "clsx";
 import { Form, useFormikContext } from "formik";
 import { useEffect } from "react";
 import { args as arx } from "../shared/lib/args/args";
 import { Call, CallError } from "../shared/lib/call";
-import { Tooltip } from "../shared/ui/components";
+import { toGas } from "../shared/lib/converter";
 import { TextField, UnitField } from "../shared/ui/form-fields";
 import { BaseTask, BaseTaskProps, DefaultFormData, DisplayData } from "./base";
 import "./custom.scss";
@@ -21,7 +19,8 @@ export class CustomTask extends BaseTask<FormData> {
             addr: arx.string().contract(),
             func: arx.string(),
             args: arx.string().json(),
-            gas: arx.big().gas(),
+            // ensure gas is > 0
+            gas: arx.big().gas().min("1", "cannot have 0 gas"),
             depo: arx.big().token(),
         })
         .transform(({ gas, gasUnit, depo, depoUnit, ...rest }) => ({
@@ -147,8 +146,8 @@ export class CustomTask extends BaseTask<FormData> {
         return {
             name,
             addr,
-            actions: [
-                {
+            actions: {
+                "action-0": {
                     func,
                     gas,
                     gasUnit: gasUnit.toString(),
@@ -156,7 +155,7 @@ export class CustomTask extends BaseTask<FormData> {
                     depoUnit: depoUnit.toString(),
                     args: arx.string().json().isValidSync(args) ? JSON.stringify(JSON.parse(args), null, "  ") : args,
                 },
-            ],
+            },
         };
     }
 }

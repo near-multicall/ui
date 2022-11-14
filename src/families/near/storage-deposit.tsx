@@ -11,8 +11,6 @@ import { BaseTask, BaseTaskProps, BaseTaskState, DefaultFormData } from "./../ba
 import "./near.scss";
 
 type FormData = DefaultFormData & {
-    amount: string;
-    amountUnit: unit | number;
     accountId: string;
     registration_only: boolean;
 };
@@ -32,7 +30,7 @@ export class StorageDeposit extends BaseTask<FormData, Props, State> {
         .shape({
             addr: arx.string().contract(),
             gas: arx.big().gas(),
-            amount: arx
+            depo: arx
                 .big()
                 .token()
                 .test({
@@ -59,11 +57,10 @@ export class StorageDeposit extends BaseTask<FormData, Props, State> {
                 }),
             accountId: arx.string().address(),
         })
-        .transform(({ gas, gasUnit, depo, amount, ...rest }) => ({
+        .transform(({ gas, gasUnit, depo, depoUnit, registration_only, ...rest }) => ({
             ...rest,
-            amount,
-            depo: amount,
             gas: arx.big().intoParsed(gasUnit).cast(gas).toFixed(),
+            depo: arx.big().intoParsed(depoUnit).cast(depo).toFixed(),
         }))
         .requireAll()
         .retainAll();
@@ -74,10 +71,8 @@ export class StorageDeposit extends BaseTask<FormData, Props, State> {
         func: "storage_deposit",
         gas: "7.5",
         gasUnit: "Tgas",
-        depo: "1",
-        depoUnit: "yocto",
-        amount: "0",
-        amountUnit: "NEAR",
+        depo: "0",
+        depoUnit: "NEAR",
         accountId: STORAGE.addresses.multicall,
         registration_only: true,
     };
@@ -92,16 +87,6 @@ export class StorageDeposit extends BaseTask<FormData, Props, State> {
             storageBalance: null,
             storageBalanceBounds: null,
         };
-
-        this.schema = this.schema.transform(({ amount, amountUnit, registration_only, ...rest }) => ({
-            ...rest,
-            amount:
-                registration_only && !!this.state.storageBalanceBounds
-                    ? this.state.storageBalanceBounds.min
-                    : arx.big().intoParsed(amountUnit).cast(amount).toFixed(),
-        }));
-
-        this.tryUpdateSm().catch(() => {});
     }
 
     protected override init(
@@ -115,7 +100,7 @@ export class StorageDeposit extends BaseTask<FormData, Props, State> {
                 addr: call.address,
                 func: call.actions[0].func,
                 gas: arx.big().intoFormatted(this.initialValues.gasUnit).cast(call.actions[0].gas).toFixed(),
-                amount: call.actions[0].depo,
+                depo: arx.big().intoFormatted(this.initialValues.depoUnit).cast(call.actions[0].depo).toFixed(),
                 accountId: call.actions[0].args?.account_id ?? STORAGE.addresses.multicall,
                 registration_only: call.actions[0].args?.registration_only ?? true,
             };
@@ -135,18 +120,7 @@ export class StorageDeposit extends BaseTask<FormData, Props, State> {
             },
         });
 
-        if (call !== null)
-            this.tryUpdateSm().then((res) =>
-                this.setFormData({
-                    amount: res
-                        ? arx
-                              .big()
-                              .intoFormatted(this.state.formData.amountUnit)
-                              .cast(this.state.formData.amount)
-                              .toFixed()
-                        : this.state.formData.amount,
-                })
-            );
+        this.tryUpdateSm().catch(() => {});
     }
 
     static override inferOwnType(json: Call): boolean {
@@ -159,15 +133,15 @@ export class StorageDeposit extends BaseTask<FormData, Props, State> {
     }
 
     public override toCall(): Call {
-        const { addr, func, gas, gasUnit, amount, amountUnit, accountId, registration_only } = this.state.formData;
+        const { addr, func, gas, gasUnit, depo, depoUnit, accountId, registration_only } = this.state.formData;
 
         if (!arx.big().isValidSync(gas)) throw new CallError("Failed to parse gas input value", this.props.id);
-        if (!arx.big().isValidSync(amount)) throw new CallError("Failed to parse amount input value", this.props.id);
+        if (!arx.big().isValidSync(depo)) throw new CallError("Failed to parse deposit input value", this.props.id);
 
         const amt =
             registration_only && !!this.state.storageBalanceBounds
                 ? this.state.storageBalanceBounds.min
-                : arx.big().intoParsed(amountUnit).cast(amount).toFixed();
+                : arx.big().intoParsed(depoUnit).cast(depo).toFixed();
 
         return {
             address: addr,
@@ -224,8 +198,17 @@ export class StorageDeposit extends BaseTask<FormData, Props, State> {
     }
 
     public override async validateForm(values: FormData): Promise<FormikErrors<FormData>> {
-        values.depo = values.amount;
-        values.depoUnit = values.amountUnit;
+        if (this.state.storageBalanceBounds !== null && this.state.storageBalance !== null) {
+            const missing = Big(this.state.storageBalanceBounds.min).sub(this.state.storageBalance.total);
+            values.depo =
+                values.registration_only && !!this.state.storageBalanceBounds
+                    ? arx
+                          .big()
+                          .intoFormatted(values.depoUnit)
+                          .cast(missing.gt(0) ? missing : 0)
+                          .toFixed()
+                    : values.depo;
+        }
         this.setFormData(values);
         await new Promise((resolve) => this.resolveDebounced(resolve));
         await this.tryUpdateSm();
@@ -285,14 +268,14 @@ export class StorageDeposit extends BaseTask<FormData, Props, State> {
                 )}
                 <CheckboxField
                     name="registration_only"
-                    label="Register only"
+                    label="Registration only"
                     checked={values.registration_only}
                 />
                 {!values.registration_only && (
                     <UnitField
-                        name="amount"
+                        name="depo"
                         label="Amount"
-                        unit="amountUnit"
+                        unit="depoUnit"
                         options={["NEAR", "yocto"]}
                     />
                 )}

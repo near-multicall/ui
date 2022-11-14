@@ -40,6 +40,7 @@ const CONTRACT_CODE_HASHES_SELECTOR: Record<string, string[]> = {
         "ZGdM2TFdQpcXrxPxvq25514EViyi9xBSboetDiB3Uiq", // 2.0
         "8LN56HLNjvwtiNb6pRVNSTMtPgJYqGjAgkVSHRiK5Wfv", // v2.1 (with gas fix)
         "783vth3Fg8MBBGGFmRqrytQCWBpYzUcmHoCq4Mo8QqF5", // v3.0
+        "xJQXQqHWiL4d88Df73Dq9JS1BevArkdxLkFWbUfxJMG", // v3.0?? (new factory re-deployment. See: https://explorer.testnet.near.org/transactions/GPu4qHL5X2qCw4bNJS4aJ9BQoBg8sJhujUfutfZ7b3yA )
     ],
 };
 

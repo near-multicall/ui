@@ -29,7 +29,7 @@ export class NftRevoke extends BaseTask<FormData, Props, State> {
         .object()
         .shape({
             addr: arx.string().nft(),
-            gas: arx.big().gas().min(toGas("1")).max(toGas("250")),
+            gas: arx.big().gas().min(toGas("1"), "minimum 1 Tgas").max(toGas("250"), "maximum 250 Tgas"),
             depo: arx.big().token(),
             tokenId: arx
                 .string()
@@ -62,7 +62,7 @@ export class NftRevoke extends BaseTask<FormData, Props, State> {
         name: "NFT Revoke",
         addr: "",
         func: "nft_revoke",
-        gas: "0",
+        gas: "10",
         gasUnit: "Tgas",
         depo: "1",
         depoUnit: "yocto",

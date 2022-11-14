@@ -405,7 +405,6 @@ export class DaoPage extends Component<Props, State> {
         SputnikDAO.init(addr)
             .catch((e) => new SputnikDAO(addr))
             .then((newDao) => {
-                if (!newDao) return;
                 // some error happened during DAO object init.
                 if (!newDao.ready) {
                     this.setState({
@@ -422,8 +421,8 @@ export class DaoPage extends Component<Props, State> {
                                 dao: newDao,
                                 multicall: new Multicall(multicallAddress),
                                 loading: false,
-                                proposed: proposalData?.proposal_id || -1,
-                                proposedInfo: (proposalData?.proposal_info as ProposalOutput) || null,
+                                proposed: proposalData?.proposal_id ?? -1,
+                                proposedInfo: (proposalData?.proposal_info as ProposalOutput) ?? null,
                             })
                         );
                 }
@@ -441,7 +440,6 @@ export class DaoPage extends Component<Props, State> {
             SputnikDAO.init(daoAddress).catch((e) => new SputnikDAO(daoAddress)),
             Multicall.init(multicallAddress).catch((e) => new Multicall(multicallAddress)),
         ]).then(([newDao, newMulticall]) => {
-            if (!newDao || !newMulticall) return;
             // some error happened during DAO object init.
             if (!newDao.ready || !newMulticall.ready) {
                 this.setState({
@@ -457,8 +455,8 @@ export class DaoPage extends Component<Props, State> {
                             dao: newDao,
                             multicall: newMulticall,
                             loading: false,
-                            proposed: proposalData?.proposal_id || -1,
-                            proposedInfo: (proposalData?.proposal_info as ProposalOutput) || null,
+                            proposed: proposalData?.proposal_id ?? -1,
+                            proposedInfo: (proposalData?.proposal_info as ProposalOutput) ?? null,
                         })
                     );
             }

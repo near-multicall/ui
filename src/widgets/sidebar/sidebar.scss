@@ -106,3 +106,14 @@
         }
     }
 }
+
+.extras {
+    margin-top: auto;
+    .socials {
+        @include mixin.center-items(space-around);
+    }
+    .legal-disclaimer {
+        font-size: size.$small-text;
+        max-width: 25ch;
+    }
+}

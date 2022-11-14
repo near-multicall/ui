@@ -98,7 +98,7 @@ export class WalletComponent extends Component<Props, State> {
         };
 
         this.schema.check({
-            user: accountId,
+            user: accountId ?? "",
             dao: STORAGE.addresses.dao,
         });
 
@@ -156,7 +156,7 @@ export class WalletComponent extends Component<Props, State> {
                     currentMulticall: newMulticall,
                 });
 
-                this.schema.check({ user: accountId });
+                this.schema.check({ user: accountId ?? "" });
             })
             .finally(() => {
                 let color = Color.RED;
