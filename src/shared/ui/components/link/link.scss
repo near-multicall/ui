@@ -4,4 +4,22 @@
     color: darken(color.$blue, 30%);
     text-decoration: none;
     cursor: pointer;
+
+    &-tooltip {
+        background-color: color.$darkish;
+
+        &.MuiTooltip-tooltip {
+            background-color: color.$darkish;
+        }
+
+        &-arrow,
+        &-arrow.MuiTooltip-arrow {
+            color: color.$darkish;
+        }
+
+        &-button,
+        &-button.MuiButtonBase-root {
+            color: color.$white;
+        }
+    }
 }
