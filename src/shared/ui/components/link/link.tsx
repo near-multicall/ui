@@ -3,7 +3,7 @@ import { Tooltip } from "../tooltip";
 
 import "./link.scss";
 
-export interface LinkProps extends HTMLProps<HTMLAnchorElement> {
+export interface LinkProps extends Omit<HTMLProps<HTMLAnchorElement>, "children"> {
     noTooltip?: boolean;
     title?: string;
 }

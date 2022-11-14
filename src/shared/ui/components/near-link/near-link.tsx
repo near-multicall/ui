@@ -15,8 +15,7 @@ export const NearLink = ({ address }: NearLinkProps) => {
             href={addr.toUrl()}
             target="_blank"
             rel="noopener noreferrer"
-        >
-            {addr.value}
-        </Link>
+            title={addr.value}
+        />
     );
 };
