@@ -273,8 +273,8 @@ export class Sidebar extends Component {
                             {
                                 title: (
                                     <div className="legal-disclaimer">
-                                        The software is an open source and provided “as is”, without warranty of any
-                                        kind. Community developed. Not audited. Use at your own risk.
+                                        The software is open source and provided “as is”, without warranty of any kind.
+                                        Community developed. Not audited. Use at your own risk.
                                     </div>
                                 ),
                             },
