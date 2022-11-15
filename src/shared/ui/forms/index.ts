@@ -7,6 +7,7 @@ export { FormRadioGroup } from "./elements/form-radio-group";
 export { CheckboxField } from "./fields/checkbox-field";
 export { ChoiceField } from "./fields/choice-field";
 export { FormRadio } from "./fields/form-radio";
+export { FileField } from "./fields/file-field";
 export { InfoField } from "./fields/info-field";
 export { SelectField } from "./fields/select-field";
 export { TextField } from "./fields/text-field";
