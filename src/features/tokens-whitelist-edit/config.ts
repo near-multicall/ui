@@ -2,7 +2,7 @@ import { HTMLProps } from "react";
 
 import { MulticallTokensWhitelistChangesDiffKey, type MulticallConfigDiff } from "../../shared/lib/contracts/multicall";
 import { MulticallInstanceEntity } from "../../entities";
-import { DesignKitConfigType } from "../../shared/ui/components";
+import { DesignKitConfigType } from "../../shared/ui/design";
 
 namespace TokensWhitelistEditFeature {
     export type ChangesDiffKey = MulticallTokensWhitelistChangesDiffKey;

@@ -1,4 +1,4 @@
-import { NearLink, type NearLinkProps } from "../../../shared/ui/components";
+import { NearLink, type NearLinkProps } from "../../../shared/ui/design";
 
 interface MulticallInstanceAdminProps extends NearLinkProps {}
 

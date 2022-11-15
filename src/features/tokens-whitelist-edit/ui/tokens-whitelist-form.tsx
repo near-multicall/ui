@@ -2,7 +2,7 @@ import { CancelOutlined, DeleteOutlined, EditOutlined, SettingsBackupRestoreOutl
 import { IconButton } from "@mui/material";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { TextInput, Tooltip } from "../../../shared/ui/components";
+import { TextInput, Tooltip } from "../../../shared/ui/design";
 import { ArgsString } from "../../../shared/lib/args-old";
 import { MulticallInstance } from "../../../entities";
 import { TokensWhitelistEditConfig, type TokensWhitelistEditFeature } from "../config";

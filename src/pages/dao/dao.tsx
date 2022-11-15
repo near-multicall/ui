@@ -13,7 +13,7 @@ import { SputnikDAO, SputnikUI } from "../../shared/lib/contracts/sputnik-dao";
 import { Big, toGas, toYocto } from "../../shared/lib/converter";
 import { STORAGE } from "../../shared/lib/persistent";
 import { signAndSendTxs } from "../../shared/lib/wallet";
-import { Tabs } from "../../shared/ui/components";
+import { Tabs } from "../../shared/ui/design";
 
 import { TextField } from "../../shared/ui/form-kit";
 import { DaoConfigTab } from "./config/config";

@@ -5,7 +5,7 @@ import { ComponentProps, useCallback, useMemo, useReducer, useState } from "reac
 import { ArgsError, ArgsString } from "../../../shared/lib/args-old";
 import { STORAGE } from "../../../shared/lib/persistent";
 import { Validation } from "../../../shared/lib/validation";
-import { Dialog, TextInput, Tooltip } from "../../../shared/ui/components";
+import { Dialog, TextInput, Tooltip } from "../../../shared/ui/design";
 import { DappLoginConfig as Config } from "../config";
 import { DappLoginDialogsModel } from "../model/dapp-login-dialogs";
 

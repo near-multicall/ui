@@ -16,7 +16,7 @@ import { Wallet } from "../../entities/wallet";
 import { DappLogin } from "../../features";
 import { STORAGE } from "../../shared/lib/persistent";
 import { viewAccount } from "../../shared/lib/wallet";
-import { PopupMenu, Tooltip } from "../../shared/ui/components";
+import { PopupMenu, Tooltip } from "../../shared/ui/design";
 
 import { LoadFromJsonDialog, LoadFromProposalDialog, SaveAsJsonDialog, ClearAllDialog } from "./dialogs.jsx";
 

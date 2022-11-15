@@ -1,7 +1,7 @@
 import { NavLink } from "react-router-dom";
 
 import { Big, toTGas } from "../../../shared/lib/converter";
-import { DataInspector, IconLabel } from "../../../shared/ui/components";
+import { DataInspector, IconLabel } from "../../../shared/ui/design";
 
 import { JobConfig, type JobEntity } from "../config";
 import "./job.scss";

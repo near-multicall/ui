@@ -3,7 +3,7 @@ import { FormEventHandler, HTMLProps } from "react";
 
 import { ArgsString } from "../../../shared/lib/args-old";
 import { toNEAR } from "../../../shared/lib/converter";
-import { Button, ButtonGroup, NearIcon, TextInput, Tile } from "../../../shared/ui/components";
+import { Button, ButtonGroup, NearIcon, TextInput, Tile } from "../../../shared/ui/design";
 import { MulticallConfigEditorConfig, MulticallConfigEditorWidget } from "../config";
 
 import "./mce-changes-proposal.scss";

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { ArgsString } from "../../../shared/lib/args-old";
 import { toNEAR, toYocto } from "../../../shared/lib/converter";
-import { IconLabel, NearIcon, NearLink, Table, Tile, Tooltip } from "../../../shared/ui/components";
+import { IconLabel, NearIcon, NearLink, Table, Tile, Tooltip } from "../../../shared/ui/design";
 import { JobSettingsEditConfig, type JobSettingsEditFeature } from "../config";
 
 interface JobSettingsFormProps extends JobSettingsEditFeature.Inputs {}

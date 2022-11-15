@@ -1,7 +1,7 @@
 import { PreviewOutlined } from "@mui/icons-material";
 import { ComponentProps } from "react";
 
-import { PopupMenu } from "../../../shared/ui/components";
+import { PopupMenu } from "../../../shared/ui/design";
 import { DappLoginConfig as Config } from "../config";
 import { DappLoginDialogsModel } from "../model/dapp-login-dialogs";
 

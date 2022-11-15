@@ -2,7 +2,7 @@ import Icon from "@mui/material/Icon";
 import clsx from "clsx";
 import { Component } from "react";
 
-import { Tabs } from "../../shared/ui/components";
+import { Tabs } from "../../shared/ui/design";
 import { Builder } from "../builder/builder.jsx";
 import { Editor } from "../editor/editor.jsx";
 import { Export } from "../export/export";

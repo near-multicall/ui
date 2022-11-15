@@ -1,4 +1,4 @@
-import { Scrollable, Table, Tile } from "../../../shared/ui/components";
+import { Scrollable, Table, Tile } from "../../../shared/ui/design";
 import { MulticallInstanceAdminsModel } from "../model/mi-admins";
 import { type MulticallInstanceEntity } from "../config";
 

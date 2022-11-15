@@ -1,6 +1,6 @@
 import clsx from "clsx";
 
-import { Scrollable, Table, Tile } from "../../../shared/ui/components";
+import { Scrollable, Table, Tile } from "../../../shared/ui/design";
 import { JobModel } from "../model/job";
 import { type JobEntity } from "../config";
 

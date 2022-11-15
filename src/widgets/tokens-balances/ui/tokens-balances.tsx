@@ -1,6 +1,6 @@
 import clsx from "clsx";
 
-import { Tile, Scrollable, Table } from "../../../shared/ui/components";
+import { Tile, Scrollable, Table } from "../../../shared/ui/design";
 import { FungibleToken, NearToken } from "../../../entities";
 
 import { type TokensBalancesWidget } from "../config";

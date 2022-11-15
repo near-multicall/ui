@@ -1,4 +1,4 @@
-import { IconLabel, NearIcon } from "../../../shared/ui/components";
+import { IconLabel, NearIcon } from "../../../shared/ui/design";
 
 import { FungibleTokenFormat } from "../lib/ft-format";
 import { FungibleTokenBalancesModel } from "../model/ft-balances";

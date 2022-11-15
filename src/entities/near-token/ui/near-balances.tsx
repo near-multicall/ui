@@ -1,4 +1,4 @@
-import { IconLabel, NearIcon } from "../../../shared/ui/components";
+import { IconLabel, NearIcon } from "../../../shared/ui/design";
 
 import { NearTokenBalancesModel } from "../model/near-balances";
 import { type NearTokenEntity } from "../config";

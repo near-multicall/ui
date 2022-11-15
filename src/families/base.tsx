@@ -7,7 +7,7 @@ import { args as arx } from "../shared/lib/args/args";
 import { fields, ObjectSchema } from "../shared/lib/args/args-types/args-object";
 import { Call, CallError } from "../shared/lib/call";
 import { unit } from "../shared/lib/converter";
-import { Tooltip } from "../shared/ui/components";
+import { Tooltip } from "../shared/ui/design";
 import "./base.scss";
 import { FormikErrors } from "formik";
 

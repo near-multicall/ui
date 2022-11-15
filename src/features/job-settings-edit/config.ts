@@ -2,7 +2,7 @@ import { HTMLProps } from "react";
 
 import { MulticallInstance, MulticallInstanceEntity } from "../../entities";
 import { MulticallConfigDiff, MulticallContract } from "../../shared/lib/contracts/multicall";
-import { DesignKitConfigType } from "../../shared/ui/components";
+import { DesignKitConfigType } from "../../shared/ui/design";
 
 namespace JobSettingsEditFeature {
     export type ChangesDiffKey = MulticallInstanceEntity.ParamKey;

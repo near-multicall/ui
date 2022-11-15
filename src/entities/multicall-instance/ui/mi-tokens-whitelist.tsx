@@ -1,4 +1,4 @@
-import { Scrollable, Table, type TableProps, Tile, TileProps } from "../../../shared/ui/components";
+import { Scrollable, Table, type TableProps, Tile, TileProps } from "../../../shared/ui/design";
 import { MulticallInstanceTokensModel } from "../model/mi-tokens";
 import { type MulticallInstanceEntity } from "../config";
 
