@@ -35,7 +35,7 @@ export const MCEChangesProposal = ({
         classes={{
             content: clsx(`${classNameRoot}-changesProposal`, { "is-inEditMode": Boolean(editMode) }, className),
         }}
-        heading={editMode ? "Changes proposal" : null}
+        heading={editMode ? "Summary" : null}
     >
         <p className={`${classNameRoot}-changesProposal-hint`}>
             {disabled

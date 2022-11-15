@@ -1,9 +1,10 @@
-.DaoConfigTab {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
+@use "sass/mixin";
+@use "sass/size";
 
-    grid-template-areas:
-        "MulticallConfigEditor MulticallConfigEditor"
-        "MulticallConfigEditor MulticallConfigEditor";
+.DaoConfigTab {
+    margin: size.$gap !important;
+    padding: 0 !important;
+    overflow-y: scroll;
+    border-radius: size.$task-radius;
+    @include mixin.no-scrollbar;
 }

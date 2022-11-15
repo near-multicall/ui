@@ -40,19 +40,19 @@
 
     &--highlighted {
         &--blue {
-            background-color: color.$blue;
+            border-left: 2 * size.$gap solid color.$blue;
         }
 
         &--green {
-            background-color: color.$green;
+            border-left: 2 * size.$gap solid color.$green;
         }
 
         &--red {
-            background-color: color.$red;
+            border-left: 2 * size.$gap solid color.$red;
         }
 
         &--yellow {
-            background-color: color.$yellow;
+            border-left: 2 * size.$gap solid color.$yellow;
         }
     }
 
