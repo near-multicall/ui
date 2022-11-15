@@ -183,10 +183,6 @@
     }
 }
 
-.task-container {
-    @include task-theme(color.$text);
-}
-
 form.edit {
     @include mixin.full;
     @include mixin.center-items(flex-start);
