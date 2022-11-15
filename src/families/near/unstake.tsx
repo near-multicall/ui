@@ -7,14 +7,14 @@ import { fields } from "../../shared/lib/args/args-types/args-object";
 import { Call, CallError } from "../../shared/lib/call";
 import { toGas, unit, formatTokenAmount } from "../../shared/lib/converter";
 import { StakingPool } from "../../shared/lib/contracts/staking-pool";
-import { CheckboxField, TextField, UnitField } from "../../shared/ui/form-kit";
+import { CheckboxField, TextField, UnitField } from "../../shared/ui/forms";
 import { BaseTask, BaseTaskProps, BaseTaskState } from "../base";
 import "./near.scss";
 import { STORAGE } from "../../shared/lib/persistent";
 
 import type { DefaultFormData } from "../base";
 import type { HumanReadableAccount } from "../../shared/lib/contracts/staking-pool";
-import { InfoField } from "../../shared/ui/form-kit/fields/info-field";
+import { InfoField } from "../../shared/ui/forms/fields/info-field";
 
 type FormData = DefaultFormData & {
     amount: string;

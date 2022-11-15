@@ -6,7 +6,7 @@ import { fields } from "../../shared/lib/args/args-types/args-object";
 import { Call, CallError } from "../../shared/lib/call";
 import { Big, toGas, unit } from "../../shared/lib/converter";
 import { FungibleToken } from "../../shared/lib/standards/fungibleToken";
-import { TextField, UnitField, InfoField, CheckboxField } from "../../shared/ui/form-kit";
+import { TextField, UnitField, InfoField, CheckboxField } from "../../shared/ui/forms";
 import { BaseTask, BaseTaskProps, BaseTaskState, DefaultFormData, DisplayData } from "../base";
 import "./near.scss";
 

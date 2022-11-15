@@ -15,7 +15,7 @@ import { STORAGE } from "../../shared/lib/persistent";
 import { signAndSendTxs } from "../../shared/lib/wallet";
 import { Tabs } from "../../shared/ui/design";
 
-import { TextField } from "../../shared/ui/form-kit";
+import { TextField } from "../../shared/ui/forms";
 import { DaoConfigTab } from "./config/config";
 import "./dao.scss";
 import { DaoFundsTab } from "./funds/funds";

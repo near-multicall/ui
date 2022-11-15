@@ -6,7 +6,7 @@ import { Call, CallError } from "../../shared/lib/call";
 import { Big, unit } from "../../shared/lib/converter";
 import { STORAGE } from "../../shared/lib/persistent";
 import { StorageManagement, StorageBalance, StorageBalanceBounds } from "../../shared/lib/standards/storageManagement";
-import { CheckboxField, InfoField, TextField, UnitField } from "../../shared/ui/form-kit";
+import { CheckboxField, InfoField, TextField, UnitField } from "../../shared/ui/forms";
 import { BaseTask, BaseTaskProps, BaseTaskState, DefaultFormData } from "./../base";
 import "./near.scss";
 
