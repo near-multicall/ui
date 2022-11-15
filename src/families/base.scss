@@ -210,6 +210,9 @@ form.edit {
             font-size: size.$large-text;
             height: size.$large-text;
         }
+        span {
+            white-space: nowrap;
+        }
         &:hover {
             text-decoration: underline;
             color: color.$light-text !important;
