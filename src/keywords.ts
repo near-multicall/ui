@@ -21,6 +21,12 @@ export const keywords = {
     multicall: {
         near_transfer: ["pay"],
     },
+    mintbase: {
+        create_store: ["create store"],
+        grant_minter: ["add minter"],
+        revoke_minter: ["remove minter"],
+        transfer_store_ownership: ["transfer store ownership"],
+    },
     token_farm: {
         create_token: ["TokenFarm", "treasury"],
     },
