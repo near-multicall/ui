@@ -14,10 +14,23 @@ export interface LinkProps extends Omit<HTMLProps<HTMLAnchorElement>, "children"
 
 const _Link = "Link";
 
-export const Link = ({ href, label, noTooltip = false, ...props }: LinkProps) => {
+export const Link = ({ href, label, noTooltip = true, ...props }: LinkProps) => {
     const text = label && label.length > 0 ? label : href;
 
-    return (
+    const element = (
+        <a
+            className={_Link}
+            target="_blank"
+            rel="noopener noreferrer"
+            {...{ ...props, href }}
+        >
+            {text}
+        </a>
+    );
+
+    return noTooltip ? (
+        element
+    ) : (
         <Tooltip
             arrow
             classes={{ arrow: `${_Link}-tooltip-arrow`, tooltip: `${_Link}-tooltip` }}
@@ -35,14 +48,7 @@ export const Link = ({ href, label, noTooltip = false, ...props }: LinkProps) =>
             followCursor
             leaveDelay={3000}
         >
-            <a
-                className={_Link}
-                target="_blank"
-                rel="noopener noreferrer"
-                {...{ ...props, href }}
-            >
-                {text}
-            </a>
+            {element}
         </Tooltip>
     );
 };
