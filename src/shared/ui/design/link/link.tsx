@@ -1,6 +1,6 @@
 import { CopyAllOutlined } from "@mui/icons-material";
-import { IconButton } from "@mui/material";
-import { HTMLProps, useCallback } from "react";
+import { Button } from "@mui/material";
+import { forwardRef, HTMLProps, MutableRefObject, useCallback } from "react";
 
 import { Tooltip } from "../tooltip";
 
@@ -14,41 +14,44 @@ export interface LinkProps extends Omit<HTMLProps<HTMLAnchorElement>, "children"
 
 const _Link = "Link";
 
-export const Link = ({ href, label, noTooltip = true, ...props }: LinkProps) => {
+export const Link = ({ href, label, noTooltip = false, ...props }: LinkProps) => {
     const text = label && label.length > 0 ? label : href;
 
-    const element = (
+    const Element = forwardRef((forwardedProps, ref) => (
         <a
             className={_Link}
             target="_blank"
+            ref={ref as MutableRefObject<HTMLAnchorElement>}
             rel="noopener noreferrer"
-            {...{ ...props, href }}
+            {...{ ...forwardedProps, ...props, href }}
         >
             {text}
         </a>
-    );
+    ));
 
     return noTooltip ? (
-        element
+        <Element />
     ) : (
         <Tooltip
             arrow
             classes={{ arrow: `${_Link}-tooltip-arrow`, tooltip: `${_Link}-tooltip` }}
             content={
-                <IconButton
+                <Button
                     classes={{ root: `${_Link}-tooltip-button` }}
                     onClick={useCallback(() => void navigator.clipboard.writeText(text), [text])}
+                    startIcon={
+                        <CopyAllOutlined
+                            color="inherit"
+                            fontSize="inherit"
+                        />
+                    }
                 >
-                    <CopyAllOutlined
-                        color="inherit"
-                        fontSize="large"
-                    />
-                </IconButton>
+                    Copy
+                </Button>
             }
-            followCursor
-            leaveDelay={3000}
+            leaveDelay={2000}
         >
-            {element}
+            <Element />
         </Tooltip>
     );
 };

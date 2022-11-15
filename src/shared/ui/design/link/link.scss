@@ -1,4 +1,5 @@
 @use "sass/color";
+@use "sass/size";
 
 .Link {
     color: darken(color.$blue, 30%);
@@ -6,19 +7,20 @@
     cursor: pointer;
 
     &-tooltip {
-        background-color: color.$darkish;
+        background-color: color.$darkest;
 
         &.MuiTooltip-tooltip {
-            background-color: color.$darkish;
+            background-color: color.$darkest;
         }
 
         &-arrow,
         &-arrow.MuiTooltip-arrow {
-            color: color.$darkish;
+            color: color.$darkest;
         }
 
         &-button,
         &-button.MuiButtonBase-root {
+            font-size: size.$small-text;
             color: color.$white;
         }
     }
