@@ -5,7 +5,8 @@
 
 $meta-pool-purple: #735de9;
 
-.meta-pool-nslp-add-liquidity-task {
+.meta-pool-nslp-add-liquidity-task,
+.meta-pool-nslp-remove-liquidity-task {
     background-color: $meta-pool-purple;
     background-image: url("../../app/static/meta-pool/MetaPool_symbol.svg");
     background-position-x: 0rem;
@@ -15,7 +16,8 @@ $meta-pool-purple: #735de9;
     @include base.task-theme(color.$light-text);
 }
 
-.meta-pool-nslp-add-liquidity-task-edit {
+.meta-pool-nslp-add-liquidity-task-edit,
+.meta-pool-nslp-remove-liquidity-task-edit {
     .InfoField-content {
         display: flex;
         flex-flow: column nowrap;

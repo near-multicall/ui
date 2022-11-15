@@ -3,13 +3,19 @@ import { useEffect } from "react";
 import { args as arx } from "../../shared/lib/args/args";
 import { Call, CallError } from "../../shared/lib/call";
 import { GetAccountInfoResult, MetaPool } from "../../shared/lib/contracts/meta-pool";
-import { InfoField, TextField, UnitField } from "../../shared/ui/form-fields";
+import { CheckboxField, InfoField, TextField, UnitField } from "../../shared/ui/form-fields";
 import { BaseTask, BaseTaskProps, BaseTaskState, DefaultFormData } from "../base";
 import * as MetaPoolLogo from "../../app/static/meta-pool/MetaPool_logo.png";
 import "./meta-pool.scss";
 import { STORAGE } from "../../shared/lib/persistent";
+import { Big, unit } from "../../shared/lib/converter";
+import { fields } from "../../shared/lib/args/args-types/args-object";
 
-type FormData = DefaultFormData;
+type FormData = DefaultFormData & {
+    amount: string;
+    amountUnit: unit | number;
+    removeAll: boolean;
+};
 
 type Props = BaseTaskProps;
 
@@ -17,30 +23,48 @@ type State = BaseTaskState<FormData> & {
     metaPoolAccountInfo: GetAccountInfoResult | null;
 };
 
-export class NslpAddLiquidity extends BaseTask<FormData, Props, State> {
-    override uniqueClassName = "meta-pool-nslp-add-liquidity-task";
+export class NslpRemoveLiquidity extends BaseTask<FormData, Props, State> {
+    override uniqueClassName = "meta-pool-nslp-remove-liquidity-task";
     override schema = arx
         .object()
         .shape({
             gas: arx.big().gas(),
-            depo: arx.big().token().min("1000000000000000000000000", "a minimum of 1 NEAR is required"),
+            amount: arx
+                .big()
+                .token()
+                .test({
+                    name: "dynamic max",
+                    message: "You don't own this many LP shares",
+                    test: (value, ctx) => {
+                        if (value == null || ctx.options.context?.metaPoolAccountInfo?.nslp_shares == null) return true;
+                        try {
+                            if (Big(value).gt(ctx.options.context.metaPoolAccountInfo.nslp_shares)) return false;
+                        } catch (e) {}
+                        return true;
+                    },
+                })
+                .requiredWhen("removeAll", (removeAll) => !removeAll),
         })
-        .transform(({ gas, gasUnit, depo, depoUnit, ...rest }) => ({
+        .transform(({ gas, gasUnit, amount, amountUnit, removeAll, ...rest }) => ({
             ...rest,
+            removeAll,
             gas: arx.big().intoParsed(gasUnit).cast(gas),
-            depo: arx.big().intoParsed(depoUnit).cast(depo),
+            amount: removeAll ? null : arx.big().intoParsed(amountUnit).cast(amount),
         }))
         .requireAll()
         .retainAll();
 
     override initialValues: FormData = {
-        name: "Add Liquidity",
+        name: "Remove Liquidity",
         addr: MetaPool.FACTORY_ADDRESS,
-        func: "nslp_add_liquidity",
+        func: "nslp_remove_liquidity",
         gas: "20",
         gasUnit: "Tgas",
-        depo: "10",
+        depo: "0",
         depoUnit: "NEAR",
+        amount: "0",
+        amountUnit: "NEAR",
+        removeAll: false,
     };
 
     constructor(props: BaseTaskProps) {
@@ -54,13 +78,18 @@ export class NslpAddLiquidity extends BaseTask<FormData, Props, State> {
         this.confidentlyUpdateMetaPoolAccount();
     }
 
-    protected override init(call: Call<{}> | null): void {
+    protected override init(call: Call<{ amount: string }> | null): void {
         if (call !== null) {
             const fromCall = {
                 addr: call.address,
                 func: call.actions[0].func,
                 gas: arx.big().intoFormatted(this.initialValues.gasUnit).cast(call.actions[0].gas).toFixed(),
                 depo: arx.big().intoFormatted(this.initialValues.depoUnit).cast(call.actions[0].depo).toFixed(),
+                amount: arx
+                    .big()
+                    .intoFormatted(this.initialValues.amountUnit)
+                    .cast(call.actions[0].args.amount)
+                    .toFixed(),
             };
             this.initialValues = Object.keys(this.initialValues).reduce((acc, k) => {
                 const v = fromCall[k as keyof typeof fromCall];
@@ -69,7 +98,7 @@ export class NslpAddLiquidity extends BaseTask<FormData, Props, State> {
         }
 
         this.state = { ...this.state, formData: this.initialValues };
-        this.schema.check(this.state.formData);
+        this.schema.check(this.state.formData, { context: { metaPoolAccountInfo: this.state.metaPoolAccountInfo } });
     }
 
     static override inferOwnType(json: Call): boolean {
@@ -77,22 +106,30 @@ export class NslpAddLiquidity extends BaseTask<FormData, Props, State> {
             !!json &&
             json.actions.length === 1 &&
             json.address === MetaPool.FACTORY_ADDRESS &&
-            json.actions[0].func === "nslp_add_liquidity"
+            json.actions[0].func === "nslp_remove_liquidity"
         );
     }
 
     public override toCall(): Call {
-        const { addr, func, gas, gasUnit, depo, depoUnit } = this.state.formData;
+        const { addr, func, gas, gasUnit, depo, depoUnit, amount, amountUnit, removeAll } = this.state.formData;
 
         if (!arx.big().isValidSync(gas)) throw new CallError("Failed to parse gas input value", this.props.id);
         if (!arx.big().isValidSync(depo)) throw new CallError("Failed to parse deposit value", this.props.id);
+        if (removeAll && this.state.metaPoolAccountInfo?.nslp_shares === undefined)
+            throw new CallError("Lacking metadata", this.props.id);
+        if (!removeAll && !arx.big().isValidSync(amount))
+            throw new CallError("Failed to parse amount value", this.props.id);
 
         return {
             address: addr,
             actions: [
                 {
                     func,
-                    args: {},
+                    args: {
+                        amount: removeAll
+                            ? this.state.metaPoolAccountInfo!.nslp_shares
+                            : arx.big().intoParsed(amountUnit).cast(amount).toFixed(),
+                    },
                     gas: arx.big().intoParsed(gasUnit).cast(gas).toFixed(),
                     depo: arx.big().intoParsed(depoUnit).cast(depo).toFixed(),
                 },
@@ -108,8 +145,19 @@ export class NslpAddLiquidity extends BaseTask<FormData, Props, State> {
         return !!metaPoolAccountInfo;
     }
 
+    public override async validateForm(values: FormData): Promise<FormikErrors<FormData>> {
+        this.setFormData(values);
+        await new Promise((resolve) => this.resolveDebounced(resolve));
+        await this.schema.check(values, { context: { metaPoolAccountInfo: this.state.metaPoolAccountInfo } });
+        return Object.fromEntries(
+            Object.entries(fields(this.schema))
+                .map(([k, v]) => [k, v?.message() ?? ""])
+                .filter(([_, v]) => v !== "")
+        );
+    }
+
     public override Editor = (): React.ReactNode => {
-        const { resetForm, validateForm } = useFormikContext();
+        const { resetForm, validateForm, values } = useFormikContext<FormData>();
         const { metaPoolAccountInfo } = this.state;
 
         useEffect(() => {
@@ -147,12 +195,19 @@ export class NslpAddLiquidity extends BaseTask<FormData, Props, State> {
                         </p>
                     </InfoField>
                 )}
-                <UnitField
-                    name="depo"
-                    unit="depoUnit"
-                    options={["NEAR", "yocto"]}
-                    label="Amount"
+                <CheckboxField
+                    name="removeAll"
+                    label="Remove All"
+                    checked={values.removeAll}
                 />
+                {!values.removeAll && (
+                    <UnitField
+                        name="amount"
+                        unit="amountUnit"
+                        options={["NEAR", "yocto"]}
+                        label="Amount"
+                    />
+                )}
                 <UnitField
                     name="gas"
                     unit="gasUnit"

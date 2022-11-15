@@ -245,6 +245,14 @@ export class Task extends Component {
                                 json={json}
                             />
                         );
+                    case "nslp_remove_liquidity":
+                        return (
+                            <Family.MetaPool.NslpRemoveLiquidity
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
                 }
 
             default:
