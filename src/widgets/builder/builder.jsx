@@ -1,7 +1,7 @@
 import debounce from "lodash.debounce";
 import { Component } from "react";
 import { Droppable } from "react-beautiful-dnd";
-import { TextField } from "../../shared/ui/form-fields";
+import { TextField } from "../../shared/ui/form-kit";
 import { Column } from "../column/column.jsx";
 import { keywords } from "../../keywords";
 import { Formik, Form } from "formik";

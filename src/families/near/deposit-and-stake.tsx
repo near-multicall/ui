@@ -5,7 +5,7 @@ import { fields } from "../../shared/lib/args/args-types/args-object";
 import { Call, CallError } from "../../shared/lib/call";
 import { toGas } from "../../shared/lib/converter";
 import { StakingPool } from "../../shared/lib/contracts/staking-pool";
-import { InfoField, TextField, UnitField } from "../../shared/ui/form-fields";
+import { InfoField, TextField, UnitField } from "../../shared/ui/form-kit";
 import type { DefaultFormData } from "../base";
 import { BaseTask, BaseTaskProps, BaseTaskState } from "../base";
 import "./near.scss";

@@ -1,6 +1,6 @@
 import { MenuItem } from "@mui/material";
 import clsx from "clsx";
-import { TextField, TextFieldProps } from "../text-field/text-field";
+import { TextField, TextFieldProps } from "./text-field";
 
 const _SelectField = "SelectField";
 

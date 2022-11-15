@@ -17,7 +17,7 @@ import { STORAGE } from "../../shared/lib/persistent";
 import { FungibleToken } from "../../shared/lib/standards/fungibleToken";
 import { signAndSendTxs } from "../../shared/lib/wallet";
 import { DateTimePicker } from "../../shared/ui/components";
-import { ChoiceField, TextField, UnitField } from "../../shared/ui/form-fields";
+import { ChoiceField, TextField, UnitField } from "../../shared/ui/form-kit";
 import "./export.scss";
 
 const Ctx = Wallet.trySelectorContext();

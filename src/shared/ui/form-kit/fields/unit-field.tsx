@@ -1,6 +1,6 @@
 import clsx from "clsx";
-import { TextField, TextFieldProps } from "../text-field/text-field";
-import { SelectField, SelectFieldProps } from "../select-field/select-field";
+import { TextField, TextFieldProps } from "./text-field";
+import { SelectField, SelectFieldProps } from "./select-field";
 import "./unit-field.scss";
 
 const _UnitField = "UnitField";

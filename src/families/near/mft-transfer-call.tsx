@@ -6,7 +6,7 @@ import { fields } from "../../shared/lib/args/args-types/args-object";
 import { Call, CallError } from "../../shared/lib/call";
 import { toGas } from "../../shared/lib/converter";
 import { MultiFungibleToken } from "../../shared/lib/standards/multiFungibleToken";
-import { TextField, UnitField } from "../../shared/ui/form-fields";
+import { TextField, UnitField } from "../../shared/ui/form-kit";
 import { BaseTask, BaseTaskProps, BaseTaskState, DefaultFormData } from "../base";
 import "./near.scss";
 
