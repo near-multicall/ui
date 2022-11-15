@@ -71,7 +71,8 @@ export class CreateStore extends BaseTask<FormData, Props, State> {
                 .max(4, "maximum length is 4")
                 .matches(/^([a-z]|[0-9])+$/, "only lowercase letters or numbers"),
             icon: arx.mixed<File>(),
-            amount: arx.big().token(),
+            gas: arx.big().gas(),
+            depo: arx.big().token(),
         })
         .transform(({ gas, gasUnit, amount, amountUnit, ...rest }) => ({
             ...rest,
