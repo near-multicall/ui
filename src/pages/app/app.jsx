@@ -132,6 +132,7 @@ export class AppPage extends Component {
         this.taskID = 0;
         this.columnID = 1;
 
+        window.EDITOR?.edit(null);
         STORAGE.setLayout(initialData);
     };
 
