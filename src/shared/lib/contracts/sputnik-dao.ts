@@ -210,7 +210,7 @@ class SputnikDAO {
         this.address = daoAddress;
     }
 
-    // used to create and initialize a DAO instance
+    // create and initialize a DAO instance
     static async init(daoAddress: string): Promise<SputnikDAO> {
         // verify address is a SputnikDAO, fetch DAO info and mark it ready
         const newDAO = new SputnikDAO(daoAddress);

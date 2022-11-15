@@ -174,8 +174,12 @@ export class Transfer extends BaseTask<FormData> {
                 <a
                     className="protocol"
                     href="https://multicall.app"
+                    target="_blank"
+                    rel="noopener noreferrer"
                 >
-                    powered by <DynamicFeedOutlined className="icon" /> near-multicall
+                    <span>powered by</span>
+                    <DynamicFeedOutlined className="logo" />
+                    <span>near-multicall</span>
                 </a>
             </Form>
         );

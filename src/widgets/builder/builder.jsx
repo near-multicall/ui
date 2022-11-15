@@ -36,8 +36,8 @@ export class Builder extends Component {
         return tasks.filter((task) => {
             return (
                 searchTerm === "" ||
-                (keywords[task.addr]?.[task.func] ?? [])
-                    .concat(task.addr, task.func)
+                (keywords[task.family]?.[task.func] ?? [])
+                    .concat(task.family, task.func)
                     .some((kw) => normalize(kw).includes(normalize(searchTerm)))
             );
         });
