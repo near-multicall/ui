@@ -170,10 +170,7 @@
                 &:not(:first-of-type) {
                     padding: 0;
 
-                    & > span > a,
-                    & > span > p,
-                    & > span > input,
-                    & > span > span {
+                    & > span {
                         padding: size.$gap * 0.4 size.$gap * 0.6;
                     }
                 }

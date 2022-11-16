@@ -1,5 +1,6 @@
 import { ContentCopy } from "@mui/icons-material";
 import { Button, IconButton } from "@mui/material";
+import clsx from "clsx";
 import { forwardRef, HTMLProps, MutableRefObject, useCallback } from "react";
 
 import { Tooltip } from "../tooltip";
@@ -14,20 +15,22 @@ export interface LinkProps extends Omit<HTMLProps<HTMLAnchorElement>, "children"
 
 const _Link = "Link";
 
-export const Link = ({ href, label, noTooltip = false, ...props }: LinkProps) => {
+export const Link = ({ className, href, label, noTooltip = false, ...props }: LinkProps) => {
     const text = label && label.length > 0 ? label : href;
 
-    const Element = forwardRef((forwardedProps, ref) => (
-        <a
-            className={_Link}
-            target="_blank"
-            ref={ref as MutableRefObject<HTMLAnchorElement>}
-            rel="noopener noreferrer"
-            {...{ ...forwardedProps, ...props, href }}
-        >
-            {text}
-        </a>
-    ));
+    const Element = forwardRef(
+        ({ className: forwardedClassName, ...forwardedProps }: HTMLProps<HTMLAnchorElement>, ref) => (
+            <a
+                className={clsx(_Link, forwardedClassName, className)}
+                target="_blank"
+                ref={ref as MutableRefObject<HTMLAnchorElement>}
+                rel="noopener noreferrer"
+                {...{ ...forwardedProps, ...props, href }}
+            >
+                {text}
+            </a>
+        )
+    );
 
     return noTooltip ? (
         <Element />
@@ -36,19 +39,6 @@ export const Link = ({ href, label, noTooltip = false, ...props }: LinkProps) =>
             arrow
             classes={{ arrow: `${_Link}-tooltip-arrow`, tooltip: `${_Link}-tooltip` }}
             content={
-                /*<Button
-                    classes={{ root: `${_Link}-tooltip-button` }}
-                    onClick={useCallback(() => void navigator.clipboard.writeText(text), [text])}
-                    startIcon={
-                        <ContentCopy
-                            color="inherit"
-                            fontSize="inherit"
-                        />
-                    }
-                >
-                    Copy
-                </Button>*/
-
                 <IconButton
                     classes={{ root: `${_Link}-tooltip-button` }}
                     onClick={useCallback(() => void navigator.clipboard.writeText(text), [text])}
@@ -60,8 +50,8 @@ export const Link = ({ href, label, noTooltip = false, ...props }: LinkProps) =>
                     />
                 </IconButton>
             }
-            leaveDelay={0}
-            placement="right-start"
+            leaveDelay={1000}
+            placement="right"
         >
             <Element />
         </Tooltip>
