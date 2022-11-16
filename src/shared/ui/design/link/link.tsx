@@ -1,4 +1,4 @@
-import { CopyAllOutlined } from "@mui/icons-material";
+import { ContentCopy } from "@mui/icons-material";
 import { Button } from "@mui/material";
 import { forwardRef, HTMLProps, MutableRefObject, useCallback } from "react";
 
@@ -40,7 +40,7 @@ export const Link = ({ href, label, noTooltip = false, ...props }: LinkProps) =>
                     classes={{ root: `${_Link}-tooltip-button` }}
                     onClick={useCallback(() => void navigator.clipboard.writeText(text), [text])}
                     startIcon={
-                        <CopyAllOutlined
+                        <ContentCopy
                             color="inherit"
                             fontSize="inherit"
                         />
@@ -50,6 +50,7 @@ export const Link = ({ href, label, noTooltip = false, ...props }: LinkProps) =>
                 </Button>
             }
             leaveDelay={2000}
+            placement="right-end"
         >
             <Element />
         </Tooltip>
