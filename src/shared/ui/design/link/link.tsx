@@ -60,7 +60,7 @@ export const Link = ({ href, label, noTooltip = false, ...props }: LinkProps) =>
                     />
                 </IconButton>
             }
-            leaveDelay={2000}
+            leaveDelay={0}
             placement="right-start"
         >
             <Element />
