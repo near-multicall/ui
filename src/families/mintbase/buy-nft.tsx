@@ -7,8 +7,7 @@ import { args as arx } from "../../shared/lib/args/args";
 import { fields } from "../../shared/lib/args/args-types/args-object";
 import { Call, CallError } from "../../shared/lib/call";
 import { MintbaseStore } from "../../shared/lib/contracts/mintbase";
-import { toGas } from "../../shared/lib/converter";
-import { STORAGE } from "../../shared/lib/persistent";
+import { Big, formatTokenAmount, toGas } from "../../shared/lib/converter";
 import { InfoField, TextField, UnitField } from "../../shared/ui/form-fields";
 import { BaseTask, BaseTaskProps, BaseTaskState } from "../base";
 import "./mintbase.scss";
@@ -17,35 +16,38 @@ import type { StoreInfo } from "../../shared/lib/contracts/mintbase";
 import type { DefaultFormData } from "../base";
 
 type FormData = DefaultFormData & {
-    newMinter: string;
+    listingUrl: string;
 };
 
 type Props = BaseTaskProps;
 
 type State = BaseTaskState<FormData> & {
-    mintbaseStore: MintbaseStore;
-    mintbaseStoreInfo: StoreInfo;
-    minters: string[];
+    nftContractId: string;
+    tokenId: string;
+    metadataId: string;
+    listingInfo: {
+        price: string;
+        title: string;
+        token_id: string;
+        market_id: string;
+        media: string;
+    };
 };
 
-export class AddMinter extends BaseTask<FormData, Props, State> {
-    override uniqueClassName = "mintbase-add-minter-task";
+export class BuyNft extends BaseTask<FormData, Props, State> {
+    override uniqueClassName = "mintbase-buy-nft-task";
     override schema = arx
         .object()
         .shape({
-            addr: arx
+            listingUrl: arx
                 .string()
-                .mintbaseStore()
+                .url()
                 .test({
-                    name: "check owner",
-                    message: "store must be owned by the DAO's multicall",
-                    test: (value, ctx) =>
-                        value == null ||
-                        ctx.options.context?.storeOwner == null ||
-                        ctx.options.context.storeOwner === STORAGE.addresses.multicall,
+                    name: "check is valid Mintbase listing URL",
+                    message: "URL does not belong to a Mintbase listing",
+                    test: (value) => !!value && MintbaseStore.isListingURLValid(value),
                 }),
             gas: arx.big().gas().min(toGas("3.5")).max(toGas("250")),
-            newMinter: arx.string().address(),
         })
         .transform(({ gas, gasUnit, ...rest }) => ({
             ...rest,
@@ -55,13 +57,13 @@ export class AddMinter extends BaseTask<FormData, Props, State> {
         .retainAll();
 
     override initialValues: FormData = {
-        name: "Add Minter",
-        addr: "",
-        func: "grant_minter",
-        newMinter: "",
+        name: "Simple Buy",
+        addr: MintbaseStore.SIMPLE_MARKETPLACE_ADDRESS,
+        func: "buy",
+        listingUrl: "",
         gas: "30",
         gasUnit: "Tgas",
-        depo: "1",
+        depo: "0",
         depoUnit: "yocto",
     };
 
@@ -72,15 +74,17 @@ export class AddMinter extends BaseTask<FormData, Props, State> {
 
     protected override init(
         call: Call<{
-            account_id: string;
+            nft_contract_id: string;
+            token_id: string;
         }> | null
     ): void {
         if (call !== null) {
             const fromCall = {
                 addr: call.address,
                 func: call.actions[0].func,
-                newMinter: call.actions[0].args.account_id,
+                listingUrl: "haha",
                 gas: arx.big().intoFormatted(this.initialValues.gasUnit).cast(call.actions[0].gas).toFixed(),
+                depo: arx.big().intoFormatted(this.initialValues.depoUnit).cast(call.actions[0].depo).toFixed(),
             };
             this.initialValues = Object.keys(this.initialValues).reduce((acc, k) => {
                 const v = fromCall[k as keyof typeof fromCall];
@@ -93,22 +97,24 @@ export class AddMinter extends BaseTask<FormData, Props, State> {
     }
 
     static override inferOwnType(json: Call): boolean {
-        return !!json && json.actions[0].func === "grant_minter";
+        return !!json && json.address === MintbaseStore.SIMPLE_MARKETPLACE_ADDRESS && json.actions[0].func === "buy";
     }
 
     public override toCall(): Call {
-        const { addr, newMinter, gas, gasUnit, depo } = this.state.formData;
+        const { gas, gasUnit, depo } = this.state.formData;
+        const { nftContractId, tokenId } = this.state;
 
         if (!arx.big().isValidSync(gas)) throw new CallError("Failed to parse gas input value", this.props.id);
         if (!arx.big().isValidSync(depo)) throw new CallError("Failed to parse deposit input value", this.props.id);
 
         return {
-            address: addr,
+            address: MintbaseStore.SIMPLE_MARKETPLACE_ADDRESS,
             actions: [
                 {
-                    func: "grant_minter",
+                    func: "buy",
                     args: {
-                        account_id: newMinter,
+                        nft_contract_id: nftContractId,
+                        token_id: tokenId,
                     },
                     gas: arx.big().intoParsed(gasUnit).cast(gas).toFixed(),
                     depo,
@@ -118,18 +124,19 @@ export class AddMinter extends BaseTask<FormData, Props, State> {
     }
 
     // TODO: fetch store owner/data
-    private tryUpdateMintbaseStore(): Promise<boolean> {
+    private tryFetchListingInfo(): Promise<boolean> {
         return new Promise<boolean>((resolve) => {
             this.schema
                 .check(this.state.formData, { context: { storeOwner: this.state.mintbaseStoreInfo?.owner } })
                 .then(() => {
-                    const { addr } = fields(this.schema);
-                    if (!addr.isBad()) {
-                        this.confidentlyUpdateMintbaseStore().then((ready) => resolve(ready));
+                    const { listingUrl } = fields(this.schema);
+                    if (!listingUrl.isBad()) {
+                        this.confidentlyFetchListingInfo().then((ready) => resolve(ready));
                     } else {
                         this.setState({
-                            mintbaseStore: new MintbaseStore(this.state.formData.addr),
-                            minters: [],
+                            nftContractId: "",
+                            tokenId: "",
+                            metadataId: "",
                         }); // will be invalid
                         resolve(false);
                     }
@@ -138,22 +145,25 @@ export class AddMinter extends BaseTask<FormData, Props, State> {
     }
 
     // fetch store data/owner
-    private async confidentlyUpdateMintbaseStore(): Promise<boolean> {
-        const { addr } = this.state.formData;
-        const [store, storeInfo, minters] = await Promise.all([
-            MintbaseStore.init(addr),
-            new MintbaseStore(addr).getInfo(),
-            new MintbaseStore(addr).listMinters(),
-        ]);
-        this.setState({ minters, mintbaseStore: store, mintbaseStoreInfo: storeInfo });
+    private async confidentlyFetchListingInfo(): Promise<boolean> {
+        const { listingUrl } = this.state.formData;
+        const { nftContractId, metadataId } = MintbaseStore.getInfoFromlistingUrl(listingUrl)!;
+        const listings = await MintbaseStore.apiGetSimpleListings(nftContractId, metadataId);
+        if (listings.length === 0) return false;
+        // find the cheapest token in the series
+        let cheapest = listings[0];
+        for (let i = 0; i < listings.length; i++) {
+            if (Big(listings[i].price).lt(cheapest.price)) cheapest = listings[i];
+        }
+        this.setState({ nftContractId, tokenId: cheapest.token_id, metadataId, listingInfo: cheapest });
         window.EDITOR.forceUpdate();
-        return store.ready;
+        return true;
     }
 
     public override async validateForm(values: FormData): Promise<FormikErrors<FormData>> {
         this.setFormData(values);
         await new Promise((resolve) => this.resolveDebounced(resolve));
-        await this.tryUpdateMintbaseStore();
+        await this.tryFetchListingInfo();
         return Object.fromEntries(
             Object.entries(fields(this.schema))
                 .map(([k, v]) => [k, v?.message() ?? ""])
@@ -163,7 +173,7 @@ export class AddMinter extends BaseTask<FormData, Props, State> {
 
     public override Editor = (): React.ReactNode => {
         const { resetForm, validateForm, values } = useFormikContext<FormData>();
-        const { minters } = this.state;
+        const { listingInfo, nftContractId } = this.state;
 
         useEffect(() => {
             resetForm({
@@ -183,29 +193,22 @@ export class AddMinter extends BaseTask<FormData, Props, State> {
                 />
                 <div className="empty-line" />
                 <TextField
-                    name="addr"
-                    label="Store address"
+                    name="listingUrl"
+                    label="Listing URL"
                     roundtop
                 />
-                {minters?.length > 0 ? (
+                {!!nftContractId && !!listingInfo ? (
                     <InfoField>
-                        <b>Minter</b>
-                        {minters.map((id) => (
-                            <a
-                                className="minter-account-id"
-                                href={arx.string().intoUrl().cast(id)}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                            >
-                                {id}
-                            </a>
-                        ))}
+                        <b>Price: </b>
+                        <div>{formatTokenAmount(listingInfo.price, 24, 5)}Ⓝ</div>
+                        <b>Title: </b>
+                        <div>{listingInfo.title}</div>
+                        <img
+                            src={listingInfo.media}
+                            alt="nft media"
+                        />
                     </InfoField>
                 ) : null}
-                <TextField
-                    name="newMinter"
-                    label="New minter"
-                />
                 <UnitField
                     name="gas"
                     unit="gasUnit"
