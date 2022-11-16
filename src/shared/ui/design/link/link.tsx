@@ -1,5 +1,5 @@
 import { ContentCopy } from "@mui/icons-material";
-import { Button } from "@mui/material";
+import { Button, IconButton } from "@mui/material";
 import { forwardRef, HTMLProps, MutableRefObject, useCallback } from "react";
 
 import { Tooltip } from "../tooltip";
@@ -36,7 +36,7 @@ export const Link = ({ href, label, noTooltip = false, ...props }: LinkProps) =>
             arrow
             classes={{ arrow: `${_Link}-tooltip-arrow`, tooltip: `${_Link}-tooltip` }}
             content={
-                <Button
+                /*<Button
                     classes={{ root: `${_Link}-tooltip-button` }}
                     onClick={useCallback(() => void navigator.clipboard.writeText(text), [text])}
                     startIcon={
@@ -47,10 +47,21 @@ export const Link = ({ href, label, noTooltip = false, ...props }: LinkProps) =>
                     }
                 >
                     Copy
-                </Button>
+                </Button>*/
+
+                <IconButton
+                    classes={{ root: `${_Link}-tooltip-button` }}
+                    onClick={useCallback(() => void navigator.clipboard.writeText(text), [text])}
+                    size="small"
+                >
+                    <ContentCopy
+                        color="inherit"
+                        fontSize="large"
+                    />
+                </IconButton>
             }
             leaveDelay={2000}
-            placement="right-end"
+            placement="right-start"
         >
             <Element />
         </Tooltip>
