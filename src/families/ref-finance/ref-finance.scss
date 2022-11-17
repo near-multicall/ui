@@ -1,0 +1,24 @@
+@use "sass/color";
+@use "sass/mixin";
+@use "sass/size";
+@use "sass/font";
+@use "../base";
+
+.ref-finance-unstake-task {
+    background: color.$lightest;
+    @include base.task-theme(color.$text);
+
+    * > a {
+        color: darken(color.$blue, 20%) !important;
+    }
+}
+
+.MuiInputAdornment-root {
+    width: fit-content;
+
+    p {
+        display: block !important;
+        font-size: size.$small-text !important;
+        color: color.$lightish;
+    }
+}
