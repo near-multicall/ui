@@ -93,6 +93,7 @@ export class Task extends Component {
                                 json={json}
                             />
                         );
+
                     case "ft_transfer_call":
                         return (
                             <Family.Near.FtTransferCall
@@ -101,6 +102,7 @@ export class Task extends Component {
                                 json={json}
                             />
                         );
+
                     case "nft_transfer":
                         return (
                             <Family.Near.NftTransfer
@@ -109,6 +111,7 @@ export class Task extends Component {
                                 json={json}
                             />
                         );
+
                     case "nft_transfer_call":
                         return (
                             <Family.Near.NftTransferCall
@@ -117,6 +120,7 @@ export class Task extends Component {
                                 json={json}
                             />
                         );
+
                     case "nft_approve":
                         return (
                             <Family.Near.NftApprove
@@ -125,6 +129,7 @@ export class Task extends Component {
                                 json={json}
                             />
                         );
+
                     case "nft_revoke":
                         return (
                             <Family.Near.NftRevoke
@@ -133,6 +138,7 @@ export class Task extends Component {
                                 json={json}
                             />
                         );
+
                     case "mft_transfer":
                         return (
                             <Family.Near.MftTransfer
@@ -141,6 +147,7 @@ export class Task extends Component {
                                 json={json}
                             />
                         );
+
                     case "mft_transfer_call":
                         return (
                             <Family.Near.MftTransferCall
@@ -149,6 +156,7 @@ export class Task extends Component {
                                 json={json}
                             />
                         );
+
                     case "deposit_and_stake":
                         return (
                             <Family.Near.DepositAndStake
@@ -157,6 +165,7 @@ export class Task extends Component {
                                 json={json}
                             />
                         );
+
                     case "unstake":
                         return (
                             <Family.Near.Unstake
@@ -165,6 +174,7 @@ export class Task extends Component {
                                 json={json}
                             />
                         );
+
                     case "withdraw":
                         return (
                             <Family.Near.Withdraw
@@ -173,6 +183,7 @@ export class Task extends Component {
                                 json={json}
                             />
                         );
+
                     case "storage_deposit":
                         return (
                             <Family.Near.StorageDeposit
@@ -181,6 +192,7 @@ export class Task extends Component {
                                 json={json}
                             />
                         );
+
                     case "storage_withdraw":
                         return (
                             <Family.Near.StorageWithdraw
@@ -189,6 +201,7 @@ export class Task extends Component {
                                 json={json}
                             />
                         );
+
                     case "storage_unregister":
                         return (
                             <Family.Near.StorageUnregister
@@ -209,6 +222,7 @@ export class Task extends Component {
                                 json={json}
                             />
                         );
+
                     case "transfer_store_ownership":
                         return (
                             <Family.Mintbase.TransferStoreOwnership
@@ -217,6 +231,7 @@ export class Task extends Component {
                                 json={json}
                             />
                         );
+
                     case "grant_minter":
                         return (
                             <Family.Mintbase.AddMinter
@@ -225,6 +240,7 @@ export class Task extends Component {
                                 json={json}
                             />
                         );
+
                     case "revoke_minter":
                         return (
                             <Family.Mintbase.RemoveMinter
@@ -235,12 +251,26 @@ export class Task extends Component {
                         );
                 }
 
+            case "ref-finance":
+                switch (func) {
+                    case "xref-unstake-task":
+                        return (
+                            <Family.RefFinance.Unstake
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
+                }
+
             default:
-                for (let family in Family) {
+                for (const family in Family) {
                     if (family === "BaseTask") continue;
-                    for (let task in Family[family])
+
+                    for (const task in Family[family])
                         if (Family[family][task].inferOwnType(json)) {
                             const TaskComponent = Family[family][task];
+
                             return (
                                 <TaskComponent
                                     ref={this.instance}
