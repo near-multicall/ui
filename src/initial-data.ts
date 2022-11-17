@@ -1,6 +1,10 @@
 export const initialData = {
     tasks: {
+        /**
+         * Custom task
+         */
         "task-i1": { id: "task-i1", family: "", func: "" },
+
         "task-i2": { id: "task-i2", family: "near", func: "ft_transfer" },
         "task-i3": { id: "task-i3", family: "near", func: "ft_transfer_call" },
         "task-i4": { id: "task-i4", family: "near", func: "nft_transfer" },
@@ -15,21 +19,28 @@ export const initialData = {
         "task-i13": { id: "task-i13", family: "near", func: "storage_withdraw" },
         "task-i14": { id: "task-i14", family: "near", func: "storage_unregister" },
         "task-i15": { id: "task-i15", family: "near", func: "storage_deposit" },
+
         "task-i16": { id: "task-i16", family: "multicall", func: "near_transfer" },
+
         "task-i17": { id: "task-i17", family: "mintbase", func: "create_store" },
         "task-i18": { id: "task-i18", family: "mintbase", func: "transfer_store_ownership" },
         "task-i19": { id: "task-i19", family: "mintbase", func: "grant_minter" },
         "task-i20": { id: "task-i20", family: "mintbase", func: "revoke_minter" },
+
+        "task-i21": { id: "task-i21", family: "ref-finance", func: "xref-unstake" },
     },
+
     columns: {
         "column-0": {
             id: "column-0",
             title: "Drag here",
             taskIds: [],
         },
+
         menu: {
             id: "menu",
             title: "Infinite Column",
+
             taskIds: [
                 "task-i1",
                 "task-i2",
@@ -51,8 +62,10 @@ export const initialData = {
                 "task-i18",
                 "task-i19",
                 "task-i20",
+                "task-i21",
             ],
         },
     },
+
     columnOrder: ["column-0"],
 };

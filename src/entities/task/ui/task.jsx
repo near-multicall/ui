@@ -253,9 +253,9 @@ export class Task extends Component {
 
             case "ref-finance":
                 switch (func) {
-                    case "unstake":
+                    case "xref-unstake":
                         return (
-                            <Family.RefFinance.Unstake
+                            <Family.RefFinance.XrefUnstake
                                 ref={this.instance}
                                 id={this.id}
                                 json={json}

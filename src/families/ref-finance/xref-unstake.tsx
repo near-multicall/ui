@@ -28,7 +28,7 @@ type State = BaseTaskState<FormData> & {
     stakeInfo: HumanReadableAccount | null;
 };
 
-export class Unstake extends BaseTask<FormData, Props, State> {
+export class XrefUnstake extends BaseTask<FormData, Props, State> {
     override uniqueClassName = "ref-finance-xref-unstake-task";
 
     override schema = arx
@@ -59,7 +59,7 @@ export class Unstake extends BaseTask<FormData, Props, State> {
         .retainAll();
 
     override initialValues: FormData = {
-        name: "Unstake",
+        name: "Unstake xREF",
         addr: "",
         func: "unstake",
         gas: "30",

@@ -1,3 +1,3 @@
 import "./ref-finance.scss";
 
-export { Unstake } from "./unstake";
+export { XrefUnstake } from "./xref-unstake";
