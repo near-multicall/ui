@@ -253,7 +253,7 @@ export class Task extends Component {
 
             case "ref-finance":
                 switch (func) {
-                    case "xref-unstake-task":
+                    case "unstake":
                         return (
                             <Family.RefFinance.Unstake
                                 ref={this.instance}

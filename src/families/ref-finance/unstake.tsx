@@ -29,7 +29,7 @@ type State = BaseTaskState<FormData> & {
 };
 
 export class Unstake extends BaseTask<FormData, Props, State> {
-    override uniqueClassName = "xref-unstake-task";
+    override uniqueClassName = "ref-finance-xref-unstake-task";
 
     override schema = arx
         .object()
