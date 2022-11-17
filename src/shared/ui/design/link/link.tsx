@@ -1,7 +1,7 @@
-import { ContentCopy } from "@mui/icons-material";
-import { Button, IconButton } from "@mui/material";
+import { CheckCircleRounded, ContentCopy } from "@mui/icons-material";
+import { IconButton } from "@mui/material";
 import clsx from "clsx";
-import { forwardRef, HTMLProps, MutableRefObject, useCallback } from "react";
+import { forwardRef, HTMLProps, MutableRefObject, useCallback, useEffect, useState } from "react";
 
 import { Tooltip } from "../tooltip";
 
@@ -32,6 +32,18 @@ export const Link = ({ className, href, label, noTooltip = false, ...props }: Li
         )
     );
 
+    const [copied, copiedStateUpdate] = useState(false);
+
+    const onCopyButtonClick = useCallback(
+        async () => void copiedStateUpdate(!Boolean(await navigator.clipboard.writeText(text))),
+        [text]
+    );
+
+    useEffect(
+        () => void (copied ? setTimeout(() => void copiedStateUpdate(false), 2000) : null),
+        [copied, copiedStateUpdate]
+    );
+
     return noTooltip ? (
         <Element />
     ) : (
@@ -41,16 +53,24 @@ export const Link = ({ className, href, label, noTooltip = false, ...props }: Li
             content={
                 <IconButton
                     classes={{ root: `${_Link}-tooltip-button` }}
-                    onClick={useCallback(() => void navigator.clipboard.writeText(text), [text])}
+                    disabled={copied}
+                    onClick={onCopyButtonClick}
                     size="small"
                 >
-                    <ContentCopy
-                        color="inherit"
-                        fontSize="large"
-                    />
+                    {!copied ? (
+                        <ContentCopy
+                            color="inherit"
+                            fontSize="large"
+                        />
+                    ) : (
+                        <CheckCircleRounded
+                            color="inherit"
+                            fontSize="large"
+                        />
+                    )}
                 </IconButton>
             }
-            leaveDelay={1000}
+            leaveDelay={2000}
             placement="right"
         >
             <Element />

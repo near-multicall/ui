@@ -8,10 +8,12 @@
     cursor: pointer;
 
     &-tooltip {
+        padding: 0;
         background-color: color.$darkest;
 
         &.MuiTooltip-tooltip {
-            margin-left: size.$text !important;
+            margin-left: size.$small-text !important;
+            padding: 0;
             background-color: color.$darkest;
         }
 
@@ -22,8 +24,14 @@
 
         &-button,
         &-button.MuiButtonBase-root {
+            background-color: color.$black;
+            border-radius: inherit;
             font-size: size.$small-text;
             color: color.$white;
+
+            &.Mui-disabled {
+                color: color.$white;
+            }
         }
     }
 }
