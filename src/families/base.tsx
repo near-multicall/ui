@@ -1,15 +1,16 @@
 import { DeleteOutline, EditOutlined, MoveDown } from "@mui/icons-material";
-import { Component } from "react";
 import clsx from "clsx";
+import { FormikErrors } from "formik";
 import debounce from "lodash.debounce";
+import { Component } from "react";
 
 import { args as arx } from "../shared/lib/args/args";
 import { fields, ObjectSchema } from "../shared/lib/args/args-types/args-object";
 import { Call, CallError } from "../shared/lib/call";
 import { unit } from "../shared/lib/converter";
 import { Tooltip } from "../shared/ui/design";
+
 import "./base.scss";
-import { FormikErrors } from "formik";
 
 export interface DefaultFormData {
     name: string;
@@ -24,6 +25,7 @@ export interface DefaultFormData {
 export interface DisplayData {
     name: string;
     addr: string;
+
     actions: Record<
         string,
         {
@@ -90,6 +92,7 @@ export abstract class BaseTask<
         const TEMP = window.TEMP!;
         this.initialValues = JSON.parse(JSON.stringify(TEMP.formData));
         this.options = TEMP.options;
+
         this.initState = {
             ...this.initState,
             showArgs: TEMP.showArgs,
@@ -102,6 +105,7 @@ export abstract class BaseTask<
         this.initialValues = JSON.parse(JSON.stringify(payload.formData));
         this.options = JSON.parse(JSON.stringify(payload.options));
         window.COPY = null;
+
         this.initState = {
             ...this.initState,
             showArgs: payload.showArgs,
@@ -115,15 +119,7 @@ export abstract class BaseTask<
     }
 
     protected setFormData(newFormData: Partial<TFormData>, callback?: () => void) {
-        this.setState(
-            {
-                formData: {
-                    ...this.state.formData,
-                    ...newFormData,
-                },
-            },
-            callback
-        );
+        this.setState({ formData: { ...this.state.formData, ...newFormData } }, callback);
     }
 
     public abstract toCall(): Call;
@@ -147,6 +143,7 @@ export abstract class BaseTask<
         this.setFormData(values);
         await new Promise((resolve) => this.resolveDebounced(resolve));
         await this.schema.check(values);
+
         return Object.fromEntries(
             Object.entries(fields(this.schema))
                 .map(([k, v]) => [k, v?.message() ?? ""])
@@ -158,15 +155,19 @@ export abstract class BaseTask<
 
     protected getDisplayData(): DisplayData {
         const { name, addr, func, gas, gasUnit, depo, depoUnit } = this.state.formData;
+
         let args = "";
+
         try {
             args = JSON.stringify(this.toCall().actions[0].args, null, "  ");
         } catch (e) {
             if (e instanceof CallError) args = `Error: ${e.message}`;
         }
+
         return {
             name,
             addr,
+
             actions: {
                 "action-0": {
                     func,
@@ -210,7 +211,9 @@ export abstract class BaseTask<
                             }}
                         />
                     </Tooltip>
+
                     <div className="edit-pseudo"></div>
+
                     <Tooltip
                         content={"Clone card"}
                         disableInteractive
@@ -222,8 +225,10 @@ export abstract class BaseTask<
                             }}
                         />
                     </Tooltip>
+
                     <div className="duplicate-pseudo"></div>
                     <h3>{name}</h3>
+
                     <Tooltip
                         content={"Delete"}
                         disableInteractive
@@ -235,11 +240,14 @@ export abstract class BaseTask<
                             }}
                         />
                     </Tooltip>
+
                     <div className="delete-pseudo"></div>
                 </div>
+
                 <div className="data-container">
                     <p className="addr">
                         <span>Contract address</span>
+
                         <a
                             className="code"
                             href={arx.string().intoUrl().cast(addr)}
@@ -249,6 +257,7 @@ export abstract class BaseTask<
                             {addr}
                         </a>
                     </p>
+
                     {Object.entries(actions).map(([actionId, { func, args, gas, gasUnit, depo, depoUnit }]) => (
                         <div
                             className="action-data-container"
@@ -258,8 +267,10 @@ export abstract class BaseTask<
                                 <span>Function name</span>
                                 <span className="code">{func}</span>
                             </p>
+
                             <p className="expandable">
                                 <span>Function arguments</span>
+
                                 {showArgs?.[actionId] ? (
                                     <a
                                         onClick={() =>
@@ -278,15 +289,20 @@ export abstract class BaseTask<
                                     </a>
                                 )}
                             </p>
+
                             {showArgs?.[actionId] && <pre className="code">{args}</pre>}
+
                             <p>
                                 <span>Allocated gas</span>
+
                                 <span className="code">
                                     {gas} <span>{gasUnit}</span>
                                 </span>
                             </p>
+
                             <p>
                                 <span>Attached deposit</span>
+
                                 <span className="code">
                                     {depo} <span>{depoUnit}</span>
                                 </span>
