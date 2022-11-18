@@ -14,6 +14,7 @@ import { InfoField } from "../../shared/ui/forms/fields/info-field";
 import { STORAGE } from "../../shared/lib/persistent";
 import { BaseTask, BaseTaskProps, BaseTaskState } from "../base";
 import type { DefaultFormData } from "../base";
+import { RefFinanceAdapter } from "../../shared/adapters";
 
 type FormData = DefaultFormData & {
     amount: string;
@@ -41,7 +42,7 @@ export class XrefUnstake extends BaseTask<FormData, Props, State> {
             amount: arx
                 .big()
                 .token()
-                .min("1", "cannot unstake 0 NEAR")
+                .min("1", `cannot unstake 0 ${RefFinanceAdapter.tokens.xREF.symbol.toString()}`)
                 .when("unstakeAll", {
                     is: true,
                     then: (s) => s.optional(),
@@ -70,7 +71,7 @@ export class XrefUnstake extends BaseTask<FormData, Props, State> {
         depo: "1",
         depoUnit: "yocto",
         amount: "0",
-        amountUnit: "NEAR",
+        amountUnit: 18,
         unstakeAll: false,
     };
 
@@ -236,7 +237,7 @@ export class XrefUnstake extends BaseTask<FormData, Props, State> {
                     <UnitField
                         name="amount"
                         unit="amountUnit"
-                        options={["NEAR", "yocto"]}
+                        options={[RefFinanceAdapter.tokens.xREF.symbol.toString(), "yocto"]}
                         label="Unstaking amount"
                     />
                 )}
