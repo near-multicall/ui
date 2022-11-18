@@ -1,6 +1,6 @@
 class RefFinanceAdapter {
     public static readonly tokens = {
-        xREF: { decimals: 18, symbol: "xREF" },
+        xREF: { decimals: 18, symbol: Symbol("xREF") },
     };
 }
 
