@@ -180,7 +180,11 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
                 if (!addr.isBad()) {
                     this.confidentlyUpdateFt().then((ready) => resolve(ready));
                 } else {
-                    this.setState({ token: new FungibleToken(this.state.formData.addr), needsSd: false }); // will be invalid
+                    this.setState({
+                        /** Probably invalid */
+                        token: new FungibleToken(this.state.formData.addr),
+                        needsSd: false,
+                    });
                     resolve(false);
                 }
             });

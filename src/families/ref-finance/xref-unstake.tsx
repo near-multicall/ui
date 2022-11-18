@@ -52,7 +52,10 @@ export class XrefUnstake extends BaseTask<FormData, Props, State> {
             ...rest,
             unstakeAll,
             gas: arx.big().intoParsed(gasUnit).cast(gas),
-            // If transferAll, then amount takes a valid dummy value to silence errors.
+
+            /**
+             * If `unstakeAll` is `true`, a valid dummy value is used in order to silence errors.
+             */
             amount: unstakeAll ? null : arx.big().intoParsed(amountUnit).cast(amount),
         }))
         .requireAll({ ignore: ["amount"] })
