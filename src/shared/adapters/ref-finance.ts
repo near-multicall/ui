@@ -1,7 +1,7 @@
-class RefFinanceContract {
+class RefFinanceAdapter {
     public static readonly tokens = {
         xREF: { decimals: 18, symbol: "xREF" },
     };
 }
 
-export { RefFinanceContract };
+export { RefFinanceAdapter };
