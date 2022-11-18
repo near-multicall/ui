@@ -1,16 +1,16 @@
 import { HTMLProps } from "react";
 import { JobSettingsEdit, TokensWhitelistEdit } from "../../features";
 import { MulticallConfigDiff, MulticallContract } from "../../shared/lib/contracts/multicall";
-import { SputnikDAOContract } from "../../shared/lib/contracts/sputnik-dao";
+import { SputnikDAOAdapter } from "../../shared/lib/contracts/sputnik-dao";
 
 namespace MulticallConfigEditorWidget {
     export interface Inputs extends HTMLProps<HTMLDivElement> {
-        contracts: { dao: SputnikDAOContract; multicall: MulticallContract };
+        contracts: { dao: SputnikDAOAdapter; multicall: MulticallContract };
     }
 
     export type ChangesDiff = MulticallConfigDiff;
 
-    export type ProposalDescription = Parameters<SputnikDAOContract["proposeFunctionCall"]>[0];
+    export type ProposalDescription = Parameters<SputnikDAOAdapter["proposeFunctionCall"]>[0];
 }
 
 class MulticallConfigEditorConfig {

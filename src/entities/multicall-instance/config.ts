@@ -1,5 +1,5 @@
 import { MulticallConfigParamKey } from "../../shared/lib/contracts/multicall";
-import { SputnikDAOContract } from "../../shared/lib/contracts/sputnik-dao";
+import { SputnikDAOAdapter } from "../../shared/lib/contracts/sputnik-dao";
 import { toYocto } from "../../shared/lib/converter";
 
 /**
@@ -7,7 +7,7 @@ import { toYocto } from "../../shared/lib/converter";
  */
 namespace MulticallInstanceEntity {
     export interface Inputs {
-        daoContractAddress: SputnikDAOContract["address"];
+        daoContractAddress: SputnikDAOAdapter["address"];
     }
 
     export type ParamKey = MulticallConfigParamKey;

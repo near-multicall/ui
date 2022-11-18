@@ -5,7 +5,7 @@ import { Big, toGas, dateToCron, toYocto } from "../converter";
 import { FungibleToken } from "../standards/fungibleToken";
 import { type Tx, viewAccount, viewState, view } from "../wallet";
 
-import type { FunctionCallAction as daoFunctionCallAction, SputnikDAOContract } from "./sputnik-dao";
+import type { FunctionCallAction as daoFunctionCallAction, SputnikDAOAdapter } from "./sputnik-dao";
 
 const FACTORY_ADDRESS_SELECTOR: Record<string, string> = {
     mainnet: "v1.multicall.near",
@@ -149,7 +149,7 @@ class Multicall {
      * @param callback Stateful data fetch callback
      */
     static instanceDataFetchFx = async (
-        daoContractAddress: SputnikDAOContract["address"],
+        daoContractAddress: SputnikDAOAdapter["address"],
         callback: (result: { data: Multicall | null; error: Error | null; loading: boolean }) => void
     ) =>
         callback(
