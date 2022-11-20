@@ -14,7 +14,7 @@ import { InfoField } from "../../shared/ui/forms/fields/info-field";
 import { STORAGE } from "../../shared/lib/persistent";
 import { BaseTask, BaseTaskProps, BaseTaskState } from "../base";
 import type { DefaultFormData } from "../base";
-import { RefFinanceAdapter } from "../../shared/adapters";
+import { RefFinanceAdapter } from "../../shared/lib/contracts";
 
 type FormData = DefaultFormData & {
     amount: string;
