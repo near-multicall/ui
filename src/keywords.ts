@@ -27,4 +27,8 @@ export const keywords = {
         revoke_minter: ["remove minter"],
         transfer_store_ownership: ["transfer store ownership"],
     },
+    "meta-pool": {
+        nslp_add_liquidity: ["add liquidity", "lp"],
+        nslp_remove_liquidity: ["remove liquidity", "lp"],
+    },
 };
