@@ -1,28 +1,28 @@
 import { useEffect, useState } from "react";
 
 import { ArgsAccount } from "../../../shared/lib/args-old";
-import { MulticallContract } from "../../../shared/lib/contracts/multicall";
+import { Multicall } from "../../../shared/lib/contracts/multicall";
 import { Props } from "../../../shared/lib/props";
 
 import { type MulticallInstanceEntity } from "../config";
 
 export type MulticallInstanceAdminsAddressList = {
-    data: MulticallContract["admins"] | null;
+    data: Multicall["admins"] | null;
     error: Error | null;
     loading: boolean;
 };
 
 export class MulticallInstanceAdminsModel {
     static addressListFetchFx = async (
-        daoContractAddress: MulticallInstanceEntity.Inputs["daoContractAddress"],
+        daoAddress: MulticallInstanceEntity.Inputs["daoAddress"],
         callback: (result: MulticallInstanceAdminsAddressList) => void
     ) =>
-        await MulticallContract.instanceDataFetchFx(
-            `${ArgsAccount.deconstructAddress(daoContractAddress).name}.${MulticallContract.FACTORY_ADDRESS}`,
+        await Multicall.instanceDataFetchFx(
+            `${ArgsAccount.deconstructAddress(daoAddress).name}.${Multicall.FACTORY_ADDRESS}`,
             (multicallInstanceData) => callback(Props.evolve({ data: ({ admins }) => admins }, multicallInstanceData))
         );
 
-    static useAddressList = (daoContractAddress: MulticallInstanceEntity.Inputs["daoContractAddress"]) => {
+    static useAddressList = (daoAddress: MulticallInstanceEntity.Inputs["daoAddress"]) => {
         const [state, stateUpdate] = useState<MulticallInstanceAdminsAddressList>({
             data: null,
             error: null,
@@ -30,8 +30,8 @@ export class MulticallInstanceAdminsModel {
         });
 
         useEffect(
-            () => void MulticallInstanceAdminsModel.addressListFetchFx(daoContractAddress, stateUpdate),
-            [daoContractAddress, stateUpdate]
+            () => void MulticallInstanceAdminsModel.addressListFetchFx(daoAddress, stateUpdate),
+            [daoAddress, stateUpdate]
         );
 
         return state;

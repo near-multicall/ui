@@ -4,7 +4,7 @@ import { useCallback, useMemo, useState, FormEventHandler, useEffect, useContext
 import { MulticallInstance, Wallet } from "../../../entities";
 import { JobSettingsEdit, TokensWhitelistEdit } from "../../../features";
 import { ArgsString } from "../../../shared/lib/args-old";
-import { MulticallContract } from "../../../shared/lib/contracts/multicall";
+import { Multicall } from "../../../shared/lib/contracts/multicall";
 import { signAndSendTxs } from "../../../shared/lib/wallet";
 import { MulticallConfigEditorConfig, MulticallConfigEditorWidget } from "../config";
 
@@ -71,7 +71,7 @@ export const MulticallConfigEditorUI = ({ className, contracts }: MulticallConfi
                 .proposeFunctionCall(
                     proposalDescription,
                     contracts.multicall.address,
-                    MulticallContract.configDiffToProposalActions(changesDiff)
+                    Multicall.configDiffToProposalActions(changesDiff)
                 )
                 .then((someTx) => signAndSendTxs([someTx]))
                 .catch(console.error);
@@ -89,12 +89,12 @@ export const MulticallConfigEditorUI = ({ className, contracts }: MulticallConfi
         <div className={clsx(_MulticallConfigEditor, className)}>
             <MulticallInstance.AdminsTable
                 className={`${_MulticallConfigEditor}-admins`}
-                daoContractAddress={contracts.dao.address}
+                daoAddress={contracts.dao.address}
             />
 
             <TokensWhitelistEdit.Form
                 className={`${_MulticallConfigEditor}-tokensWhitelist`}
-                daoContractAddress={contracts.dao.address}
+                daoAddress={contracts.dao.address}
                 disabled={!proposalCreationPermitted}
                 resetTrigger={childFormsResetRequested}
                 {...{ onEdit }}
@@ -102,9 +102,9 @@ export const MulticallConfigEditorUI = ({ className, contracts }: MulticallConfi
 
             <JobSettingsEdit.Form
                 className={`${_MulticallConfigEditor}-jobsSettings`}
-                daoContractAddress={contracts.dao.address}
+                daoAddress={contracts.dao.address}
                 disabled={!proposalCreationPermitted}
-                multicallContract={contracts.multicall}
+                multicallInstance={contracts.multicall}
                 resetTrigger={childFormsResetRequested}
                 {...{ onEdit }}
             />

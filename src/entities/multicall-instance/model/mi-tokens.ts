@@ -1,30 +1,30 @@
 import { useEffect, useState } from "react";
 
 import { ArgsAccount } from "../../../shared/lib/args-old";
-import { MulticallContract } from "../../../shared/lib/contracts/multicall";
+import { Multicall } from "../../../shared/lib/contracts/multicall";
 import { Props } from "../../../shared/lib/props";
 
 import { type MulticallInstanceEntity } from "../config";
 
 export type MulticallInstanceTokensWhitelist = {
-    data: MulticallContract["tokensWhitelist"] | null;
+    data: Multicall["tokensWhitelist"] | null;
     error: Error | null;
     loading: boolean;
 };
 
 export class MulticallInstanceTokensModel {
     static whitelistFetchFx = async (
-        daoContractAddress: MulticallInstanceEntity.Inputs["daoContractAddress"],
+        daoAddress: MulticallInstanceEntity.Inputs["daoAddress"],
         callback: (result: MulticallInstanceTokensWhitelist) => void
     ) =>
-        await MulticallContract.instanceDataFetchFx(
-            `${ArgsAccount.deconstructAddress(daoContractAddress).name}.${MulticallContract.FACTORY_ADDRESS}`,
+        await Multicall.instanceDataFetchFx(
+            `${ArgsAccount.deconstructAddress(daoAddress).name}.${Multicall.FACTORY_ADDRESS}`,
 
             (multicallInstanceData) =>
                 callback(Props.evolve({ data: ({ tokensWhitelist }) => tokensWhitelist }, multicallInstanceData))
         );
 
-    static useWhitelist = (daoContractAddress: MulticallInstanceEntity.Inputs["daoContractAddress"]) => {
+    static useWhitelist = (daoAddress: MulticallInstanceEntity.Inputs["daoAddress"]) => {
         const [state, stateUpdate] = useState<MulticallInstanceTokensWhitelist>({
             data: null,
             error: null,
@@ -32,8 +32,8 @@ export class MulticallInstanceTokensModel {
         });
 
         useEffect(
-            () => void MulticallInstanceTokensModel.whitelistFetchFx(daoContractAddress, stateUpdate),
-            [daoContractAddress, stateUpdate]
+            () => void MulticallInstanceTokensModel.whitelistFetchFx(daoAddress, stateUpdate),
+            [daoAddress, stateUpdate]
         );
 
         return state;

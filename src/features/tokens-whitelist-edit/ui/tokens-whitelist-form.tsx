@@ -11,7 +11,7 @@ interface TokensWhitelistFormProps extends TokensWhitelistEditFeature.Inputs {}
 
 export const TokensWhitelistForm = ({
     className,
-    daoContractAddress,
+    daoAddress,
     disabled,
     onEdit,
     resetTrigger,
@@ -126,7 +126,7 @@ export const TokensWhitelistForm = ({
                 ),
             }}
             itemsAdditional={Array.from(addTokens)}
-            {...{ className, daoContractAddress }}
+            {...{ className, daoAddress }}
         />
     );
 };

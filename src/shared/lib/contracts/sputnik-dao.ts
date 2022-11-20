@@ -622,5 +622,5 @@ class SputnikDAO {
     }
 }
 
-export { SputnikDAO, SputnikDAO as SputnikDAOContract, SputnikUI, ProposalKindPolicyLabel, ProposalStatus };
+export { SputnikDAO, SputnikUI, ProposalKindPolicyLabel, ProposalStatus };
 export type { FunctionCall, FunctionCallAction, ProposalOutput, ProposalKind, ProposalAction };

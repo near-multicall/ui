@@ -1,7 +1,7 @@
 import { HTMLProps } from "react";
 
 import { MulticallInstance, MulticallInstanceEntity } from "../../entities";
-import { MulticallConfigDiff, MulticallContract } from "../../shared/lib/contracts/multicall";
+import { MulticallConfigDiff, Multicall } from "../../shared/lib/contracts/multicall";
 import { DesignKitConfigType } from "../../shared/ui/design";
 
 namespace JobSettingsEditFeature {
@@ -11,8 +11,8 @@ namespace JobSettingsEditFeature {
 
     export interface Inputs
         extends Omit<HTMLProps<HTMLDivElement>, "onChange">,
-            Pick<MulticallInstanceEntity.Inputs, "daoContractAddress"> {
-        multicallContract: MulticallContract;
+            Pick<MulticallInstanceEntity.Inputs, "daoAddress"> {
+        multicallInstance: Multicall;
         onEdit: (payload: FormState) => void;
         resetTrigger: { subscribe: (callback: EventListener) => () => void };
     }
