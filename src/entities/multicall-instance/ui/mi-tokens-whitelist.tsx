@@ -19,13 +19,13 @@ interface MulticallInstanceTokensWhitelistTableProps
 export const MulticallInstanceTokensWhitelistTable = ({
     ItemProps,
     className,
-    daoContractAddress,
+    daoAddress,
     footer,
     headingCorners,
     itemsAdditional,
     onItemsSelected,
 }: MulticallInstanceTokensWhitelistTableProps) => {
-    const { data, error, loading } = MulticallInstanceTokensModel.useWhitelist(daoContractAddress);
+    const { data, error, loading } = MulticallInstanceTokensModel.useWhitelist(daoAddress);
 
     return (
         <Tile

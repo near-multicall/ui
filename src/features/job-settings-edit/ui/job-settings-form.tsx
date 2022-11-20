@@ -12,7 +12,7 @@ interface JobSettingsFormProps extends JobSettingsEditFeature.Inputs {}
 export const JobSettingsForm = ({
     className,
     disabled,
-    multicallContract,
+    multicallInstance,
     onEdit,
     resetTrigger,
 }: JobSettingsFormProps) => {
@@ -29,18 +29,18 @@ export const JobSettingsForm = ({
     ];
 
     const formFields = {
-        croncatManager: useMemo(() => new ArgsString(multicallContract.croncatManager), [multicallContract]),
+        croncatManager: useMemo(() => new ArgsString(multicallInstance.croncatManager), [multicallInstance]),
 
         jobBond: useMemo(
-            () => new ArgsString(multicallContract.jobBond !== "" ? toNEAR(multicallContract.jobBond) : ""),
-            [multicallContract]
+            () => new ArgsString(multicallInstance.jobBond !== "" ? toNEAR(multicallInstance.jobBond) : ""),
+            [multicallInstance]
         ),
     };
 
     const onCroncatManagerChange = useCallback<Required<TextFieldProps>["onChange"]>(
         ({ target: { value } }) =>
             void croncatManagerUpdate(
-                value !== multicallContract.croncatManager ? value : formInitialState.croncatManager
+                value !== multicallInstance.croncatManager ? value : formInitialState.croncatManager
             ),
 
         [croncatManagerUpdate]
@@ -48,14 +48,14 @@ export const JobSettingsForm = ({
 
     const onJobBondChange = useCallback<Required<TextFieldProps>["onChange"]>(
         ({ target: { value } }) =>
-            void jobBondUpdate(value !== toNEAR(multicallContract.jobBond) ? toYocto(value) : formInitialState.jobBond),
+            void jobBondUpdate(value !== toNEAR(multicallInstance.jobBond) ? toYocto(value) : formInitialState.jobBond),
 
         [jobBondUpdate]
     );
 
     const formReset = useCallback(() => {
-        formFields.croncatManager.value = multicallContract.croncatManager;
-        formFields.jobBond.value = toNEAR(multicallContract.jobBond);
+        formFields.croncatManager.value = multicallInstance.croncatManager;
+        formFields.jobBond.value = toNEAR(multicallInstance.jobBond);
 
         void croncatManagerUpdate(formInitialState.croncatManager);
         void jobBondUpdate(formInitialState.jobBond);
@@ -105,7 +105,7 @@ export const JobSettingsForm = ({
                         ({ croncatManager, jobBond }[id] ===
                             formInitialState[id as JobSettingsEditFeature.ChangesDiffKey] ||
                         { croncatManager, jobBond }[id] ===
-                            multicallContract[id as JobSettingsEditFeature.ChangesDiffKey]
+                            multicallInstance[id as JobSettingsEditFeature.ChangesDiffKey]
                             ? null
                             : "blue"),
 
@@ -128,10 +128,10 @@ export const JobSettingsForm = ({
                                 <TextField
                                     fullWidth
                                     onChange={onCroncatManagerChange}
-                                    value={croncatManager || multicallContract.croncatManager}
+                                    value={croncatManager || multicallInstance.croncatManager}
                                 />
                             ) : (
-                                <NearLink address={croncatManager || multicallContract.croncatManager} />
+                                <NearLink address={croncatManager || multicallInstance.croncatManager} />
                             ),
                         ],
                     },
@@ -151,14 +151,14 @@ export const JobSettingsForm = ({
                                     fullWidth
                                     onChange={onJobBondChange}
                                     type="number"
-                                    value={toNEAR(jobBond || multicallContract.jobBond)}
+                                    value={toNEAR(jobBond || multicallInstance.jobBond)}
                                 />
                             ) : (
                                 <IconLabel
                                     icon={NearIcon.NATIVE_TOKEN_CHARACTER}
                                     label={
-                                        jobBond || multicallContract.jobBond !== ""
-                                            ? toNEAR(jobBond || multicallContract.jobBond)
+                                        jobBond || multicallInstance.jobBond !== ""
+                                            ? toNEAR(jobBond || multicallInstance.jobBond)
                                             : "..."
                                     }
                                     reversed

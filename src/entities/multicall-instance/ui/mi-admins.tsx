@@ -8,8 +8,8 @@ interface MulticallInstanceAdminsTableProps extends MulticallInstanceEntity.Inpu
     className?: string;
 }
 
-export const MulticallInstanceAdminsTable = ({ className, daoContractAddress }: MulticallInstanceAdminsTableProps) => {
-    const { data, error, loading } = MulticallInstanceAdminsModel.useAddressList(daoContractAddress);
+export const MulticallInstanceAdminsTable = ({ className, daoAddress }: MulticallInstanceAdminsTableProps) => {
+    const { data, error, loading } = MulticallInstanceAdminsModel.useAddressList(daoAddress);
 
     return (
         <Tile
