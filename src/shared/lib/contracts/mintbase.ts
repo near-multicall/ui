@@ -197,6 +197,23 @@ class MintbaseStore {
         return response.data.mb_views_active_listings;
     }
 
+    static async apiGetMetadataId(nftContractId: string, tokenId: string): Promise<string> {
+        const query = `{
+            mb_views_active_listings(
+                where: {
+                    nft_contract_id: {_eq: "${nftContractId}"},
+                    token_id: {_eq: "${tokenId}"}
+                }
+            ) {
+                metadata_id
+            }
+          }
+        `;
+        const response = await this.queryApi(query);
+        const numListings = response.data.mb_views_active_listings.length;
+        return numListings === 1 ? response.data.mb_views_active_listings[0].metadata_id.split(":")[1] : "";
+    }
+
     // check if URL is for a proposal page on UI of choice
     static getInfoFromlistingUrl(url: string): { nftContractId: string; metadataId: string } | undefined {
         // create URL object from url

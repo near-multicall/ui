@@ -12,7 +12,6 @@ import { InfoField, TextField, UnitField } from "../../shared/ui/form-fields";
 import { BaseTask, BaseTaskProps, BaseTaskState } from "../base";
 import "./mintbase.scss";
 
-import type { StoreInfo } from "../../shared/lib/contracts/mintbase";
 import type { DefaultFormData } from "../base";
 
 type FormData = DefaultFormData & {
@@ -78,11 +77,13 @@ export class BuyNft extends BaseTask<FormData, Props, State> {
             token_id: string;
         }> | null
     ): void {
+        const nftContractId = call?.actions[0].args.nft_contract_id;
+        const tokenId = call?.actions[0].args.token_id;
         if (call !== null) {
             const fromCall = {
                 addr: call.address,
                 func: call.actions[0].func,
-                listingUrl: "haha",
+                listingUrl: "loading...",
                 gas: arx.big().intoFormatted(this.initialValues.gasUnit).cast(call.actions[0].gas).toFixed(),
                 depo: arx.big().intoFormatted(this.initialValues.depoUnit).cast(call.actions[0].depo).toFixed(),
             };
@@ -93,7 +94,14 @@ export class BuyNft extends BaseTask<FormData, Props, State> {
         }
 
         this.state = { ...this.state, formData: this.initialValues };
-        this.schema.check(this.state.formData, { context: { storeOwner: this.state.mintbaseStoreInfo?.owner } });
+        this.schema.check(this.state.formData);
+
+        if (call !== null)
+            MintbaseStore.apiGetMetadataId(nftContractId!, tokenId!).then((metadataId: string) =>
+                this.setFormData({
+                    listingUrl: `${MintbaseStore.UI_BASE_URL}/meta/${nftContractId}%3A${metadataId}`,
+                })
+            );
     }
 
     static override inferOwnType(json: Call): boolean {
@@ -126,21 +134,12 @@ export class BuyNft extends BaseTask<FormData, Props, State> {
     // TODO: fetch store owner/data
     private tryFetchListingInfo(): Promise<boolean> {
         return new Promise<boolean>((resolve) => {
-            this.schema
-                .check(this.state.formData, { context: { storeOwner: this.state.mintbaseStoreInfo?.owner } })
-                .then(() => {
-                    const { listingUrl } = fields(this.schema);
-                    if (!listingUrl.isBad()) {
-                        this.confidentlyFetchListingInfo().then((ready) => resolve(ready));
-                    } else {
-                        this.setState({
-                            nftContractId: "",
-                            tokenId: "",
-                            metadataId: "",
-                        }); // will be invalid
-                        resolve(false);
-                    }
-                });
+            this.schema.check(this.state.formData).then(() => {
+                const { listingUrl } = fields(this.schema);
+                if (!listingUrl.isBad()) {
+                    this.confidentlyFetchListingInfo().then((ready) => resolve(ready));
+                } else resolve(false);
+            });
         });
     }
 
