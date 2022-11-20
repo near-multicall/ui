@@ -28,4 +28,7 @@ export const keywords = {
         transfer_store_ownership: ["transfer store ownership"],
         buy: ["nft", "marketplace"],
     },
+    paras: {
+        buy: ["nft", "marketplace"],
+    },
 };

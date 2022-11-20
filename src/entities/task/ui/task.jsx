@@ -243,6 +243,18 @@ export class Task extends Component {
                         );
                 }
 
+            case "paras":
+                switch (func) {
+                    case "buy":
+                        return (
+                            <Family.Paras.BuyNft
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
+                }
+
             default:
                 for (let family in Family) {
                     if (family === "BaseTask") continue;

@@ -214,7 +214,6 @@ class MintbaseStore {
         return numListings === 1 ? response.data.mb_views_active_listings[0].metadata_id.split(":")[1] : "";
     }
 
-    // check if URL is for a proposal page on UI of choice
     static getInfoFromlistingUrl(url: string): { nftContractId: string; metadataId: string } | undefined {
         // create URL object from url
         let urlObj: URL;

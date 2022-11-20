@@ -141,3 +141,4 @@ class NonFungibleToken extends StorageManagement {
 }
 
 export { NonFungibleToken };
+export type { TokenMetadata };

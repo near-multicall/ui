@@ -1,15 +1,17 @@
 import { Form, FormikErrors, useFormikContext } from "formik";
 import { useEffect } from "react";
-import MintbaseLogo from "../../app/static/mintbase/Mintbase_logo.svg";
+import ParasLogo from "../../app/static/paras/Paras_logo.svg";
 import { args as arx } from "../../shared/lib/args/args";
 import { fields } from "../../shared/lib/args/args-types/args-object";
 import { Call, CallError } from "../../shared/lib/call";
-import { MintbaseStore } from "../../shared/lib/contracts/mintbase";
+import { Paras, type MarketDataJson } from "../../shared/lib/contracts/paras";
+import { NonFungibleToken } from "../../shared/lib/standards/nonFungibleToken";
 import { Big, formatTokenAmount, toGas } from "../../shared/lib/converter";
 import { InfoField, TextField, UnitField } from "../../shared/ui/form-fields";
 import { BaseTask, BaseTaskProps, BaseTaskState } from "../base";
-import "./mintbase.scss";
+import "./paras.scss";
 
+import type { TokenMetadata } from "../../shared/lib/standards/nonFungibleToken";
 import type { DefaultFormData } from "../base";
 
 type FormData = DefaultFormData & {
@@ -19,20 +21,12 @@ type FormData = DefaultFormData & {
 type Props = BaseTaskProps;
 
 type State = BaseTaskState<FormData> & {
-    nftContractId: string;
-    tokenId: string;
-    metadataId: string;
-    listingInfo: {
-        price: string;
-        title: string;
-        token_id: string;
-        market_id: string;
-        media: string;
-    };
+    marketData: MarketDataJson | null;
+    metadata: TokenMetadata;
 };
 
 export class BuyNft extends BaseTask<FormData, Props, State> {
-    override uniqueClassName = "mintbase-buy-nft-task";
+    override uniqueClassName = "paras-buy-nft-task";
     override schema = arx
         .object()
         .shape({
@@ -40,9 +34,15 @@ export class BuyNft extends BaseTask<FormData, Props, State> {
                 .string()
                 .url()
                 .test({
-                    name: "Mintbase listing URL",
-                    message: "URL does not belong to a Mintbase listing",
-                    test: (value) => value == null || value === "" || MintbaseStore.isListingURLValid(value),
+                    name: "Paras listing URL",
+                    message: "URL does not belong to a Paras listing",
+                    test: (value) => value == null || value === "" || Paras.isListingURLValid(value),
+                })
+                .test({
+                    name: "auction",
+                    message: "Listing is an auction",
+                    test: (value, ctx) =>
+                        value == null || value === "" || ctx?.options.context?.marketData?.is_auction == null,
                 }),
             gas: arx.big().gas().min(toGas("3.5")).max(toGas("250")),
         })
@@ -55,7 +55,7 @@ export class BuyNft extends BaseTask<FormData, Props, State> {
 
     override initialValues: FormData = {
         name: "Simple Buy",
-        addr: MintbaseStore.SIMPLE_MARKETPLACE_ADDRESS,
+        addr: Paras.MARKETPLACE_ADDRESS,
         func: "buy",
         listingUrl: "",
         gas: "30",
@@ -76,12 +76,19 @@ export class BuyNft extends BaseTask<FormData, Props, State> {
         }> | null
     ): void {
         if (call !== null) {
+            const nftContractId = call.actions[0].args.nft_contract_id;
+            const tokenId = call.actions[0].args.token_id;
+            const tokenIdCombi = tokenId.includes(":")
+                ? `${tokenId.split(":")[0]}/${encodeURIComponent(tokenId)}`
+                : tokenId;
             const fromCall = {
                 addr: call.address,
                 func: call.actions[0].func,
+                listingUrl: `${Paras.UI_BASE_URL}/token/${nftContractId}::${tokenIdCombi}`,
                 gas: arx.big().intoFormatted(this.initialValues.gasUnit).cast(call.actions[0].gas).toFixed(),
                 depo: arx.big().intoFormatted(this.initialValues.depoUnit).cast(call.actions[0].depo).toFixed(),
             };
+
             this.initialValues = Object.keys(this.initialValues).reduce((acc, k) => {
                 const v = fromCall[k as keyof typeof fromCall];
                 return v !== null && v !== undefined ? { ...acc, [k as keyof FormData]: v } : acc;
@@ -89,40 +96,24 @@ export class BuyNft extends BaseTask<FormData, Props, State> {
         }
 
         this.state = { ...this.state, formData: this.initialValues };
-
-        if (call !== null) {
-            const nftContractId = call.actions[0].args.nft_contract_id;
-            const tokenId = call.actions[0].args.token_id;
-            MintbaseStore.apiGetMetadataId(nftContractId, tokenId).then((metadataId: string) =>
-                this.setFormData(
-                    {
-                        listingUrl: `${MintbaseStore.UI_BASE_URL}/meta/${nftContractId}%3A${metadataId}`,
-                    },
-                    () =>
-                        this.schema.check(this.state.formData).then(() =>
-                            this.setState({
-                                nftContractId,
-                                tokenId,
-                            })
-                        )
-                )
-            );
-        }
     }
 
     static override inferOwnType(json: Call): boolean {
-        return !!json && json.address === MintbaseStore.SIMPLE_MARKETPLACE_ADDRESS && json.actions[0].func === "buy";
+        return !!json && json.address === Paras.MARKETPLACE_ADDRESS && json.actions[0].func === "buy";
     }
 
     public override toCall(): Call {
-        const { gas, gasUnit, depo } = this.state.formData;
-        const { nftContractId, tokenId } = this.state;
+        const { listingUrl, gas, gasUnit, depo } = this.state.formData;
+        const { nftContractId, tokenId } = Paras.getInfoFromlistingUrl(listingUrl) ?? {
+            nftContractId: null,
+            tokenId: null,
+        };
 
         if (!arx.big().isValidSync(gas)) throw new CallError("Failed to parse gas input value", this.props.id);
         if (!arx.big().isValidSync(depo)) throw new CallError("Failed to parse deposit input value", this.props.id);
 
         return {
-            address: MintbaseStore.SIMPLE_MARKETPLACE_ADDRESS,
+            address: Paras.MARKETPLACE_ADDRESS,
             actions: [
                 {
                     func: "buy",
@@ -138,29 +129,27 @@ export class BuyNft extends BaseTask<FormData, Props, State> {
     }
 
     // TODO: fetch store owner/data
-    private tryFetchListingInfo(): Promise<boolean> {
+    private tryLoadMarketData(): Promise<boolean> {
         return new Promise<boolean>((resolve) => {
-            this.schema.check(this.state.formData).then(() => {
+            this.schema.check(this.state.formData, { context: { marketData: this.state.marketData } }).then(() => {
                 const { listingUrl } = fields(this.schema);
                 if (!listingUrl.isBad()) {
-                    this.confidentlyFetchListingInfo().then((ready) => resolve(ready));
+                    this.confidentlyLoadMarketData().then((ready) => resolve(ready));
                 } else resolve(false);
             });
         });
     }
 
     // fetch store data/owner
-    private async confidentlyFetchListingInfo(): Promise<boolean> {
+    private async confidentlyLoadMarketData(): Promise<boolean> {
         const { listingUrl } = this.state.formData;
-        const { nftContractId, metadataId } = MintbaseStore.getInfoFromlistingUrl(listingUrl)!;
-        const listings = await MintbaseStore.apiGetSimpleListings(nftContractId, metadataId);
-        if (listings.length === 0) return false;
-        // find the cheapest token in the series
-        let cheapest = listings[0];
-        for (let i = 0; i < listings.length; i++) {
-            if (Big(listings[i].price).lt(cheapest.price)) cheapest = listings[i];
-        }
-        this.setState({ nftContractId, tokenId: cheapest.token_id, metadataId, listingInfo: cheapest });
+        const { nftContractId, tokenId } = Paras.getInfoFromlistingUrl(listingUrl)!;
+        const [marketData, nft] = await Promise.all([
+            Paras.getMarketData(nftContractId, tokenId),
+            NonFungibleToken.init(nftContractId, tokenId),
+        ]);
+        if (marketData == null || marketData!.is_auction === true) return false;
+        this.setState({ marketData, metadata: nft.token?.metadata! });
         window.EDITOR.forceUpdate();
         return true;
     }
@@ -168,7 +157,7 @@ export class BuyNft extends BaseTask<FormData, Props, State> {
     public override async validateForm(values: FormData): Promise<FormikErrors<FormData>> {
         this.setFormData(values);
         await new Promise((resolve) => this.resolveDebounced(resolve));
-        await this.tryFetchListingInfo();
+        await this.tryLoadMarketData();
         return Object.fromEntries(
             Object.entries(fields(this.schema))
                 .map(([k, v]) => [k, v?.message() ?? ""])
@@ -178,7 +167,7 @@ export class BuyNft extends BaseTask<FormData, Props, State> {
 
     public override Editor = (): React.ReactNode => {
         const { resetForm, validateForm, values } = useFormikContext<FormData>();
-        const { listingInfo, nftContractId } = this.state;
+        const { marketData, metadata } = this.state;
 
         useEffect(() => {
             resetForm({
@@ -202,10 +191,10 @@ export class BuyNft extends BaseTask<FormData, Props, State> {
                     label="Listing URL"
                     roundtop
                 />
-                {!!nftContractId && !!listingInfo && (
+                {!!marketData && !!metadata && (
                     <InfoField>
                         <img
-                            src={listingInfo.media}
+                            src={metadata.media!}
                             alt="nft media"
                         />
                         <p className="entry">
@@ -213,11 +202,11 @@ export class BuyNft extends BaseTask<FormData, Props, State> {
                             <span className="value">{`${arx
                                 .big()
                                 .intoFormatted("NEAR")
-                                .cast(listingInfo.price)} \u24C3`}</span>
+                                .cast(marketData.price)} \u24C3`}</span>
                         </p>
                         <p className="entry">
                             <span className="key">Title</span>
-                            <span className="value">{listingInfo.title}</span>
+                            <span className="value">{metadata.title}</span>
                         </p>
                     </InfoField>
                 )}
@@ -230,14 +219,14 @@ export class BuyNft extends BaseTask<FormData, Props, State> {
                 />
                 <a
                     className="protocol"
-                    href="https://www.mintbase.io/"
+                    href="https://paras.id/"
                     target="_blank"
                     rel="noopener noreferrer"
                 >
                     <span>powered by</span>
                     <img
-                        src={MintbaseLogo}
-                        alt="Mintbase"
+                        src={ParasLogo}
+                        alt="Paras"
                         className="logo"
                     />
                 </a>

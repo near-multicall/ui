@@ -1,0 +1,36 @@
+@use "sass/color";
+@use "sass/mixin";
+@use "sass/font";
+@use "../base";
+
+$paras-blue: #1300be;
+$paras-black: #04002a;
+
+.paras-buy-nft-task {
+    background: radial-gradient(at bottom left, $paras-blue 0%, $paras-black 100%);
+    @include base.task-theme(color.$light-text);
+}
+
+.paras-buy-nft-task-edit {
+    .InfoField-content {
+        display: flex;
+        flex-flow: column nowrap;
+        .entry {
+            @include mixin.center-items(space-between, center);
+            height: 2em;
+            flex-flow: row nowrap;
+            max-width: 100%;
+        }
+        .key {
+            font-weight: 800;
+            white-space: nowrap;
+        }
+        .value {
+            font-family: font.$code;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-left: 2em;
+        }
+    }
+}
