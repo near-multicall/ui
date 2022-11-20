@@ -42,7 +42,7 @@ export class BuyNft extends BaseTask<FormData, Props, State> {
                 .string()
                 .url()
                 .test({
-                    name: "check is valid Mintbase listing URL",
+                    name: "Mintbase listing URL",
                     message: "URL does not belong to a Mintbase listing",
                     test: (value) => !!value && MintbaseStore.isListingURLValid(value),
                 }),
@@ -77,13 +77,10 @@ export class BuyNft extends BaseTask<FormData, Props, State> {
             token_id: string;
         }> | null
     ): void {
-        const nftContractId = call?.actions[0].args.nft_contract_id;
-        const tokenId = call?.actions[0].args.token_id;
         if (call !== null) {
             const fromCall = {
                 addr: call.address,
                 func: call.actions[0].func,
-                listingUrl: "loading...",
                 gas: arx.big().intoFormatted(this.initialValues.gasUnit).cast(call.actions[0].gas).toFixed(),
                 depo: arx.big().intoFormatted(this.initialValues.depoUnit).cast(call.actions[0].depo).toFixed(),
             };
@@ -94,14 +91,25 @@ export class BuyNft extends BaseTask<FormData, Props, State> {
         }
 
         this.state = { ...this.state, formData: this.initialValues };
-        this.schema.check(this.state.formData);
 
-        if (call !== null)
-            MintbaseStore.apiGetMetadataId(nftContractId!, tokenId!).then((metadataId: string) =>
-                this.setFormData({
-                    listingUrl: `${MintbaseStore.UI_BASE_URL}/meta/${nftContractId}%3A${metadataId}`,
-                })
+        if (call !== null) {
+            const nftContractId = call.actions[0].args.nft_contract_id;
+            const tokenId = call.actions[0].args.token_id;
+            MintbaseStore.apiGetMetadataId(nftContractId, tokenId).then((metadataId: string) =>
+                this.setFormData(
+                    {
+                        listingUrl: `${MintbaseStore.UI_BASE_URL}/meta/${nftContractId}%3A${metadataId}`,
+                    },
+                    () =>
+                        this.schema.check(this.state.formData).then(() =>
+                            this.setState({
+                                nftContractId,
+                                tokenId,
+                            })
+                        )
+                )
             );
+        }
     }
 
     static override inferOwnType(json: Call): boolean {
