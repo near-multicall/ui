@@ -1,1 +1,1 @@
-export { RefFinanceAdapter } from "./ref-finance";
+export { RefFinance } from "./ref-finance";
