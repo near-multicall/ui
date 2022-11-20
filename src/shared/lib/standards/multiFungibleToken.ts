@@ -52,6 +52,19 @@ class MultiFungibleToken {
     async mftMetadata(): Promise<MultiFungibleTokenMetadata> {
         return view(this.address, "mft_metadata", { token_id: this.id });
     }
+
+    // TODO: Not deployed yet. Wait for Ref's next contract upgrade.
+    async mftHasRegistered(accountId: string): Promise<boolean> {
+        return view(this.address, "mft_has_registered", { token_id: this.id, account_id: accountId });
+    }
+
+    async mftBalanceOf(accountId: string): Promise<string> {
+        return view(this.address, "mft_balance_of", { token_id: this.id, account_id: accountId });
+    }
+
+    async mftTotalSupply(): Promise<string> {
+        return view(this.address, "mft_total_supply", { token_id: this.id });
+    }
 }
 
 export { MultiFungibleToken };

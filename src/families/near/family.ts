@@ -3,6 +3,7 @@ export { FtTransfer } from "./ft-transfer";
 export { FtTransferCall } from "./ft-transfer-call";
 export { MftTransfer } from "./mft-transfer";
 export { MftTransferCall } from "./mft-transfer-call";
+export { MftRegister } from "./mft-register";
 export { NftTransfer } from "./nft-transfer";
 export { NftTransferCall } from "./nft-transfer-call";
 export { NftApprove } from "./nft-approve";

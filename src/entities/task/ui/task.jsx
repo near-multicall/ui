@@ -149,6 +149,14 @@ export class Task extends Component {
                                 json={json}
                             />
                         );
+                    case "mft_register":
+                        return (
+                            <Family.Near.MftRegister
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
                     case "deposit_and_stake":
                         return (
                             <Family.Near.DepositAndStake
