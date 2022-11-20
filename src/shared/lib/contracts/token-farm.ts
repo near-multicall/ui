@@ -1,15 +1,10 @@
 import type { FungibleTokenMetadata } from "../standards/fungibleToken";
-import { view, viewAccount } from "../wallet";
+import { view } from "../wallet";
 
 const FACTORY_ADDRESS_SELECTOR: Record<string, string> = {
     mainnet: "tkn.near",
-    testnet: "",
+    testnet: "tokens.testnet",
 };
-
-// const CONTRACT_CODE_HASHES_SELECTOR: Record<string, string[]> = {
-//     mainnet: ["4AVV1KUVgi17XoXkqxUPzyMhERXu15mGawriPQvWmBKD"],
-//     testnet: [],
-// };
 
 export type TokenArgs = {
     owner_id: string;
