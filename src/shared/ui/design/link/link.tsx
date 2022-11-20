@@ -40,7 +40,7 @@ export const Link = ({ className, href, label, noTooltip = false, ...props }: Li
     );
 
     useEffect(
-        () => void (copied ? setTimeout(() => void copiedStateUpdate(false), 2000) : null),
+        () => void (copied ? setTimeout(() => void copiedStateUpdate(false), 1000) : null),
         [copied, copiedStateUpdate]
     );
 
