@@ -77,7 +77,7 @@ export const MulticallConfigEditorUI = ({ className, contracts }: MulticallConfi
                 .catch(console.error);
         },
 
-        [contracts, proposalDescription]
+        [changesDiff, contracts, proposalDescription]
     );
 
     useEffect(
