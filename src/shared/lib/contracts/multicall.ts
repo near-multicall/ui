@@ -2,12 +2,12 @@ import { Account } from "@near-wallet-selector/core";
 
 import { ArgsAccount } from "../args-old";
 import { Big, toGas, dateToCron, toYocto } from "../converter";
-import { FungibleToken } from "../standards/fungibleToken";
+import { AccountId, Base64String, BigString, U128String, U64String } from "../types";
 import { type Tx, viewAccount, viewState, view } from "../wallet";
 
 import type { FunctionCallAction as daoFunctionCallAction, SputnikDAO } from "./sputnik-dao";
 
-const FACTORY_ADDRESS_SELECTOR: Record<string, string> = {
+const FACTORY_ADDRESS_SELECTOR: Record<string, AccountId> = {
     mainnet: "v1.multicall.near",
     testnet: "v1_03.multicall.testnet",
 };
@@ -33,31 +33,27 @@ type JobData = {
      */
     job: {
         croncat_hash: string;
-        creator: string;
-        bond: string; // string encoded number (u128)
+        creator: AccountId;
+        bond: U128String; // string encoded number (u128)
         cadence: string;
-        trigger_gas: string; // string encoded number (u64)
-        croncat_budget: string; // string encoded number (u128)
-        start_at: string; // string encoded number (u64)
+        trigger_gas: U64String; // string encoded number (u64)
+        croncat_budget: U128String; // string encoded number (u128)
+        start_at: U64String; // string encoded number (u64)
         run_count: number;
         is_active: boolean;
         multicalls: MulticallArgs[];
     };
 };
 
-type MulticallAdminData = Account["accountId"];
-
-type WhitelistedTokenData = FungibleToken["address"];
-
 type FunctionCall = {
     func: string;
-    args: string; // base64 encoded JSON args
-    gas: string; // string encoded number (u64)
-    depo: string; // string encoded number (u128)
+    args: Base64String; // base64 encoded JSON args
+    gas: U64String; // string encoded number (u64)
+    depo: U128String; // string encoded number (u128)
 };
 
 type BatchCall = {
-    address: Account["accountId"];
+    address: AccountId;
     actions: FunctionCall[];
 };
 
@@ -76,35 +72,35 @@ enum MulticallTokensWhitelistChangesDiffKey {
 }
 
 type MulticallConfigDiff = {
-    [MulticallTokensWhitelistChangesDiffKey.addTokens]: string[];
-    [MulticallConfigParamKey.croncatManager]: string;
-    [MulticallConfigParamKey.jobBond]: string;
-    [MulticallTokensWhitelistChangesDiffKey.removeTokens]: string[];
+    [MulticallTokensWhitelistChangesDiffKey.addTokens]: AccountId[];
+    [MulticallConfigParamKey.croncatManager]: AccountId;
+    [MulticallConfigParamKey.jobBond]: U128String;
+    [MulticallTokensWhitelistChangesDiffKey.removeTokens]: AccountId[];
 };
 
 class Multicall {
-    static FACTORY_ADDRESS: string = FACTORY_ADDRESS_SELECTOR[window.NEAR_ENV];
-    static CONTRACT_CODE_HASHES: string[] = CONTRACT_CODE_HASHES_SELECTOR[window.NEAR_ENV];
+    static FACTORY_ADDRESS: AccountId = FACTORY_ADDRESS_SELECTOR[window.NEAR_ENV];
+    static CONTRACT_CODE_HASHES: AccountId[] = CONTRACT_CODE_HASHES_SELECTOR[window.NEAR_ENV];
     // 0.025 NEAR is the min required by croncat for a non-recurring task. Assume trigger of 270 Tgas and 0 NEAR.
-    static CRONCAT_FEE: string = toYocto("0.0275");
+    static CRONCAT_FEE: BigString = toYocto("0.0275");
 
-    address: Account["accountId"];
-    admins: MulticallAdminData[] = [];
-    [MulticallConfigParamKey.croncatManager]: string = "";
+    address: AccountId;
+    admins: AccountId[] = [];
+    [MulticallConfigParamKey.croncatManager]: AccountId = "";
     // only whitelisted tokens can be attached to multicalls or job activations.
-    tokensWhitelist: WhitelistedTokenData[] = [];
+    tokensWhitelist: AccountId[] = [];
     // job bond amount must be attached as deposit when adding new jobs.
     // needs initialization, but start with "" because it's distinguishable from a real value (string encoded numbers).
-    [MulticallConfigParamKey.jobBond]: string = "";
+    [MulticallConfigParamKey.jobBond]: U128String = "";
     // Multicall instance is ready when info (admins...) are fetched & assigned correctly.
     ready: boolean = false;
 
-    constructor(multicallAddress: string) {
+    constructor(multicallAddress: AccountId) {
         this.address = multicallAddress;
     }
 
     // used to create and initialize a Multicall instance
-    static async init(multicallAddress: string): Promise<Multicall> {
+    static async init(multicallAddress: AccountId): Promise<Multicall> {
         // verify address is a Multicall instance, fetch its info and mark it ready
         const newMulticall = new Multicall(multicallAddress);
         const [isMulticall, admins, croncatManager, tokensWhitelist, jobBond] = await Promise.all([
@@ -149,7 +145,7 @@ class Multicall {
      * @param callback Stateful data fetch callback
      */
     static instanceDataFetchFx = async (
-        daoAddress: SputnikDAO["address"],
+        daoAddress: AccountId,
         callback: (result: { data: Multicall | null; error: Error | null; loading: boolean }) => void
     ) =>
         callback(
@@ -168,7 +164,7 @@ class Multicall {
      *
      * @param accountId
      */
-    static async isMulticall(accountId: string): Promise<boolean> {
+    static async isMulticall(accountId: AccountId): Promise<boolean> {
         const accountInfo = await viewAccount(accountId);
         const codeHash: string = accountInfo.code_hash;
         return Multicall.CONTRACT_CODE_HASHES.includes(codeHash);
@@ -178,7 +174,7 @@ class Multicall {
      * Multicall's factory has an admin-controlled fee to be
      * paid upon creating a new multicall instance contract
      */
-    static async getFactoryFee(): Promise<string> {
+    static async getFactoryFee(): Promise<U128String> {
         return view(this.FACTORY_ADDRESS, "get_fee", {});
     }
 
@@ -240,28 +236,28 @@ class Multicall {
     /**
      * get list of admins
      */
-    async getAdmins(): Promise<string[]> {
+    async getAdmins(): Promise<AccountId[]> {
         return view(this.address, "get_admins", {});
     }
 
     /**
      * get whitelisted tokens
      */
-    async getWhitelistedTokens(): Promise<string[]> {
+    async getWhitelistedTokens(): Promise<AccountId[]> {
         return view(this.address, "get_tokens", {});
     }
 
     /**
      * get croncat manager address that was registered on the multicall instance.
      */
-    async getCroncatManager(): Promise<string> {
+    async getCroncatManager(): Promise<AccountId> {
         return view(this.address, "get_croncat_manager", {});
     }
 
     /**
      * get job bond
      */
-    async getJobBond(): Promise<string> {
+    async getJobBond(): Promise<U128String> {
         return view(this.address, "get_job_bond", {});
     }
 
@@ -292,7 +288,7 @@ class Multicall {
      * @returns
      */
     // TODO: currently budget is hard-coded for jobs with 1 multicall
-    async addJob(multicalls: MulticallArgs[], triggerDate: Date, triggerGas: string): Promise<Tx> {
+    async addJob(multicalls: MulticallArgs[], triggerDate: Date, triggerGas: U64String): Promise<Tx> {
         // crontab in CronCat format. See: https://github.com/CronCats/Schedule
         const cadence: string = dateToCron(triggerDate);
         // timestamp as required by NEAR chain (UTC, in nanoseconds)
