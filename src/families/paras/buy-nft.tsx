@@ -78,15 +78,21 @@ export class BuyNft extends BaseTask<FormData, Props, State> {
         if (call !== null) {
             const nftContractId = call.actions[0].args.nft_contract_id;
             const tokenId = call.actions[0].args.token_id;
-            const tokenIdCombi = tokenId.includes(":")
-                ? `${tokenId.split(":")[0]}/${encodeURIComponent(tokenId)}`
-                : tokenId;
             const fromCall = {
                 addr: call.address,
                 func: call.actions[0].func,
-                listingUrl: `${Paras.UI_BASE_URL}/token/${nftContractId}::${tokenIdCombi}`,
                 gas: arx.big().intoFormatted(this.initialValues.gasUnit).cast(call.actions[0].gas).toFixed(),
                 depo: arx.big().intoFormatted(this.initialValues.depoUnit).cast(call.actions[0].depo).toFixed(),
+                ...(nftContractId != null &&
+                    nftContractId !== "" &&
+                    tokenId != null &&
+                    tokenId !== "" && {
+                        listingUrl:
+                            `${Paras.UI_BASE_URL}/token/${nftContractId}::` +
+                            (tokenId.includes(":")
+                                ? `${tokenId.split(":")[0]}/${encodeURIComponent(tokenId)}`
+                                : tokenId),
+                    }),
             };
 
             this.initialValues = Object.keys(this.initialValues).reduce((acc, k) => {
