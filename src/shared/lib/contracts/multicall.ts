@@ -153,17 +153,13 @@ class Multicall {
         callback: (result: { data: Multicall | null; error: Error | null; loading: boolean }) => void
     ) =>
         callback(
-            await Multicall.init(`${ArgsAccount.deconstructAddress(daoAddress).name}.${Multicall.FACTORY_ADDRESS}`)
-                .then((multicallInstance) => ({
-                    data: multicallInstance,
-                    error: null,
-                    loading: false,
-                }))
-                .catch((error) => ({
-                    data: null,
-                    error,
-                    loading: false,
-                }))
+            await Multicall.init(
+                `${ArgsAccount.deconstructAddress(daoAddress).name}.${Multicall.FACTORY_ADDRESS}`
+            ).then((multicallInstance) => ({
+                data: multicallInstance.ready ? multicallInstance : null,
+                error: multicallInstance.ready ? null : new Error("Unable to connect to Multicall Instance"),
+                loading: false,
+            }))
         );
 
     /**
