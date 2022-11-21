@@ -1,5 +1,8 @@
+import { Account } from "@near-wallet-selector/core";
+
 import { ArgsAccount } from "../args-old";
 import { Big, toGas, dateToCron, toYocto } from "../converter";
+import { FungibleToken } from "../standards/fungibleToken";
 import { type Tx, viewAccount, viewState, view } from "../wallet";
 
 import type { FunctionCallAction as daoFunctionCallAction, SputnikDAO } from "./sputnik-dao";
@@ -42,6 +45,10 @@ type JobData = {
     };
 };
 
+type MulticallAdminData = Account["accountId"];
+
+type WhitelistedTokenData = FungibleToken["address"];
+
 type FunctionCall = {
     func: string;
     args: string; // base64 encoded JSON args
@@ -50,7 +57,7 @@ type FunctionCall = {
 };
 
 type BatchCall = {
-    address: string;
+    address: Account["accountId"];
     actions: FunctionCall[];
 };
 
@@ -81,11 +88,11 @@ class Multicall {
     // 0.025 NEAR is the min required by croncat for a non-recurring task. Assume trigger of 270 Tgas and 0 NEAR.
     static CRONCAT_FEE: string = toYocto("0.0275");
 
-    address: string;
-    admins: string[] = [];
+    address: Account["accountId"];
+    admins: MulticallAdminData[] = [];
     [MulticallConfigParamKey.croncatManager]: string = "";
     // only whitelisted tokens can be attached to multicalls or job activations.
-    tokensWhitelist: string[] = [];
+    tokensWhitelist: WhitelistedTokenData[] = [];
     // job bond amount must be attached as deposit when adding new jobs.
     // needs initialization, but start with "" because it's distinguishable from a real value (string encoded numbers).
     [MulticallConfigParamKey.jobBond]: string = "";
