@@ -206,14 +206,21 @@ export class BuyNft extends BaseTask<FormData, Props, State> {
                 />
                 {!!nftContractId && !!listingInfo ? (
                     <InfoField>
-                        <b>Price: </b>
-                        <div>{formatTokenAmount(listingInfo.price, 24, 5)}Ⓝ</div>
-                        <b>Title: </b>
-                        <div>{listingInfo.title}</div>
                         <img
                             src={listingInfo.media}
                             alt="nft media"
                         />
+                        <p className="entry">
+                            <span className="key">Price</span>
+                            <span className="value">{`${arx
+                                .big()
+                                .intoFormatted("NEAR")
+                                .cast(listingInfo.price)} \u24C3`}</span>
+                        </p>
+                        <p className="entry">
+                            <span className="key">Title</span>
+                            <span className="value">{listingInfo.title}</span>
+                        </p>
                     </InfoField>
                 ) : null}
                 <UnitField

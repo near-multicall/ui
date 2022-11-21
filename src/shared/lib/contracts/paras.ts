@@ -1,5 +1,5 @@
 const MARKETPLACE_ADDRESS_SELECTOR: Record<string, string> = {
-    mainnet: "marketplace.paras.near ",
+    mainnet: "marketplace.paras.near",
     testnet: "paras-marketplace-v2.testnet",
 };
 
