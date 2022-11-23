@@ -1,18 +1,17 @@
+import { InputAdornment } from "@mui/material";
 import { Form, FormikErrors, useFormikContext } from "formik";
 import { useEffect } from "react";
+import * as TokenFarmSymbol from "../../app/static/token-farm/TokenFarm_symbol.png";
 import { args as arx } from "../../shared/lib/args/args";
 import { fields } from "../../shared/lib/args/args-types/args-object";
 import { Call, CallError } from "../../shared/lib/call";
 import { TknFarm, TokenArgs } from "../../shared/lib/contracts/token-farm";
-import { Big, unit } from "../../shared/lib/converter";
-import { STORAGE } from "../../shared/lib/persistent";
-import { StorageManagement, StorageBalance, StorageBalanceBounds } from "../../shared/lib/standards/storageManagement";
-import { CheckboxField, InfoField, TextField, UnitField } from "../../shared/ui/form-fields";
-import { BaseTask, BaseTaskProps, BaseTaskState, DefaultFormData } from "../base";
 import { dataUrlToFile, fileToDataUrl } from "../../shared/lib/converter";
-import * as TokenFarmSymbol from "../../app/static/token-farm/TokenFarm_symbol.png";
-import "./token-farm.scss";
+import { STORAGE } from "../../shared/lib/persistent";
+import { InfoField, TextField, UnitField } from "../../shared/ui/form-fields";
 import { FileField } from "../../shared/ui/form-fields/file-field/file-field";
+import { BaseTask, BaseTaskProps, BaseTaskState, DefaultFormData } from "../base";
+import "./token-farm.scss";
 
 type FormData = DefaultFormData & {
     ownerId: string;
@@ -39,7 +38,14 @@ export class CreateToken extends BaseTask<FormData, Props, State> {
         .shape({
             gas: arx.big().gas(),
             ownerId: arx.string().address(),
-            totalSupply: arx.big(),
+            totalSupply: arx.big().test({
+                name: "too many decimals places",
+                message: "too many decimals places",
+                test: (value, ctx) =>
+                    value == null ||
+                    ctx.parent.decimals == null ||
+                    arx.big().maxDecimalPlaces(ctx.parent.decimals).isValidSync(value),
+            }),
             tokenName: arx.string(),
             tokenSymbol: arx
                 .string()
@@ -54,13 +60,14 @@ export class CreateToken extends BaseTask<FormData, Props, State> {
                     },
                 }),
             icon: arx.mixed<File>(),
-            decimals: arx.number(),
+            decimals: arx.number().integer().min(0).required("please input a number"),
         })
-        .transform(({ gas, gasUnit, ...rest }) => ({
+        .transform(({ gas, gasUnit, decimals, ...rest }) => ({
             ...rest,
             gas: arx.big().intoParsed(gasUnit).cast(gas).toFixed(),
+            ...(decimals !== "" && { decimals }),
         }))
-        .requireAll()
+        .requireAll({ ignore: ["decimals"] })
         .retainAll();
 
     override initialValues: FormData = {
@@ -105,7 +112,11 @@ export class CreateToken extends BaseTask<FormData, Props, State> {
                 gas: arx.big().intoFormatted(this.initialValues.gasUnit).cast(call.actions[0].gas).toFixed(),
                 depo: arx.big().intoFormatted(this.initialValues.depoUnit).cast(call.actions[0].depo).toFixed(),
                 ownerId: call.actions[0].args.args.owner_id,
-                totalSupply: call.actions[0].args.args.total_supply,
+                totalSupply: arx
+                    .big()
+                    .intoFormatted(call.actions[0].args.args.metadata.decimals)
+                    .cast(call.actions[0].args.args.total_supply)
+                    .toFixed(),
                 tokenName: call.actions[0].args.args.metadata.name,
                 tokenSymbol: call.actions[0].args.args.metadata.symbol,
                 icon: !!iconDataUrl ? dataUrlToFile(iconDataUrl, "token-icon") : null,
@@ -157,7 +168,10 @@ export class CreateToken extends BaseTask<FormData, Props, State> {
 
         if (!arx.big().isValidSync(gas)) throw new CallError("Failed to parse gas input value", this.props.id);
         if (!arx.big().isValidSync(depo)) throw new CallError("Failed to parse depo input value", this.props.id);
+        if (!arx.big().isValidSync(totalSupply))
+            throw new CallError("Failed to parse total supply input value", this.props.id);
 
+        console.log(decimals);
         return {
             address: addr,
             actions: [
@@ -166,7 +180,7 @@ export class CreateToken extends BaseTask<FormData, Props, State> {
                     args: {
                         args: {
                             owner_id: ownerId,
-                            total_supply: totalSupply,
+                            total_supply: arx.big().intoParsed(decimals).cast(totalSupply).toFixed(),
                             metadata: {
                                 spec,
                                 name: tokenName,
@@ -228,6 +242,12 @@ export class CreateToken extends BaseTask<FormData, Props, State> {
         );
     }
 
+    protected override onAddressesUpdated(e: CustomEvent<{ multicall: string }>): void {
+        this.setFormData({ ownerId: e.detail.multicall });
+        window.EDITOR.forceUpdate();
+        this.forceUpdate();
+    }
+
     public override Editor = (): React.ReactNode => {
         const { resetForm, validateForm, values } = useFormikContext<FormData>();
         const { iconDataUrl } = this.state;
@@ -257,12 +277,18 @@ export class CreateToken extends BaseTask<FormData, Props, State> {
                 <TextField
                     name="tokenSymbol"
                     label="Token Symbol"
-                    roundtop
+                />
+                <TextField
+                    name="totalSupply"
+                    label="Total Supply"
+                    InputProps={{
+                        endAdornment: <InputAdornment position="end">{values.tokenSymbol}</InputAdornment>,
+                    }}
                 />
                 <TextField
                     name="decimals"
                     label="Token Decimals"
-                    roundtop
+                    type="number"
                 />
                 <FileField
                     name="icon"
@@ -285,10 +311,6 @@ export class CreateToken extends BaseTask<FormData, Props, State> {
                         />
                     </InfoField>
                 ) : null}
-                <TextField
-                    name="ownerId"
-                    label="Owner Account ID"
-                />
                 <UnitField
                     name="gas"
                     unit="gasUnit"
