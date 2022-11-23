@@ -7,7 +7,7 @@ const FACTORY_ADDRESS_SELECTOR: Record<string, string> = {
 };
 
 const SIMPLE_MARKETPLACE_ADDRESS_SELECTOR: Record<string, string> = {
-    mainnet: "simple.market.mintbase1.near ",
+    mainnet: "simple.market.mintbase1.near",
     testnet: "market-v2-beta.mintspace2.testnet",
 };
 
