@@ -7,7 +7,7 @@ import { fields } from "../../shared/lib/args/args-types/args-object";
 import { Call, CallError } from "../../shared/lib/call";
 import { toGas } from "../../shared/lib/converter";
 import { MintbaseStore } from "../../shared/lib/contracts/mintbase";
-import { CheckboxField, InfoField, TextField, UnitField } from "../../shared/ui/forms";
+import { CheckboxField, InfoField, TextField, UnitField } from "../../shared/ui/form";
 import { BaseTask, BaseTaskProps, BaseTaskState } from "../base";
 import MintbaseLogo from "../../app/static/mintbase/Mintbase_logo.svg";
 import "./mintbase.scss";

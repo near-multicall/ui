@@ -5,7 +5,7 @@ import { Call, CallError } from "../../shared/lib/call";
 import { Multicall } from "../../shared/lib/contracts/multicall";
 import { unit } from "../../shared/lib/converter";
 import { STORAGE } from "../../shared/lib/persistent";
-import { CheckboxField, TextField, UnitField } from "../../shared/ui/forms";
+import { CheckboxField, TextField, UnitField } from "../../shared/ui/form";
 import { BaseTask, BaseTaskProps, DefaultFormData } from "../base";
 import { DynamicFeedOutlined } from "@mui/icons-material";
 import "./multicall.scss";

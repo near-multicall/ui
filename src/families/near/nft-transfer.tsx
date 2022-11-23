@@ -6,7 +6,7 @@ import { Call, CallError } from "../../shared/lib/call";
 import { toGas } from "../../shared/lib/converter";
 import { STORAGE } from "../../shared/lib/persistent";
 import { NonFungibleToken } from "../../shared/lib/standards/nonFungibleToken";
-import { TextField, UnitField } from "../../shared/ui/forms";
+import { TextField, UnitField } from "../../shared/ui/form";
 import type { DefaultFormData } from "../base";
 import { BaseTask, BaseTaskProps, BaseTaskState } from "../base";
 import "./near.scss";
