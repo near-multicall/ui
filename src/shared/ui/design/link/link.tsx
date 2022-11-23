@@ -70,7 +70,7 @@ export const Link = ({ className, href, label, noTooltip = false, ...props }: Li
                     )}
                 </IconButton>
             }
-            leaveDelay={2000}
+            leaveDelay={400}
             placement="right"
         >
             <Element />
