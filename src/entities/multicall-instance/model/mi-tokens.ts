@@ -3,8 +3,9 @@ import { useEffect, useState } from "react";
 import { ArgsAccount } from "../../../shared/lib/args-old";
 import { Multicall } from "../../../shared/lib/contracts/multicall";
 import { Props } from "../../../shared/lib/props";
-
 import { type MulticallInstanceEntity } from "../config";
+
+import { MulticallInstanceSettingsModel } from "./mi-settings";
 
 export type MulticallInstanceTokensWhitelist = {
     data: Multicall["tokensWhitelist"] | null;
@@ -17,7 +18,7 @@ export class MulticallInstanceTokensModel {
         daoAddress: MulticallInstanceEntity.Inputs["daoAddress"],
         callback: (result: MulticallInstanceTokensWhitelist) => void
     ) =>
-        await Multicall.instanceDataFetchFx(
+        await MulticallInstanceSettingsModel.fetchFx(
             `${ArgsAccount.deconstructAddress(daoAddress).name}.${Multicall.FACTORY_ADDRESS}`,
 
             (multicallInstanceData) =>

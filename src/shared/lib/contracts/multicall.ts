@@ -1,11 +1,8 @@
-import { Account } from "@near-wallet-selector/core";
-
-import { ArgsAccount } from "../args-old";
 import { Big, toGas, dateToCron, toYocto } from "../converter";
 import { AccountId, Base64String, BigString, U128String, U64String } from "../types";
 import { type Tx, viewAccount, viewState, view } from "../wallet";
 
-import type { FunctionCallAction as daoFunctionCallAction, SputnikDAO } from "./sputnik-dao";
+import type { FunctionCallAction as daoFunctionCallAction } from "./sputnik-dao";
 
 const FACTORY_ADDRESS_SELECTOR: Record<string, AccountId> = {
     mainnet: "v1.multicall.near",
@@ -136,27 +133,6 @@ class Multicall {
         }
         return newMulticall;
     }
-
-    /**
-     * Calls the given callback with a result of multicall contract instantiation,
-     * represented as stateful response.
-     *
-     * @param daoAddress DAO contract address
-     * @param callback Stateful data fetch callback
-     */
-    static instanceDataFetchFx = async (
-        daoAddress: AccountId,
-        callback: (result: { data: Multicall | null; error: Error | null; loading: boolean }) => void
-    ) =>
-        callback(
-            await Multicall.init(
-                `${ArgsAccount.deconstructAddress(daoAddress).name}.${Multicall.FACTORY_ADDRESS}`
-            ).then((multicallInstance) => ({
-                data: multicallInstance.ready ? multicallInstance : null,
-                error: multicallInstance.ready ? null : new Error("Unable to connect to Multicall Instance"),
-                loading: false,
-            }))
-        );
 
     /**
      * check of given accountId is a multicall instance.
