@@ -38,13 +38,13 @@ class Paras {
     static UI_BASE_URL: string = UI_URL_SELECTOR[window.NEAR_ENV];
 
     static async getMarketData(nftContractId: string, tokenId: string): Promise<MarketDataJson | null> {
-        return await view(this.MARKETPLACE_ADDRESS, "get_market_data", {
+        return view(this.MARKETPLACE_ADDRESS, "get_market_data", {
             nft_contract_id: nftContractId,
             token_id: tokenId,
         }).catch(() => null);
     }
 
-    static getInfoFromlistingUrl(url: string): { nftContractId: string; tokenId: string } | undefined {
+    static getInfoFromListingUrl(url: string): { nftContractId: string; tokenId: string } | undefined {
         // create URL object from url
         let urlObj: URL;
         try {
@@ -56,18 +56,17 @@ class Paras {
 
         if (this.UI_BASE_URL === urlObj.origin) {
             const path: string[] = urlObj.pathname.split("/");
-            const info = decodeURIComponent(path[2]).split("::");
-            if (info.length !== 2) return;
+            const info = path[2].split("::");
             // check output validity: nftContractId is valid NEAR address
-            if (args.string().address().isValidSync(info[0])) {
-                const tokenId = info[1].split("/").pop()!;
-                return { nftContractId: info[0], tokenId };
+            if (info.length === 2 && args.string().address().isValidSync(info[0])) {
+                const tokenIdEncoded = path.length === 4 ? path.pop()! : info.pop()!;
+                return { nftContractId: info[0], tokenId: decodeURIComponent(tokenIdEncoded) };
             }
         }
     }
 
     static isListingURLValid(urlString: string): boolean {
-        return Boolean(this.getInfoFromlistingUrl(urlString));
+        return Boolean(this.getInfoFromListingUrl(urlString));
     }
 }
 
