@@ -233,6 +233,26 @@ export class Task extends Component {
                                 json={json}
                             />
                         );
+                    case "buy":
+                        return (
+                            <Family.Mintbase.BuyNft
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
+                }
+
+            case "paras":
+                switch (func) {
+                    case "buy":
+                        return (
+                            <Family.Paras.BuyNft
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
                 }
 
             default:

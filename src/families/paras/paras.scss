@@ -3,34 +3,15 @@
 @use "sass/font";
 @use "../base";
 
-$mintbase-blue: #070c2b;
-$mintbase-red: #ff2424;
+$paras-blue: #1300be;
+$paras-black: #04002a;
 
-.mintbase-create-store-task,
-.mintbase-transfer-store-ownership-task,
-.mintbase-add-minter-task,
-.mintbase-remove-minter-task,
-.mintbase-buy-nft-task {
-    background-color: $mintbase-blue;
-    background-image: url("../../app/static/mintbase/Mintbase_symbol.svg");
-    background-position-x: 42rem;
-    background-position-y: 239rem;
-    background-size: 77rem;
+.paras-buy-nft-task {
+    background: radial-gradient(at bottom left, $paras-blue 0%, $paras-black 100%);
     @include base.task-theme(color.$light-text);
 }
 
-.mintbase-add-minter-task-edit,
-.mintbase-remove-minter-task-edit {
-    .InfoField-content {
-        display: flex;
-        flex-flow: column nowrap;
-        .minter-account-id {
-            align-self: flex-end;
-        }
-    }
-}
-
-.mintbase-buy-nft-task-edit {
+.paras-buy-nft-task-edit {
     .InfoField-content {
         display: flex;
         flex-flow: column nowrap;
