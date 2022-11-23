@@ -115,7 +115,7 @@ export class BuyNft extends BaseTask<FormData, Props, State> {
     }
 
     public override toCall(): Call {
-        const { gas, gasUnit, depo } = this.state.formData;
+        const { gas, gasUnit, depo, depoUnit } = this.state.formData;
         const { nftContractId, tokenId } = this.state;
 
         if (!arx.big().isValidSync(gas)) throw new CallError("Failed to parse gas input value", this.props.id);
@@ -131,7 +131,7 @@ export class BuyNft extends BaseTask<FormData, Props, State> {
                         token_id: tokenId,
                     },
                     gas: arx.big().intoParsed(gasUnit).cast(gas).toFixed(),
-                    depo,
+                    depo: arx.big().intoParsed(depoUnit).cast(depo).toFixed(),
                 },
             ],
         };
@@ -152,7 +152,7 @@ export class BuyNft extends BaseTask<FormData, Props, State> {
     // fetch store data/owner
     private async confidentlyFetchListingInfo(): Promise<boolean> {
         const { listingUrl } = this.state.formData;
-        const { nftContractId, metadataId } = MintbaseStore.getInfoFromlistingUrl(listingUrl)!;
+        const { nftContractId, metadataId } = MintbaseStore.getInfoFromListingUrl(listingUrl)!;
         const listings = await MintbaseStore.apiGetSimpleListings(nftContractId, metadataId);
         if (listings.length === 0) return false;
         // find the cheapest token in the series
@@ -166,7 +166,6 @@ export class BuyNft extends BaseTask<FormData, Props, State> {
     }
 
     public override async validateForm(values: FormData): Promise<FormikErrors<FormData>> {
-        values.depo = this.state.listingInfo?.price;
         this.setFormData(values);
         await new Promise((resolve) => this.resolveDebounced(resolve));
         await this.tryFetchListingInfo();
