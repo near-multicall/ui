@@ -299,6 +299,8 @@ export class CreateToken extends BaseTask<FormData, Props, State> {
                 <a
                     className="protocol"
                     href="https://tkn.farm/"
+                    target="_blank"
+                    rel="noopener noreferrer"
                 >
                     <span>powered by</span>
                     <img

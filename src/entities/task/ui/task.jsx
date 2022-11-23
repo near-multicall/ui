@@ -75,111 +75,7 @@ export class Task extends Component {
                 switch (func) {
                     case "near_transfer":
                         return (
-                            <Family.Near.FtTransfer
-                                ref={this.instance}
-                                id={this.id}
-                                json={json}
-                            />
-                        );
-                    case "ft_transfer_call":
-                        return (
-                            <Family.Near.FtTransferCall
-                                ref={this.instance}
-                                id={this.id}
-                                json={json}
-                            />
-                        );
-                    case "nft_transfer":
-                        return (
-                            <Family.Near.NftTransfer
-                                ref={this.instance}
-                                id={this.id}
-                                json={json}
-                            />
-                        );
-                    case "nft_transfer_call":
-                        return (
-                            <Family.Near.NftTransferCall
-                                ref={this.instance}
-                                id={this.id}
-                                json={json}
-                            />
-                        );
-                    case "nft_approve":
-                        return (
-                            <Family.Near.NftApprove
-                                ref={this.instance}
-                                id={this.id}
-                                json={json}
-                            />
-                        );
-                    case "nft_revoke":
-                        return (
-                            <Family.Near.NftRevoke
-                                ref={this.instance}
-                                id={this.id}
-                                json={json}
-                            />
-                        );
-                    case "mft_transfer":
-                        return (
-                            <Family.Near.MftTransfer
-                                ref={this.instance}
-                                id={this.id}
-                                json={json}
-                            />
-                        );
-                    case "mft_transfer_call":
-                        return (
-                            <Family.Near.MftTransferCall
-                                ref={this.instance}
-                                id={this.id}
-                                json={json}
-                            />
-                        );
-                    case "deposit_and_stake":
-                        return (
-                            <Family.Near.DepositAndStake
-                                ref={this.instance}
-                                id={this.id}
-                                json={json}
-                            />
-                        );
-                    case "unstake":
-                        return (
-                            <Family.Near.Unstake
-                                ref={this.instance}
-                                id={this.id}
-                                json={json}
-                            />
-                        );
-                    case "withdraw":
-                        return (
-                            <Family.Near.Withdraw
-                                ref={this.instance}
-                                id={this.id}
-                                json={json}
-                            />
-                        );
-                    case "storage_deposit":
-                        return (
-                            <Family.Near.StorageDeposit
-                                ref={this.instance}
-                                id={this.id}
-                                json={json}
-                            />
-                        );
-                    case "storage_withdraw":
-                        return (
-                            <Family.Near.StorageWithdraw
-                                ref={this.instance}
-                                id={this.id}
-                                json={json}
-                            />
-                        );
-                    case "storage_unregister":
-                        return (
-                            <Family.Near.StorageUnregister
+                            <Family.Multicall.Transfer
                                 ref={this.instance}
                                 id={this.id}
                                 json={json}
@@ -187,33 +83,9 @@ export class Task extends Component {
                         );
                 }
 
-            case "mintbase":
+            case "near":
                 switch (func) {
-                    case "create_store":
-                        return (
-                            <Family.Mintbase.CreateStore
-                                ref={this.instance}
-                                id={this.id}
-                                json={json}
-                            />
-                        );
-                    case "transfer_store_ownership":
-                        return (
-                            <Family.Mintbase.TransferStoreOwnership
-                                ref={this.instance}
-                                id={this.id}
-                                json={json}
-                            />
-                        );
-                    case "grant_minter":
-                        return (
-                            <Family.Mintbase.AddMinter
-                                ref={this.instance}
-                                id={this.id}
-                                json={json}
-                            />
-                        );
-                    case "revoke_minter":
+                    case "ft_transfer":
                         return (
                             <Family.Near.FtTransfer
                                 ref={this.instance}
