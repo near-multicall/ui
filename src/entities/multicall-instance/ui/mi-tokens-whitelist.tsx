@@ -30,13 +30,13 @@ export const MulticallInstanceTokensWhitelistTable = ({
     return (
         <Tile
             classes={{ root: className }}
-            heading="Tokens whitelist"
+            heading="Token whitelist"
             noData={data !== null && data.length === 0}
             {...{ error, footer, headingCorners, loading }}
         >
             <Scrollable>
                 <Table
-                    RowProps={{ centeredTitle: true, withTitile: true, noKeys: true, ...ItemProps }}
+                    RowProps={{ centeredTitle: true, withTitle: true, noKeys: true, ...ItemProps }}
                     dense
                     displayMode="compact"
                     header={["Contract address"]}

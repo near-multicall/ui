@@ -20,7 +20,7 @@ export const MulticallInstanceAdminsTable = ({ className, daoAddress }: Multical
         >
             <Scrollable>
                 <Table
-                    RowProps={{ centeredTitle: true, withTitile: true, noKeys: true }}
+                    RowProps={{ centeredTitle: true, withTitle: true, noKeys: true }}
                     dense
                     displayMode="compact"
                     header={["Account address"]}

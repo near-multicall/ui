@@ -18,12 +18,12 @@ export const TokensBalancesUI = ({ className, contracts }: TokensBalancesUIProps
     return (
         <Tile
             classes={{ root: clsx(_TokensBalances, className) }}
-            heading="Tokens balances"
+            heading="Token balances"
         >
             {(nearTokenBalances ?? fungibleTokensBalances) && (
                 <Scrollable>
                     <Table
-                        RowProps={{ withTitile: true }}
+                        RowProps={{ withTitle: true }}
                         header={["Token", "Multicall", "DAO", "Total"]}
                         rows={[...(nearTokenBalances ? [nearTokenBalances] : []), ...(fungibleTokensBalances ?? [])]}
                     />

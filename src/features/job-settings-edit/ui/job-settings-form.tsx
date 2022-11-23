@@ -69,7 +69,7 @@ export const JobSettingsForm = ({
     return (
         <Tile
             classes={{ root: className }}
-            heading="Jobs settings"
+            heading="Job settings"
             headingCorners={{
                 end: editModeEnabled ? (
                     <>
@@ -109,7 +109,7 @@ export const JobSettingsForm = ({
                             ? null
                             : "blue"),
 
-                    withTitile: true,
+                    withTitle: true,
                     noKeys: true,
                 }}
                 displayMode="compact"

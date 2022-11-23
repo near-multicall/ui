@@ -16,7 +16,7 @@ export interface TableRowProps {
     /**
      * Display first cell of each row as its title in `"compact"` table `displayMode`
      */
-    withTitile?: boolean;
+    withTitle?: boolean;
     header: TableHeader;
     id: string;
     idToHighlightColor?: (id: TableRowProps["id"]) => DesignKitConfigType.Color | null;
@@ -43,7 +43,7 @@ export const TableRowCompact = ({
     cells,
     centeredTitle,
     dense,
-    withTitile,
+    withTitle,
     header,
     id,
     idToHighlightColor,
@@ -68,8 +68,8 @@ export const TableRowCompact = ({
                 <div
                     className={clsx(`${_TableRow}-content--compact`, {
                         [`${_TableRow}-content--compact--dense`]: dense,
-                        [`${_TableRow}-content--compact--withTitile`]: withTitile,
-                        [`${_TableRow}-content--compact--withTitile--centeredTitle`]: centeredTitle,
+                        [`${_TableRow}-content--compact--withTitle`]: withTitle,
+                        [`${_TableRow}-content--compact--withTitle--centeredTitle`]: centeredTitle,
                         [`${_TableRow}-content--compact--noKeys`]: noKeys,
                     })}
                     key={headerCellIndex}

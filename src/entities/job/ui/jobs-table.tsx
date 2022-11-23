@@ -23,7 +23,7 @@ export const JobsTable = ({ className, contracts }: JobsTableProps) => {
         >
             <Scrollable>
                 <Table
-                    RowProps={{ withTitile: true }}
+                    RowProps={{ withTitle: true }}
                     className={`${_JobsTable}-body`}
                     displayMode="compact"
                     header={["Status", "ID", "Start at", "Croncat hash", "Creator", "Trigger gas", "Multicalls"]}
