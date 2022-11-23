@@ -22,7 +22,7 @@ type Props = BaseTaskProps;
 
 type State = BaseTaskState<FormData> & {
     marketData: MarketDataJson | null;
-    metadata: TokenMetadata;
+    metadata: TokenMetadata | null;
 };
 
 export class BuyNft extends BaseTask<FormData, Props, State> {
@@ -67,6 +67,12 @@ export class BuyNft extends BaseTask<FormData, Props, State> {
     constructor(props: Props) {
         super(props);
         this._constructor();
+
+        this.state = {
+            ...this.state,
+            marketData: null,
+            metadata: null,
+        };
     }
 
     protected override init(
@@ -134,7 +140,6 @@ export class BuyNft extends BaseTask<FormData, Props, State> {
         };
     }
 
-    // TODO: fetch store owner/data
     private tryLoadMarketData(): Promise<boolean> {
         return new Promise<boolean>((resolve) => {
             this.schema.check(this.state.formData, { context: { marketData: this.state.marketData } }).then(() => {
@@ -146,7 +151,6 @@ export class BuyNft extends BaseTask<FormData, Props, State> {
         });
     }
 
-    // fetch store data/owner
     private async confidentlyLoadMarketData(): Promise<boolean> {
         const { listingUrl } = this.state.formData;
         const { nftContractId, tokenId } = Paras.getInfoFromlistingUrl(listingUrl)!;
@@ -154,8 +158,8 @@ export class BuyNft extends BaseTask<FormData, Props, State> {
             Paras.getMarketData(nftContractId, tokenId),
             NonFungibleToken.init(nftContractId, tokenId),
         ]);
-        if (marketData == null || marketData!.is_auction === true) return false;
-        this.setState({ marketData, metadata: nft.token?.metadata! });
+        // console.log(marketData, nftContractId, tokenId);
+        this.setState({ marketData, metadata: nft.token?.metadata ?? null });
         window.EDITOR.forceUpdate();
         return true;
     }
@@ -172,7 +176,7 @@ export class BuyNft extends BaseTask<FormData, Props, State> {
     }
 
     public override Editor = (): React.ReactNode => {
-        const { resetForm, validateForm, values } = useFormikContext<FormData>();
+        const { resetForm, validateForm } = useFormikContext();
         const { marketData, metadata } = this.state;
 
         useEffect(() => {
