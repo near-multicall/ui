@@ -20,7 +20,9 @@ export const initialData = {
         "task-i18": { id: "task-i18", family: "mintbase", func: "transfer_store_ownership" },
         "task-i19": { id: "task-i19", family: "mintbase", func: "grant_minter" },
         "task-i20": { id: "task-i20", family: "mintbase", func: "revoke_minter" },
-        "task-i21": { id: "task-i21", family: "token_farm", func: "create_token" },
+        "task-i21": { id: "task-i21", family: "mintbase", func: "buy" },
+        "task-i22": { id: "task-i22", family: "paras", func: "buy" },
+        "task-i23": { id: "task-i23", family: "token_farm", func: "create_token" },
     },
     columns: {
         "column-0": {
@@ -53,6 +55,8 @@ export const initialData = {
                 "task-i19",
                 "task-i20",
                 "task-i21",
+                // "task-i22",
+                "task-i23",
             ],
         },
     },
