@@ -36,7 +36,7 @@ export const MulticallInstanceTokensWhitelistTable = ({
         >
             <Scrollable>
                 <Table
-                    RowProps={{ centeredTitle: true, entitled: true, noKeys: true, ...ItemProps }}
+                    RowProps={{ centeredTitle: true, withTitile: true, noKeys: true, ...ItemProps }}
                     dense
                     displayMode="compact"
                     header={["Contract address"]}

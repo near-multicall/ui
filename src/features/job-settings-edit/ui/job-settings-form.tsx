@@ -109,7 +109,7 @@ export const JobSettingsForm = ({
                             ? null
                             : "blue"),
 
-                    entitled: true,
+                    withTitile: true,
                     noKeys: true,
                 }}
                 displayMode="compact"

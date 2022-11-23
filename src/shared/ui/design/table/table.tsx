@@ -22,7 +22,7 @@ export interface TableProps extends HTMLAttributes<HTMLDivElement>, Pick<TableRo
      * `"classic"` mode is a classic table view.
      *
      * In `"compact"` mode, the table is being rendered as a single column with `rows` rendered as cards,
-     *  where every card is entitled by corresponding element from `header`.
+     *  where every card has corresponding element from `header` as a title.
      *
      * In `"default"` mode, the table is being rendered according to the screen size:
      *  `"classic"` mode is meant for wide screens, while `"compact"` is meant for medium and small ones.

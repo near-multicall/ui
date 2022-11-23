@@ -23,7 +23,7 @@ export const TokensBalancesUI = ({ className, contracts }: TokensBalancesUIProps
             {(nearTokenBalances ?? fungibleTokensBalances) && (
                 <Scrollable>
                     <Table
-                        RowProps={{ entitled: true }}
+                        RowProps={{ withTitile: true }}
                         header={["Token", "Multicall", "DAO", "Total"]}
                         rows={[...(nearTokenBalances ? [nearTokenBalances] : []), ...(fungibleTokensBalances ?? [])]}
                     />
