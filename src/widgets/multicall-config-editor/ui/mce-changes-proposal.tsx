@@ -70,7 +70,7 @@ export const MCEChangesProposal = ({
                                         )}
                                         key={data as string}
                                     >
-                                        {!isNaN(parseInt(data as string)) &&
+                                        {!Number.isNaN(data) &&
                                         ChangesDiffKey === MulticallConfigEditorConfig.ChangesDiffKey.jobBond
                                             ? `${toNEAR(data as string)} ${NearIcon.NATIVE_TOKEN_CHARACTER}`
                                             : (data as string)}

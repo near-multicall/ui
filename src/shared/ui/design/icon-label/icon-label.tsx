@@ -30,6 +30,6 @@ export const IconLabel = ({ icon, label, reversed = false }: IconLabelProps) => 
             )}
         </span>
 
-        <span className={`${_IconLabel}-label`}>{label}</span>
+        <span className={clsx(`${_IconLabel}-label`, { "font--code": !Number.isNaN(label) })}>{label}</span>
     </span>
 );
