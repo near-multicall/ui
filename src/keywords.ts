@@ -31,4 +31,7 @@ export const keywords = {
     paras: {
         buy: ["nft", "marketplace"],
     },
+    token_farm: {
+        create_token: ["TokenFarm", "treasury"],
+    },
 };
