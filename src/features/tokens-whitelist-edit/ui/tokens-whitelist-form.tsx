@@ -113,7 +113,7 @@ export const TokensWhitelistForm = ({
                         <CancelOutlined />
                     </IconButton>
                 ) : (
-                    <Tooltip title={disabled ? "You are in read-only mode" : "Propose changes"}>
+                    <Tooltip content={disabled ? "You are in read-only mode" : "Propose changes"}>
                         <span>
                             <IconButton
                                 onClick={() => void editModeSwitch(true)}
