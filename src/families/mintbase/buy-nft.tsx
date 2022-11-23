@@ -19,16 +19,16 @@ type FormData = DefaultFormData & {
 type Props = BaseTaskProps;
 
 type State = BaseTaskState<FormData> & {
-    nftContractId: string;
-    tokenId: string;
-    metadataId: string;
+    nftContractId: string | null;
+    tokenId: string | null;
+    metadataId: string | null;
     listingInfo: {
         price: string;
         title: string;
         token_id: string;
         market_id: string;
         media: string;
-    };
+    } | null;
 };
 
 export class BuyNft extends BaseTask<FormData, Props, State> {
@@ -67,6 +67,14 @@ export class BuyNft extends BaseTask<FormData, Props, State> {
     constructor(props: Props) {
         super(props);
         this._constructor();
+
+        this.state = {
+            ...this.state,
+            nftContractId: null,
+            tokenId: null,
+            metadataId: null,
+            listingInfo: null,
+        };
     }
 
     protected override init(
@@ -98,13 +106,7 @@ export class BuyNft extends BaseTask<FormData, Props, State> {
                     {
                         listingUrl: `${MintbaseStore.UI_BASE_URL}/meta/${nftContractId}%3A${metadataId}`,
                     },
-                    () =>
-                        this.schema.check(this.state.formData).then(() =>
-                            this.setState({
-                                nftContractId,
-                                tokenId,
-                            })
-                        )
+                    this.tryFetchListingInfo
                 )
             );
         }
@@ -144,7 +146,11 @@ export class BuyNft extends BaseTask<FormData, Props, State> {
                 const { listingUrl } = fields(this.schema);
                 if (!listingUrl.isBad()) {
                     this.confidentlyFetchListingInfo().then((ready) => resolve(ready));
-                } else resolve(false);
+                } else {
+                    this.setState({ tokenId: null, listingInfo: null, nftContractId: null, metadataId: null });
+                    this.setFormData({ depo: "0" });
+                    resolve(false);
+                }
             });
         });
     }
@@ -154,13 +160,18 @@ export class BuyNft extends BaseTask<FormData, Props, State> {
         const { listingUrl } = this.state.formData;
         const { nftContractId, metadataId } = MintbaseStore.getInfoFromListingUrl(listingUrl)!;
         const listings = await MintbaseStore.apiGetSimpleListings(nftContractId, metadataId);
-        if (listings.length === 0) return false;
+        if (listings.length === 0) {
+            this.setState({ tokenId: null, listingInfo: null, nftContractId, metadataId });
+            this.setFormData({ depo: "0" });
+            return false;
+        }
         // find the cheapest token in the series
         let cheapest = listings[0];
         for (let i = 0; i < listings.length; i++) {
             if (Big(listings[i].price).lt(cheapest.price)) cheapest = listings[i];
         }
         this.setState({ nftContractId, tokenId: cheapest.token_id, metadataId, listingInfo: cheapest });
+        this.setFormData({ depo: cheapest.price });
         window.EDITOR.forceUpdate();
         return true;
     }
