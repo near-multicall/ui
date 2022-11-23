@@ -158,7 +158,7 @@ export class BuyNft extends BaseTask<FormData, Props, State> {
     // fetch store data/owner
     private async confidentlyFetchListingInfo(): Promise<boolean> {
         const { listingUrl, depoUnit } = this.state.formData;
-        const { nftContractId, metadataId } = MintbaseStore.getInfoFromlistingUrl(listingUrl)!;
+        const { nftContractId, metadataId } = MintbaseStore.getInfoFromListingUrl(listingUrl)!;
         const listings = await MintbaseStore.apiGetSimpleListings(nftContractId, metadataId);
         if (listings.length === 0) {
             this.setState({ tokenId: null, listingInfo: null, nftContractId, metadataId });

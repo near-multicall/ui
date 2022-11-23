@@ -220,7 +220,7 @@ class MintbaseStore {
         return numListings === 1 ? response.data.mb_views_active_listings[0].metadata_id.split(":")[1] : "";
     }
 
-    static getInfoFromlistingUrl(url: string): { nftContractId: string; metadataId: string } | undefined {
+    static getInfoFromListingUrl(url: string): { nftContractId: string; metadataId: string } | undefined {
         // create URL object from url
         let urlObj: URL;
         try {
@@ -250,7 +250,7 @@ class MintbaseStore {
     }
 
     static isListingURLValid(urlString: string): boolean {
-        return Boolean(this.getInfoFromlistingUrl(urlString));
+        return Boolean(this.getInfoFromListingUrl(urlString));
     }
     // TODO: query store owner
 }
