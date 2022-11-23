@@ -157,7 +157,7 @@ export class BuyNft extends BaseTask<FormData, Props, State> {
 
     // fetch store data/owner
     private async confidentlyFetchListingInfo(): Promise<boolean> {
-        const { listingUrl } = this.state.formData;
+        const { listingUrl, depoUnit } = this.state.formData;
         const { nftContractId, metadataId } = MintbaseStore.getInfoFromlistingUrl(listingUrl)!;
         const listings = await MintbaseStore.apiGetSimpleListings(nftContractId, metadataId);
         if (listings.length === 0) {
@@ -171,7 +171,7 @@ export class BuyNft extends BaseTask<FormData, Props, State> {
             if (Big(listings[i].price).lt(cheapest.price)) cheapest = listings[i];
         }
         this.setState({ nftContractId, tokenId: cheapest.token_id, metadataId, listingInfo: cheapest });
-        this.setFormData({ depo: cheapest.price });
+        this.setFormData({ depo: arx.big().intoFormatted(depoUnit).cast(cheapest.price).toFixed() });
         window.EDITOR.forceUpdate();
         return true;
     }
