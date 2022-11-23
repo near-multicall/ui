@@ -5,7 +5,7 @@ import { args as arx } from "../../shared/lib/args/args";
 import { fields } from "../../shared/lib/args/args-types/args-object";
 import { Call, CallError } from "../../shared/lib/call";
 import { MintbaseStore } from "../../shared/lib/contracts/mintbase";
-import { Big, formatTokenAmount, toGas } from "../../shared/lib/converter";
+import { Big, toGas } from "../../shared/lib/converter";
 import { InfoField, TextField, UnitField } from "../../shared/ui/form-fields";
 import { BaseTask, BaseTaskProps, BaseTaskState } from "../base";
 import "./mintbase.scss";
@@ -61,7 +61,7 @@ export class BuyNft extends BaseTask<FormData, Props, State> {
         gas: "30",
         gasUnit: "Tgas",
         depo: "0",
-        depoUnit: "yocto",
+        depoUnit: "NEAR",
     };
 
     constructor(props: Props) {
@@ -166,6 +166,7 @@ export class BuyNft extends BaseTask<FormData, Props, State> {
     }
 
     public override async validateForm(values: FormData): Promise<FormikErrors<FormData>> {
+        values.depo = this.state.listingInfo?.price;
         this.setFormData(values);
         await new Promise((resolve) => this.resolveDebounced(resolve));
         await this.tryFetchListingInfo();

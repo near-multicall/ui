@@ -1,5 +1,6 @@
 import { view, rpcProvider } from "../wallet";
 import { args } from "../args/args";
+import { Big } from "../converter";
 
 const FACTORY_ADDRESS_SELECTOR: Record<string, string> = {
     mainnet: "mintbase1.near",
@@ -7,7 +8,7 @@ const FACTORY_ADDRESS_SELECTOR: Record<string, string> = {
 };
 
 const SIMPLE_MARKETPLACE_ADDRESS_SELECTOR: Record<string, string> = {
-    mainnet: "simple.market.mintbase1.near ",
+    mainnet: "simple.market.mintbase1.near",
     testnet: "market-v2-beta.mintspace2.testnet",
 };
 
@@ -194,7 +195,12 @@ class MintbaseStore {
           }
         `;
         const response = await this.queryApi(query);
-        return response.data.mb_views_active_listings;
+        // make sure price is in string, not number scientific notation
+
+        return response.data.mb_views_active_listings.map((listing: any) => ({
+            ...listing,
+            price: Big(listing.price).toFixed(),
+        }));
     }
 
     static async apiGetMetadataId(nftContractId: string, tokenId: string): Promise<string> {
