@@ -7,9 +7,13 @@ const FACTORY_ADDRESS_SELECTOR: Record<string, string> = {
     testnet: "mintspace2.testnet",
 };
 
-const SIMPLE_MARKETPLACE_ADDRESS_SELECTOR: Record<string, string> = {
-    mainnet: "simple.market.mintbase1.near",
-    testnet: "market-v2-beta.mintspace2.testnet",
+const SIMPLE_MARKETPLACE_ADDRESS_SELECTOR: Record<string, string[]> = {
+    mainnet: ["simple.market.mintbase1.near"],
+    testnet: [
+        "market-v2-beta.mintspace2.testnet",
+        // old marketplace, no "buy" method.
+        // "market.mintspace2.testnet",
+    ],
 };
 
 const API_URL_SELECTOR: Record<string, string> = {
@@ -38,7 +42,7 @@ type StoreInfo = {
 
 class MintbaseStore {
     static FACTORY_ADDRESS: string = FACTORY_ADDRESS_SELECTOR[window.NEAR_ENV];
-    static SIMPLE_MARKETPLACE_ADDRESS: string = SIMPLE_MARKETPLACE_ADDRESS_SELECTOR[window.NEAR_ENV];
+    static SIMPLE_MARKETPLACE_ADDRESSES: string[] = SIMPLE_MARKETPLACE_ADDRESS_SELECTOR[window.NEAR_ENV];
     static UI_BASE_URL: string = UI_URL_SELECTOR[window.NEAR_ENV];
     static API_URL: string = API_URL_SELECTOR[window.NEAR_ENV];
 
@@ -147,7 +151,8 @@ class MintbaseStore {
 
     static async getSimpleListing(
         nftContractId: string,
-        tokenId: string
+        tokenId: string,
+        marketId: string
     ): Promise<{
         nft_token_id: string;
         nft_approval_id: number;
@@ -158,10 +163,7 @@ class MintbaseStore {
         created_at: string;
         current_offer: unknown;
     }> {
-        return view(this.SIMPLE_MARKETPLACE_ADDRESS, "get_listing", {
-            nft_contract_id: nftContractId,
-            token_id: tokenId,
-        });
+        return view(marketId, "get_listing", { nft_contract_id: nftContractId, token_id: tokenId });
     }
 
     static async apiGetSimpleListings(
@@ -183,7 +185,6 @@ class MintbaseStore {
                     metadata_id: {_eq: "${nftContractAddress}:${metadataId}"},
                     kind: {_eq: "simple"},
                     currency: {_eq: "near"},
-                    market_id: {_eq: "${this.SIMPLE_MARKETPLACE_ADDRESS}"}
                 }
             ) {
                 price
@@ -194,10 +195,13 @@ class MintbaseStore {
             }
           }
         `;
-        const response = await this.queryApi(query);
+        const response = (await this.queryApi(query)).data.mb_views_active_listings;
+        // only allow listings on known Mintbase marketplaces, compatible with our "Simple Buy" card.
+        const whitelisted = response.filter((listing: any) =>
+            this.SIMPLE_MARKETPLACE_ADDRESSES.includes(listing.market_id)
+        );
         // make sure price is in string, not number scientific notation
-
-        return response.data.mb_views_active_listings.map((listing: any) => ({
+        return whitelisted.map((listing: any) => ({
             ...listing,
             price: Big(listing.price).toFixed(),
         }));
@@ -205,7 +209,7 @@ class MintbaseStore {
 
     static async apiGetMetadataId(nftContractId: string, tokenId: string): Promise<string> {
         const query = `{
-            mb_views_active_listings(
+            nft_tokens(
                 where: {
                     nft_contract_id: {_eq: "${nftContractId}"},
                     token_id: {_eq: "${tokenId}"}
@@ -216,8 +220,8 @@ class MintbaseStore {
           }
         `;
         const response = await this.queryApi(query);
-        const numListings = response.data.mb_views_active_listings.length;
-        return numListings === 1 ? response.data.mb_views_active_listings[0].metadata_id.split(":")[1] : "";
+        const numListings = response.data.nft_tokens.length;
+        return numListings === 1 ? response.data.nft_tokens[0].metadata_id.split(":")[1] : "";
     }
 
     static getInfoFromListingUrl(url: string): { nftContractId: string; metadataId: string } | undefined {

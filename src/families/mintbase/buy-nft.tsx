@@ -5,7 +5,7 @@ import { args as arx } from "../../shared/lib/args/args";
 import { fields } from "../../shared/lib/args/args-types/args-object";
 import { Call, CallError } from "../../shared/lib/call";
 import { MintbaseStore } from "../../shared/lib/contracts/mintbase";
-import { Big, toGas } from "../../shared/lib/converter";
+import { toGas } from "../../shared/lib/converter";
 import { InfoField, TextField, UnitField } from "../../shared/ui/form-fields";
 import { BaseTask, BaseTaskProps, BaseTaskState } from "../base";
 import "./mintbase.scss";
@@ -55,10 +55,10 @@ export class BuyNft extends BaseTask<FormData, Props, State> {
 
     override initialValues: FormData = {
         name: "Simple Buy",
-        addr: MintbaseStore.SIMPLE_MARKETPLACE_ADDRESS,
+        addr: MintbaseStore.SIMPLE_MARKETPLACE_ADDRESSES[0],
         func: "buy",
         listingUrl: "",
-        gas: "30",
+        gas: "200",
         gasUnit: "Tgas",
         depo: "0",
         depoUnit: "NEAR",
@@ -113,18 +113,22 @@ export class BuyNft extends BaseTask<FormData, Props, State> {
     }
 
     static override inferOwnType(json: Call): boolean {
-        return !!json && json.address === MintbaseStore.SIMPLE_MARKETPLACE_ADDRESS && json.actions[0].func === "buy";
+        return (
+            !!json &&
+            MintbaseStore.SIMPLE_MARKETPLACE_ADDRESSES.includes(json.address) &&
+            json.actions[0].func === "buy"
+        );
     }
 
     public override toCall(): Call {
-        const { gas, gasUnit, depo, depoUnit } = this.state.formData;
+        const { gas, gasUnit, depo, depoUnit, addr } = this.state.formData;
         const { nftContractId, tokenId } = this.state;
 
         if (!arx.big().isValidSync(gas)) throw new CallError("Failed to parse gas input value", this.props.id);
         if (!arx.big().isValidSync(depo)) throw new CallError("Failed to parse deposit input value", this.props.id);
 
         return {
-            address: MintbaseStore.SIMPLE_MARKETPLACE_ADDRESS,
+            address: addr,
             actions: [
                 {
                     func: "buy",
@@ -148,7 +152,7 @@ export class BuyNft extends BaseTask<FormData, Props, State> {
                     this.confidentlyFetchListingInfo().then((ready) => resolve(ready));
                 } else {
                     this.setState({ tokenId: null, listingInfo: null, nftContractId: null, metadataId: null });
-                    this.setFormData({ depo: "0" });
+                    this.setFormData({ depo: "0", addr: MintbaseStore.SIMPLE_MARKETPLACE_ADDRESSES[0] });
                     resolve(false);
                 }
             });
@@ -162,16 +166,16 @@ export class BuyNft extends BaseTask<FormData, Props, State> {
         const listings = await MintbaseStore.apiGetSimpleListings(nftContractId, metadataId);
         if (listings.length === 0) {
             this.setState({ tokenId: null, listingInfo: null, nftContractId, metadataId });
-            this.setFormData({ depo: "0" });
+            this.setFormData({ depo: "0", addr: MintbaseStore.SIMPLE_MARKETPLACE_ADDRESSES[0] });
             return false;
         }
         // find the cheapest token in the series
-        let cheapest = listings[0];
-        for (let i = 0; i < listings.length; i++) {
-            if (Big(listings[i].price).lt(cheapest.price)) cheapest = listings[i];
-        }
+        const cheapest = listings.reduce((prev, curr) => (prev.price < curr.price ? prev : curr));
         this.setState({ nftContractId, tokenId: cheapest.token_id, metadataId, listingInfo: cheapest });
-        this.setFormData({ depo: arx.big().intoFormatted(depoUnit).cast(cheapest.price).toFixed() });
+        this.setFormData({
+            depo: arx.big().intoFormatted(depoUnit).cast(cheapest.price).toFixed(),
+            addr: cheapest.market_id,
+        });
         window.EDITOR.forceUpdate();
         return true;
     }
@@ -188,7 +192,7 @@ export class BuyNft extends BaseTask<FormData, Props, State> {
     }
 
     public override Editor = (): React.ReactNode => {
-        const { resetForm, validateForm, values } = useFormikContext<FormData>();
+        const { resetForm, validateForm } = useFormikContext();
         const { listingInfo, nftContractId } = this.state;
 
         useEffect(() => {
