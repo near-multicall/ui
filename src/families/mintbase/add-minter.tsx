@@ -1,5 +1,3 @@
-// TODO: add checkbox and support "unstake_all".
-
 import { Form, FormikErrors, useFormikContext } from "formik";
 import { useEffect } from "react";
 import MintbaseLogo from "../../app/static/mintbase/Mintbase_logo.svg";
@@ -11,10 +9,10 @@ import { toGas } from "../../shared/lib/converter";
 import { STORAGE } from "../../shared/lib/persistent";
 import { InfoField, TextField, UnitField } from "../../shared/ui/form-fields";
 import { BaseTask, BaseTaskProps, BaseTaskState } from "../base";
-import "./mintbase.scss";
 
 import type { StoreInfo } from "../../shared/lib/contracts/mintbase";
 import type { DefaultFormData } from "../base";
+import "./mintbase.scss";
 
 type FormData = DefaultFormData & {
     newMinter: string;
