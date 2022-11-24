@@ -16,7 +16,7 @@ import { signAndSendTxs } from "../../shared/lib/wallet";
 import { Tabs } from "../../shared/ui/design";
 
 import { TextField } from "../../shared/ui/form";
-import { DaoConfigTab } from "./config/config";
+import { DaoSettingsTab } from "./settings/settings";
 import "./dao.scss";
 import { DaoFundsTab } from "./funds/funds";
 import { DaoJobsTab } from "./jobs/jobs";
@@ -508,7 +508,7 @@ export class DaoPage extends Component<Props, State> {
             <Tabs
                 classes={{ buttonsPanel: "DaoPage-tabs-buttonsPanel", contentSpace: "DaoPage-tabs-contentSpace" }}
                 items={[
-                    DaoConfigTab.uiConnect({ className: `${_DaoPage}-content`, contracts: { dao, multicall } }),
+                    DaoSettingsTab.uiConnect({ className: `${_DaoPage}-content`, contracts: { dao, multicall } }),
                     DaoFundsTab.uiConnect({ className: `${_DaoPage}-content`, contracts: { dao, multicall } }),
                     DaoJobsTab.uiConnect({ className: `${_DaoPage}-content`, contracts: { multicall } }),
                 ]}
