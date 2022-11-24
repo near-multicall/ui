@@ -2,7 +2,7 @@ import { ArgsAccount } from "../../../shared/lib/args-old";
 import { Multicall } from "../../../shared/lib/contracts/multicall";
 import { AccountId } from "../../../shared/lib/types";
 
-export class MulticallInstanceSettingsModel {
+export class MIInfoModel {
     /**
      * Calls the given callback with a result of multicall contract instantiation,
      * represented as stateful response.
@@ -10,7 +10,7 @@ export class MulticallInstanceSettingsModel {
      * @param daoAddress DAO contract address
      * @param callback Stateful data fetch callback
      */
-    static fetchFx = async (
+    static dataFetchFx = async (
         daoAddress: AccountId,
         callback: (result: { data: Multicall | null; error: Error | null; loading: boolean }) => void
     ) =>

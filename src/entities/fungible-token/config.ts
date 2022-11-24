@@ -1,7 +1,7 @@
 import { Multicall } from "../../shared/lib/contracts/multicall";
 import { SputnikDAO } from "../../shared/lib/contracts/sputnik-dao";
 
-namespace FungibleTokenEntity {
+export namespace FT {
     export interface Inputs {
         contracts: {
             dao: SputnikDAO;
@@ -10,8 +10,6 @@ namespace FungibleTokenEntity {
     }
 }
 
-class FungibleTokenConfig {
+export class FTConfig {
     static FRACTIONAL_PART_LENGTH = 5;
 }
-
-export { FungibleTokenConfig, type FungibleTokenEntity };

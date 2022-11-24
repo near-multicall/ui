@@ -1,19 +1,19 @@
 import clsx from "clsx";
 import { useCallback, useMemo, useState, FormEventHandler, useEffect, useContext } from "react";
 
-import { MulticallInstance, Wallet } from "../../../entities";
-import { JobSettingsEdit, TokensWhitelistEdit } from "../../../features";
+import { MI, Wallet } from "../../../entities";
+import { JobSettingsEdit, TokenWhitelistEdit } from "../../../features";
 import { ArgsString } from "../../../shared/lib/args-old";
 import { Multicall } from "../../../shared/lib/contracts/multicall";
 import { signAndSendTxs } from "../../../shared/lib/wallet";
-import { MulticallConfigEditorConfig, MulticallConfigEditorWidget } from "../config";
+import { Config, Widget } from "../config";
 
-import { MCEChangesProposal } from "./mce-changes-proposal";
-import "./multicall-config-editor.scss";
+import { SEProposalForm } from "./se-proposal-form";
+import "./settings-editor.scss";
 
-const _MulticallConfigEditor = "MulticallConfigEditor";
+const _SettingsEditor = "SettingsEditor";
 
-export const MulticallConfigEditorUI = ({ className, contracts }: MulticallConfigEditorWidget.Inputs) => {
+export const SettingsEditor = ({ className, contracts }: Widget.Inputs) => {
     const wallet = useContext(Wallet.SelectorContext);
 
     const proposalCreationPermitted =
@@ -21,14 +21,14 @@ export const MulticallConfigEditorUI = ({ className, contracts }: MulticallConfi
 
     const [editMode, editModeSwitch] = useState(false);
 
-    const changesDiffInitialState: MulticallConfigEditorWidget.ChangesDiff = {
-        [MulticallConfigEditorConfig.ChangesDiffKey.removeTokens]: [],
-        [MulticallConfigEditorConfig.ChangesDiffKey.addTokens]: [],
-        [MulticallConfigEditorConfig.ChangesDiffKey.jobBond]: "",
-        [MulticallConfigEditorConfig.ChangesDiffKey.croncatManager]: "",
+    const changesDiffInitialState: Widget.Diff = {
+        [Config.DiffKey.removeTokens]: [],
+        [Config.DiffKey.addTokens]: [],
+        [Config.DiffKey.jobBond]: "",
+        [Config.DiffKey.croncatManager]: "",
     };
 
-    const [changesDiff, changesDiffUpdate] = useState<MulticallConfigEditorWidget.ChangesDiff>(changesDiffInitialState),
+    const [changesDiff, changesDiffUpdate] = useState<Widget.Diff>(changesDiffInitialState),
         formValues = { proposalDescription: useMemo(() => new ArgsString(""), []) },
         [proposalDescription, proposalDescriptionUpdate] = useState(formValues.proposalDescription.value),
         _childFormsResetRequested = "childFormsResetRequested";
@@ -57,8 +57,7 @@ export const MulticallConfigEditorUI = ({ className, contracts }: MulticallConfi
     }, [editMode, editModeSwitch, formReset]);
 
     const onEdit = useCallback(
-        (update: Partial<MulticallConfigEditorWidget.ChangesDiff>) =>
-            void changesDiffUpdate((latestState) => ({ ...latestState, ...update })),
+        (update: Partial<Widget.Diff>) => void changesDiffUpdate((latestState) => ({ ...latestState, ...update })),
 
         [changesDiffUpdate]
     );
@@ -86,14 +85,14 @@ export const MulticallConfigEditorUI = ({ className, contracts }: MulticallConfi
     );
 
     return (
-        <div className={clsx(_MulticallConfigEditor, className)}>
-            <MulticallInstance.AdminsTable
-                className={`${_MulticallConfigEditor}-admins`}
+        <div className={clsx(_SettingsEditor, className)}>
+            <MI.AdminsTable
+                className={`${_SettingsEditor}-admins`}
                 daoAddress={contracts.dao.address}
             />
 
-            <TokensWhitelistEdit.Form
-                className={`${_MulticallConfigEditor}-tokensWhitelist`}
+            <TokenWhitelistEdit.Form
+                className={`${_SettingsEditor}-tokenWhitelist`}
                 daoAddress={contracts.dao.address}
                 disabled={!proposalCreationPermitted}
                 resetTrigger={childFormsResetRequested}
@@ -101,7 +100,7 @@ export const MulticallConfigEditorUI = ({ className, contracts }: MulticallConfi
             />
 
             <JobSettingsEdit.Form
-                className={`${_MulticallConfigEditor}-jobsSettings`}
+                className={`${_SettingsEditor}-jobsSettings`}
                 daoAddress={contracts.dao.address}
                 disabled={!proposalCreationPermitted}
                 multicallInstance={contracts.multicall}
@@ -109,8 +108,8 @@ export const MulticallConfigEditorUI = ({ className, contracts }: MulticallConfi
                 {...{ onEdit }}
             />
 
-            <MCEChangesProposal
-                classNameRoot={_MulticallConfigEditor}
+            <SEProposalForm
+                classNameRoot={_SettingsEditor}
                 description={proposalDescription}
                 disabled={!proposalCreationPermitted}
                 onDescriptionUpdate={proposalDescriptionUpdate}

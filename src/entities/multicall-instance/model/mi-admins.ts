@@ -3,37 +3,34 @@ import { useEffect, useState } from "react";
 import { ArgsAccount } from "../../../shared/lib/args-old";
 import { Multicall } from "../../../shared/lib/contracts/multicall";
 import { Props } from "../../../shared/lib/props";
-import { type MulticallInstanceEntity } from "../config";
+import { type MI } from "../config";
 
-import { MulticallInstanceSettingsModel } from "./mi-settings";
+import { MIInfoModel } from "./mi-settings";
 
-export type MulticallInstanceAdminsAddressList = {
+export type MIAdminAddresses = {
     data: Multicall["admins"] | null;
     error: Error | null;
     loading: boolean;
 };
 
-export class MulticallInstanceAdminsModel {
+export class MIAdminsModel {
     static addressListFetchFx = async (
-        daoAddress: MulticallInstanceEntity.Inputs["daoAddress"],
-        callback: (result: MulticallInstanceAdminsAddressList) => void
+        daoAddress: MI.Inputs["daoAddress"],
+        callback: (result: MIAdminAddresses) => void
     ) =>
-        await MulticallInstanceSettingsModel.fetchFx(
+        await MIInfoModel.dataFetchFx(
             `${ArgsAccount.deconstructAddress(daoAddress).name}.${Multicall.FACTORY_ADDRESS}`,
             (multicallInstanceData) => callback(Props.evolve({ data: ({ admins }) => admins }, multicallInstanceData))
         );
 
-    static useAddressList = (daoAddress: MulticallInstanceEntity.Inputs["daoAddress"]) => {
-        const [state, stateUpdate] = useState<MulticallInstanceAdminsAddressList>({
+    static useAddressList = (daoAddress: MI.Inputs["daoAddress"]) => {
+        const [state, stateUpdate] = useState<MIAdminAddresses>({
             data: null,
             error: null,
             loading: true,
         });
 
-        useEffect(
-            () => void MulticallInstanceAdminsModel.addressListFetchFx(daoAddress, stateUpdate),
-            [daoAddress, stateUpdate]
-        );
+        useEffect(() => void MIAdminsModel.addressListFetchFx(daoAddress, stateUpdate), [daoAddress, stateUpdate]);
 
         return state;
     };

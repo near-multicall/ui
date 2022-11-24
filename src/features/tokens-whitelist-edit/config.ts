@@ -1,38 +1,38 @@
 import { HTMLProps } from "react";
 
-import { MulticallTokensWhitelistChangesDiffKey, type MulticallConfigDiff } from "../../shared/lib/contracts/multicall";
-import { MulticallInstanceEntity } from "../../entities";
+import { MulticallTokenWhitelistDiffKey, type MulticallSettingsDiff } from "../../shared/lib/contracts/multicall";
+import { MIEntity } from "../../entities";
 import { DesignKitConfigType } from "../../shared/ui/design";
 
-namespace TokensWhitelistEditFeature {
-    export type ChangesDiffKey = MulticallTokensWhitelistChangesDiffKey;
+namespace TokenWhitelistEditFeature {
+    export type DiffKey = MulticallTokenWhitelistDiffKey;
 
-    export interface Inputs extends Omit<HTMLProps<HTMLDivElement>, "onChange">, MulticallInstanceEntity.Inputs {
-        onEdit: (payload: Pick<MulticallConfigDiff, ChangesDiffKey>) => void;
+    export interface Inputs extends Omit<HTMLProps<HTMLDivElement>, "onChange">, MIEntity.Inputs {
+        onEdit: (payload: Pick<MulticallSettingsDiff, DiffKey>) => void;
         resetTrigger: { subscribe: (callback: EventListener) => () => void };
     }
 
     export interface FormStates
         extends Record<
-            keyof Pick<MulticallConfigDiff, ChangesDiffKey>,
-            Set<MulticallConfigDiff[keyof Pick<MulticallConfigDiff, ChangesDiffKey>][number]>
+            keyof Pick<MulticallSettingsDiff, DiffKey>,
+            Set<MulticallSettingsDiff[keyof Pick<MulticallSettingsDiff, DiffKey>][number]>
         > {}
 }
 
-class TokensWhitelistEditConfig {
-    public static readonly ChangesDiffKey = MulticallTokensWhitelistChangesDiffKey;
+class TokenWhitelistEditConfig {
+    public static readonly DiffKey = MulticallTokenWhitelistDiffKey;
 
-    public static readonly ChangesDiffMetadata = {
-        [TokensWhitelistEditConfig.ChangesDiffKey.addTokens]: {
+    public static readonly DiffMetadata = {
+        [TokenWhitelistEditConfig.DiffKey.addTokens]: {
             color: "green" as DesignKitConfigType.Color,
             description: "Tokens to add to whitelist",
         },
 
-        [TokensWhitelistEditConfig.ChangesDiffKey.removeTokens]: {
+        [TokenWhitelistEditConfig.DiffKey.removeTokens]: {
             color: "red" as DesignKitConfigType.Color,
             description: "Tokens to remove from whitelist",
         },
     };
 }
 
-export { TokensWhitelistEditConfig, type TokensWhitelistEditFeature };
+export { TokenWhitelistEditConfig, type TokenWhitelistEditFeature };

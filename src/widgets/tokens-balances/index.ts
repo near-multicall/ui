@@ -1,8 +1,8 @@
-import { TokensBalancesUI } from "./ui/tokens-balances";
-import { TokensBalancesWidget } from "./config";
+import { TokenBalances as UI } from "./ui/tokens-balances";
+import { Widget } from "./config";
 
-class TokensBalances {
-    static UI = TokensBalancesUI;
+class TokenBalances {
+    static UI = UI;
 }
 
-export { TokensBalances, type TokensBalancesWidget };
+export { TokenBalances, type Widget as TokenBalancesWidget };

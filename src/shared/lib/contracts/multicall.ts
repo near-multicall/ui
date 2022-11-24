@@ -58,21 +58,21 @@ type MulticallArgs = {
     calls: BatchCall[][];
 };
 
-enum MulticallConfigParamKey {
+enum MulticallSettingsParamKey {
     croncatManager = "croncatManager",
     jobBond = "jobBond",
 }
 
-enum MulticallTokensWhitelistChangesDiffKey {
+enum MulticallTokenWhitelistDiffKey {
     addTokens = "addTokens",
     removeTokens = "removeTokens",
 }
 
-type MulticallConfigDiff = {
-    [MulticallTokensWhitelistChangesDiffKey.addTokens]: AccountId[];
-    [MulticallConfigParamKey.croncatManager]: AccountId;
-    [MulticallConfigParamKey.jobBond]: U128String;
-    [MulticallTokensWhitelistChangesDiffKey.removeTokens]: AccountId[];
+type MulticallSettingsDiff = {
+    [MulticallTokenWhitelistDiffKey.addTokens]: AccountId[];
+    [MulticallSettingsParamKey.croncatManager]: AccountId;
+    [MulticallSettingsParamKey.jobBond]: U128String;
+    [MulticallTokenWhitelistDiffKey.removeTokens]: AccountId[];
 };
 
 class Multicall {
@@ -83,12 +83,12 @@ class Multicall {
 
     address: AccountId;
     admins: AccountId[] = [];
-    [MulticallConfigParamKey.croncatManager]: AccountId = "";
+    [MulticallSettingsParamKey.croncatManager]: AccountId = "";
     // only whitelisted tokens can be attached to multicalls or job activations.
     tokensWhitelist: AccountId[] = [];
     // job bond amount must be attached as deposit when adding new jobs.
     // needs initialization, but start with "" because it's distinguishable from a real value (string encoded numbers).
-    [MulticallConfigParamKey.jobBond]: U128String = "";
+    [MulticallSettingsParamKey.jobBond]: U128String = "";
     // Multicall instance is ready when info (admins...) are fetched & assigned correctly.
     ready: boolean = false;
 
@@ -166,7 +166,7 @@ class Multicall {
         addTokens = [],
         jobBond = "",
         croncatManager = "",
-    }: MulticallConfigDiff): daoFunctionCallAction[] {
+    }: MulticallSettingsDiff): daoFunctionCallAction[] {
         const actions: daoFunctionCallAction[] = [];
 
         // action: change croncat manager address
@@ -292,5 +292,5 @@ class Multicall {
     }
 }
 
-export { Multicall, MulticallConfigParamKey, MulticallTokensWhitelistChangesDiffKey };
-export type { JobData, MulticallArgs, MulticallConfigDiff };
+export { Multicall, MulticallSettingsParamKey, MulticallTokenWhitelistDiffKey };
+export type { JobData, MulticallArgs, MulticallSettingsDiff };

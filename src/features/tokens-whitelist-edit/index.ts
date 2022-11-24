@@ -1,8 +1,8 @@
-import { TokensWhitelistEditConfig, type TokensWhitelistEditFeature } from "./config";
-import { TokensWhitelistForm } from "./ui/tokens-whitelist-form";
+import { TokenWhitelistEditConfig, type TokenWhitelistEditFeature } from "./config";
+import { TokenWhitelistForm } from "./ui/tokens-whitelist-form";
 
-class TokensWhitelistEdit extends TokensWhitelistEditConfig {
-    static Form = TokensWhitelistForm;
+class TokenWhitelistEdit extends TokenWhitelistEditConfig {
+    static Form = TokenWhitelistForm;
 }
 
-export { TokensWhitelistEdit, type TokensWhitelistEditFeature };
+export { TokenWhitelistEdit, type TokenWhitelistEditFeature };

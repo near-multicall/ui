@@ -1,22 +1,17 @@
 import { Scrollable, Table, type TableProps, Tile, TileProps } from "../../../shared/ui/design";
-import { MulticallInstanceTokensModel } from "../model/mi-tokens";
-import { type MulticallInstanceEntity } from "../config";
+import { MITokensModel } from "../model/mi-tokens";
+import { type MI } from "../config";
 
-import {
-    type MulticallInstanceWhitelistedTokenProps,
-    multicallInstanceWhitelistedTokenToTableRow,
-} from "./mi-whitelisted-token";
+import { type MIWhitelistedTokenProps, miWhitelistedTokenAsTableRow } from "./mi-whitelisted-token";
 
-interface MulticallInstanceTokensWhitelistTableProps
-    extends MulticallInstanceEntity.Inputs,
-        Pick<TileProps, "footer" | "headingCorners"> {
+interface MITokenWhitelistTableProps extends MI.Inputs, Pick<TileProps, "footer" | "headingCorners"> {
     ItemProps?: TableProps["RowProps"];
     className?: string;
-    itemsAdditional?: MulticallInstanceWhitelistedTokenProps["address"][];
+    itemsAdditional?: MIWhitelistedTokenProps["address"][];
     onItemsSelected?: TableProps["onRowsSelected"];
 }
 
-export const MulticallInstanceTokensWhitelistTable = ({
+export const MITokenWhitelistTable = ({
     ItemProps,
     className,
     daoAddress,
@@ -24,8 +19,8 @@ export const MulticallInstanceTokensWhitelistTable = ({
     headingCorners,
     itemsAdditional,
     onItemsSelected,
-}: MulticallInstanceTokensWhitelistTableProps) => {
-    const { data, error, loading } = MulticallInstanceTokensModel.useWhitelist(daoAddress);
+}: MITokenWhitelistTableProps) => {
+    const { data, error, loading } = MITokensModel.useWhitelist(daoAddress);
 
     return (
         <Tile
@@ -41,7 +36,7 @@ export const MulticallInstanceTokensWhitelistTable = ({
                     displayMode="compact"
                     header={["Contract address"]}
                     onRowsSelected={onItemsSelected}
-                    rows={data?.concat(itemsAdditional ?? []).map(multicallInstanceWhitelistedTokenToTableRow)}
+                    rows={data?.concat(itemsAdditional ?? []).map(miWhitelistedTokenAsTableRow)}
                 />
             </Scrollable>
         </Tile>

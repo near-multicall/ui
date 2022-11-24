@@ -4,14 +4,14 @@ import { FormEventHandler, HTMLProps } from "react";
 import { ArgsString } from "../../../shared/lib/args-old";
 import { toNEAR } from "../../../shared/lib/converter";
 import { Button, ButtonGroup, NearIcon, TextInput, Tile } from "../../../shared/ui/design";
-import { MulticallConfigEditorConfig, MulticallConfigEditorWidget } from "../config";
+import { Config, Widget } from "../config";
 
-import "./mce-changes-proposal.scss";
+import "./se-proposal-form.scss";
 
-export interface MCEChangesProposalProps extends HTMLProps<HTMLDivElement> {
-    changesDiff: MulticallConfigEditorWidget.ChangesDiff;
+export interface SEProposalFormProps extends HTMLProps<HTMLDivElement> {
+    changesDiff: Widget.Diff;
     classNameRoot: Required<HTMLProps<HTMLDivElement>>["className"];
-    description: MulticallConfigEditorWidget.ProposalDescription;
+    description: Widget.ProposalDescription;
     formValues: { proposalDescription: ArgsString };
     editMode: boolean;
     onCancel: FormEventHandler;
@@ -19,7 +19,7 @@ export interface MCEChangesProposalProps extends HTMLProps<HTMLDivElement> {
     onSubmit: FormEventHandler;
 }
 
-export const MCEChangesProposal = ({
+export const SEProposalForm = ({
     changesDiff,
     className,
     classNameRoot,
@@ -30,48 +30,47 @@ export const MCEChangesProposal = ({
     onCancel,
     onDescriptionUpdate,
     onSubmit,
-}: MCEChangesProposalProps) => (
+}: SEProposalFormProps) => (
     <Tile
         classes={{
-            content: clsx(`${classNameRoot}-changesProposal`, { "is-inEditMode": Boolean(editMode) }, className),
+            content: clsx(`${classNameRoot}-proposalForm`, { "is-inEditMode": Boolean(editMode) }, className),
         }}
         heading={editMode ? "Summary" : null}
     >
-        <p className={`${classNameRoot}-changesProposal-hint`}>
+        <p className={`${classNameRoot}-proposalForm-hint`}>
             {disabled
                 ? "Current account has no permission to propose changes"
                 : "Start editing to create config changes proposal template"}
         </p>
 
-        <div className={`${classNameRoot}-changesProposal-summary`}>
-            {Object.values(MulticallConfigEditorConfig.ChangesDiffKey).map(
-                (ChangesDiffKey) =>
-                    changesDiff[ChangesDiffKey].length > 0 && (
+        <div className={`${classNameRoot}-proposalForm-summary`}>
+            {Object.values(Config.DiffKey).map(
+                (DiffKey) =>
+                    changesDiff[DiffKey].length > 0 && (
                         <div
-                            className={`${classNameRoot}-changesProposal-summary-entry`}
-                            key={ChangesDiffKey}
+                            className={`${classNameRoot}-proposalForm-summary-entry`}
+                            key={DiffKey}
                         >
-                            <h3 className={`${classNameRoot}-changesProposal-summary-entry-description`}>
-                                {MulticallConfigEditorConfig.ChangesDiffMetadata[ChangesDiffKey].description + ":"}
+                            <h3 className={`${classNameRoot}-proposalForm-summary-entry-description`}>
+                                {Config.DiffMetadata[DiffKey].description + ":"}
                             </h3>
 
-                            <ul className={`${classNameRoot}-changesProposal-summary-entry-data`}>
-                                {(Array.isArray(changesDiff[ChangesDiffKey])
-                                    ? Array.from(changesDiff[ChangesDiffKey])
-                                    : [changesDiff[ChangesDiffKey]]
+                            <ul className={`${classNameRoot}-proposalForm-summary-entry-data`}>
+                                {(Array.isArray(changesDiff[DiffKey])
+                                    ? Array.from(changesDiff[DiffKey])
+                                    : [changesDiff[DiffKey]]
                                 ).map((data) => (
                                     <li
                                         className={clsx(
-                                            `${classNameRoot}-changesProposal-summary-entry-data-chip`,
+                                            `${classNameRoot}-proposalForm-summary-entry-data-chip`,
 
-                                            `${classNameRoot}-changesProposal-summary-entry-data-chip` +
+                                            `${classNameRoot}-proposalForm-summary-entry-data-chip` +
                                                 "--" +
-                                                MulticallConfigEditorConfig.ChangesDiffMetadata[ChangesDiffKey].color
+                                                Config.DiffMetadata[DiffKey].color
                                         )}
                                         key={data as string}
                                     >
-                                        {!Number.isNaN(data) &&
-                                        ChangesDiffKey === MulticallConfigEditorConfig.ChangesDiffKey.jobBond
+                                        {!Number.isNaN(data) && DiffKey === Config.DiffKey.jobBond
                                             ? `${toNEAR(data as string)} ${NearIcon.NATIVE_TOKEN_CHARACTER}`
                                             : (data as string)}
                                     </li>
@@ -82,7 +81,7 @@ export const MCEChangesProposal = ({
             )}
         </div>
 
-        <form className={`${classNameRoot}-changesProposal-submit`}>
+        <form className={`${classNameRoot}-proposalForm-submit`}>
             <div>
                 <TextInput
                     fullWidth

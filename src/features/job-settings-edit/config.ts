@@ -1,17 +1,15 @@
 import { HTMLProps } from "react";
 
-import { MulticallInstance, MulticallInstanceEntity } from "../../entities";
-import { MulticallConfigDiff, Multicall } from "../../shared/lib/contracts/multicall";
+import { MI, MIEntity } from "../../entities";
+import { MulticallSettingsDiff, Multicall } from "../../shared/lib/contracts/multicall";
 import { DesignKitConfigType } from "../../shared/ui/design";
 
 namespace JobSettingsEditFeature {
-    export type ChangesDiffKey = MulticallInstanceEntity.ParamKey;
+    export type DiffKey = MIEntity.ParamKey;
 
-    export type FormState = Pick<MulticallConfigDiff, MulticallInstanceEntity.ParamKey>;
+    export type FormState = Pick<MulticallSettingsDiff, MIEntity.ParamKey>;
 
-    export interface Inputs
-        extends Omit<HTMLProps<HTMLDivElement>, "onChange">,
-            Pick<MulticallInstanceEntity.Inputs, "daoAddress"> {
+    export interface Inputs extends Omit<HTMLProps<HTMLDivElement>, "onChange">, Pick<MIEntity.Inputs, "daoAddress"> {
         multicallInstance: Multicall;
         onEdit: (payload: FormState) => void;
         resetTrigger: { subscribe: (callback: EventListener) => () => void };
@@ -19,15 +17,15 @@ namespace JobSettingsEditFeature {
 }
 
 class JobSettingsEditConfig {
-    public static readonly ChangesDiffKey = MulticallInstance.ParamKey;
+    public static readonly DiffKey = MI.ParamKey;
 
-    public static readonly ChangesDiffMetadata = {
-        [JobSettingsEditConfig.ChangesDiffKey.croncatManager]: {
+    public static readonly DiffMetadata = {
+        [JobSettingsEditConfig.DiffKey.croncatManager]: {
             color: "blue" as DesignKitConfigType.Color,
             description: "Croncat manager",
         },
 
-        [JobSettingsEditConfig.ChangesDiffKey.jobBond]: {
+        [JobSettingsEditConfig.DiffKey.jobBond]: {
             color: "blue" as DesignKitConfigType.Color,
             description: "Job bond",
         },

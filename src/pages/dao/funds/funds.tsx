@@ -1,11 +1,11 @@
 import clsx from "clsx";
 import { HTMLProps } from "react";
 
-import { TokensBalances, type TokensBalancesWidget } from "../../../widgets";
+import { TokenBalances, type TokenBalancesWidget } from "../../../widgets";
 
 import "./funds.scss";
 
-interface DaoFundsTabUIProps extends HTMLProps<HTMLDivElement>, TokensBalancesWidget.Inputs {}
+interface DaoFundsTabUIProps extends HTMLProps<HTMLDivElement>, TokenBalancesWidget.Inputs {}
 
 const _DaoFundsTab = "DaoFundsTab";
 
@@ -14,7 +14,7 @@ const DaoFundsTabUI = ({ className, contracts, ...props }: DaoFundsTabUIProps) =
         className={clsx(_DaoFundsTab, className)}
         {...props}
     >
-        <TokensBalances.UI {...{ contracts }} />
+        <TokenBalances.UI {...{ contracts }} />
     </div>
 );
 

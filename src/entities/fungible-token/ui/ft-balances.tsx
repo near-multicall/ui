@@ -1,13 +1,12 @@
 import { IconLabel, NearIcon } from "../../../shared/ui/design";
+import { FTFormat } from "../lib/ft-format";
+import { FTInfoModel } from "../model/ft-info";
+import { type FT } from "../config";
 
-import { FungibleTokenFormat } from "../lib/ft-format";
-import { FungibleTokenBalancesModel } from "../model/ft-balances";
-import { type FungibleTokenEntity } from "../config";
+interface FTBalancesProps extends FT.Inputs {}
 
-interface FungibleTokensBalancesRenderProps extends FungibleTokenEntity.Inputs {}
-
-export const fungibleTokensBalancesRender = ({ contracts }: FungibleTokensBalancesRenderProps) => {
-    const { data } = FungibleTokenBalancesModel.useAllTokensFrom(contracts);
+export const ftBalances = ({ contracts }: FTBalancesProps) => {
+    const { data } = FTInfoModel.useNonZeroBalances(contracts);
 
     return !data
         ? null
@@ -18,9 +17,9 @@ export const fungibleTokensBalancesRender = ({ contracts }: FungibleTokensBalanc
                       label={metadata.symbol}
                   />,
 
-                  FungibleTokenFormat.amountToDisplayAmount(multicall, metadata.decimals),
-                  FungibleTokenFormat.amountToDisplayAmount(dao, metadata.decimals),
-                  FungibleTokenFormat.amountToDisplayAmount(total, metadata.decimals),
+                  FTFormat.amountToDisplayAmount(multicall, metadata.decimals),
+                  FTFormat.amountToDisplayAmount(dao, metadata.decimals),
+                  FTFormat.amountToDisplayAmount(total, metadata.decimals),
               ],
 
               id: metadata.symbol,

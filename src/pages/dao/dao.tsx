@@ -3,7 +3,7 @@ import { Base64 } from "js-base64";
 import debounce from "lodash.debounce";
 import { Component, ContextType } from "react";
 
-import { MulticallInstance, Wallet } from "../../entities";
+import { MI, Wallet } from "../../entities";
 import { Form, Formik } from "formik";
 import { args } from "../../shared/lib/args/args";
 import { fields } from "../../shared/lib/args/args-types/args-object";
@@ -181,7 +181,7 @@ export class DaoPage extends Component<Props, State> {
 
         const multicallAddress = this.toMulticallAddress(formData.addr);
 
-        const depo = Big(this.fee).plus(MulticallInstance.MIN_BALANCE);
+        const depo = Big(this.fee).plus(MI.MIN_BALANCE);
         const daoSearchInput: HTMLInputElement = document.querySelector(".DaoSearch input")!;
 
         /**

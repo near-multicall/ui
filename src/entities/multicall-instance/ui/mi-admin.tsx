@@ -1,14 +1,14 @@
 import { NearLink, type NearLinkProps } from "../../../shared/ui/design";
 
-interface MulticallInstanceAdminProps extends NearLinkProps {}
+interface MIAdminProps extends NearLinkProps {}
 
-const MulticallInstanceAdmin = ({ address }: MulticallInstanceAdminProps) => (
+const MIAdmin = ({ address }: MIAdminProps) => (
     <span>
         <NearLink {...{ address }} />
     </span>
 );
 
-export const multicallInstanceAdminToTableRow = (item: MulticallInstanceAdminProps["address"]) => ({
-    content: [<MulticallInstanceAdmin address={item} />],
+export const miAdminAsTableRow = (item: MIAdminProps["address"]) => ({
+    content: [<MIAdmin address={item} />],
     id: item,
 });

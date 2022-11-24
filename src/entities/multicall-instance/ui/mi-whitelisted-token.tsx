@@ -1,19 +1,17 @@
 import { FungibleToken } from "../../../shared/lib/standards/fungibleToken";
 import { NearLink } from "../../../shared/ui/design";
 
-export interface MulticallInstanceWhitelistedTokenProps {
+export interface MIWhitelistedTokenProps {
     address: FungibleToken["address"];
 }
 
-const MulticallInstanceWhitelistedToken = ({ address }: MulticallInstanceWhitelistedTokenProps) => (
+const MIWhitelistedToken = ({ address }: MIWhitelistedTokenProps) => (
     <span>
         <NearLink {...{ address }} />
     </span>
 );
 
-export const multicallInstanceWhitelistedTokenToTableRow = (
-    item: MulticallInstanceWhitelistedTokenProps["address"]
-) => ({
-    content: [<MulticallInstanceWhitelistedToken address={item} />],
+export const miWhitelistedTokenAsTableRow = (item: MIWhitelistedTokenProps["address"]) => ({
+    content: [<MIWhitelistedToken address={item} />],
     id: item,
 });

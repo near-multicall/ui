@@ -3,39 +3,36 @@ import { useEffect, useState } from "react";
 import { ArgsAccount } from "../../../shared/lib/args-old";
 import { Multicall } from "../../../shared/lib/contracts/multicall";
 import { Props } from "../../../shared/lib/props";
-import { type MulticallInstanceEntity } from "../config";
+import { type MI } from "../config";
 
-import { MulticallInstanceSettingsModel } from "./mi-settings";
+import { MIInfoModel } from "./mi-settings";
 
-export type MulticallInstanceTokensWhitelist = {
+export type MITokenWhitelist = {
     data: Multicall["tokensWhitelist"] | null;
     error: Error | null;
     loading: boolean;
 };
 
-export class MulticallInstanceTokensModel {
+export class MITokensModel {
     static whitelistFetchFx = async (
-        daoAddress: MulticallInstanceEntity.Inputs["daoAddress"],
-        callback: (result: MulticallInstanceTokensWhitelist) => void
+        daoAddress: MI.Inputs["daoAddress"],
+        callback: (result: MITokenWhitelist) => void
     ) =>
-        await MulticallInstanceSettingsModel.fetchFx(
+        await MIInfoModel.dataFetchFx(
             `${ArgsAccount.deconstructAddress(daoAddress).name}.${Multicall.FACTORY_ADDRESS}`,
 
             (multicallInstanceData) =>
                 callback(Props.evolve({ data: ({ tokensWhitelist }) => tokensWhitelist }, multicallInstanceData))
         );
 
-    static useWhitelist = (daoAddress: MulticallInstanceEntity.Inputs["daoAddress"]) => {
-        const [state, stateUpdate] = useState<MulticallInstanceTokensWhitelist>({
+    static useWhitelist = (daoAddress: MI.Inputs["daoAddress"]) => {
+        const [state, stateUpdate] = useState<MITokenWhitelist>({
             data: null,
             error: null,
             loading: true,
         });
 
-        useEffect(
-            () => void MulticallInstanceTokensModel.whitelistFetchFx(daoAddress, stateUpdate),
-            [daoAddress, stateUpdate]
-        );
+        useEffect(() => void MITokensModel.whitelistFetchFx(daoAddress, stateUpdate), [daoAddress, stateUpdate]);
 
         return state;
     };

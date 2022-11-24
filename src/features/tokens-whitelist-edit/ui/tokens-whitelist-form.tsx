@@ -4,22 +4,22 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { TextInput, Tooltip } from "../../../shared/ui/design";
 import { ArgsString } from "../../../shared/lib/args-old";
-import { MulticallInstance } from "../../../entities";
-import { TokensWhitelistEditConfig, type TokensWhitelistEditFeature } from "../config";
+import { MI } from "../../../entities";
+import { TokenWhitelistEditConfig, type TokenWhitelistEditFeature } from "../config";
 
-interface TokensWhitelistFormProps extends TokensWhitelistEditFeature.Inputs {}
+interface TokenWhitelistFormProps extends TokenWhitelistEditFeature.Inputs {}
 
-export const TokensWhitelistForm = ({
+export const TokenWhitelistForm = ({
     className,
     daoAddress,
     disabled,
     onEdit,
     resetTrigger,
-}: TokensWhitelistFormProps) => {
+}: TokenWhitelistFormProps) => {
     const [editModeEnabled, editModeSwitch] = useState(false);
 
-    const [addTokens, markForAddition] = useState<TokensWhitelistEditFeature.FormStates["addTokens"]>(new Set()),
-        [removeTokens, markForRemoval] = useState<TokensWhitelistEditFeature.FormStates["removeTokens"]>(new Set());
+    const [addTokens, markForAddition] = useState<TokenWhitelistEditFeature.FormStates["addTokens"]>(new Set()),
+        [removeTokens, markForRemoval] = useState<TokenWhitelistEditFeature.FormStates["removeTokens"]>(new Set());
 
     const tokenToAddAddress = useMemo(() => new ArgsString(""), []);
 
@@ -68,11 +68,11 @@ export const TokensWhitelistForm = ({
     );
 
     return (
-        <MulticallInstance.TokensWhitelistTable
+        <MI.TokenWhitelistTable
             ItemProps={{
                 idToHighlightColor: (id) =>
-                    (addTokens.has(id) && TokensWhitelistEditConfig.ChangesDiffMetadata.addTokens.color) ||
-                    (removeTokens.has(id) && TokensWhitelistEditConfig.ChangesDiffMetadata.removeTokens.color) ||
+                    (addTokens.has(id) && TokenWhitelistEditConfig.DiffMetadata.addTokens.color) ||
+                    (removeTokens.has(id) && TokenWhitelistEditConfig.DiffMetadata.removeTokens.color) ||
                     null,
 
                 slots: {

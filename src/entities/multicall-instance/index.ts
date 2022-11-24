@@ -1,13 +1,13 @@
-import { type MulticallInstanceEntity, MulticallInstanceEntityConfig } from "./config";
-import { MulticallInstanceAdminsTable } from "./ui/mi-admins";
-import { MulticallInstanceTokensWhitelistTable } from "./ui/mi-tokens-whitelist";
+import { MI as MIEntity, MIConfig } from "./config";
+import { MIAdminsTable } from "./ui/mi-admins";
+import { MITokenWhitelistTable } from "./ui/mi-token-whitelist";
 
 /**
  * Multicall Instance entity
  */
-class MulticallInstance extends MulticallInstanceEntityConfig {
-    static AdminsTable = MulticallInstanceAdminsTable;
-    static TokensWhitelistTable = MulticallInstanceTokensWhitelistTable;
+class MI extends MIConfig {
+    static AdminsTable = MIAdminsTable;
+    static TokenWhitelistTable = MITokenWhitelistTable;
 }
 
-export { MulticallInstance, MulticallInstanceEntity };
+export { MI, type MIEntity };

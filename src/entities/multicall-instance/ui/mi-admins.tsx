@@ -1,15 +1,15 @@
 import { Scrollable, Table, Tile } from "../../../shared/ui/design";
-import { MulticallInstanceAdminsModel } from "../model/mi-admins";
-import { type MulticallInstanceEntity } from "../config";
+import { MIAdminsModel } from "../model/mi-admins";
+import { type MI } from "../config";
 
-import { multicallInstanceAdminToTableRow } from "./mi-admin";
+import { miAdminAsTableRow } from "./mi-admin";
 
-interface MulticallInstanceAdminsTableProps extends MulticallInstanceEntity.Inputs {
+interface MIAdminsTableProps extends MI.Inputs {
     className?: string;
 }
 
-export const MulticallInstanceAdminsTable = ({ className, daoAddress }: MulticallInstanceAdminsTableProps) => {
-    const { data, error, loading } = MulticallInstanceAdminsModel.useAddressList(daoAddress);
+export const MIAdminsTable = ({ className, daoAddress }: MIAdminsTableProps) => {
+    const { data, error, loading } = MIAdminsModel.useAddressList(daoAddress);
 
     return (
         <Tile
@@ -24,7 +24,7 @@ export const MulticallInstanceAdminsTable = ({ className, daoAddress }: Multical
                     dense
                     displayMode="compact"
                     header={["Account address"]}
-                    rows={data?.map(multicallInstanceAdminToTableRow)}
+                    rows={data?.map(miAdminAsTableRow)}
                 />
             </Scrollable>
         </Tile>

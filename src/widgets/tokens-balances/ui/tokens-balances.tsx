@@ -1,36 +1,33 @@
 import clsx from "clsx";
 
 import { Tile, Scrollable, Table } from "../../../shared/ui/design";
-import { FungibleToken, NearToken } from "../../../entities";
-
-import { type TokensBalancesWidget } from "../config";
+import { FT, NEAR } from "../../../entities";
+import { type TokenBalancesWidget } from "../config";
 
 import "./tokens-balances.scss";
 
-interface TokensBalancesUIProps extends TokensBalancesWidget.Inputs {}
+const _TokenBalances = "TokenBalances";
 
-const _TokensBalances = "TokensBalances";
-
-export const TokensBalancesUI = ({ className, contracts }: TokensBalancesUIProps) => {
-    const nearTokenBalances = NearToken.balancesRender({ contracts }),
-        fungibleTokensBalances = FungibleToken.allBalancesRender({ contracts });
+export const TokenBalances = ({ className, contracts }: TokenBalancesWidget.Inputs) => {
+    const nearTokenBalances = NEAR.balancesRender({ contracts }),
+        fungibleTokenBalances = FT.balances({ contracts });
 
     return (
         <Tile
-            classes={{ root: clsx(_TokensBalances, className) }}
+            classes={{ root: clsx(_TokenBalances, className) }}
             heading="Token balances"
         >
-            {(nearTokenBalances ?? fungibleTokensBalances) && (
+            {(nearTokenBalances ?? fungibleTokenBalances) && (
                 <Scrollable>
                     <Table
                         RowProps={{ withTitle: true }}
                         header={["Token", "Multicall", "DAO", "Total"]}
-                        rows={[...(nearTokenBalances ? [nearTokenBalances] : []), ...(fungibleTokensBalances ?? [])]}
+                        rows={[...(nearTokenBalances ? [nearTokenBalances] : []), ...(fungibleTokenBalances ?? [])]}
                     />
                 </Scrollable>
             )}
 
-            {(!nearTokenBalances || !fungibleTokensBalances) && <div className="loader" />}
+            {(!nearTokenBalances || !fungibleTokenBalances) && <div className="loader" />}
         </Tile>
     );
 };

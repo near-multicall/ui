@@ -2,8 +2,8 @@
 @use "sass/mixin";
 @use "sass/size";
 
-.MulticallConfigEditor-changesProposal {
-    grid-area: MCEChangesProposal;
+.SettingsEditor-proposalForm {
+    grid-area: SEProposalForm;
     gap: size.$gap * 0.4;
 
     &-hint {

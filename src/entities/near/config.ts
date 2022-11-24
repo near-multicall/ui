@@ -1,7 +1,7 @@
 import { Multicall } from "../../shared/lib/contracts/multicall";
 import { SputnikDAO } from "../../shared/lib/contracts/sputnik-dao";
 
-namespace NearTokenEntity {
+namespace NEAREntity {
     export interface Inputs {
         contracts: {
             dao: SputnikDAO;
@@ -10,8 +10,8 @@ namespace NearTokenEntity {
     }
 }
 
-class NearTokenConfig {
+class NEARConfig {
     static FRACTIONAL_PART_LENGTH = 5;
 }
 
-export { NearTokenConfig, type NearTokenEntity };
+export { NEARConfig, type NEAREntity };
