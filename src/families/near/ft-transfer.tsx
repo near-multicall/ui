@@ -48,7 +48,7 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
             gas: arx.big().intoParsed(gasUnit).cast(gas).toFixed(),
             sdGas: arx.big().intoParsed(sdGasUnit).cast(sdGas).toFixed(),
         }))
-        .requireAll({ ignore: ["memo"] })
+        .requireAll({ ignore: ["memo", "sdGas"] })
         .retainAll();
 
     override initialValues: FormData = {

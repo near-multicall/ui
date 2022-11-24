@@ -1,5 +1,6 @@
 import { Form, useFormikContext } from "formik";
 import { useEffect } from "react";
+import MintbaseLogo from "../../app/static/mintbase/Mintbase_logo.svg";
 import { args as arx } from "../../shared/lib/args/args";
 import { Call, CallError } from "../../shared/lib/call";
 import { BASE_URI_ARWEAVE, MintbaseStore } from "../../shared/lib/contracts/mintbase";
@@ -8,7 +9,6 @@ import { STORAGE } from "../../shared/lib/persistent";
 import { InfoField, TextField, UnitField } from "../../shared/ui/form";
 import { FileField } from "../../shared/ui/form/fields/file-field";
 import { BaseTask, BaseTaskProps, BaseTaskState, DefaultFormData } from "../base";
-import MintbaseLogo from "../../app/static/mintbase/Mintbase_logo.svg";
 import "./mintbase.scss";
 
 type FormData = DefaultFormData & {

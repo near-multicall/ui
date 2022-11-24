@@ -87,3 +87,4 @@ class FungibleToken extends StorageManagement {
 }
 
 export { FungibleToken };
+export type { FungibleTokenMetadata };
