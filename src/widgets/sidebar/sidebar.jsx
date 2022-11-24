@@ -271,6 +271,16 @@ export class Sidebar extends Component {
                                 title: `Switch to ${window.NEAR_ENV === "mainnet" ? "testnet" : "mainnet"}`,
                             },
                             {
+                                onClick: () =>
+                                    window.open(
+                                        `https://${
+                                            window.NEAR_ENV === "mainnet" ? "" : "testnet."
+                                        }app.astrodao.com/dao/${STORAGE.addresses.dao}`,
+                                        "_blank"
+                                    ),
+                                title: "Take me to AstroDAO",
+                            },
+                            {
                                 title: (
                                     <div className="legal-disclaimer">
                                         The software is open source and provided “as is”, without warranty of any kind.
