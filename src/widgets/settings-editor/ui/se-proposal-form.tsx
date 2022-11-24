@@ -4,14 +4,14 @@ import { FormEventHandler, HTMLProps } from "react";
 import { ArgsString } from "../../../shared/lib/args-old";
 import { toNEAR } from "../../../shared/lib/converter";
 import { Button, ButtonGroup, NearIcon, TextInput, Tile } from "../../../shared/ui/design";
-import { Config, Widget } from "../config";
+import { Config, SettingsEditor } from "../config";
 
 import "./se-proposal-form.scss";
 
 export interface SEProposalFormProps extends HTMLProps<HTMLDivElement> {
-    changesDiff: Widget.Diff;
+    changesDiff: SettingsEditor.Diff;
     classNameRoot: Required<HTMLProps<HTMLDivElement>>["className"];
-    description: Widget.ProposalDescription;
+    description: SettingsEditor.ProposalDescription;
     formValues: { proposalDescription: ArgsString };
     editMode: boolean;
     onCancel: FormEventHandler;

@@ -1,8 +1,8 @@
-import { Config, Widget } from "./config";
-import { SettingsEditor as UI } from "./ui/settings-editor";
+import { Config, SettingsEditor as SettingsEditorWidget } from "./config";
+import { SettingsEditorUI } from "./ui/settings-editor";
 
-class SettingsEditor extends Config {
-    static UI = UI;
+export class SettingsEditor extends Config {
+    static UI = SettingsEditorUI;
 }
 
-export { SettingsEditor, type Widget as SettingsEditorWidget };
+export { type SettingsEditorWidget };

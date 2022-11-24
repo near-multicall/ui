@@ -6,4 +6,4 @@ export { Editor } from "./editor/editor.jsx";
 export { Export } from "./export";
 export { SettingsEditor, type SettingsEditorWidget } from "./settings-editor";
 export { Sidebar } from "./sidebar/sidebar.jsx";
-export { TokenBalances, type TokenBalancesWidget } from "./tokens-balances";
+export { TokenBalances, type TokenBalancesWidget } from "./token-balances";

@@ -1,8 +1,8 @@
-import { FTConfig, FT as FTEntity } from "./config";
+import { Config, FT as FTEntity } from "./config";
 import { ftBalances } from "./ui/ft-balances";
 
-class FT extends FTConfig {
+export class FT extends Config {
     static balances = ftBalances;
 }
 
-export { FT, type FTEntity };
+export { type FTEntity };

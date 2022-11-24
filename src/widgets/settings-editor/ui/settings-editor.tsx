@@ -6,14 +6,14 @@ import { JobSettingsEdit, TokenWhitelistEdit } from "../../../features";
 import { ArgsString } from "../../../shared/lib/args-old";
 import { Multicall } from "../../../shared/lib/contracts/multicall";
 import { signAndSendTxs } from "../../../shared/lib/wallet";
-import { Config, Widget } from "../config";
+import { Config, SettingsEditor } from "../config";
 
 import { SEProposalForm } from "./se-proposal-form";
 import "./settings-editor.scss";
 
 const _SettingsEditor = "SettingsEditor";
 
-export const SettingsEditor = ({ className, contracts }: Widget.Inputs) => {
+export const SettingsEditorUI = ({ className, contracts }: SettingsEditor.Inputs) => {
     const wallet = useContext(Wallet.SelectorContext);
 
     const proposalCreationPermitted =
@@ -21,14 +21,14 @@ export const SettingsEditor = ({ className, contracts }: Widget.Inputs) => {
 
     const [editMode, editModeSwitch] = useState(false);
 
-    const changesDiffInitialState: Widget.Diff = {
+    const changesDiffInitialState: SettingsEditor.Diff = {
         [Config.DiffKey.removeTokens]: [],
         [Config.DiffKey.addTokens]: [],
         [Config.DiffKey.jobBond]: "",
         [Config.DiffKey.croncatManager]: "",
     };
 
-    const [changesDiff, changesDiffUpdate] = useState<Widget.Diff>(changesDiffInitialState),
+    const [changesDiff, changesDiffUpdate] = useState<SettingsEditor.Diff>(changesDiffInitialState),
         formValues = { proposalDescription: useMemo(() => new ArgsString(""), []) },
         [proposalDescription, proposalDescriptionUpdate] = useState(formValues.proposalDescription.value),
         _childFormsResetRequested = "childFormsResetRequested";
@@ -57,7 +57,8 @@ export const SettingsEditor = ({ className, contracts }: Widget.Inputs) => {
     }, [editMode, editModeSwitch, formReset]);
 
     const onEdit = useCallback(
-        (update: Partial<Widget.Diff>) => void changesDiffUpdate((latestState) => ({ ...latestState, ...update })),
+        (update: Partial<SettingsEditor.Diff>) =>
+            void changesDiffUpdate((latestState) => ({ ...latestState, ...update })),
 
         [changesDiffUpdate]
     );

@@ -2,13 +2,13 @@ import clsx from "clsx";
 
 import { Tile, Scrollable, Table } from "../../../shared/ui/design";
 import { FT, NEAR } from "../../../entities";
-import { type TokenBalancesWidget } from "../config";
+import { type TokenBalances } from "../config";
 
-import "./tokens-balances.scss";
+import "./token-balances.scss";
 
 const _TokenBalances = "TokenBalances";
 
-export const TokenBalances = ({ className, contracts }: TokenBalancesWidget.Inputs) => {
+export const TokenBalancesUI = ({ className, contracts }: TokenBalances.Inputs) => {
     const nearTokenBalances = NEAR.balancesRender({ contracts }),
         fungibleTokenBalances = FT.balances({ contracts });
 
