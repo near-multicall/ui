@@ -39,7 +39,7 @@ export class NslpAddLiquidity extends BaseTask<FormData, Props, State> {
         func: "nslp_add_liquidity",
         gas: "20",
         gasUnit: "Tgas",
-        depo: "10",
+        depo: "",
         depoUnit: "NEAR",
     };
 

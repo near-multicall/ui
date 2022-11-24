@@ -43,7 +43,7 @@ export class NslpRemoveLiquidity extends BaseTask<FormData, Props, State> {
                         return true;
                     },
                 })
-                .requiredWhen("removeAll", (removeAll) => !removeAll),
+                .requiredWhen("removeAll", (removeAll: boolean) => !removeAll),
         })
         .transform(({ gas, gasUnit, amount, amountUnit, removeAll, ...rest }) => ({
             ...rest,
@@ -62,7 +62,7 @@ export class NslpRemoveLiquidity extends BaseTask<FormData, Props, State> {
         gasUnit: "Tgas",
         depo: "0",
         depoUnit: "NEAR",
-        amount: "0",
+        amount: "",
         amountUnit: "NEAR",
         removeAll: false,
     };
