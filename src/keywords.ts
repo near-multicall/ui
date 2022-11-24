@@ -26,6 +26,13 @@ export const keywords = {
         grant_minter: ["add minter"],
         revoke_minter: ["remove minter"],
         transfer_store_ownership: ["transfer store ownership"],
+        buy: ["nft", "marketplace"],
+    },
+    paras: {
+        buy: ["nft", "marketplace"],
+    },
+    token_farm: {
+        create_token: ["TokenFarm", "treasury"],
     },
     "meta-pool": {
         nslp_add_liquidity: ["add liquidity", "lp"],
