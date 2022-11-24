@@ -7,7 +7,7 @@ import { Call, CallError } from "../../shared/lib/call";
 import { Paras, type MarketDataJson } from "../../shared/lib/contracts/paras";
 import { NonFungibleToken } from "../../shared/lib/standards/nonFungibleToken";
 import { Big, formatTokenAmount, toGas } from "../../shared/lib/converter";
-import { InfoField, TextField, UnitField } from "../../shared/ui/form-fields";
+import { InfoField, TextField, UnitField } from "../../shared/ui/form";
 import { BaseTask, BaseTaskProps, BaseTaskState } from "../base";
 import "./paras.scss";
 

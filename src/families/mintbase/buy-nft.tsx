@@ -6,7 +6,7 @@ import { fields } from "../../shared/lib/args/args-types/args-object";
 import { Call, CallError } from "../../shared/lib/call";
 import { MintbaseStore } from "../../shared/lib/contracts/mintbase";
 import { toGas } from "../../shared/lib/converter";
-import { InfoField, TextField, UnitField } from "../../shared/ui/form-fields";
+import { InfoField, TextField, UnitField } from "../../shared/ui/form";
 import { BaseTask, BaseTaskProps, BaseTaskState } from "../base";
 import "./mintbase.scss";
 
