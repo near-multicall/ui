@@ -118,6 +118,7 @@ export class NslpAddLiquidity extends BaseTask<FormData, Props, State> {
                 touched: Object.keys(this.state.formData).reduce((acc, k) => ({ ...acc, [k]: true }), {}),
             });
             validateForm(this.state.formData);
+            this.confidentlyUpdateMetaPoolAccount();
         }, []);
 
         return (
@@ -135,14 +136,14 @@ export class NslpAddLiquidity extends BaseTask<FormData, Props, State> {
                             <span className="key">You own</span>
                             <span className="value">{`${arx
                                 .big()
-                                .intoFormatted("NEAR")
+                                .intoFormatted("NEAR", 5)
                                 .cast(metaPoolAccountInfo.nslp_shares)} LP shares`}</span>
                         </p>
                         <p className="entry">
                             <span className="key"></span>
                             <span className="value">{`= ${arx
                                 .big()
-                                .intoFormatted("NEAR")
+                                .intoFormatted("NEAR", 5)
                                 .cast(metaPoolAccountInfo.nslp_share_value)} \u24C3`}</span>
                         </p>
                     </InfoField>

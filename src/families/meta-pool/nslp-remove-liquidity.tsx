@@ -1,4 +1,4 @@
-import { Form, useFormikContext } from "formik";
+import { Form, FormikErrors, useFormikContext } from "formik";
 import { useEffect } from "react";
 import { args as arx } from "../../shared/lib/args/args";
 import { Call, CallError } from "../../shared/lib/call";
@@ -127,7 +127,7 @@ export class NslpRemoveLiquidity extends BaseTask<FormData, Props, State> {
                     func,
                     args: {
                         amount: removeAll
-                            ? this.state.metaPoolAccountInfo!.nslp_shares
+                            ? this.state.metaPoolAccountInfo!.nslp_share_value
                             : arx.big().intoParsed(amountUnit).cast(amount).toFixed(),
                     },
                     gas: arx.big().intoParsed(gasUnit).cast(gas).toFixed(),
@@ -148,6 +148,7 @@ export class NslpRemoveLiquidity extends BaseTask<FormData, Props, State> {
     public override async validateForm(values: FormData): Promise<FormikErrors<FormData>> {
         this.setFormData(values);
         await new Promise((resolve) => this.resolveDebounced(resolve));
+        if (values.removeAll) await this.confidentlyUpdateMetaPoolAccount();
         await this.schema.check(values, { context: { metaPoolAccountInfo: this.state.metaPoolAccountInfo } });
         return Object.fromEntries(
             Object.entries(fields(this.schema))
@@ -166,6 +167,7 @@ export class NslpRemoveLiquidity extends BaseTask<FormData, Props, State> {
                 touched: Object.keys(this.state.formData).reduce((acc, k) => ({ ...acc, [k]: true }), {}),
             });
             validateForm(this.state.formData);
+            this.confidentlyUpdateMetaPoolAccount();
         }, []);
 
         return (
@@ -183,14 +185,14 @@ export class NslpRemoveLiquidity extends BaseTask<FormData, Props, State> {
                             <span className="key">You own</span>
                             <span className="value">{`${arx
                                 .big()
-                                .intoFormatted("NEAR")
+                                .intoFormatted("NEAR", 5)
                                 .cast(metaPoolAccountInfo.nslp_shares)} LP shares`}</span>
                         </p>
                         <p className="entry">
                             <span className="key"></span>
                             <span className="value">{`= ${arx
                                 .big()
-                                .intoFormatted("NEAR")
+                                .intoFormatted("NEAR", 5)
                                 .cast(metaPoolAccountInfo.nslp_share_value)} \u24C3`}</span>
                         </p>
                     </InfoField>
