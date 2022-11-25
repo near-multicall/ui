@@ -8,13 +8,14 @@ import "./tile.scss";
 const _Tile = "Tile";
 
 export interface TileProps extends PropsWithChildren, Omit<HTMLAttributes<HTMLDivElement>, "className"> {
-    classes?: Partial<Record<"root" | "content" | "footer" | "heading", HTMLAttributes<HTMLDivElement>["className"]>>;
+    classes?: Partial<Record<"root" | "content" | "footer" | "header", HTMLAttributes<HTMLDivElement>["className"]>>;
     error?: Error | null;
     footer?: JSX.Element;
     heading?: string | null;
-    headingCorners?: { start?: JSX.Element; end?: JSX.Element };
+    headerSlots?: { start?: JSX.Element; end?: JSX.Element };
     loading?: boolean;
     noData?: boolean;
+    order?: "default" | "swapped";
 }
 
 export const Tile = ({
@@ -23,21 +24,17 @@ export const Tile = ({
     error,
     footer,
     heading,
-    headingCorners,
+    headerSlots,
     loading = false,
     noData = false,
+    order = "default",
 }: TileProps) => (
-    <div className={clsx(_Tile, classes?.root)}>
-        {heading && (
-            <span className={clsx(`${_Tile}-heading`, classes?.heading)}>
-                {headingCorners?.start && (
-                    <span className={`${_Tile}-heading-corner--start`}>{headingCorners?.start}</span>
-                )}
-
-                <h1 className={`${_Tile}-heading-text`}>{heading}</h1>
-                {headingCorners?.end && <span className={`${_Tile}-heading-corner--end`}>{headingCorners?.end}</span>}
-            </span>
-        )}
+    <div className={clsx(_Tile, `${_Tile}--${order}`, classes?.root)}>
+        <span className={clsx(`${_Tile}-header`, classes?.header)}>
+            {headerSlots?.start && <span className={`${_Tile}-header-slot--start`}>{headerSlots?.start}</span>}
+            {heading && <h1 className={`${_Tile}-header-text`}>{heading}</h1>}
+            {headerSlots?.end && <span className={`${_Tile}-header-slot--end`}>{headerSlots?.end}</span>}
+        </span>
 
         <div className={clsx(`${_Tile}-content`, classes?.content)}>
             {loading && <div className="loader" />}

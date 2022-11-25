@@ -105,7 +105,7 @@ export const TokensWhitelistForm = ({
                     void null
                 )
             }
-            headingCorners={{
+            headerSlots={{
                 end: editModeEnabled ? (
                     <Tooltip content="Cancel & Reset">
                         <IconButton onClick={formReset}>

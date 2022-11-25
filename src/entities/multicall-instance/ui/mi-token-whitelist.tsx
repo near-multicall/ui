@@ -4,7 +4,7 @@ import { type MI } from "../config";
 
 import { type MIWhitelistedTokenProps, miWhitelistedTokenAsTableRow } from "./mi-whitelisted-token";
 
-interface MITokenWhitelistTableProps extends MI.Inputs, Pick<TileProps, "footer" | "headingCorners"> {
+interface MITokenWhitelistTableProps extends MI.Inputs, Pick<TileProps, "footer" | "headerSlots"> {
     ItemProps?: TableProps["RowProps"];
     className?: string;
     itemsAdditional?: MIWhitelistedTokenProps["address"][];
@@ -16,7 +16,7 @@ export const MITokenWhitelistTable = ({
     className,
     daoAddress,
     footer,
-    headingCorners,
+    headerSlots,
     itemsAdditional,
     onItemsSelected,
 }: MITokenWhitelistTableProps) => {
@@ -27,7 +27,7 @@ export const MITokenWhitelistTable = ({
             classes={{ root: className }}
             heading="Token whitelist"
             noData={data !== null && data.length === 0}
-            {...{ error, footer, headingCorners, loading }}
+            {...{ error, footer, headerSlots, loading }}
         >
             <Scrollable>
                 <Table

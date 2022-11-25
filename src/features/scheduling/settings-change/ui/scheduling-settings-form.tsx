@@ -68,7 +68,7 @@ export const SchedulingSettingsForm = ({
         <Tile
             classes={{ root: className }}
             heading="Scheduling"
-            headingCorners={{
+            headerSlots={{
                 end: editModeEnabled ? (
                     <>
                         <Tooltip content="Preview">

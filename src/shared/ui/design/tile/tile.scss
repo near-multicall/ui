@@ -10,7 +10,7 @@
     background-color: color.$lightest;
     font-size: size.$small-text;
 
-    &-heading {
+    &-header {
         display: flex;
         flex-flow: row nowrap;
         align-items: center;
@@ -22,7 +22,7 @@
             font-size: size.$large-text;
         }
 
-        &-corner {
+        &-slot {
             &--start,
             &--end {
                 .MuiButtonBase-root {
