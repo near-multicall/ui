@@ -6,7 +6,8 @@
     flex-flow: column nowrap;
     position: relative;
     border-radius: size.$task-radius;
-    padding: size.$gap * 0.6;
+    padding: size.$gap * 0.5;
+    gap: size.$gap * 0.5;
     background-color: color.$lightest;
     font-size: size.$small-text;
 
@@ -14,8 +15,8 @@
         display: flex;
         flex-flow: row nowrap;
         align-items: center;
+        padding: size.$gap * 0.2 size.$gap * 0.2 size.$gap * 0.5;
         gap: size.$gap;
-        padding: size.$gap * 0.2 size.$gap * 0.2 size.$gap * 0.8;
 
         &-text,
         svg {
@@ -36,6 +37,10 @@
         }
     }
 
+    &-subheader {
+        margin-bottom: auto;
+    }
+
     &-content {
         display: flex;
         flex-flow: column nowrap;
@@ -46,8 +51,13 @@
     }
 
     &-footer {
-        display: flex;
-        justify-content: center;
         margin-top: auto;
+    }
+
+    &-subheader,
+    &-footer {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: center;
     }
 }

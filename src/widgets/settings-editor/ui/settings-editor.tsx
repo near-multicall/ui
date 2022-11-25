@@ -2,7 +2,7 @@ import clsx from "clsx";
 import { useCallback, useMemo, useState, FormEventHandler, useEffect, useContext } from "react";
 
 import { MI, Wallet } from "../../../entities";
-import { SchedulingSettingsChange, TokensWhitelistChange } from "../../../features";
+import { SchedulingSettingsChange, TokenWhitelistChange } from "../../../features";
 import { ArgsString } from "../../../shared/lib/args-old";
 import { Multicall } from "../../../shared/lib/contracts/multicall";
 import { signAndSendTxs } from "../../../shared/lib/wallet";
@@ -92,7 +92,7 @@ export const SettingsEditorUI = ({ className, contracts }: SettingsEditor.Inputs
                 daoAddress={contracts.dao.address}
             />
 
-            <TokensWhitelistChange.Form
+            <TokenWhitelistChange.Form
                 className={`${_SettingsEditor}-tokenWhitelist`}
                 daoAddress={contracts.dao.address}
                 disabled={!proposalCreationPermitted}

@@ -1,8 +1,8 @@
-import { Config, type TokensWhitelistChange as TWChangeFeature } from "./config";
-import { TokensWhitelistForm } from "./ui/tokens-whitelist-form";
+import { Config, type TokenWhitelistChange as TWChangeFeature } from "./config";
+import { TokenWhitelistForm } from "./ui/tokens-whitelist-form";
 
-export class TokensWhitelistChange extends Config {
-    static Form = TokensWhitelistForm;
+export class TokenWhitelistChange extends Config {
+    static Form = TokenWhitelistForm;
 }
 
 export { type TWChangeFeature };

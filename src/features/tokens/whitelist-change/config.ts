@@ -4,7 +4,7 @@ import { MulticallTokenWhitelistDiffKey, type MulticallSettingsDiff } from "../.
 import { MIEntity } from "../../../entities";
 import { DesignKitConfigType } from "../../../shared/ui/design";
 
-export namespace TokensWhitelistChange {
+export namespace TokenWhitelistChange {
     export type DiffKey = MulticallTokenWhitelistDiffKey;
 
     export interface Inputs extends Omit<HTMLProps<HTMLDivElement>, "onChange">, MIEntity.Inputs {

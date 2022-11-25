@@ -5,19 +5,19 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { TextInput, Tooltip } from "../../../../shared/ui/design";
 import { ArgsString } from "../../../../shared/lib/args-old";
 import { MI } from "../../../../entities";
-import { Config, TokensWhitelistChange } from "../config";
+import { Config, TokenWhitelistChange } from "../config";
 
-export const TokensWhitelistForm = ({
+export const TokenWhitelistForm = ({
     className,
     daoAddress,
     disabled,
     onEdit,
     resetTrigger,
-}: TokensWhitelistChange.Inputs) => {
+}: TokenWhitelistChange.Inputs) => {
     const [editModeEnabled, editModeSwitch] = useState(false);
 
-    const [addTokens, markForAddition] = useState<TokensWhitelistChange.FormStates["addTokens"]>(new Set()),
-        [removeTokens, markForRemoval] = useState<TokensWhitelistChange.FormStates["removeTokens"]>(new Set());
+    const [addTokens, markForAddition] = useState<TokenWhitelistChange.FormStates["addTokens"]>(new Set()),
+        [removeTokens, markForRemoval] = useState<TokenWhitelistChange.FormStates["removeTokens"]>(new Set());
 
     const tokenToAddAddress = useMemo(() => new ArgsString(""), []);
 
@@ -89,22 +89,6 @@ export const TokensWhitelistForm = ({
                         void null,
                 },
             }}
-            footer={
-                editModeEnabled ? (
-                    <TextInput
-                        fullWidth
-                        label="New token address"
-                        onKeyUp={({ key, target }) =>
-                            void (key === "Enter" && Object.hasOwn(target, "value")
-                                ? onAdditionRequest((target as HTMLInputElement).value)
-                                : null)
-                        }
-                        value={tokenToAddAddress}
-                    />
-                ) : (
-                    void null
-                )
-            }
             headerSlots={{
                 end: editModeEnabled ? (
                     <Tooltip content="Cancel & Reset">
@@ -124,6 +108,22 @@ export const TokensWhitelistForm = ({
                 ),
             }}
             itemsAdditional={Array.from(addTokens)}
+            subheader={
+                editModeEnabled ? (
+                    <TextInput
+                        fullWidth
+                        label="New token address"
+                        onKeyUp={({ key, target }) =>
+                            void (key === "Enter" && Object.hasOwn(target, "value")
+                                ? onAdditionRequest((target as HTMLInputElement).value)
+                                : null)
+                        }
+                        value={tokenToAddAddress}
+                    />
+                ) : (
+                    void null
+                )
+            }
             {...{ className, daoAddress }}
         />
     );
