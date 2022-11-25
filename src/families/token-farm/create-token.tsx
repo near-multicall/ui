@@ -171,7 +171,6 @@ export class CreateToken extends BaseTask<FormData, Props, State> {
         if (!arx.big().isValidSync(totalSupply))
             throw new CallError("Failed to parse total supply input value", this.props.id);
 
-        console.log(decimals);
         return {
             address: addr,
             actions: [

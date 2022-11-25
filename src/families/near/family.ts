@@ -12,3 +12,4 @@ export { StorageUnregister } from "./storage-unregister";
 export { StorageWithdraw } from "./storage-withdraw";
 export { Unstake } from "./unstake";
 export { Withdraw } from "./withdraw";
+export { WrapNear } from "./wrap-near";

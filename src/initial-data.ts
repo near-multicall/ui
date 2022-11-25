@@ -25,6 +25,7 @@ export const initialData = {
         "task-i23": { id: "task-i23", family: "token_farm", func: "create_token" },
         "task-i24": { id: "task-i24", family: "meta-pool", func: "nslp_add_liquidity" },
         "task-i25": { id: "task-i25", family: "meta-pool", func: "nslp_remove_liquidity" },
+        "task-i26": { id: "task-i26", family: "near", func: "near_deposit" },
     },
     columns: {
         "column-0": {
@@ -61,6 +62,7 @@ export const initialData = {
                 "task-i23",
                 "task-i24",
                 "task-i25",
+                "task-i26",
             ],
         },
     },

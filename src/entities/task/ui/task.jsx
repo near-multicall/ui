@@ -197,6 +197,14 @@ export class Task extends Component {
                                 json={json}
                             />
                         );
+                    case "near_deposit":
+                        return (
+                            <Family.Near.WrapNear
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
                 }
 
             case "mintbase":
