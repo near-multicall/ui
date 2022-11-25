@@ -2,24 +2,22 @@ import { CancelOutlined, DeleteOutlined, EditOutlined, SettingsBackupRestoreOutl
 import { IconButton } from "@mui/material";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { TextInput, Tooltip } from "../../../shared/ui/design";
-import { ArgsString } from "../../../shared/lib/args-old";
-import { MI } from "../../../entities";
-import { TokenWhitelistEditConfig, type TokenWhitelistEditFeature } from "../config";
+import { TextInput, Tooltip } from "../../../../shared/ui/design";
+import { ArgsString } from "../../../../shared/lib/args-old";
+import { MI } from "../../../../entities";
+import { Config, TokensWhitelistChange } from "../config";
 
-interface TokenWhitelistFormProps extends TokenWhitelistEditFeature.Inputs {}
-
-export const TokenWhitelistForm = ({
+export const TokensWhitelistForm = ({
     className,
     daoAddress,
     disabled,
     onEdit,
     resetTrigger,
-}: TokenWhitelistFormProps) => {
+}: TokensWhitelistChange.Inputs) => {
     const [editModeEnabled, editModeSwitch] = useState(false);
 
-    const [addTokens, markForAddition] = useState<TokenWhitelistEditFeature.FormStates["addTokens"]>(new Set()),
-        [removeTokens, markForRemoval] = useState<TokenWhitelistEditFeature.FormStates["removeTokens"]>(new Set());
+    const [addTokens, markForAddition] = useState<TokensWhitelistChange.FormStates["addTokens"]>(new Set()),
+        [removeTokens, markForRemoval] = useState<TokensWhitelistChange.FormStates["removeTokens"]>(new Set());
 
     const tokenToAddAddress = useMemo(() => new ArgsString(""), []);
 
@@ -71,8 +69,8 @@ export const TokenWhitelistForm = ({
         <MI.TokenWhitelistTable
             ItemProps={{
                 idToHighlightColor: (id) =>
-                    (addTokens.has(id) && TokenWhitelistEditConfig.DiffMetadata.addTokens.color) ||
-                    (removeTokens.has(id) && TokenWhitelistEditConfig.DiffMetadata.removeTokens.color) ||
+                    (addTokens.has(id) && Config.DiffMetadata.addTokens.color) ||
+                    (removeTokens.has(id) && Config.DiffMetadata.removeTokens.color) ||
                     null,
 
                 slots: {
@@ -109,19 +107,19 @@ export const TokenWhitelistForm = ({
             }
             headingCorners={{
                 end: editModeEnabled ? (
-                    <IconButton onClick={formReset}>
-                        <CancelOutlined />
-                    </IconButton>
+                    <Tooltip content="Cancel & Reset">
+                        <IconButton onClick={formReset}>
+                            <CancelOutlined />
+                        </IconButton>
+                    </Tooltip>
                 ) : (
                     <Tooltip content={disabled ? "You are in read-only mode" : "Propose changes"}>
-                        <span>
-                            <IconButton
-                                onClick={() => void editModeSwitch(true)}
-                                {...{ disabled }}
-                            >
-                                <EditOutlined />
-                            </IconButton>
-                        </span>
+                        <IconButton
+                            onClick={() => void editModeSwitch(true)}
+                            {...{ disabled }}
+                        >
+                            <EditOutlined />
+                        </IconButton>
                     </Tooltip>
                 ),
             }}

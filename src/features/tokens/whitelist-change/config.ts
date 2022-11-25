@@ -1,10 +1,10 @@
 import { HTMLProps } from "react";
 
-import { MulticallTokenWhitelistDiffKey, type MulticallSettingsDiff } from "../../shared/lib/contracts/multicall";
-import { MIEntity } from "../../entities";
-import { DesignKitConfigType } from "../../shared/ui/design";
+import { MulticallTokenWhitelistDiffKey, type MulticallSettingsDiff } from "../../../shared/lib/contracts/multicall";
+import { MIEntity } from "../../../entities";
+import { DesignKitConfigType } from "../../../shared/ui/design";
 
-namespace TokenWhitelistEditFeature {
+export namespace TokensWhitelistChange {
     export type DiffKey = MulticallTokenWhitelistDiffKey;
 
     export interface Inputs extends Omit<HTMLProps<HTMLDivElement>, "onChange">, MIEntity.Inputs {
@@ -19,20 +19,18 @@ namespace TokenWhitelistEditFeature {
         > {}
 }
 
-class TokenWhitelistEditConfig {
+export class Config {
     public static readonly DiffKey = MulticallTokenWhitelistDiffKey;
 
     public static readonly DiffMetadata = {
-        [TokenWhitelistEditConfig.DiffKey.addTokens]: {
+        [Config.DiffKey.addTokens]: {
             color: "green" as DesignKitConfigType.Color,
             description: "Tokens to add to whitelist",
         },
 
-        [TokenWhitelistEditConfig.DiffKey.removeTokens]: {
+        [Config.DiffKey.removeTokens]: {
             color: "red" as DesignKitConfigType.Color,
             description: "Tokens to remove from whitelist",
         },
     };
 }
-
-export { TokenWhitelistEditConfig, type TokenWhitelistEditFeature };

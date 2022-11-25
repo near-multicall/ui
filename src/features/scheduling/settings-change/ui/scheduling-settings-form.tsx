@@ -2,30 +2,28 @@ import { CancelOutlined, EditOutlined, VisibilityOutlined } from "@mui/icons-mat
 import { IconButton, TextField, TextFieldProps } from "@mui/material";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { ArgsString } from "../../../shared/lib/args-old";
-import { toNEAR, toYocto } from "../../../shared/lib/converter";
-import { IconLabel, NearIcon, NearLink, Table, Tile, Tooltip } from "../../../shared/ui/design";
-import { JobSettingsEditConfig, type JobSettingsEditFeature } from "../config";
+import { ArgsString } from "../../../../shared/lib/args-old";
+import { toNEAR, toYocto } from "../../../../shared/lib/converter";
+import { IconLabel, NearIcon, NearLink, Table, Tile, Tooltip } from "../../../../shared/ui/design";
+import { Config, SchedulingSettingsChange } from "../config";
 
-interface JobSettingsFormProps extends JobSettingsEditFeature.Inputs {}
-
-export const JobSettingsForm = ({
+export const SchedulingSettingsForm = ({
     className,
     disabled,
     multicallInstance,
     onEdit,
     resetTrigger,
-}: JobSettingsFormProps) => {
+}: SchedulingSettingsChange.Inputs) => {
     const [editModeEnabled, editModeSwitch] = useState(false);
 
-    const formInitialState: JobSettingsEditFeature.FormState = {
-        [JobSettingsEditConfig.DiffKey.croncatManager]: "",
-        [JobSettingsEditConfig.DiffKey.jobBond]: "",
+    const formInitialState: SchedulingSettingsChange.FormState = {
+        [Config.DiffKey.croncatManager]: "",
+        [Config.DiffKey.jobBond]: "",
     };
 
     const [[croncatManager, croncatManagerUpdate], [jobBond, jobBondUpdate]] = [
-        useState<JobSettingsEditFeature.FormState["croncatManager"]>(formInitialState.croncatManager),
-        useState<JobSettingsEditFeature.FormState["jobBond"]>(formInitialState.jobBond),
+        useState<SchedulingSettingsChange.FormState["croncatManager"]>(formInitialState.croncatManager),
+        useState<SchedulingSettingsChange.FormState["jobBond"]>(formInitialState.jobBond),
     ];
 
     const formFields = {
@@ -69,30 +67,32 @@ export const JobSettingsForm = ({
     return (
         <Tile
             classes={{ root: className }}
-            heading="Job settings"
+            heading="Scheduling"
             headingCorners={{
                 end: editModeEnabled ? (
                     <>
-                        {(croncatManager.length > 0 || jobBond.length > 0) && (
+                        <Tooltip content="Preview">
                             <IconButton onClick={() => void editModeSwitch(false)}>
                                 <VisibilityOutlined />
                             </IconButton>
-                        )}
+                        </Tooltip>
 
-                        <IconButton onClick={formReset}>
-                            <CancelOutlined />
-                        </IconButton>
+                        {(croncatManager.length > 0 || jobBond.length > 0) && (
+                            <Tooltip content="Cancel & Reset">
+                                <IconButton onClick={formReset}>
+                                    <CancelOutlined />
+                                </IconButton>
+                            </Tooltip>
+                        )}
                     </>
                 ) : (
                     <Tooltip content={disabled ? "You are in read-only mode" : "Propose changes"}>
-                        <span>
-                            <IconButton
-                                onClick={() => void editModeSwitch(true)}
-                                {...{ disabled }}
-                            >
-                                <EditOutlined />
-                            </IconButton>
-                        </span>
+                        <IconButton
+                            onClick={() => void editModeSwitch(true)}
+                            {...{ disabled }}
+                        >
+                            <EditOutlined />
+                        </IconButton>
                     </Tooltip>
                 ),
             }}
@@ -102,8 +102,8 @@ export const JobSettingsForm = ({
                     centeredTitle: true,
 
                     idToHighlightColor: (id) =>
-                        ({ croncatManager, jobBond }[id] === formInitialState[id as JobSettingsEditFeature.DiffKey] ||
-                        { croncatManager, jobBond }[id] === multicallInstance[id as JobSettingsEditFeature.DiffKey]
+                        ({ croncatManager, jobBond }[id] === formInitialState[id as SchedulingSettingsChange.DiffKey] ||
+                        { croncatManager, jobBond }[id] === multicallInstance[id as SchedulingSettingsChange.DiffKey]
                             ? null
                             : "blue"),
 
@@ -115,11 +115,10 @@ export const JobSettingsForm = ({
                 header={["Option", "Value"]}
                 rows={[
                     {
-                        id: JobSettingsEditConfig.DiffKey.croncatManager,
+                        id: Config.DiffKey.croncatManager,
 
                         content: [
-                            JobSettingsEditConfig.DiffMetadata[JobSettingsEditConfig.DiffKey.croncatManager]
-                                .description,
+                            Config.DiffMetadata[Config.DiffKey.croncatManager].description,
 
                             editModeEnabled ? (
                                 <TextField
@@ -133,10 +132,10 @@ export const JobSettingsForm = ({
                         ],
                     },
                     {
-                        id: JobSettingsEditConfig.DiffKey.jobBond,
+                        id: Config.DiffKey.jobBond,
 
                         content: [
-                            JobSettingsEditConfig.DiffMetadata[JobSettingsEditConfig.DiffKey.jobBond].description,
+                            Config.DiffMetadata[Config.DiffKey.jobBond].description,
 
                             editModeEnabled ? (
                                 <TextField

@@ -1,6 +1,6 @@
 import { HTMLProps } from "react";
 
-import { JobSettingsEdit, TokenWhitelistEdit } from "../../features";
+import { SchedulingSettingsChange, TokensWhitelistChange } from "../../features";
 import { MulticallSettingsDiff, Multicall } from "../../shared/lib/contracts/multicall";
 import { SputnikDAO } from "../../shared/lib/contracts/sputnik-dao";
 
@@ -16,12 +16,12 @@ export namespace SettingsEditor {
 
 export class Config {
     public static readonly DiffKey = {
-        ...JobSettingsEdit.DiffKey,
-        ...TokenWhitelistEdit.DiffKey,
+        ...SchedulingSettingsChange.DiffKey,
+        ...TokensWhitelistChange.DiffKey,
     };
 
     public static readonly DiffMetadata = {
-        ...JobSettingsEdit.DiffMetadata,
-        ...TokenWhitelistEdit.DiffMetadata,
+        ...SchedulingSettingsChange.DiffMetadata,
+        ...TokensWhitelistChange.DiffMetadata,
     };
 }
