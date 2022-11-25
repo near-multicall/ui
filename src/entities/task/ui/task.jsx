@@ -267,6 +267,26 @@ export class Task extends Component {
                         );
                 }
 
+            case "meta-pool":
+                switch (func) {
+                    case "nslp_add_liquidity":
+                        return (
+                            <Family.MetaPool.NslpAddLiquidity
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
+                    case "nslp_remove_liquidity":
+                        return (
+                            <Family.MetaPool.NslpRemoveLiquidity
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
+                }
+
             default:
                 for (let family in Family) {
                     if (family === "BaseTask") continue;

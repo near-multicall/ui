@@ -23,6 +23,8 @@ export const initialData = {
         "task-i21": { id: "task-i21", family: "mintbase", func: "buy" },
         "task-i22": { id: "task-i22", family: "paras", func: "buy" },
         "task-i23": { id: "task-i23", family: "token_farm", func: "create_token" },
+        "task-i24": { id: "task-i24", family: "meta-pool", func: "nslp_add_liquidity" },
+        "task-i25": { id: "task-i25", family: "meta-pool", func: "nslp_remove_liquidity" },
     },
     columns: {
         "column-0": {
@@ -57,6 +59,8 @@ export const initialData = {
                 "task-i21",
                 // "task-i22",
                 "task-i23",
+                "task-i24",
+                "task-i25",
             ],
         },
     },

@@ -5,5 +5,6 @@ import * as TknFarm from "./token-farm/family";
 import * as Near from "./near/family";
 import * as Mintbase from "./mintbase/family";
 import * as Paras from "./paras/family";
+import * as MetaPool from "./meta-pool/family";
 
-export { CustomTask, Multicall, Near, Mintbase, Paras, TknFarm };
+export { CustomTask, Multicall, Near, Mintbase, Paras, TknFarm, MetaPool };

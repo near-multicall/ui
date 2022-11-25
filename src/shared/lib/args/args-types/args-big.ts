@@ -110,13 +110,17 @@ class BigSchema extends MixedSchema<Big> {
      * @param message
      * @returns
      */
-    intoFormatted(decimalsOrUnit: number | unit, message: string = locale.big.format) {
+    intoFormatted(
+        decimalsOrUnit: number | unit,
+        precision: number | undefined = undefined,
+        message: string = locale.big.format
+    ) {
         const decimals = typeof decimalsOrUnit === "number" ? decimalsOrUnit : unitToDecimals[decimalsOrUnit];
         let formatFailed = false;
         return this.transform((value) => {
             if (value == null) return null;
             try {
-                return new Big(formatTokenAmount(value, decimals));
+                return new Big(formatTokenAmount(value, decimals, precision));
             } catch (e) {
                 formatFailed = true;
                 return null;

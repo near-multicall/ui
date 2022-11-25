@@ -34,4 +34,8 @@ export const keywords = {
     token_farm: {
         create_token: ["TokenFarm", "treasury"],
     },
+    "meta-pool": {
+        nslp_add_liquidity: ["add liquidity", "lp"],
+        nslp_remove_liquidity: ["remove liquidity", "lp"],
+    },
 };
