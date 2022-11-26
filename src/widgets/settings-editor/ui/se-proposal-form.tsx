@@ -52,7 +52,7 @@ export const SEProposalForm = ({
                             key={DiffKey}
                         >
                             <h3 className={`${classNameRoot}-proposalForm-summary-entry-description`}>
-                                {ModuleContext.DiffMetadata[DiffKey].description + ":"}
+                                {ModuleContext.DiffMeta[DiffKey].description + ":"}
                             </h3>
 
                             <ul className={`${classNameRoot}-proposalForm-summary-entry-data`}>
@@ -66,7 +66,7 @@ export const SEProposalForm = ({
 
                                             `${classNameRoot}-proposalForm-summary-entry-data-chip` +
                                                 "--" +
-                                                ModuleContext.DiffMetadata[DiffKey].color
+                                                ModuleContext.DiffMeta[DiffKey].color
                                         )}
                                         key={data as string}
                                     >

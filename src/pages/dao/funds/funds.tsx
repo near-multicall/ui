@@ -1,11 +1,11 @@
 import clsx from "clsx";
 import { HTMLProps } from "react";
 
-import { TokenBalances, type TokenBalancesWidget } from "../../../widgets";
+import { TokenBalances, type TokenBalancesModule } from "../../../widgets";
 
 import "./funds.scss";
 
-interface DaoFundsTabUIProps extends HTMLProps<HTMLDivElement>, TokenBalancesWidget.Inputs {}
+interface DaoFundsTabUIProps extends HTMLProps<HTMLDivElement>, TokenBalancesModule.Inputs {}
 
 const _DaoFundsTab = "DaoFundsTab";
 

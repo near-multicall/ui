@@ -120,7 +120,7 @@ export const SchedulingSettingsForm = ({
                         id: ModuleContext.DiffKey.croncatManager,
 
                         content: [
-                            ModuleContext.DiffMetadata[ModuleContext.DiffKey.croncatManager].description,
+                            ModuleContext.DiffMeta[ModuleContext.DiffKey.croncatManager].description,
 
                             editModeEnabled ? (
                                 <TextField
@@ -137,7 +137,7 @@ export const SchedulingSettingsForm = ({
                         id: ModuleContext.DiffKey.jobBond,
 
                         content: [
-                            ModuleContext.DiffMetadata[ModuleContext.DiffKey.jobBond].description,
+                            ModuleContext.DiffMeta[ModuleContext.DiffKey.jobBond].description,
 
                             editModeEnabled ? (
                                 <TextField

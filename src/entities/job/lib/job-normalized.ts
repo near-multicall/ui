@@ -3,7 +3,7 @@ import { Base64 } from "js-base64";
 import { JobData } from "../../../shared/lib/contracts/multicall";
 import { Big } from "../../../shared/lib/converter";
 
-import { JobModuleContext, type JobEntity } from "../context";
+import { JobModuleContext, type JobModule } from "../context";
 
 /**
  * Job status is:
@@ -12,7 +12,7 @@ import { JobModuleContext, type JobEntity } from "../context";
  * - Expired: job not active, and execution moment is in the past.
  * - Inactive: job not active, but execution moment in the future.
  */
-const jobToStatus = ({ job }: JobData): JobEntity.Status => {
+const jobToStatus = ({ job }: JobData): JobModule.Status => {
     if (job.is_active) {
         if (job.run_count > -1) return JobModuleContext.Status.Running;
         else return JobModuleContext.Status.Active;
@@ -63,7 +63,7 @@ const jobToJobWithMulticallsDataDecoded = ({ id, job }: JobData): JobData => ({
  *
  * @returns Extended job data structure.
  */
-const jobToJobWithStatus = (job: JobData): JobEntity.DataWithStatus => ({
+const jobToJobWithStatus = (job: JobData): JobModule.DataWithStatus => ({
     ...job,
     job: { ...job.job, status: JobModuleContext.Status[jobToStatus(job)] },
 });

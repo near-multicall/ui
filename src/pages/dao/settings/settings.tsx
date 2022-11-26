@@ -1,11 +1,11 @@
 import clsx from "clsx";
 import { HTMLProps } from "react";
 
-import { SettingsEditor, SettingsEditorWidget } from "../../../widgets";
+import { SettingsEditor, SettingsEditorModule } from "../../../widgets";
 
 import "./settings.scss";
 
-interface DaoSettingsTabUIProps extends HTMLProps<HTMLDivElement>, SettingsEditorWidget.Inputs {}
+interface DaoSettingsTabUIProps extends HTMLProps<HTMLDivElement>, SettingsEditorModule.Inputs {}
 
 const _DaoSettingsTab = "DaoSettingsTab";
 

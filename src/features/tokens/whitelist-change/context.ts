@@ -1,13 +1,13 @@
 import { HTMLProps } from "react";
 
 import { MulticallTokenWhitelistDiffKey, type MulticallSettingsDiff } from "../../../shared/lib/contracts/multicall";
-import { MIEntity } from "../../../entities";
+import { MIModule } from "../../../entities";
 import { DesignContext } from "../../../shared/ui/design";
 
 export namespace TokenWhitelistChange {
     export type DiffKey = MulticallTokenWhitelistDiffKey;
 
-    export interface Inputs extends Omit<HTMLProps<HTMLDivElement>, "onChange">, MIEntity.Inputs {
+    export interface Inputs extends Omit<HTMLProps<HTMLDivElement>, "onChange">, MIModule.Inputs {
         onEdit: (payload: Pick<MulticallSettingsDiff, DiffKey>) => void;
         resetTrigger: { subscribe: (callback: EventListener) => () => void };
     }
@@ -22,7 +22,7 @@ export namespace TokenWhitelistChange {
 export class ModuleContext {
     public static readonly DiffKey = MulticallTokenWhitelistDiffKey;
 
-    public static readonly DiffMetadata = {
+    public static readonly DiffMeta = {
         [ModuleContext.DiffKey.addTokens]: {
             color: "green" as DesignContext.Color,
             description: "Tokens to add to whitelist",

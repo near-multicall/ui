@@ -1,15 +1,15 @@
 import { HTMLProps } from "react";
 
-import { MI, MIEntity } from "../../../entities";
+import { MI, MIModule } from "../../../entities";
 import { MulticallSettingsDiff, Multicall } from "../../../shared/lib/contracts/multicall";
 import { DesignContext } from "../../../shared/ui/design";
 
 export namespace SchedulingSettingsChange {
-    export type DiffKey = MIEntity.ParamKey;
+    export type DiffKey = MIModule.ParamKey;
 
-    export type FormState = Pick<MulticallSettingsDiff, MIEntity.ParamKey>;
+    export type FormState = Pick<MulticallSettingsDiff, MIModule.ParamKey>;
 
-    export interface Inputs extends Omit<HTMLProps<HTMLDivElement>, "onChange">, Pick<MIEntity.Inputs, "daoAddress"> {
+    export interface Inputs extends Omit<HTMLProps<HTMLDivElement>, "onChange">, Pick<MIModule.Inputs, "daoAddress"> {
         multicallInstance: Multicall;
         onEdit: (payload: FormState) => void;
         resetTrigger: { subscribe: (callback: EventListener) => () => void };
@@ -19,7 +19,7 @@ export namespace SchedulingSettingsChange {
 export class ModuleContext {
     public static readonly DiffKey = MI.ParamKey;
 
-    public static readonly DiffMetadata = {
+    public static readonly DiffMeta = {
         [ModuleContext.DiffKey.croncatManager]: {
             color: "blue" as DesignContext.Color,
             description: "Croncat manager",

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Big, formatTokenAmount } from "../../../shared/lib/converter";
 import { viewAccount } from "../../../shared/lib/wallet";
 
-import { NEARTokenModuleContext, type NEARTokenEntity } from "../context";
+import { NEARTokenModuleContext, type NEARTokenModule } from "../context";
 
 type NEARTokenDataFxResponse = {
     data: { dao: string; multicall: string; total: string } | null;
@@ -11,7 +11,7 @@ type NEARTokenDataFxResponse = {
 };
 
 const nearTokenDataFx = async (
-    { dao, multicall }: NEARTokenEntity.Inputs["contracts"],
+    { dao, multicall }: NEARTokenModule.Inputs["contracts"],
     callback: (result: NEARTokenDataFxResponse) => void
 ) => {
     const [daoAccInfo, multicallAccInfo] = await Promise.all([
@@ -38,7 +38,7 @@ const nearTokenDataFx = async (
     });
 };
 
-const useNEARTokenData = (contracts: NEARTokenEntity.Inputs["contracts"]) => {
+const useNEARTokenData = (contracts: NEARTokenModule.Inputs["contracts"]) => {
     const [state, stateUpdate] = useState<NEARTokenDataFxResponse>({ data: null, loading: true });
 
     useEffect(() => void nearTokenDataFx(contracts, stateUpdate), [contracts, stateUpdate]);

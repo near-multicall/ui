@@ -69,8 +69,8 @@ export const TokenWhitelistForm = ({
         <MI.TokenWhitelistTable
             ItemProps={{
                 idToHighlightColor: (id) =>
-                    (addTokens.has(id) && ModuleContext.DiffMetadata.addTokens.color) ||
-                    (removeTokens.has(id) && ModuleContext.DiffMetadata.removeTokens.color) ||
+                    (addTokens.has(id) && ModuleContext.DiffMeta.addTokens.color) ||
+                    (removeTokens.has(id) && ModuleContext.DiffMeta.removeTokens.color) ||
                     null,
 
                 slots: {

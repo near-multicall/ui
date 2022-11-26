@@ -1,6 +1,6 @@
 import { type JobData, type Multicall } from "../../shared/lib/contracts/multicall";
 
-namespace JobEntity {
+namespace JobModule {
     export interface Inputs {
         className?: string;
         contracts: { multicall: Multicall };
@@ -22,15 +22,15 @@ namespace JobEntity {
 }
 
 class JobModuleContext {
-    static readonly Status = JobEntity.Status;
+    static readonly Status = JobModule.Status;
 
     static StatusIcons = {
-        [JobEntity.Status.Inactive]: "🟡",
-        [JobEntity.Status.Expired]: "🔴",
-        [JobEntity.Status.Active]: "🟢",
-        [JobEntity.Status.Running]: "🟣",
-        [JobEntity.Status.Unknown]: "❔",
+        [JobModule.Status.Inactive]: "🟡",
+        [JobModule.Status.Expired]: "🔴",
+        [JobModule.Status.Active]: "🟢",
+        [JobModule.Status.Running]: "🟣",
+        [JobModule.Status.Unknown]: "❔",
     };
 }
 
-export { JobModuleContext, type JobEntity };
+export { JobModuleContext, type JobModule };

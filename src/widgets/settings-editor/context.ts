@@ -20,8 +20,8 @@ export class ModuleContext {
         ...TokenWhitelistChange.DiffKey,
     };
 
-    public static readonly DiffMetadata = {
-        ...SchedulingSettingsChange.DiffMetadata,
-        ...TokenWhitelistChange.DiffMetadata,
+    public static readonly DiffMeta = {
+        ...SchedulingSettingsChange.DiffMeta,
+        ...TokenWhitelistChange.DiffMeta,
     };
 }

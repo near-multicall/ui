@@ -1,18 +1,18 @@
 import { useEffect, useState } from "react";
 
-import { type JobEntity } from "../context";
+import { type JobModule } from "../context";
 import { JobNormalized } from "../lib/job-normalized";
 
 type JobAllEntries = {
     /** Jobs indexed by ID for easy access to each particular job */
-    data: Record<JobEntity.DataWithStatus["id"], JobEntity.DataWithStatus> | null;
+    data: Record<JobModule.DataWithStatus["id"], JobModule.DataWithStatus> | null;
     error?: Error | null;
     loading: boolean;
 };
 
 export class JobModel {
     static allEntriesFetchFx = async (
-        { multicall }: JobEntity.Inputs["contracts"],
+        { multicall }: JobModule.Inputs["contracts"],
         callback: (result: JobAllEntries) => void
     ) =>
         callback(
@@ -37,7 +37,7 @@ export class JobModel {
                 }))
         );
 
-    static useAllEntries = (contracts: JobEntity.Inputs["contracts"]) => {
+    static useAllEntries = (contracts: JobModule.Inputs["contracts"]) => {
         const [state, stateUpdate] = useState<JobAllEntries>({ data: null, error: null, loading: true });
 
         useEffect(() => void JobModel.allEntriesFetchFx(contracts, stateUpdate), [contracts, stateUpdate]);

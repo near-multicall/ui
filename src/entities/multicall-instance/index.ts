@@ -1,4 +1,4 @@
-import { MI as MIEntity, MIModuleContext } from "./context";
+import { MI as MIModule, MIModuleContext } from "./context";
 import { MIAdminsTable } from "./ui/mi-admins";
 import { MITokenWhitelistTable } from "./ui/mi-token-whitelist";
 
@@ -10,4 +10,4 @@ class MI extends MIModuleContext {
     static TokenWhitelistTable = MITokenWhitelistTable;
 }
 
-export { MI, type MIEntity };
+export { MI, type MIModule };
