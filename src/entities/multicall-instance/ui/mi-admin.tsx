@@ -1,4 +1,4 @@
-import { NearLink, type NearLinkProps } from "../../../shared/ui/design";
+import { NearLink, NearLinkProps } from "../../../shared/ui/design";
 
 interface MIAdminProps extends NearLinkProps {}
 

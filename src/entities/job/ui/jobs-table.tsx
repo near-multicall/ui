@@ -2,17 +2,17 @@ import clsx from "clsx";
 
 import { Scrollable, Table, Tile } from "../../../shared/ui/design";
 import { JobModel } from "../model/job";
-import { type JobModule } from "../context";
+import { type Job } from "../context";
 
-import { jobTableRowRender } from "./job";
+import { jobAsTableRow } from "./job";
 import "./jobs-table.scss";
 
-interface JobsTableProps extends JobModule.Inputs {}
+interface JobsTableProps extends Job.Inputs {}
 
 const _JobsTable = "JobsTable";
 
-export const JobsTable = ({ className, contracts }: JobsTableProps) => {
-    const { data, error, loading } = JobModel.useAllEntries(contracts);
+export const JobsTable = ({ className, adapters }: JobsTableProps) => {
+    const { data, error, loading } = JobModel.useAllEntries(adapters);
 
     return (
         <Tile
@@ -28,7 +28,7 @@ export const JobsTable = ({ className, contracts }: JobsTableProps) => {
                     displayMode="compact"
                     header={["Status", "ID", "Start at", "Croncat hash", "Creator", "Trigger gas", "Multicalls"]}
                     rows={Object.values(data ?? {})
-                        .map(jobTableRowRender)
+                        .map(jobAsTableRow)
                         .reverse()}
                 />
             </Scrollable>

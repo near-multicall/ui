@@ -6,7 +6,7 @@ import { SputnikDAO } from "../../shared/lib/contracts/sputnik-dao";
 
 export namespace SettingsEditor {
     export interface Inputs extends HTMLProps<HTMLDivElement> {
-        contracts: { dao: SputnikDAO; multicall: Multicall };
+        adapters: { dao: SputnikDAO; multicall: Multicall };
     }
 
     export type Diff = MulticallSettingsDiff;

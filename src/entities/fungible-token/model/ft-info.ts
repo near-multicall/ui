@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import { Big } from "../../../shared/lib/converter";
 import { FungibleToken } from "../../../shared/lib/standards/fungibleToken";
-import { type FT } from "../context";
+import { FT } from "../context";
 
 type FTInfo = {
     data: { metadata: FungibleToken["metadata"]; dao: string; multicall: string; total: string }[] | null;
@@ -11,7 +11,7 @@ type FTInfo = {
 
 export class FTInfoModel {
     private static readonly nonZeroBalancesFetchFx = async (
-        { dao, multicall }: FT.Inputs["contracts"],
+        { dao, multicall }: FT.Inputs["adapters"],
         callback: (result: FTInfo) => void
     ) => {
         /* Get LikelyTokens list on DAO and its Multicall instance */
@@ -54,10 +54,10 @@ export class FTInfoModel {
         });
     };
 
-    public static readonly useNonZeroBalances = (contracts: FT.Inputs["contracts"]) => {
+    public static readonly useNonZeroBalances = (adapters: FT.Inputs["adapters"]) => {
         const [state, stateUpdate] = useState<FTInfo>({ data: null, loading: true });
 
-        useEffect(() => void FTInfoModel.nonZeroBalancesFetchFx(contracts, stateUpdate), [contracts, stateUpdate]);
+        useEffect(() => void FTInfoModel.nonZeroBalancesFetchFx(adapters, stateUpdate), [adapters, stateUpdate]);
 
         return state;
     };

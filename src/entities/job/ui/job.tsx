@@ -2,31 +2,29 @@ import { NavLink } from "react-router-dom";
 
 import { Big, toTGas } from "../../../shared/lib/converter";
 import { DataInspector, IconLabel } from "../../../shared/ui/design";
+import { ModuleContext, Job } from "../context";
 
-import { JobModuleContext, type JobModule } from "../context";
 import "./job.scss";
-
-interface JobEntryProps extends JobModule.DataWithStatus {}
 
 const _Job = "Job";
 
-const JobDisplayStatus = ({ job }: Pick<JobModule.DataWithStatus, "job">) => {
+const JobDisplayStatus = ({ job }: Pick<Job.DataWithStatus, "job">) => {
     const statusTextByStatus = {
-        ...JobModuleContext.Status,
-        [JobModuleContext.Status.Running]: `${JobModuleContext.Status.Running}: ${job.run_count + 1}/${
+        ...ModuleContext.Status,
+        [ModuleContext.Status.Running]: `${ModuleContext.Status.Running}: ${job.run_count + 1}/${
             job.multicalls.length
         }`,
     };
 
     return (
         <IconLabel
-            icon={JobModuleContext.StatusIcons[job.status]}
+            icon={ModuleContext.StatusIcons[job.status]}
             label={statusTextByStatus[job.status]}
         />
     );
 };
 
-export const jobTableRowRender = ({ id, job }: JobEntryProps) => ({
+export const jobAsTableRow = ({ id, job }: Job.DataWithStatus) => ({
     content: [
         <JobDisplayStatus {...{ job }} />,
         id,

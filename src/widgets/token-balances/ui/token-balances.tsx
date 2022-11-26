@@ -8,9 +8,9 @@ import "./token-balances.scss";
 
 const _TokenBalances = "TokenBalances";
 
-export const TokenBalancesUI = ({ className, contracts }: TokenBalances.Inputs) => {
-    const nearTokenBalances = NEARToken.balancesRender({ contracts }),
-        fungibleTokenBalances = FT.balances({ contracts });
+export const TokenBalancesUI = ({ className, adapters }: TokenBalances.Inputs) => {
+    const nearTokenBalances = NEARToken.balancesRender({ adapters }),
+        fungibleTokenBalances = FT.balances({ adapters });
 
     return (
         <Tile

@@ -9,12 +9,12 @@ interface DaoFundsTabUIProps extends HTMLProps<HTMLDivElement>, TokenBalancesMod
 
 const _DaoFundsTab = "DaoFundsTab";
 
-const DaoFundsTabUI = ({ className, contracts, ...props }: DaoFundsTabUIProps) => (
+const DaoFundsTabUI = ({ className, adapters, ...props }: DaoFundsTabUIProps) => (
     <div
         className={clsx(_DaoFundsTab, className)}
         {...props}
     >
-        <TokenBalances.UI {...{ contracts }} />
+        <TokenBalances.UI {...{ adapters }} />
     </div>
 );
 

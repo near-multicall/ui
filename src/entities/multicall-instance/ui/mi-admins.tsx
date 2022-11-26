@@ -1,6 +1,6 @@
 import { Scrollable, Table, Tile } from "../../../shared/ui/design";
 import { MIAdminsModel } from "../model/mi-admins";
-import { type MI } from "../context";
+import { MI } from "../context";
 
 import { miAdminAsTableRow } from "./mi-admin";
 

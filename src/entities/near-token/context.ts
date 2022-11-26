@@ -1,17 +1,15 @@
 import { Multicall } from "../../shared/lib/contracts/multicall";
 import { SputnikDAO } from "../../shared/lib/contracts/sputnik-dao";
 
-namespace NEARTokenModule {
+export namespace NEARToken {
     export interface Inputs {
-        contracts: {
+        adapters: {
             dao: SputnikDAO;
             multicall: Multicall;
         };
     }
 }
 
-class NEARTokenModuleContext {
+export class ModuleContext {
     static FRACTIONAL_PART_LENGTH = 5;
 }
-
-export { NEARTokenModuleContext, type NEARTokenModule };

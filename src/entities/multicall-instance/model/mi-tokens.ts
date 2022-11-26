@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { ArgsAccount } from "../../../shared/lib/args-old";
 import { Multicall } from "../../../shared/lib/contracts/multicall";
 import { Props } from "../../../shared/lib/props";
-import { type MI } from "../context";
+import { MI } from "../context";
 
 import { MIInfoModel } from "./mi-settings";
 

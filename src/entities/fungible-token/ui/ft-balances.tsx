@@ -1,12 +1,12 @@
 import { IconLabel, NearIcon } from "../../../shared/ui/design";
 import { FTFormat } from "../lib/ft-format";
 import { FTInfoModel } from "../model/ft-info";
-import { type FT } from "../context";
+import { FT } from "../context";
 
 interface FTBalancesProps extends FT.Inputs {}
 
-export const ftBalances = ({ contracts }: FTBalancesProps) => {
-    const { data } = FTInfoModel.useNonZeroBalances(contracts);
+export const ftBalances = ({ adapters }: FTBalancesProps) => {
+    const { data } = FTInfoModel.useNonZeroBalances(adapters);
 
     return !data
         ? null

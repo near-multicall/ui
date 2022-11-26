@@ -1,9 +1,7 @@
 import { Base64 } from "js-base64";
 
-import { JobData } from "../../../shared/lib/contracts/multicall";
 import { Big } from "../../../shared/lib/converter";
-
-import { JobModuleContext, type JobModule } from "../context";
+import { ModuleContext, Job } from "../context";
 
 /**
  * Job status is:
@@ -12,16 +10,16 @@ import { JobModuleContext, type JobModule } from "../context";
  * - Expired: job not active, and execution moment is in the past.
  * - Inactive: job not active, but execution moment in the future.
  */
-const jobToStatus = ({ job }: JobData): JobModule.Status => {
+const jobToStatus = ({ job }: Job.Data): Job.Status => {
     if (job.is_active) {
-        if (job.run_count > -1) return JobModuleContext.Status.Running;
-        else return JobModuleContext.Status.Active;
+        if (job.run_count > -1) return ModuleContext.Status.Running;
+        else return ModuleContext.Status.Active;
     } else {
         // Date.now() returns timestamp in milliseconds, we use nanoseconds
         const currentTime = Big(Date.now()).times("1000000");
         const jobTime = job.start_at;
-        if (currentTime.gt(jobTime)) return JobModuleContext.Status.Expired;
-        else return JobModuleContext.Status.Inactive;
+        if (currentTime.gt(jobTime)) return ModuleContext.Status.Expired;
+        else return ModuleContext.Status.Inactive;
     }
 };
 
@@ -31,7 +29,7 @@ const jobToStatus = ({ job }: JobData): JobModule.Status => {
  *
  * @returns Updated job data structure.
  */
-const jobToJobWithMulticallsDataDecoded = ({ id, job }: JobData): JobData => ({
+const jobToJobWithMulticallsDataDecoded = ({ id, job }: Job.Data): Job.Data => ({
     id,
 
     job: {
@@ -63,9 +61,9 @@ const jobToJobWithMulticallsDataDecoded = ({ id, job }: JobData): JobData => ({
  *
  * @returns Extended job data structure.
  */
-const jobToJobWithStatus = (job: JobData): JobModule.DataWithStatus => ({
+const jobToJobWithStatus = (job: Job.Data): Job.DataWithStatus => ({
     ...job,
-    job: { ...job.job, status: JobModuleContext.Status[jobToStatus(job)] },
+    job: { ...job.job, status: ModuleContext.Status[jobToStatus(job)] },
 });
 
 export const JobNormalized = {

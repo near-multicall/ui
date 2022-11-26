@@ -9,12 +9,12 @@ interface DaoJobsTabUIProps extends HTMLProps<HTMLDivElement>, ComponentProps<ty
 
 const _DaoJobsTab = "DaoJobsTab";
 
-const DaoJobsTabUI = ({ className, contracts, ...props }: DaoJobsTabUIProps) => (
+const DaoJobsTabUI = ({ className, adapters, ...props }: DaoJobsTabUIProps) => (
     <div
         className={clsx(_DaoJobsTab, className)}
         {...props}
     >
-        <Job.EntriesTable {...{ contracts }} />
+        <Job.EntriesTable {...{ adapters }} />
     </div>
 );
 

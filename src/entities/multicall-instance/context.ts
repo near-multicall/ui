@@ -16,7 +16,7 @@ export namespace MI {
 /**
  * Multicall Instance entity config
  */
-export class MIModuleContext {
+export class ModuleContext {
     public static readonly ParamKey = MulticallSettingsParamKey;
 
     /**

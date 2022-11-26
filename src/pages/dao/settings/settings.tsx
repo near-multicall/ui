@@ -9,12 +9,12 @@ interface DaoSettingsTabUIProps extends HTMLProps<HTMLDivElement>, SettingsEdito
 
 const _DaoSettingsTab = "DaoSettingsTab";
 
-const DaoSettingsTabUI = ({ className, contracts, ...props }: DaoSettingsTabUIProps) => (
+const DaoSettingsTabUI = ({ className, adapters, ...props }: DaoSettingsTabUIProps) => (
     <div
         className={clsx(_DaoSettingsTab, className)}
         {...props}
     >
-        <SettingsEditor.UI {...{ contracts }} />
+        <SettingsEditor.UI {...{ adapters }} />
     </div>
 );
 

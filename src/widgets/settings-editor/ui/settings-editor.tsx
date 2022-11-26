@@ -13,11 +13,11 @@ import "./settings-editor.scss";
 
 const _SettingsEditor = "SettingsEditor";
 
-export const SettingsEditorUI = ({ className, contracts }: SettingsEditor.Inputs) => {
+export const SettingsEditorUI = ({ className, adapters }: SettingsEditor.Inputs) => {
     const wallet = useContext(Wallet.SelectorContext);
 
     const proposalCreationPermitted =
-        !wallet?.accountId || contracts.dao.checkUserPermission(wallet?.accountId, "AddProposal", "FunctionCall");
+        !wallet?.accountId || adapters.dao.checkUserPermission(wallet?.accountId, "AddProposal", "FunctionCall");
 
     const [editMode, editModeSwitch] = useState(false);
 
@@ -67,17 +67,17 @@ export const SettingsEditorUI = ({ className, contracts }: SettingsEditor.Inputs
         (event) => {
             void event.preventDefault();
 
-            void contracts.dao
+            void adapters.dao
                 .proposeFunctionCall(
                     proposalDescription,
-                    contracts.multicall.address,
+                    adapters.multicall.address,
                     Multicall.configDiffToProposalActions(changesDiff)
                 )
                 .then((someTx) => signAndSendTxs([someTx]))
                 .catch(console.error);
         },
 
-        [changesDiff, contracts, proposalDescription]
+        [changesDiff, adapters, proposalDescription]
     );
 
     useEffect(
@@ -89,12 +89,12 @@ export const SettingsEditorUI = ({ className, contracts }: SettingsEditor.Inputs
         <div className={clsx(_SettingsEditor, className)}>
             <MI.AdminsTable
                 className={`${_SettingsEditor}-admins`}
-                daoAddress={contracts.dao.address}
+                daoAddress={adapters.dao.address}
             />
 
             <TokenWhitelistChange.Form
                 className={`${_SettingsEditor}-tokenWhitelist`}
-                daoAddress={contracts.dao.address}
+                daoAddress={adapters.dao.address}
                 disabled={!proposalCreationPermitted}
                 resetTrigger={childFormsResetRequested}
                 {...{ onEdit }}
@@ -102,9 +102,9 @@ export const SettingsEditorUI = ({ className, contracts }: SettingsEditor.Inputs
 
             <SchedulingSettingsChange.Form
                 className={`${_SettingsEditor}-jobsSettings`}
-                daoAddress={contracts.dao.address}
+                daoAddress={adapters.dao.address}
                 disabled={!proposalCreationPermitted}
-                multicallInstance={contracts.multicall}
+                multicallInstance={adapters.multicall}
                 resetTrigger={childFormsResetRequested}
                 {...{ onEdit }}
             />

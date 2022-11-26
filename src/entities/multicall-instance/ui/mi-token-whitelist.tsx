@@ -1,8 +1,8 @@
 import { Scrollable, Table, type TableProps, Tile, TileProps } from "../../../shared/ui/design";
 import { MITokensModel } from "../model/mi-tokens";
-import { type MI } from "../context";
+import { MI } from "../context";
 
-import { type MIWhitelistedTokenProps, miWhitelistedTokenAsTableRow } from "./mi-whitelisted-token";
+import { MIWhitelistedTokenProps, miWhitelistedTokenAsTableRow } from "./mi-whitelisted-token";
 
 interface MITokenWhitelistTableProps extends MI.Inputs, Pick<TileProps, "footer" | "headerSlots" | "subheader"> {
     ItemProps?: TableProps["RowProps"];

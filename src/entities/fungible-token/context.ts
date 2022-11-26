@@ -3,7 +3,7 @@ import { SputnikDAO } from "../../shared/lib/contracts/sputnik-dao";
 
 export namespace FT {
     export interface Inputs {
-        contracts: {
+        adapters: {
             dao: SputnikDAO;
             multicall: Multicall;
         };

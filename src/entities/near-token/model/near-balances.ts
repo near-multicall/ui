@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 
 import { Big, formatTokenAmount } from "../../../shared/lib/converter";
 import { viewAccount } from "../../../shared/lib/wallet";
-
-import { NEARTokenModuleContext, type NEARTokenModule } from "../context";
+import { ModuleContext, type NEARToken } from "../context";
 
 type NEARTokenDataFxResponse = {
     data: { dao: string; multicall: string; total: string } | null;
@@ -11,7 +10,7 @@ type NEARTokenDataFxResponse = {
 };
 
 const nearTokenDataFx = async (
-    { dao, multicall }: NEARTokenModule.Inputs["contracts"],
+    { dao, multicall }: NEARToken.Inputs["adapters"],
     callback: (result: NEARTokenDataFxResponse) => void
 ) => {
     const [daoAccInfo, multicallAccInfo] = await Promise.all([
@@ -24,13 +23,13 @@ const nearTokenDataFx = async (
 
     return callback({
         data: {
-            dao: formatTokenAmount(daoRawBalance, 24, NEARTokenModuleContext.FRACTIONAL_PART_LENGTH),
-            multicall: formatTokenAmount(multicallRawBalance, 24, NEARTokenModuleContext.FRACTIONAL_PART_LENGTH),
+            dao: formatTokenAmount(daoRawBalance, 24, ModuleContext.FRACTIONAL_PART_LENGTH),
+            multicall: formatTokenAmount(multicallRawBalance, 24, ModuleContext.FRACTIONAL_PART_LENGTH),
 
             total: formatTokenAmount(
                 Big(daoRawBalance).add(multicallRawBalance).toFixed(),
                 24,
-                NEARTokenModuleContext.FRACTIONAL_PART_LENGTH
+                ModuleContext.FRACTIONAL_PART_LENGTH
             ),
         },
 
@@ -38,10 +37,10 @@ const nearTokenDataFx = async (
     });
 };
 
-const useNEARTokenData = (contracts: NEARTokenModule.Inputs["contracts"]) => {
+const useNEARTokenData = (adapters: NEARToken.Inputs["adapters"]) => {
     const [state, stateUpdate] = useState<NEARTokenDataFxResponse>({ data: null, loading: true });
 
-    useEffect(() => void nearTokenDataFx(contracts, stateUpdate), [contracts, stateUpdate]);
+    useEffect(() => void nearTokenDataFx(adapters, stateUpdate), [adapters, stateUpdate]);
 
     return state;
 };
