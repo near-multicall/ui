@@ -37,7 +37,7 @@ export class Transfer extends BaseTask<FormData> {
         .retainAll();
 
     override initialValues: FormData = {
-        name: "Transfer Near",
+        name: "Transfer NEAR",
         addr: STORAGE.addresses.multicall,
         func: "near_transfer",
         gas: "3.5",
