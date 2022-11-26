@@ -205,6 +205,14 @@ export class Task extends Component {
                                 json={json}
                             />
                         );
+                    case "near_withdraw":
+                        return (
+                            <Family.Near.UnwrapNear
+                                ref={this.instance}
+                                id={this.id}
+                                json={json}
+                            />
+                        );
                 }
 
             case "mintbase":

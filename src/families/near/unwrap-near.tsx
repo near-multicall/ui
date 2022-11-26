@@ -1,32 +1,28 @@
-// TODO: add checkbox and support "unstake_all".
-
 import { Form, FormikErrors, useFormikContext } from "formik";
 import { useEffect } from "react";
 import { args as arx } from "../../shared/lib/args/args";
 import { fields } from "../../shared/lib/args/args-types/args-object";
 import { Call, CallError } from "../../shared/lib/call";
-import { toGas, unit, formatTokenAmount } from "../../shared/lib/converter";
-import { StakingPool } from "../../shared/lib/contracts/staking-pool";
-import { CheckboxField, TextField, UnitField } from "../../shared/ui/form-fields";
+import { formatTokenAmount, toGas, unit } from "../../shared/lib/converter";
+import { STORAGE } from "../../shared/lib/persistent";
+import { FungibleToken } from "../../shared/lib/standards/fungibleToken";
+import { TextField, UnitField } from "../../shared/ui/form-fields";
 import { BaseTask, BaseTaskProps, BaseTaskState } from "../base";
 import "./near.scss";
-import { STORAGE } from "../../shared/lib/persistent";
 
-import type { DefaultFormData } from "../base";
-import type { HumanReadableAccount } from "../../shared/lib/contracts/staking-pool";
 import { InfoField } from "../../shared/ui/form-fields/info-field/info-field";
+import type { DefaultFormData } from "../base";
 
 type FormData = DefaultFormData & {
     amount: string;
     amountUnit: number | unit;
-    unstakeAll: boolean;
 };
 
 type Props = BaseTaskProps;
 
 type State = BaseTaskState<FormData> & {
-    pool: StakingPool;
-    stakeInfo: HumanReadableAccount | null;
+    multicallBalance: string;
+    daoBalance: string;
 };
 
 export class UnwrapNear extends BaseTask<FormData, Props, State> {
@@ -34,40 +30,28 @@ export class UnwrapNear extends BaseTask<FormData, Props, State> {
     override schema = arx
         .object()
         .shape({
-            addr: arx.string().stakingPool(),
             gas: arx.big().gas().min(toGas("3.5"), "minimum 3.5 Tgas").max(toGas("250"), "maximum 250 Tgas"),
-            unstakeAll: arx.boolean(),
-            amount: arx
-                .big()
-                .token()
-                .min("1", "cannot unstake 0 NEAR")
-                .when("unstakeAll", {
-                    is: true,
-                    then: (s) => s.optional(),
-                    otherwise: (s) => s.required(),
-                }),
+            amount: arx.big().token().min("1", "cannot unwrap 0 NEAR"),
         })
-        .transform(({ gas, gasUnit, amount, amountUnit, unstakeAll, ...rest }) => ({
+        .transform(({ gas, gasUnit, amount, amountUnit, ...rest }) => ({
             ...rest,
-            unstakeAll,
             gas: arx.big().intoParsed(gasUnit).cast(gas),
             // If transferAll, then amount takes a valid dummy value to silence errors.
-            amount: unstakeAll ? null : arx.big().intoParsed(amountUnit).cast(amount),
+            amount: arx.big().intoParsed(amountUnit).cast(amount),
         }))
         .requireAll({ ignore: ["amount"] })
         .retainAll();
 
     override initialValues: FormData = {
-        name: "Unstake",
-        addr: "",
+        name: "Unwrap NEAR",
+        addr: window.nearConfig.WNEAR_ADDRESS,
         func: "near_withdraw",
-        gas: "30",
+        gas: "25",
         gasUnit: "Tgas",
         depo: "1",
         depoUnit: "yocto",
         amount: "0",
         amountUnit: "NEAR",
-        unstakeAll: false,
     };
 
     constructor(props: Props) {
@@ -76,11 +60,11 @@ export class UnwrapNear extends BaseTask<FormData, Props, State> {
 
         this.state = {
             ...this.state,
-            pool: new StakingPool(this.initialValues.addr),
-            stakeInfo: null,
+            multicallBalance: "0",
+            daoBalance: "0",
         };
 
-        this.tryUpdateStakingPool().catch(() => {});
+        this.tryUpdateBalances().catch(() => {});
     }
 
     protected override init(
@@ -112,63 +96,54 @@ export class UnwrapNear extends BaseTask<FormData, Props, State> {
     }
 
     static override inferOwnType(json: Call): boolean {
-        return !!json && json.actions[0].func === "near_withdraw";
+        return !!json && json.actions[0].func === "near_withdraw" && json.address === window.nearConfig.WNEAR_ADDRESS;
     }
 
     public override toCall(): Call {
-        const { addr, func, gas, gasUnit, depo, amount, amountUnit, unstakeAll } = this.state.formData;
+        const { addr, func, gas, gasUnit, amount, amountUnit } = this.state.formData;
 
         if (!arx.big().isValidSync(gas)) throw new CallError("Failed to parse gas input value", this.props.id);
-        if (!arx.big().isValidSync(depo)) throw new CallError("Failed to parse deposit input value", this.props.id);
 
         return {
             address: addr,
             actions: [
                 {
                     func,
-                    args: unstakeAll
-                        ? {}
-                        : {
-                              amount: arx.big().intoParsed(amountUnit).cast(amount).toFixed(),
-                          },
+                    args: {
+                        amount: arx.big().intoParsed(amountUnit).cast(amount).toFixed(),
+                    },
                     gas: arx.big().intoParsed(gasUnit).cast(gas).toFixed(),
-                    depo,
+                    depo: "1", // 1 yocto
                 },
             ],
         };
     }
 
-    private tryUpdateStakingPool(): Promise<boolean> {
+    private tryUpdateBalances(): Promise<boolean> {
         return new Promise<boolean>((resolve) => {
             this.schema.check(this.state.formData).then(() => {
-                const { addr } = fields(this.schema);
-                if (!addr.isBad()) {
-                    this.confidentlyUpdateStakingPool().then((ready) => resolve(ready));
-                } else {
-                    this.setState({ pool: new StakingPool(this.state.formData.addr) }); // will be invalid
-                    resolve(false);
-                }
+                this.confidentlyUpdateBalances().then((ready) => resolve(ready));
             });
         });
     }
 
-    private async confidentlyUpdateStakingPool(): Promise<boolean> {
+    private async confidentlyUpdateBalances(): Promise<boolean> {
         const { addr } = this.state.formData;
-        const [stakingPool, multicallStakeInfo] = await Promise.all([
-            StakingPool.init(addr),
-            new StakingPool(addr).getAccount(STORAGE.addresses.multicall),
+        const wNear = new FungibleToken(addr);
+        const [multicallBalance, daoBalance] = await Promise.all([
+            wNear.ftBalanceOf(STORAGE.addresses.multicall),
+            wNear.ftBalanceOf(STORAGE.addresses.dao),
         ]);
-        this.setState({ pool: stakingPool, stakeInfo: multicallStakeInfo });
+        this.setState({ multicallBalance, daoBalance });
         window.EDITOR.forceUpdate();
-        return stakingPool.ready;
+        return true;
     }
 
-    public async validateForm(values: FormData): Promise<FormikErrors<FormData>> {
+    public override async validateForm(values: FormData): Promise<FormikErrors<FormData>> {
         this.setFormData(values);
         await new Promise((resolve) => this.resolveDebounced(resolve));
-        await this.tryUpdateStakingPool();
-        // test can't stake more than balance
-        await this.schema.check(values, { context: { stakedAmount: this.state.stakeInfo?.staked_balance } });
+        this.tryUpdateBalances();
+        await this.schema.check(values);
         return Object.fromEntries(
             Object.entries(fields(this.schema))
                 .map(([k, v]) => [k, v?.message() ?? ""])
@@ -178,7 +153,7 @@ export class UnwrapNear extends BaseTask<FormData, Props, State> {
 
     public override Editor = (): React.ReactNode => {
         const { resetForm, validateForm, values } = useFormikContext<FormData>();
-        const { pool, stakeInfo } = this.state;
+        const { multicallBalance, daoBalance } = this.state;
 
         useEffect(() => {
             resetForm({
@@ -197,27 +172,14 @@ export class UnwrapNear extends BaseTask<FormData, Props, State> {
                     autoFocus
                 />
                 <div className="empty-line" />
-                <TextField
-                    name="addr"
-                    label="Validator Address"
-                    roundtop
+                <InfoField>{`Multicall balance: ${formatTokenAmount(multicallBalance, 24, 5)} wNEAR`}</InfoField>
+                <InfoField>{`DAO balance: ${formatTokenAmount(daoBalance, 24, 5)} wNEAR`}</InfoField>
+                <UnitField
+                    name="amount"
+                    unit="amountUnit"
+                    options={["NEAR", "yocto"]}
+                    label="Amount"
                 />
-                {pool.ready ? (
-                    <InfoField>{`Staked balance: ${formatTokenAmount(stakeInfo!.staked_balance, 24, 2)} Ⓝ`}</InfoField>
-                ) : null}
-                <CheckboxField
-                    name="unstakeAll"
-                    label="Unstake all available funds"
-                    checked={values.unstakeAll}
-                />
-                {!values.unstakeAll && (
-                    <UnitField
-                        name="amount"
-                        unit="amountUnit"
-                        options={["NEAR", "yocto"]}
-                        label="Unstaking amount"
-                    />
-                )}
                 <UnitField
                     name="gas"
                     unit="gasUnit"

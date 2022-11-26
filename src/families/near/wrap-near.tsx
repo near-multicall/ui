@@ -40,7 +40,7 @@ export class WrapNear extends BaseTask<FormData, Props, State> {
         name: "Wrap NEAR",
         addr: window.nearConfig.WNEAR_ADDRESS,
         func: "near_deposit",
-        gas: "30",
+        gas: "25",
         gasUnit: "Tgas",
         depo: "0",
         depoUnit: "NEAR",
@@ -77,8 +77,6 @@ export class WrapNear extends BaseTask<FormData, Props, State> {
     }
 
     static override inferOwnType(json: Call): boolean {
-        console.log(STORAGE.addresses.multicall);
-        console.log(json);
         return !!json && json.actions[0].func === "near_deposit" && json.address === window.nearConfig.WNEAR_ADDRESS;
     }
 
