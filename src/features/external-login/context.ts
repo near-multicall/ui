@@ -1,10 +1,10 @@
-export class Config {
+export class ModuleContext {
     static KEYS = {
         all: "ed25519%3A9jeqkc8ybv7aYSA7uLNFUEn8cgKo759yue4771bBWsSr",
         public: "ed25519%3ADEaoD65LomNHAMzhNZva15LC85ntwBHdcTbCnZRXciZH",
     };
 
-    static METHODS: Record<"dao" | "multicall", { title: string; type: keyof typeof Config.METHODS }> = {
+    static METHODS: Record<"dao" | "multicall", { title: string; type: keyof typeof ModuleContext.METHODS }> = {
         dao: { title: "Login in dApps as DAO", type: "dao" },
         multicall: { title: "Login in dApps as Multicall", type: "multicall" },
     };

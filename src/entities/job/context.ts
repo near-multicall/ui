@@ -21,7 +21,7 @@ namespace JobEntity {
     };
 }
 
-class JobConfig {
+class JobModuleContext {
     static readonly Status = JobEntity.Status;
 
     static StatusIcons = {
@@ -33,4 +33,4 @@ class JobConfig {
     };
 }
 
-export { JobConfig, type JobEntity };
+export { JobModuleContext, type JobEntity };

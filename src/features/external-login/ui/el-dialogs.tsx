@@ -1,12 +1,12 @@
 import { InfoOutlined } from "@mui/icons-material";
 import clsx from "clsx";
-import { ComponentProps, useCallback, useMemo, useReducer, useState } from "react";
+import { ComponentProps, useMemo, useReducer } from "react";
 
 import { ArgsError, ArgsString } from "../../../shared/lib/args-old";
 import { STORAGE } from "../../../shared/lib/persistent";
 import { Validation } from "../../../shared/lib/validation";
 import { Dialog, TextInput, Tooltip } from "../../../shared/ui/design";
-import { Config as Config } from "../config";
+import { ModuleContext } from "../context";
 import { ELDialogsModel } from "../model/el-dialogs";
 
 import "./el-dialog.scss";
@@ -30,8 +30,8 @@ const ExternalLoginDialog = ({ className, method, onClose, open, title }: Extern
             } else {
                 const url = new URL(value);
                 url.searchParams.set("account_id", STORAGE.addresses[method]);
-                url.searchParams.set("public_key", Config.KEYS.public);
-                url.searchParams.set("all_keys", Config.KEYS.all);
+                url.searchParams.set("public_key", ModuleContext.KEYS.public);
+                url.searchParams.set("all_keys", ModuleContext.KEYS.all);
                 return url.toString();
             }
         },
@@ -47,7 +47,7 @@ const ExternalLoginDialog = ({ className, method, onClose, open, title }: Extern
             {...{ onClose, open, title }}
         >
             <ul className={`${_ExternalLoginDialog}-stepByStepGuide`}>
-                {Config.STEP_BY_STEP_GUIDE.map((step) => (
+                {ModuleContext.STEP_BY_STEP_GUIDE.map((step) => (
                     <li key={step.text}>
                         <span>
                             {step.text}
@@ -80,7 +80,7 @@ const ExternalLoginDialog = ({ className, method, onClose, open, title }: Extern
 export const ELDialogs = () => {
     const { dialogsVisibility, closeHandlerBinding } = ELDialogsModel.useVisibilityState();
 
-    return Object.values(Config.METHODS).map((loginMethod) => (
+    return Object.values(ModuleContext.METHODS).map((loginMethod) => (
         <ExternalLoginDialog
             key={loginMethod.type}
             method={loginMethod.type}

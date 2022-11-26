@@ -1,8 +1,8 @@
-import { NEARConfig, type NEAREntity } from "./config";
+import { NEARTokenModuleContext, type NEARTokenEntity } from "./context";
 import { nearTokenBalancesRender } from "./ui/near-balances";
 
-class NEAR extends NEARConfig {
+class NEARToken extends NEARTokenModuleContext {
     static balancesRender = nearTokenBalancesRender;
 }
 
-export { NEAR, type NEAREntity };
+export { NEARToken, type NEARTokenEntity };

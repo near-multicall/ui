@@ -6,7 +6,7 @@ import { SchedulingSettingsChange, TokenWhitelistChange } from "../../../feature
 import { ArgsString } from "../../../shared/lib/args-old";
 import { Multicall } from "../../../shared/lib/contracts/multicall";
 import { signAndSendTxs } from "../../../shared/lib/wallet";
-import { Config, SettingsEditor } from "../config";
+import { ModuleContext, SettingsEditor } from "../context";
 
 import { SEProposalForm } from "./se-proposal-form";
 import "./settings-editor.scss";
@@ -22,10 +22,10 @@ export const SettingsEditorUI = ({ className, contracts }: SettingsEditor.Inputs
     const [editMode, editModeSwitch] = useState(false);
 
     const changesDiffInitialState: SettingsEditor.Diff = {
-        [Config.DiffKey.removeTokens]: [],
-        [Config.DiffKey.addTokens]: [],
-        [Config.DiffKey.jobBond]: "",
-        [Config.DiffKey.croncatManager]: "",
+        [ModuleContext.DiffKey.removeTokens]: [],
+        [ModuleContext.DiffKey.addTokens]: [],
+        [ModuleContext.DiffKey.jobBond]: "",
+        [ModuleContext.DiffKey.croncatManager]: "",
     };
 
     const [changesDiff, changesDiffUpdate] = useState<SettingsEditor.Diff>(changesDiffInitialState),

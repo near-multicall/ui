@@ -134,7 +134,7 @@ type Proposal = {
 };
 
 const ProposalKindPolicyLabel: Record<ProposalKind, string> = {
-    ChangeConfig: "config",
+    ChangeConfig: "context",
     ChangePolicy: "policy",
     AddMemberToRole: "add_member_to_role",
     RemoveMemberFromRole: "remove_member_from_role",

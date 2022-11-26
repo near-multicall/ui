@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { ArgsString } from "../../../../shared/lib/args-old";
 import { toNEAR, toYocto } from "../../../../shared/lib/converter";
 import { IconLabel, NearIcon, NearLink, Table, Tile, Tooltip } from "../../../../shared/ui/design";
-import { Config, SchedulingSettingsChange } from "../config";
+import { ModuleContext, SchedulingSettingsChange } from "../context";
 
 export const SchedulingSettingsForm = ({
     className,
@@ -17,8 +17,8 @@ export const SchedulingSettingsForm = ({
     const [editModeEnabled, editModeSwitch] = useState(false);
 
     const formInitialState: SchedulingSettingsChange.FormState = {
-        [Config.DiffKey.croncatManager]: "",
-        [Config.DiffKey.jobBond]: "",
+        [ModuleContext.DiffKey.croncatManager]: "",
+        [ModuleContext.DiffKey.jobBond]: "",
     };
 
     const [[croncatManager, croncatManagerUpdate], [jobBond, jobBondUpdate]] = [
@@ -27,13 +27,15 @@ export const SchedulingSettingsForm = ({
     ];
 
     const formFields = {
-        croncatManager: useMemo(() => new ArgsString(multicallInstance.croncatManager), [multicallInstance]),
+        croncatManager: useMemo(() => new ArgsString(multicallInstance.croncatManager), []),
 
         jobBond: useMemo(
             () => new ArgsString(multicallInstance.jobBond !== "" ? toNEAR(multicallInstance.jobBond) : ""),
-            [multicallInstance]
+            []
         ),
     };
+
+    console.table(croncatManager);
 
     const onCroncatManagerChange = useCallback<Required<TextFieldProps>["onChange"]>(
         ({ target: { value } }) =>
@@ -115,10 +117,10 @@ export const SchedulingSettingsForm = ({
                 header={["Option", "Value"]}
                 rows={[
                     {
-                        id: Config.DiffKey.croncatManager,
+                        id: ModuleContext.DiffKey.croncatManager,
 
                         content: [
-                            Config.DiffMetadata[Config.DiffKey.croncatManager].description,
+                            ModuleContext.DiffMetadata[ModuleContext.DiffKey.croncatManager].description,
 
                             editModeEnabled ? (
                                 <TextField
@@ -132,10 +134,10 @@ export const SchedulingSettingsForm = ({
                         ],
                     },
                     {
-                        id: Config.DiffKey.jobBond,
+                        id: ModuleContext.DiffKey.jobBond,
 
                         content: [
-                            Config.DiffMetadata[Config.DiffKey.jobBond].description,
+                            ModuleContext.DiffMetadata[ModuleContext.DiffKey.jobBond].description,
 
                             editModeEnabled ? (
                                 <TextField

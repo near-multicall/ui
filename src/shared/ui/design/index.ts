@@ -1,4 +1,4 @@
-export { type DesignKitConfigType } from "./config";
+export { type DesignContext } from "./context";
 
 /** Atoms */
 export { Button } from "./button";

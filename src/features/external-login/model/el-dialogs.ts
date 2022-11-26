@@ -4,12 +4,12 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-import { Config } from "../config";
+import { ModuleContext } from "../context";
 
 const _dialogOpenRequested = "dialogOpenRequested";
 
 const dialogOpenRequested = {
-    dispatch: (dialogKey: keyof typeof Config.METHODS) =>
+    dispatch: (dialogKey: keyof typeof ModuleContext.METHODS) =>
         document.dispatchEvent(new CustomEvent(_dialogOpenRequested, { detail: { dialogKey } })),
 
     subscribe: (callback: EventListener) => {
@@ -23,8 +23,10 @@ export class ELDialogsModel {
     static dialogOpenRequested = dialogOpenRequested.dispatch;
 
     static useVisibilityState = () => {
-        const [dialogsVisibility, dialogVisibilitySwitch] = useState<Record<keyof typeof Config.METHODS, boolean> | {}>(
-            Object.values(Config.METHODS).reduce(
+        const [dialogsVisibility, dialogVisibilitySwitch] = useState<
+            Record<keyof typeof ModuleContext.METHODS, boolean> | {}
+        >(
+            Object.values(ModuleContext.METHODS).reduce(
                 (visibilityState, { type }) => ({ ...visibilityState, [type]: false }),
                 {}
             )

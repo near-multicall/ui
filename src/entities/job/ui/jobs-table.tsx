@@ -2,7 +2,7 @@ import clsx from "clsx";
 
 import { Scrollable, Table, Tile } from "../../../shared/ui/design";
 import { JobModel } from "../model/job";
-import { type JobEntity } from "../config";
+import { type JobEntity } from "../context";
 
 import { jobTableRowRender } from "./job";
 import "./jobs-table.scss";

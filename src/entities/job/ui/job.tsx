@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 import { Big, toTGas } from "../../../shared/lib/converter";
 import { DataInspector, IconLabel } from "../../../shared/ui/design";
 
-import { JobConfig, type JobEntity } from "../config";
+import { JobModuleContext, type JobEntity } from "../context";
 import "./job.scss";
 
 interface JobEntryProps extends JobEntity.DataWithStatus {}
@@ -12,13 +12,15 @@ const _Job = "Job";
 
 const JobDisplayStatus = ({ job }: Pick<JobEntity.DataWithStatus, "job">) => {
     const statusTextByStatus = {
-        ...JobConfig.Status,
-        [JobConfig.Status.Running]: `${JobConfig.Status.Running}: ${job.run_count + 1}/${job.multicalls.length}`,
+        ...JobModuleContext.Status,
+        [JobModuleContext.Status.Running]: `${JobModuleContext.Status.Running}: ${job.run_count + 1}/${
+            job.multicalls.length
+        }`,
     };
 
     return (
         <IconLabel
-            icon={JobConfig.StatusIcons[job.status]}
+            icon={JobModuleContext.StatusIcons[job.status]}
             label={statusTextByStatus[job.status]}
         />
     );

@@ -1,6 +1,6 @@
 import { Scrollable, Table, type TableProps, Tile, TileProps } from "../../../shared/ui/design";
 import { MITokensModel } from "../model/mi-tokens";
-import { type MI } from "../config";
+import { type MI } from "../context";
 
 import { type MIWhitelistedTokenProps, miWhitelistedTokenAsTableRow } from "./mi-whitelisted-token";
 

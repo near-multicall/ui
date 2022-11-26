@@ -3,16 +3,16 @@ import { useEffect, useState } from "react";
 import { Big, formatTokenAmount } from "../../../shared/lib/converter";
 import { viewAccount } from "../../../shared/lib/wallet";
 
-import { NEARConfig, type NEAREntity } from "../config";
+import { NEARTokenModuleContext, type NEARTokenEntity } from "../context";
 
-type NEARDataFxResponse = {
+type NEARTokenDataFxResponse = {
     data: { dao: string; multicall: string; total: string } | null;
     loading: boolean;
 };
 
 const nearTokenDataFx = async (
-    { dao, multicall }: NEAREntity.Inputs["contracts"],
-    callback: (result: NEARDataFxResponse) => void
+    { dao, multicall }: NEARTokenEntity.Inputs["contracts"],
+    callback: (result: NEARTokenDataFxResponse) => void
 ) => {
     const [daoAccInfo, multicallAccInfo] = await Promise.all([
         viewAccount(dao.address),
@@ -24,13 +24,13 @@ const nearTokenDataFx = async (
 
     return callback({
         data: {
-            dao: formatTokenAmount(daoRawBalance, 24, NEARConfig.FRACTIONAL_PART_LENGTH),
-            multicall: formatTokenAmount(multicallRawBalance, 24, NEARConfig.FRACTIONAL_PART_LENGTH),
+            dao: formatTokenAmount(daoRawBalance, 24, NEARTokenModuleContext.FRACTIONAL_PART_LENGTH),
+            multicall: formatTokenAmount(multicallRawBalance, 24, NEARTokenModuleContext.FRACTIONAL_PART_LENGTH),
 
             total: formatTokenAmount(
                 Big(daoRawBalance).add(multicallRawBalance).toFixed(),
                 24,
-                NEARConfig.FRACTIONAL_PART_LENGTH
+                NEARTokenModuleContext.FRACTIONAL_PART_LENGTH
             ),
         },
 
@@ -38,14 +38,14 @@ const nearTokenDataFx = async (
     });
 };
 
-const useNEARData = (contracts: NEAREntity.Inputs["contracts"]) => {
-    const [state, stateUpdate] = useState<NEARDataFxResponse>({ data: null, loading: true });
+const useNEARTokenData = (contracts: NEARTokenEntity.Inputs["contracts"]) => {
+    const [state, stateUpdate] = useState<NEARTokenDataFxResponse>({ data: null, loading: true });
 
     useEffect(() => void nearTokenDataFx(contracts, stateUpdate), [contracts, stateUpdate]);
 
     return state;
 };
 
-export class NEARBalancesModel {
-    static useTokenFrom = useNEARData;
+export class NEARTokenBalancesModel {
+    static useTokenFrom = useNEARTokenData;
 }

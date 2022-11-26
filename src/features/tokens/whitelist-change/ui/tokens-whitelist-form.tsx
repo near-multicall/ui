@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { TextInput, Tooltip } from "../../../../shared/ui/design";
 import { ArgsString } from "../../../../shared/lib/args-old";
 import { MI } from "../../../../entities";
-import { Config, TokenWhitelistChange } from "../config";
+import { ModuleContext, TokenWhitelistChange } from "../context";
 
 export const TokenWhitelistForm = ({
     className,
@@ -69,8 +69,8 @@ export const TokenWhitelistForm = ({
         <MI.TokenWhitelistTable
             ItemProps={{
                 idToHighlightColor: (id) =>
-                    (addTokens.has(id) && Config.DiffMetadata.addTokens.color) ||
-                    (removeTokens.has(id) && Config.DiffMetadata.removeTokens.color) ||
+                    (addTokens.has(id) && ModuleContext.DiffMetadata.addTokens.color) ||
+                    (removeTokens.has(id) && ModuleContext.DiffMetadata.removeTokens.color) ||
                     null,
 
                 slots: {

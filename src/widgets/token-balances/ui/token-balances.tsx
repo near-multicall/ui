@@ -1,15 +1,15 @@
 import clsx from "clsx";
 
 import { Tile, Scrollable, Table } from "../../../shared/ui/design";
-import { FT, NEAR } from "../../../entities";
-import { type TokenBalances } from "../config";
+import { FT, NEARToken } from "../../../entities";
+import { type TokenBalances } from "../context";
 
 import "./token-balances.scss";
 
 const _TokenBalances = "TokenBalances";
 
 export const TokenBalancesUI = ({ className, contracts }: TokenBalances.Inputs) => {
-    const nearTokenBalances = NEAR.balancesRender({ contracts }),
+    const nearTokenBalances = NEARToken.balancesRender({ contracts }),
         fungibleTokenBalances = FT.balances({ contracts });
 
     return (

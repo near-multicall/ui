@@ -1,7 +1,7 @@
 import { IconLabel, NearIcon } from "../../../shared/ui/design";
 import { FTFormat } from "../lib/ft-format";
 import { FTInfoModel } from "../model/ft-info";
-import { type FT } from "../config";
+import { type FT } from "../context";
 
 interface FTBalancesProps extends FT.Inputs {}
 

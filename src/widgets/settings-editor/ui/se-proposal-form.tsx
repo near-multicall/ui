@@ -4,7 +4,7 @@ import { FormEventHandler, HTMLProps } from "react";
 import { ArgsString } from "../../../shared/lib/args-old";
 import { toNEAR } from "../../../shared/lib/converter";
 import { Button, ButtonGroup, NearIcon, TextInput, Tile } from "../../../shared/ui/design";
-import { Config, SettingsEditor } from "../config";
+import { ModuleContext, SettingsEditor } from "../context";
 
 import "./se-proposal-form.scss";
 
@@ -44,7 +44,7 @@ export const SEProposalForm = ({
         </p>
 
         <div className={`${classNameRoot}-proposalForm-summary`}>
-            {Object.values(Config.DiffKey).map(
+            {Object.values(ModuleContext.DiffKey).map(
                 (DiffKey) =>
                     changesDiff[DiffKey].length > 0 && (
                         <div
@@ -52,7 +52,7 @@ export const SEProposalForm = ({
                             key={DiffKey}
                         >
                             <h3 className={`${classNameRoot}-proposalForm-summary-entry-description`}>
-                                {Config.DiffMetadata[DiffKey].description + ":"}
+                                {ModuleContext.DiffMetadata[DiffKey].description + ":"}
                             </h3>
 
                             <ul className={`${classNameRoot}-proposalForm-summary-entry-data`}>
@@ -66,11 +66,11 @@ export const SEProposalForm = ({
 
                                             `${classNameRoot}-proposalForm-summary-entry-data-chip` +
                                                 "--" +
-                                                Config.DiffMetadata[DiffKey].color
+                                                ModuleContext.DiffMetadata[DiffKey].color
                                         )}
                                         key={data as string}
                                     >
-                                        {!Number.isNaN(data) && DiffKey === Config.DiffKey.jobBond
+                                        {!Number.isNaN(data) && DiffKey === ModuleContext.DiffKey.jobBond
                                             ? `${toNEAR(data as string)} ${NearIcon.NATIVE_TOKEN_CHARACTER}`
                                             : (data as string)}
                                     </li>

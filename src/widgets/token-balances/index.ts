@@ -1,5 +1,5 @@
 import { TokenBalancesUI } from "./ui/token-balances";
-import { TokenBalances as TokenBalancesWidget } from "./config";
+import { TokenBalances as TokenBalancesWidget } from "./context";
 
 class TokenBalances {
     static UI = TokenBalancesUI;

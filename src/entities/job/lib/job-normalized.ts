@@ -3,7 +3,7 @@ import { Base64 } from "js-base64";
 import { JobData } from "../../../shared/lib/contracts/multicall";
 import { Big } from "../../../shared/lib/converter";
 
-import { JobConfig, type JobEntity } from "../config";
+import { JobModuleContext, type JobEntity } from "../context";
 
 /**
  * Job status is:
@@ -14,14 +14,14 @@ import { JobConfig, type JobEntity } from "../config";
  */
 const jobToStatus = ({ job }: JobData): JobEntity.Status => {
     if (job.is_active) {
-        if (job.run_count > -1) return JobConfig.Status.Running;
-        else return JobConfig.Status.Active;
+        if (job.run_count > -1) return JobModuleContext.Status.Running;
+        else return JobModuleContext.Status.Active;
     } else {
         // Date.now() returns timestamp in milliseconds, we use nanoseconds
         const currentTime = Big(Date.now()).times("1000000");
         const jobTime = job.start_at;
-        if (currentTime.gt(jobTime)) return JobConfig.Status.Expired;
-        else return JobConfig.Status.Inactive;
+        if (currentTime.gt(jobTime)) return JobModuleContext.Status.Expired;
+        else return JobModuleContext.Status.Inactive;
     }
 };
 
@@ -65,7 +65,7 @@ const jobToJobWithMulticallsDataDecoded = ({ id, job }: JobData): JobData => ({
  */
 const jobToJobWithStatus = (job: JobData): JobEntity.DataWithStatus => ({
     ...job,
-    job: { ...job.job, status: JobConfig.Status[jobToStatus(job)] },
+    job: { ...job.job, status: JobModuleContext.Status[jobToStatus(job)] },
 });
 
 export const JobNormalized = {

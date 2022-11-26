@@ -14,7 +14,7 @@ export namespace SettingsEditor {
     export type ProposalDescription = Parameters<SputnikDAO["proposeFunctionCall"]>[0];
 }
 
-export class Config {
+export class ModuleContext {
     public static readonly DiffKey = {
         ...SchedulingSettingsChange.DiffKey,
         ...TokenWhitelistChange.DiffKey,

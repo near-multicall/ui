@@ -1,7 +1,7 @@
-import { Config, type SchedulingSettingsChange as SSChangeFeature } from "./config";
+import { ModuleContext, type SchedulingSettingsChange as SSChangeFeature } from "./context";
 import { SchedulingSettingsForm } from "./ui/scheduling-settings-form";
 
-export class SchedulingSettingsChange extends Config {
+export class SchedulingSettingsChange extends ModuleContext {
     static Form = SchedulingSettingsForm;
 }
 

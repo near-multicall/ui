@@ -10,6 +10,6 @@ export namespace FT {
     }
 }
 
-export class Config {
+export class ModuleContext {
     static FRACTIONAL_PART_LENGTH = 5;
 }

@@ -2,7 +2,7 @@ import clsx from "clsx";
 import { MouseEvent, useCallback, useState, type ComponentProps } from "react";
 import { ObjectInspector } from "react-inspector";
 
-import { DataInspectorConfig as Config } from "./config";
+import { ModuleContext as ModuleContext } from "./context";
 import { DataInspectorNode } from "./data-inspector-node";
 import "./data-inspector.scss";
 
@@ -46,7 +46,7 @@ export const DataInspector = ({ classes, expanded = false, expandLevel = 1, labe
                     expandLevel={expandLevel < 1 ? 1 : expandLevel}
                     nodeRenderer={DataInspectorNode}
                     // @ts-ignore Built-in typings seems broken
-                    theme={Config.theme}
+                    theme={ModuleContext.theme}
                     {...props}
                 />
             </div>

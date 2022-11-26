@@ -2,7 +2,7 @@ import { HTMLProps } from "react";
 
 import { MI, MIEntity } from "../../../entities";
 import { MulticallSettingsDiff, Multicall } from "../../../shared/lib/contracts/multicall";
-import { DesignKitConfigType } from "../../../shared/ui/design";
+import { DesignContext } from "../../../shared/ui/design";
 
 export namespace SchedulingSettingsChange {
     export type DiffKey = MIEntity.ParamKey;
@@ -16,17 +16,17 @@ export namespace SchedulingSettingsChange {
     }
 }
 
-export class Config {
+export class ModuleContext {
     public static readonly DiffKey = MI.ParamKey;
 
     public static readonly DiffMetadata = {
-        [Config.DiffKey.croncatManager]: {
-            color: "blue" as DesignKitConfigType.Color,
+        [ModuleContext.DiffKey.croncatManager]: {
+            color: "blue" as DesignContext.Color,
             description: "Croncat manager",
         },
 
-        [Config.DiffKey.jobBond]: {
-            color: "blue" as DesignKitConfigType.Color,
+        [ModuleContext.DiffKey.jobBond]: {
+            color: "blue" as DesignContext.Color,
             description: "Job bond",
         },
     };
