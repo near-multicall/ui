@@ -105,12 +105,12 @@ export class WrapNear extends BaseTask<FormData, Props, State> {
     private tryUpdateStorageInfo(): Promise<boolean> {
         return new Promise<boolean>((resolve) => {
             this.schema.check(this.state.formData).then(() => {
-                this.confidentlyUpdateStakingPool().then((ready) => resolve(ready));
+                this.confidentlyUpdateStorageInfo().then((ready) => resolve(ready));
             });
         });
     }
 
-    private async confidentlyUpdateStakingPool(): Promise<boolean> {
+    private async confidentlyUpdateStorageInfo(): Promise<boolean> {
         const { addr } = this.state.formData;
         const storageManager = new StorageManagement(addr);
         const [balance, bounds] = await Promise.all([
@@ -126,7 +126,6 @@ export class WrapNear extends BaseTask<FormData, Props, State> {
     public override async validateForm(values: FormData): Promise<FormikErrors<FormData>> {
         this.setFormData(values);
         await new Promise((resolve) => this.resolveDebounced(resolve));
-        // run promises in parallel as staking pool info isn't needed for form validation
         this.tryUpdateStorageInfo();
         await this.schema.check(values);
         return Object.fromEntries(
@@ -134,6 +133,10 @@ export class WrapNear extends BaseTask<FormData, Props, State> {
                 .map(([k, v]) => [k, v?.message() ?? ""])
                 .filter(([_, v]) => v !== "")
         );
+    }
+
+    protected override onAddressesUpdated(e: CustomEvent<{ dao: string; multicall: string; user: string }>): void {
+        this.tryUpdateStorageInfo();
     }
 
     public override Editor = (): React.ReactNode => {
@@ -157,14 +160,19 @@ export class WrapNear extends BaseTask<FormData, Props, State> {
                     autoFocus
                 />
                 <div className="empty-line" />
-                {Big(neededStorage).lt("0") ? (
-                    <InfoField>{`Storage deposit added: ${formatTokenAmount(neededStorage, 24, 5)} Ⓝ`}</InfoField>
+                {Big(neededStorage).gt("0") ? (
+                    <InfoField roundtop>{`Storage deposit added: ${formatTokenAmount(
+                        neededStorage,
+                        24,
+                        5
+                    )} Ⓝ`}</InfoField>
                 ) : null}
                 <UnitField
                     name="depo"
                     unit="depoUnit"
                     options={["NEAR", "yocto"]}
-                    label="Staking amount"
+                    label="Amount"
+                    roundtop={!Big(neededStorage).gt("0")}
                 />
                 <UnitField
                     name="gas"
