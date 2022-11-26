@@ -17,6 +17,7 @@ export const keywords = {
         storage_withdraw: [],
         storage_unregister: [],
         storage_deposit: [],
+        near_deposit: ["wnear, wrapped", "wrap", "pay", "fungible", "token"],
     },
     multicall: {
         near_transfer: ["pay"],
