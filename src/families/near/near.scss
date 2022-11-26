@@ -18,7 +18,8 @@
 .near-deposit-and-stake-task,
 .near-unstake-task,
 .near-withdraw-task,
-.near-wrap-task {
+.near-wrap-task,
+.near-unwrap-task {
     background: color.$lightest;
     @include base.task-theme(color.$text);
     * > a {
