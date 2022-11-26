@@ -27,15 +27,13 @@ export const SchedulingSettingsForm = ({
     ];
 
     const formFields = {
-        croncatManager: useMemo(() => new ArgsString(multicallInstance.croncatManager), []),
+        croncatManager: useMemo(() => new ArgsString(multicallInstance.croncatManager), [multicallInstance]),
 
         jobBond: useMemo(
             () => new ArgsString(multicallInstance.jobBond !== "" ? toNEAR(multicallInstance.jobBond) : ""),
-            []
+            [multicallInstance]
         ),
     };
-
-    console.table(croncatManager);
 
     const onCroncatManagerChange = useCallback<Required<TextFieldProps>["onChange"]>(
         ({ target: { value } }) =>
