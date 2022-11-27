@@ -3,7 +3,7 @@ import { Component } from "react";
 import { Droppable } from "react-beautiful-dnd";
 import { TextField } from "../../shared/ui/form";
 import { Column } from "../column/column.jsx";
-import { keywords } from "../../shared/config/keywords";
+import { keywords } from "../../entities/task/config/keywords";
 import { Formik, Form } from "formik";
 import "./builder.scss";
 

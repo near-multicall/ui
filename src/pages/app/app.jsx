@@ -4,7 +4,7 @@ import { DragDropContext, Droppable } from "react-beautiful-dnd";
 
 import { Column } from "../../widgets/column/column.jsx";
 import { Menu } from "../../widgets/menu/menu.jsx";
-import { initialData } from "../../initial-data";
+import { initialData } from "../../entities/task/config/initial-data";
 import { STORAGE } from "../../shared/lib/persistent";
 import { fromCall } from "../../shared/lib/call";
 

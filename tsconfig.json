@@ -19,5 +19,5 @@
         "noImplicitThis": true,
         "strictNullChecks": true
     },
-    "include": ["src"]
+    "include": ["src", "near-config.ts"]
 }
