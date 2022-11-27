@@ -1,9 +1,7 @@
-import { Account } from "@near-wallet-selector/core";
-
 import { view } from "../wallet";
 
+import type { StorageBalanceBounds } from "./storageManagement";
 import { StorageManagement } from "./storageManagement";
-import type { StorageBalance, StorageBalanceBounds } from "./storageManagement";
 
 // Fungible token metadata follows NEP-148. See: https://nomicon.io/Standards/Tokens/FungibleToken/Metadata
 type FungibleTokenMetadata = {
@@ -19,7 +17,7 @@ type FungibleTokenMetadata = {
 // Fungible token core follow NEP-141. See: https://nomicon.io/Standards/Tokens/FungibleToken/Core
 // Also implements NEP-145 for storage management. See: https://nomicon.io/Standards/StorageManagement
 class FungibleToken extends StorageManagement {
-    address: Account["accountId"];
+    address: string;
     // needs initialization, but start with empty metadata
     metadata: FungibleTokenMetadata = { spec: "", name: "", symbol: "", decimals: -1 };
     // storage balance bounds. Needs initialization, but starts with "0" values

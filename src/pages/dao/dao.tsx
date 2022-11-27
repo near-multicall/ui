@@ -208,7 +208,7 @@ export class DaoPage extends Component<Props, State> {
                                     JSON.stringify({
                                         multicall_init_args: {
                                             admin_accounts: [dao.address],
-                                            croncat_manager: window.nearModuleContext.CRONCAT_MANAGER_ADDRESS,
+                                            croncat_manager: window.nearConfig.CRONCAT_MANAGER_ADDRESS,
                                             job_bond: dao.policy.proposal_bond,
                                         },
 
