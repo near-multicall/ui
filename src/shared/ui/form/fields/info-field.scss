@@ -18,6 +18,7 @@
 
     &-content {
         display: flex;
+        flex-flow: column;
         padding: 8.5px 14px;
         img,
         svg {
