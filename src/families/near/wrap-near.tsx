@@ -7,7 +7,7 @@ import { Big, toGas } from "../../shared/lib/converter";
 import { STORAGE } from "../../shared/lib/persistent";
 import { StorageManagement } from "../../shared/lib/standards/storageManagement";
 import { viewAccount } from "../../shared/lib/wallet";
-import { InfoField, TextField, UnitField } from "../../shared/ui/form-fields";
+import { InfoField, TextField, UnitField } from "../../shared/ui/form";
 import type { DefaultFormData } from "../base";
 import { BaseTask, BaseTaskProps, BaseTaskState } from "../base";
 import "./near.scss";

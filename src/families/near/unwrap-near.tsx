@@ -3,14 +3,13 @@ import { useEffect } from "react";
 import { args as arx } from "../../shared/lib/args/args";
 import { fields } from "../../shared/lib/args/args-types/args-object";
 import { Call, CallError } from "../../shared/lib/call";
-import { formatTokenAmount, toGas, unit } from "../../shared/lib/converter";
+import { toGas, unit } from "../../shared/lib/converter";
 import { STORAGE } from "../../shared/lib/persistent";
 import { FungibleToken } from "../../shared/lib/standards/fungibleToken";
-import { TextField, UnitField } from "../../shared/ui/form-fields";
+import { TextField, UnitField, InfoField } from "../../shared/ui/form";
 import { BaseTask, BaseTaskProps, BaseTaskState } from "../base";
 import "./near.scss";
 
-import { InfoField } from "../../shared/ui/form-fields/info-field/info-field";
 import type { DefaultFormData } from "../base";
 
 type FormData = DefaultFormData & {
