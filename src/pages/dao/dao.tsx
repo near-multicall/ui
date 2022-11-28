@@ -506,7 +506,11 @@ export class DaoPage extends Component<Props, State> {
 
         return (
             <Tabs
-                classes={{ buttonsPanel: "DaoPage-tabs-buttonsPanel", contentSpace: "DaoPage-tabs-contentSpace" }}
+                classes={{
+                    root: "DaoPage-tabs",
+                    buttonsPanel: "DaoPage-tabs-buttonsPanel",
+                    contentSpace: "DaoPage-tabs-contentSpace",
+                }}
                 items={[
                     DaoSettingsTab.uiConnect({ className: `${_DaoPage}-content`, adapters: { dao, multicall } }),
                     DaoFundsTab.uiConnect({ className: `${_DaoPage}-content`, adapters: { dao, multicall } }),
