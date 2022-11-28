@@ -3,15 +3,14 @@ import { useEffect } from "react";
 import { args as arx } from "../../shared/lib/args/args";
 import { fields } from "../../shared/lib/args/args-types/args-object";
 import { Call, CallError } from "../../shared/lib/call";
-import { Big, formatTokenAmount } from "../../shared/lib/converter";
-import { toGas } from "../../shared/lib/converter";
-import { StorageManagement } from "../../shared/lib/standards/storageManagement";
+import { Big, toGas } from "../../shared/lib/converter";
 import { STORAGE } from "../../shared/lib/persistent";
+import { StorageManagement } from "../../shared/lib/standards/storageManagement";
+import { viewAccount } from "../../shared/lib/wallet";
 import { InfoField, TextField, UnitField } from "../../shared/ui/form-fields";
 import type { DefaultFormData } from "../base";
 import { BaseTask, BaseTaskProps, BaseTaskState } from "../base";
 import "./near.scss";
-import { FungibleToken } from "../../shared/lib/standards/fungibleToken";
 
 type FormData = DefaultFormData;
 
@@ -116,15 +115,18 @@ export class WrapNear extends BaseTask<FormData, Props, State> {
     private async confidentlyUpdateStorageInfo(): Promise<boolean> {
         const { addr } = this.state.formData;
         const storageManager = new StorageManagement(addr);
-        const wNear = new FungibleToken(addr);
-        const [balance, bounds, multicallBalance, daoBalance] = await Promise.all([
+        const [balance, bounds, multicallAccount, daoAcccount] = await Promise.all([
             storageManager.storageBalanceOf(STORAGE.addresses.multicall),
             storageManager.storageBalanceBounds(),
-            wNear.ftBalanceOf(STORAGE.addresses.multicall),
-            wNear.ftBalanceOf(STORAGE.addresses.dao),
+            viewAccount(STORAGE.addresses.multicall),
+            viewAccount(STORAGE.addresses.dao),
         ]);
-        // P.S.: wNEAR has min=max for storage bounds
-        this.setState({ multicallBalance, daoBalance, neededStorage: Big(bounds.min).minus(balance.total).toFixed() });
+        this.setState({
+            multicallBalance: multicallAccount.amount,
+            daoBalance: daoAcccount.amount,
+            // P.S.: wNEAR has min=max for storage bounds
+            neededStorage: Big(bounds.min).minus(balance.total).toFixed(),
+        });
         window.EDITOR.forceUpdate();
         return true;
     }
@@ -172,11 +174,11 @@ export class WrapNear extends BaseTask<FormData, Props, State> {
                         <span className="value">{`${arx
                             .big()
                             .intoFormatted("NEAR", 5)
-                            .cast(multicallBalance)} wNEAR`}</span>
+                            .cast(multicallBalance)} NEAR`}</span>
                     </p>
                     <p className="entry">
                         <span className="key">DAO balance</span>
-                        <span className="value">{`${arx.big().intoFormatted("NEAR", 5).cast(daoBalance)} wNEAR`}</span>
+                        <span className="value">{`${arx.big().intoFormatted("NEAR", 5).cast(daoBalance)} NEAR`}</span>
                     </p>
                     {Big(neededStorage).gt("0") && (
                         <p className="entry warn">
