@@ -7,7 +7,7 @@ import { args as arx } from "../shared/lib/args/args";
 import { fields, ObjectSchema } from "../shared/lib/args/args-types/args-object";
 import { Call, CallError } from "../shared/lib/call";
 import { unit } from "../shared/lib/converter";
-import { Tooltip } from "../shared/ui/components";
+import { Tooltip } from "../shared/ui/design";
 import "./base.scss";
 import { FormikErrors } from "formik";
 
@@ -198,7 +198,7 @@ export abstract class BaseTask<
             >
                 <div className="name">
                     <Tooltip
-                        title="Edit"
+                        content="Edit"
                         disableInteractive
                     >
                         <EditOutlined
@@ -212,7 +212,7 @@ export abstract class BaseTask<
                     </Tooltip>
                     <div className="edit-pseudo"></div>
                     <Tooltip
-                        title={"Clone card"}
+                        content={"Clone card"}
                         disableInteractive
                     >
                         <MoveDown
@@ -225,7 +225,7 @@ export abstract class BaseTask<
                     <div className="duplicate-pseudo"></div>
                     <h3>{name}</h3>
                     <Tooltip
-                        title={"Delete"}
+                        content={"Delete"}
                         disableInteractive
                     >
                         <DeleteOutline

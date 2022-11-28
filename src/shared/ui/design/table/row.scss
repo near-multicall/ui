@@ -1,0 +1,223 @@
+@use "sass/color";
+@use "sass/size";
+@use "sass/font";
+
+.TableRow {
+    overflow: hidden;
+    position: relative;
+    white-space: pre;
+    background: transparent;
+
+    & .MuiTableCell-root {
+        font-size: size.$text;
+        font-family: font.$code;
+        border: none;
+        text-align: right;
+
+        &:first-of-type {
+            text-align: left;
+            font-family: font.$text;
+        }
+    }
+
+    &:hover {
+        background-color: color.$lightest;
+    }
+
+    &--compact {
+        display: flex;
+        flex-direction: column;
+        gap: size.$gap * 0.5;
+        border-radius: size.$task-radius;
+        padding: size.$gap * 0.5;
+        background-color: color.$white;
+
+        &--dense {
+            gap: size.$gap * 0.4;
+            padding: size.$gap * 0.4;
+        }
+    }
+
+    &--highlighted {
+        &--blue {
+            border-left: 2 * size.$gap solid color.$blue;
+        }
+
+        &--green {
+            border-left: 2 * size.$gap solid color.$green;
+        }
+
+        &--red {
+            border-left: 2 * size.$gap solid color.$red;
+        }
+
+        &--yellow {
+            border-left: 2 * size.$gap solid color.$yellow;
+        }
+    }
+
+    &-content {
+        &--compact {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: size.$gap;
+            font-size: size.$small-text;
+
+            &:last-of-type {
+                border-bottom-left-radius: size.$task-radius;
+                border-bottom-right-radius: size.$task-radius;
+            }
+
+            &:not(&--dense) {
+                &:first-of-type {
+                    padding: calc(size.$gap / 2);
+                }
+            }
+
+            &:not(&--withTitle) {
+                padding: 0.5 * size.$gap size.$gap;
+                background-color: rgba(color.$lightest, 0.7);
+
+                :first-of-type {
+                    border-top-left-radius: size.$task-radius;
+                    border-top-right-radius: size.$task-radius;
+                }
+
+                & > span {
+                    &:first-of-type {
+                        text-align: start;
+                    }
+                }
+            }
+
+            .MuiFormControl-root {
+                margin-top: 0;
+                margin-bottom: 0;
+            }
+
+            & > span {
+                &:first-of-type {
+                    flex: 1;
+                    font-weight: 800;
+                }
+
+                &:not(:first-of-type) {
+                    flex: auto;
+                    text-align: center;
+
+                    .MuiInputBase-root input {
+                        text-align: center;
+                    }
+                }
+
+                &:last-of-type {
+                    text-align: end;
+
+                    .MuiInputBase-root input {
+                        text-align: end;
+                    }
+                }
+            }
+
+            &--withTitle {
+                &:first-of-type {
+                    & > span {
+                        &:first-of-type {
+                            display: none;
+                        }
+
+                        &:last-of-type {
+                            font-size: size.$text;
+                        }
+                    }
+                }
+
+                &:not(:first-of-type) {
+                    padding: 0.5 * size.$gap size.$gap;
+                    background-color: rgba(color.$lightest, 0.7);
+
+                    & > span {
+                        &:last-of-type {
+                            text-overflow: ellipsis;
+                            white-space: nowrap;
+                            overflow: hidden;
+                        }
+                    }
+                }
+
+                &:nth-of-type(2) {
+                    border-top-left-radius: size.$task-radius;
+                    border-top-right-radius: size.$task-radius;
+                }
+
+                &--centeredTitle {
+                    &:first-of-type {
+                        & > span:not(:first-of-type) {
+                            text-align: center;
+                        }
+                    }
+                }
+            }
+
+            &--dense {
+                & > span {
+                    font-size: size.$text;
+                }
+            }
+
+            &--dense.TableRow-content--compact--withTitle {
+                &:not(:first-of-type) {
+                    padding: 0;
+
+                    & > span {
+                        padding: size.$gap * 0.4;
+                    }
+                }
+            }
+
+            &--noKeys {
+                & > span {
+                    &:first-of-type {
+                        display: none;
+                    }
+
+                    &:not(:first-of-type) {
+                        display: flex;
+                        justify-content: center;
+                        text-align: center;
+
+                        .MuiInputBase-root input {
+                            text-align: center;
+                        }
+                    }
+                }
+            }
+        }
+
+        &--compact &-checkbox {
+            display: flex;
+
+            .MuiCheckbox-root {
+                padding: calc(size.$text / 4);
+            }
+        }
+
+        &--compact &-slot {
+            display: flex;
+            align-items: center;
+
+            &--start {
+                justify-content: start;
+            }
+
+            &--end {
+                justify-content: end;
+            }
+
+            > * {
+                position: absolute;
+            }
+        }
+    }
+}

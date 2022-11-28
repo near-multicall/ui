@@ -16,7 +16,7 @@
     z-index: 2;
     transition: width animation.$menu-expand-time ease-out;
     &-tabs {
-        height: 100%;
+        height: calc(100% - size.$gap);
         &-buttonsPanel {
             box-shadow: inset 0px 0px 30px 0px rgba(color.$white, 0.1);
             border-radius: size.$task-radius;

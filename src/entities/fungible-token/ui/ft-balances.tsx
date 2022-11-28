@@ -1,24 +1,27 @@
-import { IconLabel, NearIcons } from "../../../shared/ui/components";
+import { IconLabel, NearIcon } from "../../../shared/ui/design";
+import { FTFormat } from "../lib/ft-format";
+import { FTInfoModel } from "../model/ft-info";
+import { FT } from "../context";
 
-import { FungibleTokenFormat } from "../lib/ft-format";
-import { FungibleTokenBalancesModel } from "../model/ft-balances";
-import { type FungibleTokenEntity } from "../config";
+interface FTBalancesProps extends FT.Inputs {}
 
-interface FungibleTokensBalancesRenderProps extends FungibleTokenEntity.Dependencies {}
-
-export const fungibleTokensBalancesRender = ({ contracts }: FungibleTokensBalancesRenderProps) => {
-    const { data } = FungibleTokenBalancesModel.useAllTokensFrom(contracts);
+export const ftBalances = ({ adapters }: FTBalancesProps) => {
+    const { data } = FTInfoModel.useNonZeroBalances(adapters);
 
     return !data
         ? null
-        : data.map(({ dao, metadata, multicall, total }) => [
-              <IconLabel
-                  icon={metadata.icon ?? <NearIcons.GenericTokenFilled />}
-                  label={metadata.symbol}
-              />,
+        : data.map(({ dao, metadata, multicall, total }) => ({
+              content: [
+                  <IconLabel
+                      icon={metadata.icon ?? <NearIcon.GenericTokenFilled />}
+                      label={metadata.symbol}
+                  />,
 
-              FungibleTokenFormat.amountToDisplayAmount(multicall, metadata.decimals),
-              FungibleTokenFormat.amountToDisplayAmount(dao, metadata.decimals),
-              FungibleTokenFormat.amountToDisplayAmount(total, metadata.decimals),
-          ]);
+                  FTFormat.amountToDisplayAmount(multicall, metadata.decimals),
+                  FTFormat.amountToDisplayAmount(dao, metadata.decimals),
+                  FTFormat.amountToDisplayAmount(total, metadata.decimals),
+              ],
+
+              id: metadata.symbol,
+          }));
 };

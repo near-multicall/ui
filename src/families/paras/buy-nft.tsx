@@ -7,7 +7,7 @@ import { Call, CallError } from "../../shared/lib/call";
 import { Paras, type MarketDataJson } from "../../shared/lib/contracts/paras";
 import { NonFungibleToken } from "../../shared/lib/standards/nonFungibleToken";
 import { Big, formatTokenAmount, toGas } from "../../shared/lib/converter";
-import { InfoField, TextField, UnitField } from "../../shared/ui/form-fields";
+import { InfoField, TextField, UnitField } from "../../shared/ui/form";
 import { BaseTask, BaseTaskProps, BaseTaskState } from "../base";
 import "./paras.scss";
 
@@ -158,7 +158,6 @@ export class BuyNft extends BaseTask<FormData, Props, State> {
             Paras.getMarketData(nftContractId, tokenId),
             NonFungibleToken.init(nftContractId, tokenId),
         ]);
-        // console.log(marketData, nftContractId, tokenId);
         this.setState({ marketData, metadata: nft.token?.metadata ?? null });
         window.EDITOR.forceUpdate();
         return true;

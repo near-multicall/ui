@@ -1,0 +1,16 @@
+@use "sass/mixin";
+@use "sass/size";
+
+.ButtonGroup {
+    @include mixin.center-items(space-between, center);
+    flex-flow: row nowrap;
+    width: 100%;
+
+    &--end {
+        margin-top: auto;
+    }
+
+    &--start {
+        margin-bottom: auto;
+    }
+}

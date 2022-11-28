@@ -1,0 +1,10 @@
+@use "sass/mixin";
+@use "sass/size";
+
+.Scrollable {
+    @include mixin.no-scrollbar;
+    overflow-y: scroll;
+    position: absolute;
+    inset: 0;
+    padding: inherit;
+}

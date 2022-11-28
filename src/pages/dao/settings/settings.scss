@@ -1,0 +1,10 @@
+@use "sass/mixin";
+@use "sass/size";
+
+.DaoSettingsTab {
+    margin: size.$gap !important;
+    padding: 0 !important;
+    overflow-y: scroll;
+    border-radius: size.$task-radius;
+    @include mixin.no-scrollbar;
+}

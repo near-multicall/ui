@@ -6,8 +6,8 @@ import { Call, CallError } from "../../shared/lib/call";
 import { BASE_URI_ARWEAVE, MintbaseStore } from "../../shared/lib/contracts/mintbase";
 import { dataUrlToFile, fileToDataUrl } from "../../shared/lib/converter";
 import { STORAGE } from "../../shared/lib/persistent";
-import { InfoField, TextField, UnitField } from "../../shared/ui/form-fields";
-import { FileField } from "../../shared/ui/form-fields/file-field/file-field";
+import { InfoField, TextField, UnitField } from "../../shared/ui/form";
+import { FileField } from "../../shared/ui/form/fields/file-field";
 import { BaseTask, BaseTaskProps, BaseTaskState, DefaultFormData } from "../base";
 import "./mintbase.scss";
 

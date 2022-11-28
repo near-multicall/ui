@@ -1,0 +1,28 @@
+@use "sass/mixin";
+@use "sass/size";
+@use "sass/color";
+
+.Tabs-layout-buttonsPanel {
+    @include mixin.center-items;
+    z-index: 1;
+    border-radius: size.$task-radius;
+    height: size.$Tabs-layout-buttonsPanel-height;
+    padding: 0;
+    overflow: hidden;
+    background-color: transparent;
+    box-shadow: inset 0px 0px 30px 0px rgba(color.$white, 0.1);
+
+    & > .Tabs-item-button {
+        &:first-of-type {
+            border-radius: size.$task-radius 0 0 size.$task-radius;
+        }
+
+        &:last-of-type {
+            border-radius: 0 size.$task-radius size.$task-radius 0;
+        }
+    }
+}
+
+.Tabs-layout-contentSpace {
+    height: 100%;
+}

@@ -1,0 +1,63 @@
+@use "sass/size";
+@use "sass/color";
+
+.Tile {
+    display: flex;
+    flex-flow: column nowrap;
+    position: relative;
+    border-radius: size.$task-radius;
+    padding: size.$gap * 0.5;
+    gap: size.$gap * 0.5;
+    background-color: color.$lightest;
+    font-size: size.$small-text;
+
+    &-header {
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: center;
+        padding: size.$gap * 0.2 size.$gap * 0.2 size.$gap * 0.5;
+        gap: size.$gap;
+
+        &-text,
+        svg {
+            font-size: size.$large-text;
+        }
+
+        &-slot {
+            &--start,
+            &--end {
+                .MuiButtonBase-root {
+                    padding: 4px;
+                }
+            }
+
+            &--end {
+                margin-left: auto;
+            }
+        }
+    }
+
+    &-subheader {
+        margin-bottom: auto;
+    }
+
+    &-content {
+        display: flex;
+        flex-flow: column nowrap;
+        position: relative;
+        width: auto;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    &-footer {
+        margin-top: auto;
+    }
+
+    &-subheader,
+    &-footer {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: center;
+    }
+}

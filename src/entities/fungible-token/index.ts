@@ -1,8 +1,8 @@
-import { FungibleTokenConfig, type FungibleTokenEntity } from "./config";
-import { fungibleTokensBalancesRender } from "./ui/ft-balances";
+import { ModuleContext, FT as FTModule } from "./context";
+import { ftBalances } from "./ui/ft-balances";
 
-class FungibleToken extends FungibleTokenConfig {
-    static allBalancesRender = fungibleTokensBalancesRender;
+export { type FTModule };
+
+export class FT extends ModuleContext {
+    static balances = ftBalances;
 }
-
-export { FungibleToken, FungibleTokenEntity };

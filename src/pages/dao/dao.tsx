@@ -3,8 +3,8 @@ import { Base64 } from "js-base64";
 import debounce from "lodash.debounce";
 import { Component, ContextType } from "react";
 
+import { MI, Wallet } from "../../entities";
 import { Form, Formik } from "formik";
-import { Wallet } from "../../entities";
 import { args } from "../../shared/lib/args/args";
 import { fields } from "../../shared/lib/args/args-types/args-object";
 import { Multicall } from "../../shared/lib/contracts/multicall";
@@ -13,17 +13,15 @@ import { SputnikDAO, SputnikUI } from "../../shared/lib/contracts/sputnik-dao";
 import { Big, toGas, toYocto } from "../../shared/lib/converter";
 import { STORAGE } from "../../shared/lib/persistent";
 import { signAndSendTxs } from "../../shared/lib/wallet";
-import { Tabs } from "../../shared/ui/components";
+import { Tabs } from "../../shared/ui/design";
 
-import { TextField } from "../../shared/ui/form-fields";
-import { DaoConfigTab } from "./config/config";
+import { TextField } from "../../shared/ui/form";
+import { DaoSettingsTab } from "./settings/settings";
 import "./dao.scss";
 import { DaoFundsTab } from "./funds/funds";
 import { DaoJobsTab } from "./jobs/jobs";
 
-// minimum balance a multicall instance needs for storage + state.
-const MIN_INSTANCE_BALANCE = toYocto(1); // 1 NEAR
-const Ctx = Wallet.useSelector();
+const Ctx = Wallet.trySelectorContext();
 
 interface Props {}
 
@@ -97,11 +95,6 @@ export class DaoPage extends Component<Props, State> {
         });
 
         this.lastAddr = null;
-    }
-
-    componentDidMount() {
-        window.SIDEBAR.switchPage("dao");
-        document.addEventListener("onaddressesupdated", (e) => this.onAddressesUpdated(e as CustomEvent));
     }
 
     setFormData(newFormData: State["formData"], callback?: () => void | undefined) {
@@ -188,13 +181,17 @@ export class DaoPage extends Component<Props, State> {
 
         const multicallAddress = this.toMulticallAddress(formData.addr);
 
-        const depo = Big(this.fee).plus(MIN_INSTANCE_BALANCE);
+        const depo = Big(this.fee).plus(MI.MIN_BALANCE);
         const daoSearchInput: HTMLInputElement = document.querySelector(".DaoSearch input")!;
 
-        // can user propose a FunctionCall to DAO?
+        /**
+         * Can user propose a FunctionCall to DAO?
+         */
         const canPropose = dao.checkUserPermission(accountId!, "AddProposal", "FunctionCall");
 
-        // can user vote approve a FunctionCall on the DAO?
+        /**
+         * Can user vote approve a FunctionCall on the DAO?
+         */
         const canApprove = dao.checkUserPermission(accountId!, "VoteApprove", "FunctionCall");
 
         const args = {
@@ -499,7 +496,9 @@ export class DaoPage extends Component<Props, State> {
 
         if (loading) return <div className="DaoPage-content loader" />;
 
-        // everything should be loaded
+        /*
+         * Everything should be loaded
+         */
         if (!multicall.admins || !multicall.tokensWhitelist || !multicall.jobBond) {
             console.error("multicall infos incomplete", multicall);
             return <div className="DaoPage-content error">Unexpected error! Multicall might be outdated.</div>;
@@ -507,14 +506,23 @@ export class DaoPage extends Component<Props, State> {
 
         return (
             <Tabs
-                classes={{ buttonsPanel: "DaoPage-tabs-buttonsPanel", contentSpace: "DaoPage-tabs-contentSpace" }}
+                classes={{
+                    root: "DaoPage-tabs",
+                    buttonsPanel: "DaoPage-tabs-buttonsPanel",
+                    contentSpace: "DaoPage-tabs-contentSpace",
+                }}
                 items={[
-                    DaoConfigTab.connect({ className: `${_DaoPage}-content`, contracts: { multicall } }),
-                    DaoFundsTab.connect({ className: `${_DaoPage}-content`, contracts: { dao, multicall } }),
-                    DaoJobsTab.connect({ className: `${_DaoPage}-content`, contracts: { multicall } }),
+                    DaoSettingsTab.uiConnect({ className: `${_DaoPage}-content`, adapters: { dao, multicall } }),
+                    DaoFundsTab.uiConnect({ className: `${_DaoPage}-content`, adapters: { dao, multicall } }),
+                    DaoJobsTab.uiConnect({ className: `${_DaoPage}-content`, adapters: { multicall } }),
                 ]}
             />
         );
+    }
+
+    componentDidMount(): void {
+        window.SIDEBAR.switchPage("dao");
+        document.addEventListener("onaddressesupdated", (event) => this.onAddressesUpdated(event as CustomEvent));
     }
 
     render() {
@@ -537,7 +545,7 @@ export class DaoPage extends Component<Props, State> {
                                     <Form>
                                         <TextField
                                             name="addr"
-                                            placeholder="Seach for DAOs"
+                                            placeholder="Search for DAOs"
                                             hiddenLabel={true}
                                             variant="standard"
                                             autoFocus

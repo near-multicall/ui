@@ -1,4 +1,4 @@
-import { initialData } from "../../initial-data";
+import { initialData } from "../../entities/task/config/initial-data";
 import debounce from "lodash.debounce";
 
 const STORAGE_KEY_ADDRESSES = "multicall_addresses";

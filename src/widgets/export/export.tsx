@@ -16,11 +16,11 @@ import { toNEAR, unit } from "../../shared/lib/converter";
 import { STORAGE } from "../../shared/lib/persistent";
 import { FungibleToken } from "../../shared/lib/standards/fungibleToken";
 import { signAndSendTxs } from "../../shared/lib/wallet";
-import { DateTimePicker } from "../../shared/ui/components";
-import { ChoiceField, TextField, UnitField } from "../../shared/ui/form-fields";
+import { DateTimePicker } from "../../shared/ui/design";
+import { ChoiceField, TextField, UnitField } from "../../shared/ui/form";
 import "./export.scss";
 
-const Ctx = Wallet.useSelector();
+const Ctx = Wallet.trySelectorContext();
 
 type FormData = {
     description: string;
@@ -325,7 +325,7 @@ export class Export extends Component<Props, State> {
     }
 
     render() {
-        const LAYOUT = this.props.layout; // ususally global parameter
+        const LAYOUT = this.props.layout; // usually global parameter
         const { showArgs } = this.state;
         const {
             attachment,

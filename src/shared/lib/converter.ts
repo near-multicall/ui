@@ -30,9 +30,14 @@ const formatTokenAmount = (amount: BigSource, decimals: number = 0, precision: n
 const toTGas = (amount: string): string => formatTokenAmount(amount, 12, 12);
 const toGas = (amount: string): string => parseTokenAmount(amount, 12);
 
-// yocto -> NEAR
+/**
+ * yocto -> NEAR
+ **/
 const toNEAR = (amount: string | number): string => formatTokenAmount(amount.toString(), 24, 24);
-// NEAR -> yocto
+
+/**
+ * NEAR -> yocto
+ **/
 const toYocto = (amount: string | number): string => parseTokenAmount(amount.toString(), 24);
 
 const convert = (amount: string | number, unit: unit, decimals?: number): number | string => {

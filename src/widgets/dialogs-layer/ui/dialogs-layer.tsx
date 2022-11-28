@@ -1,7 +1,7 @@
-import { DappLogin } from "../../../features/dapp-login";
+import { ExternalLogin } from "../../../features/external-login";
 
 export const DialogsLayer = () => (
     <>
-        <DappLogin.Dialogs />
+        <ExternalLogin.Dialogs />
     </>
 );

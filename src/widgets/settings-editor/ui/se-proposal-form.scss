@@ -1,0 +1,87 @@
+@use "sass/color";
+@use "sass/mixin";
+@use "sass/size";
+
+.SettingsEditor-proposalForm {
+    grid-area: SEProposalForm;
+    gap: size.$gap * 0.4;
+
+    &-hint {
+        @include mixin.center-items();
+        text-align: center;
+        font-size: size.$large-text;
+    }
+
+    &-summary {
+        display: none;
+        flex-flow: column nowrap;
+        gap: inherit;
+
+        &-entry {
+            display: inherit;
+            flex-flow: row wrap;
+            align-items: center;
+            gap: inherit;
+            padding: 0 size.$gap * 0.4;
+
+            &-description {
+                white-space: nowrap;
+                line-height: 1;
+            }
+
+            &-data {
+                display: inherit;
+                flex-flow: row wrap;
+                gap: 1rem;
+                padding: 0;
+                line-height: 1;
+                list-style: none;
+
+                &-chip {
+                    border-radius: size.$task-radius;
+                    padding: 0.5rem 0.6rem;
+
+                    &--blue {
+                        background-color: color.$blue;
+                    }
+
+                    &--green {
+                        background-color: color.$green;
+                    }
+
+                    &--red {
+                        background-color: color.$red;
+                    }
+
+                    &--yellow {
+                        background-color: color.$yellow;
+                    }
+                }
+            }
+        }
+    }
+
+    &-submit {
+        display: none;
+        justify-content: end;
+        gap: inherit;
+    }
+
+    &-hint,
+    &-submit {
+        flex-flow: inherit;
+        height: inherit;
+    }
+
+    &.is-inEditMode &-hint {
+        display: none;
+    }
+
+    &.is-inEditMode &-summary {
+        display: inherit;
+    }
+
+    &.is-inEditMode &-submit {
+        display: inherit;
+    }
+}
