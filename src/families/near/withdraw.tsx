@@ -7,7 +7,7 @@ import { fields } from "../../shared/lib/args/args-types/args-object";
 import { Call, CallError } from "../../shared/lib/call";
 import { toGas, unit, formatTokenAmount } from "../../shared/lib/converter";
 import { StakingPool } from "../../shared/lib/contracts/staking-pool";
-import { CheckboxField, InfoField, TextField, UnitField } from "../../shared/ui/form-fields";
+import { CheckboxField, InfoField, TextField, UnitField } from "../../shared/ui/form";
 import { BaseTask, BaseTaskProps, BaseTaskState } from "../base";
 import "./near.scss";
 import { STORAGE } from "../../shared/lib/persistent";

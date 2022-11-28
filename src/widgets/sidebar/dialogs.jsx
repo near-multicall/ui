@@ -6,7 +6,7 @@ import { ArgsError, ArgsString } from "../../shared/lib/args-old";
 import { SputnikDAO } from "../../shared/lib/contracts/sputnik-dao";
 import { readFile, saveFile } from "../../shared/lib/loader";
 import { Validation } from "../../shared/lib/validation";
-import { Dialog, TextInput } from "../../shared/ui/components";
+import { Dialog, TextInput } from "../../shared/ui/design";
 
 export const SaveAsJsonDialog = ({ onClose, open }) => {
     const [fileName, fileNameUpdate] = useState("my-multicall");

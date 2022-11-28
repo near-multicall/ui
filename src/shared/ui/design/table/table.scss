@@ -1,0 +1,46 @@
+@use "sass/color";
+@use "sass/font";
+@use "sass/size";
+
+.Table {
+    border-radius: size.$task-radius;
+    font-family: font.$text;
+
+    .MuiTableCell-root {
+        border-bottom: none;
+        padding: 0.5 * size.$gap;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    &-head {
+        overflow: hidden;
+        font-family: font.$text;
+
+        & .MuiTableCell-root {
+            border-bottom: none;
+            font-size: size.$text;
+            font-weight: 800;
+            color: color.$text;
+            text-align: right;
+
+            &:first-of-type {
+                text-align: left;
+            }
+        }
+    }
+
+    &--compact {
+        display: flex;
+        flex-flow: column nowrap;
+        gap: size.$gap * 0.6;
+    }
+
+    &--dense {
+        gap: size.$gap * 0.4;
+    }
+}

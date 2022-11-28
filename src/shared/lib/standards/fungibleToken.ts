@@ -1,6 +1,7 @@
 import { view } from "../wallet";
+
+import type { StorageBalanceBounds } from "./storageManagement";
 import { StorageManagement } from "./storageManagement";
-import type { StorageBalance, StorageBalanceBounds } from "./storageManagement";
 
 // Fungible token metadata follows NEP-148. See: https://nomicon.io/Standards/Tokens/FungibleToken/Metadata
 type FungibleTokenMetadata = {

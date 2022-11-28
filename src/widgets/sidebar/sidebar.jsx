@@ -13,10 +13,10 @@ import Discord from "../../app/static/discord.svg";
 import Github from "../../app/static/github.svg";
 import Twitter from "../../app/static/twitter.svg";
 import { Wallet } from "../../entities/wallet";
-import { DappLogin } from "../../features";
+import { ExternalLogin } from "../../features";
 import { STORAGE } from "../../shared/lib/persistent";
 import { viewAccount } from "../../shared/lib/wallet";
-import { PopupMenu, Tooltip } from "../../shared/ui/components";
+import { PopupMenu, Tooltip } from "../../shared/ui/design";
 
 import { LoadFromJsonDialog, LoadFromProposalDialog, SaveAsJsonDialog, ClearAllDialog } from "./dialogs.jsx";
 
@@ -30,9 +30,9 @@ export class Sidebar extends Component {
             FeatureFlags: {
                 initialized: false,
 
-                DappLogin: {
-                    [DappLogin.METHODS.dao.type]: true,
-                    [DappLogin.METHODS.multicall.type]: false,
+                ExternalLogin: {
+                    [ExternalLogin.METHODS.dao.type]: true,
+                    [ExternalLogin.METHODS.multicall.type]: false,
                 },
             },
 
@@ -46,7 +46,7 @@ export class Sidebar extends Component {
         };
     }
 
-    static walletContext = Wallet.useSelector();
+    static walletContext = Wallet.trySelectorContext();
 
     featureFlagsCalc() {
         viewAccount(STORAGE.addresses.multicall)
@@ -56,9 +56,9 @@ export class Sidebar extends Component {
                         ...this.state.FeatureFlags,
                         initialized: true,
 
-                        DappLogin: {
-                            ...this.state.FeatureFlags.DappLogin,
-                            [DappLogin.METHODS.multicall.type]: true,
+                        ExternalLogin: {
+                            ...this.state.FeatureFlags.ExternalLogin,
+                            [ExternalLogin.METHODS.multicall.type]: true,
                         },
                     },
                 })
@@ -69,9 +69,9 @@ export class Sidebar extends Component {
                         ...this.state.FeatureFlags,
                         initialized: true,
 
-                        DappLogin: {
-                            ...this.state.FeatureFlags.DappLogin,
-                            [DappLogin.METHODS.multicall.type]: false,
+                        ExternalLogin: {
+                            ...this.state.FeatureFlags.ExternalLogin,
+                            [ExternalLogin.METHODS.multicall.type]: false,
                         },
                     },
                 })
@@ -163,7 +163,7 @@ export class Sidebar extends Component {
                     </nav>
                     <hr />
 
-                    <DappLogin.Menu
+                    <ExternalLogin.Menu
                         FeatureFlags={this.state.FeatureFlags}
                         triggerClassName="sidebar-button"
                     />
@@ -210,8 +210,8 @@ export class Sidebar extends Component {
 
                             <div className="sidebar-button">
                                 <Tooltip
+                                    content="Clear All"
                                     placement="right"
-                                    title="Clear All"
                                 >
                                     <DeleteForeverOutlined
                                         className="icon"

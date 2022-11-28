@@ -1,0 +1,37 @@
+@use "sass/color";
+@use "sass/size";
+
+.Link {
+    line-height: 1;
+    color: darken(color.$blue, 30%);
+    text-decoration: none;
+    cursor: pointer;
+
+    &-tooltip {
+        padding: 0;
+        background-color: color.$darkest;
+
+        &.MuiTooltip-tooltip {
+            margin-left: size.$small-text !important;
+            padding: 0;
+            background-color: color.$darkest;
+        }
+
+        &-arrow,
+        &-arrow.MuiTooltip-arrow {
+            color: color.$darkest;
+        }
+
+        &-button,
+        &-button.MuiButtonBase-root {
+            background-color: color.$black;
+            border-radius: inherit;
+            font-size: size.$small-text;
+            color: color.$white;
+
+            &.Mui-disabled {
+                color: color.$white;
+            }
+        }
+    }
+}

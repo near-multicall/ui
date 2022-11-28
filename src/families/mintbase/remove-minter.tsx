@@ -7,9 +7,8 @@ import { Call, CallError } from "../../shared/lib/call";
 import { MintbaseStore } from "../../shared/lib/contracts/mintbase";
 import { toGas } from "../../shared/lib/converter";
 import { STORAGE } from "../../shared/lib/persistent";
-import { InfoField, TextField, UnitField } from "../../shared/ui/form-fields";
+import { InfoField, TextField, UnitField } from "../../shared/ui/form";
 import { BaseTask, BaseTaskProps, BaseTaskState } from "../base";
-
 import type { StoreInfo } from "../../shared/lib/contracts/mintbase";
 import type { DefaultFormData } from "../base";
 import "./mintbase.scss";

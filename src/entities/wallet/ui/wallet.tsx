@@ -1,9 +1,8 @@
-// TODO: use Multical helper class to fetch & store infos, like admins, tokens etc...
+// TODO: use Multicall helper class to fetch & store infos, like admins, tokens etc...
 
 import { Icon } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
-import { Base64 } from "js-base64";
 import debounce from "lodash.debounce";
 import { Component, ContextType } from "react";
 
@@ -12,7 +11,8 @@ import { fields } from "../../../shared/lib/args/args-types/args-object";
 import { SputnikDAO } from "../../../shared/lib/contracts/sputnik-dao";
 import { Multicall } from "../../../shared/lib/contracts/multicall";
 import { STORAGE } from "../../../shared/lib/persistent";
-import { useWalletSelector } from "./providers";
+
+import { tryWalletSelectorContext } from "./providers";
 import "./wallet.scss";
 
 enum Color {
@@ -36,7 +36,7 @@ interface State {
 
 /* TODO: Decompose code */
 export class WalletComponent extends Component<Props, State> {
-    static contextType = useWalletSelector();
+    static contextType = tryWalletSelectorContext();
     declare context: ContextType<typeof WalletComponent.contextType>;
 
     schema = args
@@ -136,7 +136,6 @@ export class WalletComponent extends Component<Props, State> {
 
     connectDao(dao: SputnikDAO["address"]) {
         const { accountId } = this.context!;
-        const { noDao, noMulticall } = fields(this.schema, "dao");
 
         const multicallAddress = this.toMulticallAddress(dao);
 
@@ -146,7 +145,6 @@ export class WalletComponent extends Component<Props, State> {
                 return new SputnikDAO(dao);
             }),
             Multicall.init(multicallAddress).catch((e) => new Multicall(multicallAddress)),
-            this.schema.check({ dao }),
         ])
             .then(([newDao, newMulticall]) => {
                 if (!newDao?.ready) return;
@@ -155,10 +153,11 @@ export class WalletComponent extends Component<Props, State> {
                     currentDao: newDao,
                     currentMulticall: newMulticall,
                 });
-
-                this.schema.check({ user: accountId ?? "" });
             })
-            .finally(() => {
+            .finally(async () => {
+                await this.schema.check({ dao, user: accountId ?? "" });
+                const { noDao, noMulticall } = fields(this.schema, "dao");
+
                 let color = Color.RED;
                 if (!noDao.isBad()) color = Color.YELLOW;
                 if (!noMulticall.isBad()) color = Color.WHITE;

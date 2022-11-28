@@ -1,8 +1,9 @@
-import * as nearAPI from "near-api-js";
 import type { NetworkId } from "@near-wallet-selector/core";
 import { Component } from "react";
 
-import { Task, Layout, Sidebar, Menu, Editor } from "../../widgets";
+import { Sidebar, Menu, Editor } from "../../widgets";
+import { Task } from "../../entities";
+import { AppPage } from "../../pages/app";
 import { WalletComponent } from "../../entities/wallet/ui/wallet";
 
 type CardInfo = {
@@ -27,7 +28,7 @@ declare global {
         EDITOR: Editor;
         EXPORT: Component;
 
-        LAYOUT: Layout;
+        LAYOUT: AppPage;
         SIDEBAR: Sidebar;
 
         // List of all mounted tasks

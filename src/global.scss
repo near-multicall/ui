@@ -23,7 +23,7 @@ body {
 }
 
 a {
-    color: color.$blue !important;
+    color: darken(color.$blue, 30%);
     text-decoration: none;
     cursor: pointer;
 }
@@ -38,6 +38,29 @@ button {
     cursor: pointer;
 }
 
+.MuiCheckbox-root {
+    .MuiSvgIcon-root {
+        width: size.$large-text;
+        height: size.$large-text;
+    }
+}
+
+.MuiTextField-root {
+    .MuiInputLabel-root,
+    .MuiInputBase-root {
+        font-size: size.$text;
+
+        input {
+            padding: calc(size.$gap * 0.4) calc(size.$gap * 0.6);
+            font-size: size.$text;
+        }
+
+        fieldset {
+            border-radius: size.$task-radius;
+        }
+    }
+}
+
 .disabled {
     background-color: color.$darkest !important;
     color: rgba(color.$light-text, 0.3);
@@ -50,4 +73,8 @@ button {
 
 .warn {
     color: color.$yellow;
+}
+
+.font--code {
+    font-family: font.$code;
 }

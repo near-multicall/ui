@@ -1,8 +1,8 @@
-import { NearTokenConfig, type NearTokenEntity } from "./config";
-import { nearTokenBalancesRender } from "./ui/near-balances";
+import { ModuleContext, type NEARToken as NEARTokenModule } from "./context";
+import { ntBalancesRender } from "./ui/nt-balances";
 
-class NearToken extends NearTokenConfig {
-    static balancesRender = nearTokenBalancesRender;
+export { type NEARTokenModule };
+
+export class NEARToken extends ModuleContext {
+    static balancesRender = ntBalancesRender;
 }
-
-export { NearToken, type NearTokenEntity };

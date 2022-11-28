@@ -36,14 +36,22 @@
                 .MuiInput-underline {
                     font-size: size.$large-text;
 
+                    input {
+                        padding: 0;
+                        padding-left: 0.5 * size.$gap;
+                        font-size: 1em;
+                    }
+
                     &:hover::before,
                     &::before {
                         border-bottom-color: color.$darkish;
                     }
+
                     &:hover::after,
                     &::after {
                         border-bottom-color: color.$dark;
                     }
+
                     input {
                         text-align: center;
                         font-family: font.$text;
@@ -109,10 +117,6 @@
                 font-size: size.$text;
                 color: color.$dark;
                 max-width: 40em;
-
-                a {
-                    color: darken(color.$blue, 20%) !important;
-                }
             }
 
             .create-multicall {
@@ -129,15 +133,18 @@
             }
         }
     }
-}
+    &-tabs {
+        height: calc(100% - (2 * size.$gap + 0.5 * size.$large-text));
 
-.DaoPage-tabs-buttonsPanel {
-    justify-content: flex-start;
-    max-width: 120rem;
-    margin: size.$gap auto 0 auto;
-    padding: 0 size.$gap;
-}
+        &-buttonsPanel {
+            justify-content: flex-start;
+            max-width: 120rem;
+            margin: size.$gap auto 0 auto;
+            padding: 0 size.$gap;
+        }
 
-.DaoPage-tabs-contentSpace {
-    height: calc(100% - size.$gap - size.$Tabs-layout-buttonsPanel-height);
+        &-contentSpace {
+            height: calc(100% - size.$gap - size.$Tabs-layout-buttonsPanel-height);
+        }
+    }
 }

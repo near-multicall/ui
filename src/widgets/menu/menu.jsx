@@ -2,7 +2,7 @@ import Icon from "@mui/material/Icon";
 import clsx from "clsx";
 import { Component } from "react";
 
-import { Tabs } from "../../shared/ui/components";
+import { Tabs } from "../../shared/ui/design";
 import { Builder } from "../builder/builder.jsx";
 import { Editor } from "../editor/editor.jsx";
 import { Export } from "../export/export";
@@ -40,12 +40,13 @@ export class Menu extends Component {
                         activeItemIndexOverride={activeTabIndex}
                         activeItemSwitchOverride={this.activeTabSwitch}
                         classes={{
+                            root: "Menu-tabs",
                             buttonsPanel: "Menu-tabs-buttonsPanel",
                             contentSpace: "Menu-tabs-contentSpace",
                         }}
                         items={[
                             {
-                                title: "Build",
+                                name: "Build",
                                 content: (
                                     <Builder
                                         layout={LAYOUT}
@@ -54,11 +55,11 @@ export class Menu extends Component {
                                 ),
                             },
                             {
-                                title: "Edit",
+                                name: "Edit",
                                 content: <Editor />,
                             },
                             {
-                                title: "Export",
+                                name: "Export",
                                 content: <Export layout={LAYOUT} />,
                             },
                         ]}
