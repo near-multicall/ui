@@ -36,17 +36,16 @@ export class UnwrapNear extends BaseTask<FormData, Props, State> {
         .transform(({ gas, gasUnit, amount, amountUnit, ...rest }) => ({
             ...rest,
             gas: arx.big().intoParsed(gasUnit).cast(gas),
-            // If transferAll, then amount takes a valid dummy value to silence errors.
             amount: arx.big().intoParsed(amountUnit).cast(amount),
         }))
-        .requireAll({ ignore: ["amount"] })
+        .requireAll()
         .retainAll();
 
     override initialValues: FormData = {
         name: "Unwrap NEAR",
         addr: window.nearConfig.WNEAR_ADDRESS,
         func: "near_withdraw",
-        gas: "25",
+        gas: "10",
         gasUnit: "Tgas",
         depo: "1",
         depoUnit: "yocto",
@@ -83,7 +82,6 @@ export class UnwrapNear extends BaseTask<FormData, Props, State> {
                         .intoFormatted(this.initialValues.amountUnit)
                         .cast(call.actions[0].args.amount)
                         ?.toFixed() ?? null,
-                transferAll: call.actions[0].args.amount === undefined,
             };
             this.initialValues = Object.keys(this.initialValues).reduce((acc, k) => {
                 const v = fromCall[k as keyof typeof fromCall];
@@ -100,9 +98,10 @@ export class UnwrapNear extends BaseTask<FormData, Props, State> {
     }
 
     public override toCall(): Call {
-        const { addr, func, gas, gasUnit, amount, amountUnit } = this.state.formData;
+        const { addr, func, gas, gasUnit, amount, amountUnit, depo } = this.state.formData;
 
         if (!arx.big().isValidSync(gas)) throw new CallError("Failed to parse gas input value", this.props.id);
+        if (!arx.big().isValidSync(amount)) throw new CallError("Failed to parse amount input value", this.props.id);
 
         return {
             address: addr,
@@ -113,7 +112,7 @@ export class UnwrapNear extends BaseTask<FormData, Props, State> {
                         amount: arx.big().intoParsed(amountUnit).cast(amount).toFixed(),
                     },
                     gas: arx.big().intoParsed(gasUnit).cast(gas).toFixed(),
-                    depo: "1", // 1 yocto
+                    depo,
                 },
             ],
         };
@@ -151,8 +150,12 @@ export class UnwrapNear extends BaseTask<FormData, Props, State> {
         );
     }
 
+    protected override onAddressesUpdated(e: CustomEvent<{ dao: string; multicall: string; user: string }>): void {
+        this.tryUpdateBalances();
+    }
+
     public override Editor = (): React.ReactNode => {
-        const { resetForm, validateForm, values } = useFormikContext<FormData>();
+        const { resetForm, validateForm } = useFormikContext();
         const { multicallBalance, daoBalance } = this.state;
 
         useEffect(() => {
@@ -164,7 +167,7 @@ export class UnwrapNear extends BaseTask<FormData, Props, State> {
         }, []);
 
         return (
-            <Form className="edit">
+            <Form className={`edit ${this.uniqueClassName}-edit`}>
                 <TextField
                     name="name"
                     label="Card Name"
@@ -172,8 +175,19 @@ export class UnwrapNear extends BaseTask<FormData, Props, State> {
                     autoFocus
                 />
                 <div className="empty-line" />
-                <InfoField>{`Multicall balance: ${formatTokenAmount(multicallBalance, 24, 5)} wNEAR`}</InfoField>
-                <InfoField>{`DAO balance: ${formatTokenAmount(daoBalance, 24, 5)} wNEAR`}</InfoField>
+                <InfoField roundtop>
+                    <p className="entry">
+                        <span className="key">Multicall balance</span>
+                        <span className="value">{`${arx
+                            .big()
+                            .intoFormatted("NEAR", 5)
+                            .cast(multicallBalance)} wNEAR`}</span>
+                    </p>
+                    <p className="entry">
+                        <span className="key">DAO balance</span>
+                        <span className="value">{`${arx.big().intoFormatted("NEAR", 5).cast(daoBalance)} wNEAR`}</span>
+                    </p>
+                </InfoField>
                 <UnitField
                     name="amount"
                     unit="amountUnit"

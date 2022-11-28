@@ -11,6 +11,7 @@ import { InfoField, TextField, UnitField } from "../../shared/ui/form-fields";
 import type { DefaultFormData } from "../base";
 import { BaseTask, BaseTaskProps, BaseTaskState } from "../base";
 import "./near.scss";
+import { FungibleToken } from "../../shared/lib/standards/fungibleToken";
 
 type FormData = DefaultFormData;
 
@@ -18,6 +19,8 @@ type Props = BaseTaskProps;
 
 type State = BaseTaskState<FormData> & {
     neededStorage: string;
+    multicallBalance: string;
+    daoBalance: string;
 };
 
 export class WrapNear extends BaseTask<FormData, Props, State> {
@@ -53,6 +56,8 @@ export class WrapNear extends BaseTask<FormData, Props, State> {
         this.state = {
             ...this.state,
             neededStorage: "0",
+            multicallBalance: "0",
+            daoBalance: "0",
         };
 
         this.tryUpdateStorageInfo().catch(() => {});
@@ -111,12 +116,15 @@ export class WrapNear extends BaseTask<FormData, Props, State> {
     private async confidentlyUpdateStorageInfo(): Promise<boolean> {
         const { addr } = this.state.formData;
         const storageManager = new StorageManagement(addr);
-        const [balance, bounds] = await Promise.all([
+        const wNear = new FungibleToken(addr);
+        const [balance, bounds, multicallBalance, daoBalance] = await Promise.all([
             storageManager.storageBalanceOf(STORAGE.addresses.multicall),
             storageManager.storageBalanceBounds(),
+            wNear.ftBalanceOf(STORAGE.addresses.multicall),
+            wNear.ftBalanceOf(STORAGE.addresses.dao),
         ]);
         // P.S.: wNEAR has min=max for storage bounds
-        this.setState({ neededStorage: Big(bounds.min).minus(balance.total).toFixed() });
+        this.setState({ multicallBalance, daoBalance, neededStorage: Big(bounds.min).minus(balance.total).toFixed() });
         window.EDITOR.forceUpdate();
         return true;
     }
@@ -139,7 +147,7 @@ export class WrapNear extends BaseTask<FormData, Props, State> {
 
     public override Editor = (): React.ReactNode => {
         const { resetForm, validateForm } = useFormikContext();
-        const { neededStorage } = this.state;
+        const { multicallBalance, daoBalance, neededStorage } = this.state;
 
         useEffect(() => {
             resetForm({
@@ -150,7 +158,7 @@ export class WrapNear extends BaseTask<FormData, Props, State> {
         }, []);
 
         return (
-            <Form className="edit">
+            <Form className={`edit ${this.uniqueClassName}-edit`}>
                 <TextField
                     name="name"
                     label="Card Name"
@@ -158,19 +166,33 @@ export class WrapNear extends BaseTask<FormData, Props, State> {
                     autoFocus
                 />
                 <div className="empty-line" />
-                {Big(neededStorage).gt("0") ? (
-                    <InfoField roundtop>{`Storage deposit added: ${formatTokenAmount(
-                        neededStorage,
-                        24,
-                        5
-                    )} Ⓝ`}</InfoField>
-                ) : null}
+                <InfoField roundtop>
+                    <p className="entry">
+                        <span className="key">Multicall balance</span>
+                        <span className="value">{`${arx
+                            .big()
+                            .intoFormatted("NEAR", 5)
+                            .cast(multicallBalance)} wNEAR`}</span>
+                    </p>
+                    <p className="entry">
+                        <span className="key">DAO balance</span>
+                        <span className="value">{`${arx.big().intoFormatted("NEAR", 5).cast(daoBalance)} wNEAR`}</span>
+                    </p>
+                    {Big(neededStorage).gt("0") && (
+                        <p className="entry warn">
+                            <span className="key">Storage deposit added</span>
+                            <span className="value">{`${arx
+                                .big()
+                                .intoFormatted("NEAR", 5)
+                                .cast(neededStorage)} Ⓝ`}</span>
+                        </p>
+                    )}
+                </InfoField>
                 <UnitField
                     name="depo"
                     unit="depoUnit"
                     options={["NEAR", "yocto"]}
                     label="Amount"
-                    roundtop={!Big(neededStorage).gt("0")}
                 />
                 <UnitField
                     name="gas"

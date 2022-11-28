@@ -51,7 +51,7 @@ export class Unstake extends BaseTask<FormData, Props, State> {
             ...rest,
             unstakeAll,
             gas: arx.big().intoParsed(gasUnit).cast(gas),
-            // If transferAll, then amount takes a valid dummy value to silence errors.
+            // If unstakeAll, then amount takes a valid dummy value to silence errors.
             amount: unstakeAll ? null : arx.big().intoParsed(amountUnit).cast(amount),
         }))
         .requireAll({ ignore: ["amount"] })
@@ -99,7 +99,7 @@ export class Unstake extends BaseTask<FormData, Props, State> {
                         .intoFormatted(this.initialValues.amountUnit)
                         .cast(call.actions[0].args.amount)
                         ?.toFixed() ?? null,
-                transferAll: call.actions[0].args.amount === undefined,
+                unstakeAll: call.actions[0].args.amount === undefined,
             };
             this.initialValues = Object.keys(this.initialValues).reduce((acc, k) => {
                 const v = fromCall[k as keyof typeof fromCall];
