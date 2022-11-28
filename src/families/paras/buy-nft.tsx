@@ -158,7 +158,6 @@ export class BuyNft extends BaseTask<FormData, Props, State> {
             Paras.getMarketData(nftContractId, tokenId),
             NonFungibleToken.init(nftContractId, tokenId),
         ]);
-        // console.log(marketData, nftContractId, tokenId);
         this.setState({ marketData, metadata: nft.token?.metadata ?? null });
         window.EDITOR.forceUpdate();
         return true;
