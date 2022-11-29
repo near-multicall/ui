@@ -1,6 +1,6 @@
 import { Big, toGas, dateToCron, toYocto } from "../converter";
-import { AccountId, Base64String, BigString, U128String, U64String } from "../types";
-import { type Tx, viewAccount, viewState, view } from "../wallet";
+import { AccountId, Base64String, U128String, U64String } from "../types";
+import { viewAccount, viewState, view } from "../wallet";
 
 import type { FunctionCallAction as daoFunctionCallAction } from "./sputnik-dao";
 
@@ -79,7 +79,7 @@ class Multicall {
     static FACTORY_ADDRESS: AccountId = FACTORY_ADDRESS_SELECTOR[window.NEAR_ENV];
     static CONTRACT_CODE_HASHES: AccountId[] = CONTRACT_CODE_HASHES_SELECTOR[window.NEAR_ENV];
     // 0.025 NEAR is the min required by croncat for a non-recurring task. Assume trigger of 270 Tgas and 0 NEAR.
-    static CRONCAT_FEE: BigString = toYocto("0.0275");
+    static CRONCAT_FEE: U128String = toYocto("0.0275");
 
     address: AccountId;
     admins: AccountId[] = [];

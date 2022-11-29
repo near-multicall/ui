@@ -2,8 +2,7 @@ import { Account } from "@near-wallet-selector/core";
 
 import { view } from "../wallet";
 
-import { StorageManagement } from "./storageManagement";
-import type { StorageBalance, StorageBalanceBounds } from "./storageManagement";
+import { StorageBalanceBounds, StorageManagement } from "./storageManagement";
 
 // Fungible token metadata follows NEP-148. See: https://nomicon.io/Standards/Tokens/FungibleToken/Metadata
 type FungibleTokenMetadata = {

@@ -136,7 +136,6 @@ export class WalletComponent extends Component<Props, State> {
 
     connectDao(dao: SputnikDAO["address"]) {
         const { accountId } = this.context!;
-        const { noDao, noMulticall } = fields(this.schema, "dao");
 
         const multicallAddress = this.toMulticallAddress(dao);
 
@@ -146,7 +145,6 @@ export class WalletComponent extends Component<Props, State> {
                 return new SputnikDAO(dao);
             }),
             Multicall.init(multicallAddress).catch((e) => new Multicall(multicallAddress)),
-            this.schema.check({ dao }),
         ])
             .then(([newDao, newMulticall]) => {
                 if (!newDao?.ready) return;
@@ -155,10 +153,11 @@ export class WalletComponent extends Component<Props, State> {
                     currentDao: newDao,
                     currentMulticall: newMulticall,
                 });
-
-                this.schema.check({ user: accountId ?? "" });
             })
-            .finally(() => {
+            .finally(async () => {
+                await this.schema.check({ dao, user: accountId ?? "" });
+                const { noDao, noMulticall } = fields(this.schema, "dao");
+
                 let color = Color.RED;
                 if (!noDao.isBad()) color = Color.YELLOW;
                 if (!noMulticall.isBad()) color = Color.WHITE;

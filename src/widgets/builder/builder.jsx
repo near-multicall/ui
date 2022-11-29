@@ -1,10 +1,11 @@
+import { Formik, Form } from "formik";
 import debounce from "lodash.debounce";
 import { Component } from "react";
 import { Droppable } from "react-beautiful-dnd";
+
 import { TextField } from "../../shared/ui/form";
 import { Column } from "../column/column.jsx";
-import { keywords } from "../../shared/config/keywords";
-import { Formik, Form } from "formik";
+import { keywords } from "../../entities/task/config/keywords";
 import "./builder.scss";
 
 const normalize = (str) => str.replace("_", " ").replace("-", " ").toLowerCase();

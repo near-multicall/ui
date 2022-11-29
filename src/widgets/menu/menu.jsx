@@ -40,6 +40,7 @@ export class Menu extends Component {
                         activeItemIndexOverride={activeTabIndex}
                         activeItemSwitchOverride={this.activeTabSwitch}
                         classes={{
+                            root: "Menu-tabs",
                             buttonsPanel: "Menu-tabs-buttonsPanel",
                             contentSpace: "Menu-tabs-contentSpace",
                         }}

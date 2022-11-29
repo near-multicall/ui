@@ -26,6 +26,10 @@
         border-radius: size.$task-radius;
         z-index: 1;
 
+        a {
+            color: color.$blue;
+        }
+
         &--propose {
             background-color: color.$green;
 

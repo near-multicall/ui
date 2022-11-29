@@ -21,13 +21,14 @@ export const MITokenWhitelistTable = ({
     onItemsSelected,
     subheader,
 }: MITokenWhitelistTableProps) => {
-    const { data, error, loading } = MITokensModel.useWhitelist(daoAddress);
+    const { data, error, loading } = MITokensModel.useWhitelist(daoAddress),
+        allItems = data?.concat(itemsAdditional ?? []);
 
     return (
         <Tile
             classes={{ root: className }}
             heading="Token whitelist"
-            noData={data !== null && data.length === 0}
+            noData={data !== null && allItems?.length === 0}
             {...{ error, footer, headerSlots, loading, subheader }}
         >
             <Scrollable>
@@ -37,7 +38,7 @@ export const MITokenWhitelistTable = ({
                     displayMode="compact"
                     header={["Contract address"]}
                     onRowsSelected={onItemsSelected}
-                    rows={data?.concat(itemsAdditional ?? []).map(miWhitelistedTokenAsTableRow)}
+                    rows={allItems?.map(miWhitelistedTokenAsTableRow)}
                 />
             </Scrollable>
         </Tile>

@@ -116,7 +116,7 @@ export class BuyNft extends BaseTask<FormData, Props, State> {
 
     public override toCall(): Call {
         const { listingUrl, gas, gasUnit, depo } = this.state.formData;
-        const { nftContractId, tokenId } = Paras.getInfoFromlistingUrl(listingUrl) ?? {
+        const { nftContractId, tokenId } = Paras.getInfoFromListingUrl(listingUrl) ?? {
             nftContractId: null,
             tokenId: null,
         };
@@ -153,12 +153,11 @@ export class BuyNft extends BaseTask<FormData, Props, State> {
 
     private async confidentlyLoadMarketData(): Promise<boolean> {
         const { listingUrl } = this.state.formData;
-        const { nftContractId, tokenId } = Paras.getInfoFromlistingUrl(listingUrl)!;
+        const { nftContractId, tokenId } = Paras.getInfoFromListingUrl(listingUrl)!;
         const [marketData, nft] = await Promise.all([
             Paras.getMarketData(nftContractId, tokenId),
             NonFungibleToken.init(nftContractId, tokenId),
         ]);
-        // console.log(marketData, nftContractId, tokenId);
         this.setState({ marketData, metadata: nft.token?.metadata ?? null });
         window.EDITOR.forceUpdate();
         return true;
