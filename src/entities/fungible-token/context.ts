@@ -5,7 +5,7 @@ export namespace FT {
     export interface Inputs {
         adapters: {
             dao: SputnikDAO;
-            multicall: Multicall;
+            multicallInstance: Multicall;
         };
     }
 }

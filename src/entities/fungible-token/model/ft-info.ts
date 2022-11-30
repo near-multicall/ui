@@ -11,13 +11,13 @@ type FTInfo = {
 
 export class FTInfoModel {
     private static readonly nonZeroBalancesFetchFx = async (
-        { dao, multicall }: FT.Inputs["adapters"],
+        { dao, multicallInstance }: FT.Inputs["adapters"],
         callback: (result: FTInfo) => void
     ) => {
         /* Get LikelyTokens list on DAO and its Multicall instance */
         const [daoLikelyTokensList, multicallLikelyTokensList] = await Promise.all([
             FungibleToken.getLikelyTokenContracts(dao.address),
-            FungibleToken.getLikelyTokenContracts(multicall.address),
+            FungibleToken.getLikelyTokenContracts(multicallInstance.address),
         ]);
 
         /* Merge and de-duplicate both token lists */
@@ -33,7 +33,7 @@ export class FTInfoModel {
                 .map(async (token) => {
                     const [daoRawBalance, multicallRawBalance] = await Promise.all([
                         token.ftBalanceOf(dao.address),
-                        token.ftBalanceOf(multicall.address),
+                        token.ftBalanceOf(multicallInstance.address),
                     ]);
 
                     return {

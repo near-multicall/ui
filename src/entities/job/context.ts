@@ -1,9 +1,9 @@
-import { type JobData, type Multicall } from "../../shared/lib/contracts/multicall";
+import { JobData, Multicall } from "../../shared/lib/contracts/multicall";
 
 export namespace Job {
     export interface Inputs {
         className?: string;
-        adapters: { multicall: Multicall };
+        adapters: { multicallInstance: Multicall };
     }
 
     export type Data = JobData;

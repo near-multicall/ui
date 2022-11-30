@@ -10,12 +10,12 @@ type NEARTokenDataFxResponse = {
 };
 
 const nearTokenDataFx = async (
-    { dao, multicall }: NEARToken.Inputs["adapters"],
+    { dao, multicallInstance }: NEARToken.Inputs["adapters"],
     callback: (result: NEARTokenDataFxResponse) => void
 ) => {
     const [daoAccInfo, multicallAccInfo] = await Promise.all([
         viewAccount(dao.address),
-        viewAccount(multicall.address),
+        viewAccount(multicallInstance.address),
     ]);
 
     const daoRawBalance = daoAccInfo.amount,

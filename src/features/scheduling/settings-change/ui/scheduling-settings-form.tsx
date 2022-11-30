@@ -8,9 +8,9 @@ import { IconLabel, NearIcon, NearLink, Table, Tile, Tooltip } from "../../../..
 import { ModuleContext, SchedulingSettingsChange } from "../context";
 
 export const SchedulingSettingsForm = ({
+    adapters: { multicallInstance },
     className,
     disabled,
-    multicallInstance,
     onEdit,
     resetTrigger,
 }: SchedulingSettingsChange.Inputs) => {

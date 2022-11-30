@@ -146,12 +146,12 @@ export class WalletComponent extends Component<Props, State> {
             }),
             Multicall.init(multicallAddress).catch((e) => new Multicall(multicallAddress)),
         ])
-            .then(([newDao, newMulticall]) => {
+            .then(([newDao, multicallInstance]) => {
                 if (!newDao?.ready) return;
 
                 this.setState({
                     currentDao: newDao,
-                    currentMulticall: newMulticall,
+                    currentMulticall: multicallInstance,
                 });
             })
             .finally(async () => {

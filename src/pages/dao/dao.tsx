@@ -30,13 +30,14 @@ interface State {
         addr: string;
     };
     dao: SputnikDAO;
-    multicall: Multicall;
+    multicallInstance: Multicall;
     loading: boolean;
     proposed: number;
     proposedInfo: ProposalOutput | null;
 }
 
 const _DaoPage = "DaoPage";
+
 export class DaoPage extends Component<Props, State> {
     static contextType = Ctx;
     declare context: ContextType<typeof Ctx>;
@@ -80,8 +81,7 @@ export class DaoPage extends Component<Props, State> {
             },
 
             dao: new SputnikDAO(addr),
-            multicall: new Multicall(this.toMulticallAddress(addr)),
-
+            multicallInstance: new Multicall(this.toMulticallAddress(addr)),
             loading: false,
             proposed: -1,
             proposedInfo: null,
@@ -160,7 +160,7 @@ export class DaoPage extends Component<Props, State> {
     onAddressesUpdated(e: CustomEvent<{ dao: string }>) {
         if (e.detail.dao !== this.state.formData.addr) {
             this.setState({
-                multicall: new Multicall(this.toMulticallAddress(e.detail.dao)),
+                multicallInstance: new Multicall(this.toMulticallAddress(e.detail.dao)),
             });
             this.formikSetValues?.({ addr: e.detail.dao });
         }
@@ -406,7 +406,7 @@ export class DaoPage extends Component<Props, State> {
                 if (!newDao.ready) {
                     this.setState({
                         dao: newDao,
-                        multicall: new Multicall(multicallAddress),
+                        multicallInstance: new Multicall(multicallAddress),
                         loading: false,
                     });
                     return;
@@ -416,7 +416,7 @@ export class DaoPage extends Component<Props, State> {
                         .then((proposalData) =>
                             this.setState({
                                 dao: newDao,
-                                multicall: new Multicall(multicallAddress),
+                                multicallInstance: new Multicall(multicallAddress),
                                 loading: false,
                                 proposed: proposalData?.proposal_id ?? -1,
                                 proposedInfo: (proposalData?.proposal_info as ProposalOutput) ?? null,
@@ -436,12 +436,12 @@ export class DaoPage extends Component<Props, State> {
         Promise.all([
             SputnikDAO.init(daoAddress).catch((e) => new SputnikDAO(daoAddress)),
             Multicall.init(multicallAddress).catch((e) => new Multicall(multicallAddress)),
-        ]).then(([newDao, newMulticall]) => {
+        ]).then(([newDao, multicallInstance]) => {
             // some error happened during DAO object init.
-            if (!newDao.ready || !newMulticall.ready) {
+            if (!newDao.ready || !multicallInstance.ready) {
                 this.setState({
                     dao: newDao,
-                    multicall: newMulticall,
+                    multicallInstance,
                     loading: false,
                 });
             } else {
@@ -450,7 +450,7 @@ export class DaoPage extends Component<Props, State> {
                     .then((proposalData) =>
                         this.setState({
                             dao: newDao,
-                            multicall: newMulticall,
+                            multicallInstance,
                             loading: false,
                             proposed: proposalData?.proposal_id ?? -1,
                             proposedInfo: (proposalData?.proposal_info as ProposalOutput) ?? null,
@@ -462,7 +462,7 @@ export class DaoPage extends Component<Props, State> {
 
     getContent() {
         const { selector: walletSelector } = this.context!;
-        const { dao, loading, multicall } = this.state;
+        const { dao, loading, multicallInstance } = this.state;
 
         // if user not logged in, remind them to sign in.
         // TODO: only require signIn when DAO has no multicall instance (to know if user can propose or vote on existing proposal to create multicall)
@@ -499,8 +499,8 @@ export class DaoPage extends Component<Props, State> {
         /*
          * Everything should be loaded
          */
-        if (!multicall.admins || !multicall.tokensWhitelist || !multicall.jobBond) {
-            console.error("multicall infos incomplete", multicall);
+        if (!multicallInstance.admins || !multicallInstance.tokensWhitelist || !multicallInstance.jobBond) {
+            console.error("multicall infos incomplete", multicallInstance);
             return <div className="DaoPage-content error">Unexpected error! Multicall might be outdated.</div>;
         }
 
@@ -512,9 +512,12 @@ export class DaoPage extends Component<Props, State> {
                     contentSpace: "DaoPage-tabs-contentSpace",
                 }}
                 items={[
-                    DaoSettingsTab.uiConnect({ className: `${_DaoPage}-content`, adapters: { dao, multicall } }),
-                    DaoFundsTab.uiConnect({ className: `${_DaoPage}-content`, adapters: { dao, multicall } }),
-                    DaoJobsTab.uiConnect({ className: `${_DaoPage}-content`, adapters: { multicall } }),
+                    DaoSettingsTab.uiConnect({
+                        className: `${_DaoPage}-content`,
+                        adapters: { dao, multicallInstance },
+                    }),
+                    DaoFundsTab.uiConnect({ className: `${_DaoPage}-content`, adapters: { dao, multicallInstance } }),
+                    DaoJobsTab.uiConnect({ className: `${_DaoPage}-content`, adapters: { multicallInstance } }),
                 ]}
             />
         );

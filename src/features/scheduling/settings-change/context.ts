@@ -10,7 +10,10 @@ export namespace SchedulingSettingsChange {
     export type FormState = Pick<MulticallSettingsDiff, MIModule.ParamKey>;
 
     export interface Inputs extends Omit<HTMLProps<HTMLDivElement>, "onChange">, Pick<MIModule.Inputs, "daoAddress"> {
-        multicallInstance: Multicall;
+        adapters: {
+            multicallInstance: Multicall;
+        };
+
         onEdit: (payload: FormState) => void;
         resetTrigger: { subscribe: (callback: EventListener) => () => void };
     }

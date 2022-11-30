@@ -99,39 +99,39 @@ class Multicall {
     // used to create and initialize a Multicall instance
     static async init(multicallAddress: AccountId): Promise<Multicall> {
         // verify address is a Multicall instance, fetch its info and mark it ready
-        const newMulticall = new Multicall(multicallAddress);
+        const multicallInstance = new Multicall(multicallAddress);
         const [isMulticall, admins, croncatManager, tokensWhitelist, jobBond] = await Promise.all([
             // on failure set isMulticall to false
             Multicall.isMulticall(multicallAddress).catch((err) => {
                 return false;
             }),
             // on failure set admins list to be empty
-            newMulticall.getAdmins().catch((err) => {
+            multicallInstance.getAdmins().catch((err) => {
                 return [];
             }),
             //on failure set manager list to be empty
-            newMulticall.getCroncatManager().catch((err) => {
+            multicallInstance.getCroncatManager().catch((err) => {
                 return "";
             }),
             // on failure set tokens whitelist to be empty
-            newMulticall.getWhitelistedTokens().catch((err) => {
+            multicallInstance.getWhitelistedTokens().catch((err) => {
                 return [];
             }),
             // on failure set job bond to ""
-            newMulticall.getJobBond().catch((err) => {
+            multicallInstance.getJobBond().catch((err) => {
                 return "";
             }),
         ]);
 
-        newMulticall.admins = admins;
-        newMulticall.croncatManager = croncatManager;
-        newMulticall.tokensWhitelist = tokensWhitelist;
-        newMulticall.jobBond = jobBond;
+        multicallInstance.admins = admins;
+        multicallInstance.croncatManager = croncatManager;
+        multicallInstance.tokensWhitelist = tokensWhitelist;
+        multicallInstance.jobBond = jobBond;
         // set ready to true if address is a Multicall instance and it has at least 1 admin.
-        if (isMulticall === true && newMulticall.admins.length >= 1) {
-            newMulticall.ready = true;
+        if (isMulticall === true && multicallInstance.admins.length >= 1) {
+            multicallInstance.ready = true;
         }
-        return newMulticall;
+        return multicallInstance;
     }
 
     /**

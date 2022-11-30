@@ -1,8 +1,8 @@
 import clsx from "clsx";
 
 import { Scrollable, Table, Tile } from "../../../shared/ui/design";
-import { JobModel } from "../model/job";
-import { type Job } from "../context";
+import { JobModel } from "../model/job-model";
+import { Job } from "../context";
 
 import { jobAsTableRow } from "./job";
 import "./jobs-table.scss";

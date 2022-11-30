@@ -70,7 +70,7 @@ export const SettingsEditorUI = ({ className, adapters }: SettingsEditor.Inputs)
             void adapters.dao
                 .proposeFunctionCall(
                     proposalDescription,
-                    adapters.multicall.address,
+                    adapters.multicallInstance.address,
                     Multicall.configDiffToProposalActions(changesDiff)
                 )
                 .then((someTx) => signAndSendTxs([someTx]))
@@ -104,9 +104,8 @@ export const SettingsEditorUI = ({ className, adapters }: SettingsEditor.Inputs)
                 className={`${_SettingsEditor}-jobsSettings`}
                 daoAddress={adapters.dao.address}
                 disabled={!proposalCreationPermitted}
-                multicallInstance={adapters.multicall}
                 resetTrigger={childFormsResetRequested}
-                {...{ onEdit }}
+                {...{ adapters, onEdit }}
             />
 
             <SEProposalForm

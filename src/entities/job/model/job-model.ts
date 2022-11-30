@@ -12,11 +12,11 @@ type JobAllEntries = {
 
 export class JobModel {
     static allEntriesFetchFx = async (
-        { multicall }: Job.Inputs["adapters"],
+        { multicallInstance }: Job.Inputs["adapters"],
         callback: (result: JobAllEntries) => void
     ) =>
         callback(
-            await multicall
+            await multicallInstance
                 .getJobs()
                 .then((data) => ({
                     data: data.reduce(

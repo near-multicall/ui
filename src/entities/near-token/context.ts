@@ -5,7 +5,7 @@ export namespace NEARToken {
     export interface Inputs {
         adapters: {
             dao: SputnikDAO;
-            multicall: Multicall;
+            multicallInstance: Multicall;
         };
     }
 }
