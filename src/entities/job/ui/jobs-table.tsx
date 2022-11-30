@@ -12,13 +12,14 @@ interface JobsTableProps extends Job.Inputs {}
 const _JobsTable = "JobsTable";
 
 export const JobsTable = ({ className, adapters }: JobsTableProps) => {
-    const { data, error, loading } = JobModel.useAllEntries(adapters);
+    const { data, error, loading } = JobModel.useAllEntries(adapters),
+        items = Object.values(data ?? {});
 
     return (
         <Tile
             classes={{ root: clsx(_JobsTable, className) }}
             heading="All jobs"
-            noData={data !== null && Object.values(data).length === 0}
+            noData={data !== null && items.length === 0}
             {...{ error, loading }}
         >
             <Scrollable>
@@ -27,9 +28,7 @@ export const JobsTable = ({ className, adapters }: JobsTableProps) => {
                     className={`${_JobsTable}-body`}
                     displayMode="compact"
                     header={["Status", "ID", "Start at", "Croncat hash", "Creator", "Trigger gas", "Multicalls"]}
-                    rows={Object.values(data ?? {})
-                        .map(jobAsTableRow)
-                        .reverse()}
+                    rows={items.map(jobAsTableRow).reverse()}
                 />
             </Scrollable>
         </Tile>
