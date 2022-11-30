@@ -71,16 +71,16 @@ export const SchedulingSettingsForm = ({
             headerSlots={{
                 end: editModeEnabled ? (
                     <>
-                        <Tooltip content="Preview">
-                            <IconButton onClick={() => void editModeSwitch(false)}>
-                                <VisibilityOutlined />
+                        <Tooltip content="Cancel & Reset">
+                            <IconButton onClick={formReset}>
+                                <CancelOutlined />
                             </IconButton>
                         </Tooltip>
 
                         {(croncatManager.length > 0 || jobBond.length > 0) && (
-                            <Tooltip content="Cancel & Reset">
-                                <IconButton onClick={formReset}>
-                                    <CancelOutlined />
+                            <Tooltip content="Preview">
+                                <IconButton onClick={() => void editModeSwitch(false)}>
+                                    <VisibilityOutlined />
                                 </IconButton>
                             </Tooltip>
                         )}
