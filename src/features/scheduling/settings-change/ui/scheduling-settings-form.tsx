@@ -35,8 +35,6 @@ export const SchedulingSettingsForm = ({
         ),
     };
 
-    console.table(croncatManager);
-
     const onCroncatManagerChange = useCallback<Required<TextFieldProps>["onChange"]>(
         ({ target: { value } }) =>
             void croncatManagerUpdate(
