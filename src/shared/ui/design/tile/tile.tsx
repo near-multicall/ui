@@ -34,11 +34,13 @@ export const Tile = ({
     subheader,
 }: TileProps) => (
     <div className={clsx(_Tile, `${_Tile}--${order}`, classes?.root)}>
-        <span className={clsx(`${_Tile}-header`, classes?.header)}>
-            {headerSlots?.start && <span className={`${_Tile}-header-slot--start`}>{headerSlots?.start}</span>}
-            {heading && <h1 className={`${_Tile}-header-text`}>{heading}</h1>}
-            {headerSlots?.end && <span className={`${_Tile}-header-slot--end`}>{headerSlots?.end}</span>}
-        </span>
+        {(headerSlots?.start ?? heading ?? headerSlots?.end ?? null) !== null && (
+            <span className={clsx(`${_Tile}-header`, classes?.header)}>
+                {headerSlots?.start && <span className={`${_Tile}-header-slot--start`}>{headerSlots?.start}</span>}
+                {heading && <h1 className={`${_Tile}-header-text`}>{heading}</h1>}
+                {headerSlots?.end && <span className={`${_Tile}-header-slot--end`}>{headerSlots?.end}</span>}
+            </span>
+        )}
 
         {subheader && <div className={clsx(`${_Tile}-subheader`, classes?.subheader)}>{subheader}</div>}
 
