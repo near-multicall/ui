@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { TextInput, Tooltip } from "../../../../shared/ui/design";
 import { ArgsString } from "../../../../shared/lib/args-old";
 import { MI } from "../../../../entities";
-import { ModuleContext, TokenWhitelistChange } from "../context";
+import { ModuleContext, TokenWhitelistChange } from "../module-context";
 
 export const TokenWhitelistForm = ({
     className,

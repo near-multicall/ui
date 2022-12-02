@@ -1,4 +1,4 @@
-import { ModuleContext, Job as JobModule } from "./context";
+import { ModuleContext, Job as JobModule } from "./module-context";
 import { JobsTable } from "./ui/jobs-table";
 
 export { type JobModule };

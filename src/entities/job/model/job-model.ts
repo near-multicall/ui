@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { Job } from "../context";
+import { Job } from "../module-context";
 import { JobNormalized } from "../lib/job-normalized";
 
 type JobAllEntries = {

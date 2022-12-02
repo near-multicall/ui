@@ -2,7 +2,7 @@ import clsx from "clsx";
 
 import { Tile, Scrollable, Table } from "../../../shared/ui/design";
 import { FT, NEARToken } from "../../../entities";
-import { type TokenBalances } from "../context";
+import { type TokenBalances } from "../module-context";
 
 import "./token-balances.scss";
 

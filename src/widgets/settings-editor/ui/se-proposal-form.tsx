@@ -4,7 +4,7 @@ import { FormEventHandler, HTMLProps } from "react";
 import { ArgsString } from "../../../shared/lib/args-old";
 import { toNEAR } from "../../../shared/lib/converter";
 import { Button, ButtonGroup, NearIcon, TextInput, Tile } from "../../../shared/ui/design";
-import { ModuleContext, SettingsEditor } from "../context";
+import { ModuleContext, SettingsEditor } from "../module-context";
 
 import "./se-proposal-form.scss";
 

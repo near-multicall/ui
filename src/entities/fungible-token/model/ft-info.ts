@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import { Big } from "../../../shared/lib/converter";
 import { FungibleToken } from "../../../shared/lib/standards/fungibleToken";
-import { FT } from "../context";
+import { FT } from "../module-context";
 
 type FTInfo = {
     data: { metadata: FungibleToken["metadata"]; dao: string; multicall: string; total: string }[] | null;

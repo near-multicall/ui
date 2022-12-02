@@ -1,4 +1,4 @@
-export { type DesignContext } from "./context";
+export { type DesignContext } from "./module-context";
 
 /** Atoms */
 export { Button } from "./button";

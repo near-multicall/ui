@@ -1,7 +1,7 @@
 import { IconLabel, NearIcon } from "../../../shared/ui/design";
 
 import { NEARTokenBalancesModel } from "../model/near-balances";
-import { type NEARToken } from "../context";
+import { type NEARToken } from "../module-context";
 
 interface NTBalancesRenderProps extends NEARToken.Inputs {}
 

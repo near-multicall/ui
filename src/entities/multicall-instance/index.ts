@@ -1,4 +1,4 @@
-import { MI as MIModule, ModuleContext } from "./context";
+import { MI as MIModule, ModuleContext } from "./module-context";
 import { MIAdminsTable } from "./ui/mi-admins";
 import { MITokenWhitelistTable } from "./ui/mi-token-whitelist";
 

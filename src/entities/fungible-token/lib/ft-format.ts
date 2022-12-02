@@ -1,6 +1,6 @@
 import { Big, formatTokenAmount } from "../../../shared/lib/converter";
 
-import { ModuleContext } from "../context";
+import { ModuleContext } from "../module-context";
 
 const amountToDisplayAmount = (amount: string, decimals: number): string => {
     const formattedAmount = formatTokenAmount(amount, decimals),

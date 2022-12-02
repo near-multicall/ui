@@ -6,7 +6,7 @@ import { ArgsError, ArgsString } from "../../../shared/lib/args-old";
 import { STORAGE } from "../../../shared/lib/persistent";
 import { Validation } from "../../../shared/lib/validation";
 import { Dialog, TextInput, Tooltip } from "../../../shared/ui/design";
-import { ModuleContext } from "../context";
+import { ModuleContext } from "../module-context";
 import { ELDialogsModel } from "../model/el-dialogs";
 
 import "./el-dialog.scss";

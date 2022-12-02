@@ -1,4 +1,4 @@
-import { ModuleContext, type TokenWhitelistChange as TokenWhitelistChangeModule } from "./context";
+import { ModuleContext, type TokenWhitelistChange as TokenWhitelistChangeModule } from "./module-context";
 import { TokenWhitelistForm } from "./ui/tokens-whitelist-form";
 
 export class TokenWhitelistChange extends ModuleContext {

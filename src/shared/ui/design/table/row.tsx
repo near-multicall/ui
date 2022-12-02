@@ -1,7 +1,7 @@
 import { Checkbox, TableCell, TableRow as MuiTableRow } from "@mui/material";
 import clsx from "clsx";
 import { ChangeEvent, useCallback } from "react";
-import { DesignContext } from "../context";
+import { DesignContext } from "../module-context";
 
 import "./row.scss";
 

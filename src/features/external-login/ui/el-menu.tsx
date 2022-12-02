@@ -2,7 +2,7 @@ import { PreviewOutlined } from "@mui/icons-material";
 import { ComponentProps } from "react";
 
 import { PopupMenu } from "../../../shared/ui/design";
-import { ModuleContext as ModuleContext } from "../context";
+import { ModuleContext as ModuleContext } from "../module-context";
 import { ELDialogsModel } from "../model/el-dialogs";
 
 interface ELMenuProps extends Pick<ComponentProps<typeof PopupMenu>, "triggerClassName"> {

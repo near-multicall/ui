@@ -2,7 +2,7 @@ import clsx from "clsx";
 import { MouseEvent, useCallback, useState, type ComponentProps } from "react";
 import { ObjectInspector } from "react-inspector";
 
-import { ModuleContext as ModuleContext } from "./context";
+import { ModuleContext as ModuleContext } from "./module-context";
 import { DataInspectorNode } from "./data-inspector-node";
 import "./data-inspector.scss";
 

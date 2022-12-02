@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import { Big, formatTokenAmount } from "../../../shared/lib/converter";
 import { viewAccount } from "../../../shared/lib/wallet";
-import { ModuleContext, type NEARToken } from "../context";
+import { ModuleContext, type NEARToken } from "../module-context";
 
 type NEARTokenDataFxResponse = {
     data: { dao: string; multicall: string; total: string } | null;

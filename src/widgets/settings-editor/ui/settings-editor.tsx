@@ -6,7 +6,7 @@ import { SchedulingSettingsChange, TokenWhitelistChange } from "../../../feature
 import { ArgsString } from "../../../shared/lib/args-old";
 import { Multicall } from "../../../shared/lib/contracts/multicall";
 import { signAndSendTxs } from "../../../shared/lib/wallet";
-import { ModuleContext, SettingsEditor } from "../context";
+import { ModuleContext, SettingsEditor } from "../module-context";
 
 import { SEProposalForm } from "./se-proposal-form";
 import "./settings-editor.scss";

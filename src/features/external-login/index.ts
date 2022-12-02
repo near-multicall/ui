@@ -1,4 +1,4 @@
-import { ModuleContext } from "./context";
+import { ModuleContext } from "./module-context";
 import { ELDialogs } from "./ui/el-dialogs";
 import { ELMenu } from "./ui/el-menu";
 

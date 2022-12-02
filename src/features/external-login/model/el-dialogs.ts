@@ -4,7 +4,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-import { ModuleContext } from "../context";
+import { ModuleContext } from "../module-context";
 
 const _dialogOpenRequested = "dialogOpenRequested";
 

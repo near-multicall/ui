@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { ArgsString } from "../../../../shared/lib/args-old";
 import { toNEAR, toYocto } from "../../../../shared/lib/converter";
 import { IconLabel, NearIcon, NearLink, Table, Tile, Tooltip } from "../../../../shared/ui/design";
-import { ModuleContext, SchedulingSettingsChange } from "../context";
+import { ModuleContext, SchedulingSettingsChange } from "../module-context";
 
 export const SchedulingSettingsForm = ({
     adapters: { multicallInstance },

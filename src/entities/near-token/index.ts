@@ -1,4 +1,4 @@
-import { ModuleContext, type NEARToken as NEARTokenModule } from "./context";
+import { ModuleContext, type NEARToken as NEARTokenModule } from "./module-context";
 import { ntBalancesRender } from "./ui/nt-balances";
 
 export { type NEARTokenModule };

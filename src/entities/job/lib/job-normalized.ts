@@ -1,7 +1,7 @@
 import { Base64 } from "js-base64";
 
 import { Big } from "../../../shared/lib/converter";
-import { ModuleContext, Job } from "../context";
+import { ModuleContext, Job } from "../module-context";
 
 /**
  * Job status is:
