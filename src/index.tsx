@@ -1,9 +1,10 @@
 import "@near-wallet-selector/modal-ui/styles.css";
+import { lazy, Suspense } from "react";
 import ReactDOM from "react-dom";
 import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 
-import { AppPage } from "./pages/app";
-import { DaoPage } from "./pages/dao/dao";
+const AppPage = lazy(() => import("./pages/app"));
+const DaoPage = lazy(() => import("./pages/dao"));
 import { Wallet } from "./entities";
 import { DialogsLayer, Sidebar } from "./widgets";
 import "./shared/lib/persistent";
@@ -27,7 +28,9 @@ ReactDOM.render(
                     element={
                         <>
                             <Sidebar full={true} />
-                            <AppPage />
+                            <Suspense fallback={<div>Loading...</div>}>
+                                <AppPage />
+                            </Suspense>
                             <DialogsLayer />
                         </>
                     }
@@ -38,7 +41,9 @@ ReactDOM.render(
                     element={
                         <>
                             <Sidebar full={true} />
-                            <DaoPage />
+                            <Suspense fallback={<div>Loading...</div>}>
+                                <DaoPage />
+                            </Suspense>
                             <DialogsLayer />
                         </>
                     }
