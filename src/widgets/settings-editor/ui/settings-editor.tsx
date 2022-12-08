@@ -87,10 +87,12 @@ export const SettingsEditorUI = ({ className, adapters }: SettingsEditor.Inputs)
 
     return (
         <div className={clsx(_SettingsEditor, className)}>
-            <MI.AdminsTable
-                className={`${_SettingsEditor}-admins`}
-                daoAddress={adapters.dao.address}
-            />
+            {/*
+              <MI.AdminsTable
+                  className={`${_SettingsEditor}-admins`}
+                  daoAddress={adapters.dao.address}
+              />
+            */}
 
             <TokenWhitelistChange.Form
                 className={`${_SettingsEditor}-tokenWhitelist`}
