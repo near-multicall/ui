@@ -9,18 +9,6 @@
     height: 100%;
 
     grid-template-areas:
-        "tokenWhitelist jobsSettings"
-        "tokenWhitelist SEProposalForm";
-
-    &-admins {
-        grid-area: admins;
-    }
-
-    &-jobsSettings {
-        grid-area: jobsSettings;
-    }
-
-    &-tokenWhitelist {
-        grid-area: tokenWhitelist;
-    }
+        "TokenWhitelistChange SchedulingSettingsChange"
+        "TokenWhitelistChange SettingsProposalCreate";
 }

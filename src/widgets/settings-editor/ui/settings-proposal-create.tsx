@@ -6,11 +6,10 @@ import { toNEAR } from "../../../shared/lib/converter";
 import { Button, ButtonGroup, NearIcon, TextInput, Tile } from "../../../shared/ui/design";
 import { ModuleContext, SettingsEditor } from "../module-context";
 
-import "./se-proposal-form.scss";
+import "./settings-proposal-create.scss";
 
-export interface SEProposalFormProps extends HTMLProps<HTMLDivElement> {
+export interface SettingsProposalCreateProps extends HTMLProps<HTMLDivElement> {
     changesDiff: SettingsEditor.Diff;
-    classNameRoot: Required<HTMLProps<HTMLDivElement>>["className"];
     description: SettingsEditor.ProposalDescription;
     formValues: { proposalDescription: ArgsString };
     editMode: boolean;
@@ -19,10 +18,11 @@ export interface SEProposalFormProps extends HTMLProps<HTMLDivElement> {
     onSubmit: FormEventHandler;
 }
 
-export const SEProposalForm = ({
+const _SettingsProposalCreate = "SettingsProposalCreate";
+
+export const SettingsProposalCreate = ({
     changesDiff,
     className,
-    classNameRoot,
     description,
     disabled,
     formValues,
@@ -30,41 +30,41 @@ export const SEProposalForm = ({
     onCancel,
     onDescriptionUpdate,
     onSubmit,
-}: SEProposalFormProps) => (
+}: SettingsProposalCreateProps) => (
     <Tile
         classes={{
-            content: clsx(`${classNameRoot}-proposalForm`, { "is-inEditMode": Boolean(editMode) }, className),
+            content: clsx(_SettingsProposalCreate, { "is-inEditMode": Boolean(editMode) }, className),
         }}
         heading={editMode ? "Summary" : null}
     >
-        <p className={`${classNameRoot}-proposalForm-hint`}>
+        <p className={`${_SettingsProposalCreate}-hint`}>
             {disabled
                 ? "Current account has no permission to propose changes"
                 : "Start editing to create config changes proposal template"}
         </p>
 
-        <div className={`${classNameRoot}-proposalForm-summary`}>
+        <div className={`${_SettingsProposalCreate}-summary`}>
             {Object.values(ModuleContext.DiffKey).map(
                 (DiffKey) =>
                     changesDiff[DiffKey].length > 0 && (
                         <div
-                            className={`${classNameRoot}-proposalForm-summary-entry`}
+                            className={`${_SettingsProposalCreate}-summary-entry`}
                             key={DiffKey}
                         >
-                            <h3 className={`${classNameRoot}-proposalForm-summary-entry-description`}>
+                            <h3 className={`${_SettingsProposalCreate}-summary-entry-description`}>
                                 {ModuleContext.DiffMeta[DiffKey].description + ":"}
                             </h3>
 
-                            <ul className={`${classNameRoot}-proposalForm-summary-entry-data`}>
+                            <ul className={`${_SettingsProposalCreate}-summary-entry-data`}>
                                 {(Array.isArray(changesDiff[DiffKey])
                                     ? Array.from(changesDiff[DiffKey])
                                     : [changesDiff[DiffKey]]
                                 ).map((data) => (
                                     <li
                                         className={clsx(
-                                            `${classNameRoot}-proposalForm-summary-entry-data-chip`,
+                                            `${_SettingsProposalCreate}-summary-entry-data-chip`,
 
-                                            `${classNameRoot}-proposalForm-summary-entry-data-chip` +
+                                            `${_SettingsProposalCreate}-summary-entry-data-chip` +
                                                 "--" +
                                                 ModuleContext.DiffMeta[DiffKey].color
                                         )}
@@ -81,7 +81,7 @@ export const SEProposalForm = ({
             )}
         </div>
 
-        <form className={`${classNameRoot}-proposalForm-submit`}>
+        <form className={`${_SettingsProposalCreate}-submit`}>
             <div>
                 <TextInput
                     fullWidth

@@ -5,25 +5,23 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { ArgsString } from "../../../../shared/lib/args-old";
 import { toNEAR, toYocto } from "../../../../shared/lib/converter";
 import { IconLabel, NearIcon, NearLink, Table, Tile, Tooltip } from "../../../../shared/ui/design";
-import { ModuleContext, SchedulingSettingsChange } from "../module-context";
+import { ModuleContext, Feature } from "../module-context";
 
-export const SchedulingSettingsForm = ({
-    adapters: { multicallInstance },
-    className,
-    disabled,
-    onEdit,
-    resetTrigger,
-}: SchedulingSettingsChange.Inputs) => {
+import "./scheduling-settings-change.scss";
+
+const _SchedulingSettingsChange = "SchedulingSettingsChange";
+
+export const Form = ({ adapters: { multicallInstance }, disabled, onEdit, resetTrigger }: Feature.Inputs) => {
     const [editModeEnabled, editModeSwitch] = useState(false);
 
-    const formInitialState: SchedulingSettingsChange.FormState = {
+    const formInitialState: Feature.FormState = {
         [ModuleContext.DiffKey.croncatManager]: "",
         [ModuleContext.DiffKey.jobBond]: "",
     };
 
     const [[croncatManager, croncatManagerUpdate], [jobBond, jobBondUpdate]] = [
-        useState<SchedulingSettingsChange.FormState["croncatManager"]>(formInitialState.croncatManager),
-        useState<SchedulingSettingsChange.FormState["jobBond"]>(formInitialState.jobBond),
+        useState<Feature.FormState["croncatManager"]>(formInitialState.croncatManager),
+        useState<Feature.FormState["jobBond"]>(formInitialState.jobBond),
     ];
 
     const formFields = {
@@ -66,7 +64,7 @@ export const SchedulingSettingsForm = ({
 
     return (
         <Tile
-            classes={{ root: className }}
+            classes={{ root: _SchedulingSettingsChange }}
             heading="Scheduling"
             headerSlots={{
                 end: editModeEnabled ? (
@@ -102,8 +100,8 @@ export const SchedulingSettingsForm = ({
                     centeredTitle: true,
 
                     idToHighlightColor: (id) =>
-                        ({ croncatManager, jobBond }[id] === formInitialState[id as SchedulingSettingsChange.DiffKey] ||
-                        { croncatManager, jobBond }[id] === multicallInstance[id as SchedulingSettingsChange.DiffKey]
+                        ({ croncatManager, jobBond }[id] === formInitialState[id as Feature.DiffKey] ||
+                        { croncatManager, jobBond }[id] === multicallInstance[id as Feature.DiffKey]
                             ? null
                             : "blue"),
 
@@ -166,3 +164,5 @@ export const SchedulingSettingsForm = ({
         </Tile>
     );
 };
+
+Form.displayName = _SchedulingSettingsChange;

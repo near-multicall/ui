@@ -1,9 +1,9 @@
-import { MI as MIModule, ModuleContext } from "./module-context";
+import { Entity as MIEntity, ModuleContext } from "./module-context";
 import { MIAdminsTable } from "./ui/mi-admins";
 import { MISettingsProvider } from "./ui/mi-settings-provider";
 import { MITokenWhitelistTable } from "./ui/mi-token-whitelist";
 
-export { type MIModule };
+export { type MIEntity };
 
 /**
  * Multicall Instance entity

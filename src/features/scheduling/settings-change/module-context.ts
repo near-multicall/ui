@@ -1,15 +1,15 @@
 import { HTMLProps } from "react";
 
-import { MI, MIModule } from "../../../entities";
+import { MI, MIEntity } from "../../../entities";
 import { MulticallSettingsDiff, Multicall } from "../../../shared/lib/contracts/multicall";
 import { DesignContext } from "../../../shared/ui/design";
 
-export namespace SchedulingSettingsChange {
-    export type DiffKey = MIModule.ParamKey;
+export namespace Feature {
+    export type DiffKey = MIEntity.ParamKey;
 
-    export type FormState = Pick<MulticallSettingsDiff, MIModule.ParamKey>;
+    export type FormState = Pick<MulticallSettingsDiff, MIEntity.ParamKey>;
 
-    export interface Inputs extends Omit<HTMLProps<HTMLDivElement>, "onChange">, Pick<MIModule.Inputs, "daoAddress"> {
+    export interface Inputs extends Omit<HTMLProps<HTMLDivElement>, "onChange"> {
         adapters: {
             multicallInstance: Multicall;
         };

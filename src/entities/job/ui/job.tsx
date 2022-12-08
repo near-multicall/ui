@@ -2,13 +2,13 @@ import { NavLink } from "react-router-dom";
 
 import { Big, toTGas } from "../../../shared/lib/converter";
 import { DataInspector, IconLabel } from "../../../shared/ui/design";
-import { ModuleContext, Job } from "../module-context";
+import { ModuleContext, Entity } from "../module-context";
 
 import "./job.scss";
 
 const _Job = "Job";
 
-const JobDisplayStatus = ({ job }: Pick<Job.DataWithStatus, "job">) => {
+const JobDisplayStatus = ({ job }: Pick<Entity.DataWithStatus, "job">) => {
     const statusTextByStatus = {
         ...ModuleContext.Status,
         [ModuleContext.Status.Running]: `${ModuleContext.Status.Running}: ${job.run_count + 1}/${
@@ -24,7 +24,7 @@ const JobDisplayStatus = ({ job }: Pick<Job.DataWithStatus, "job">) => {
     );
 };
 
-export const jobAsTableRow = ({ id, job }: Job.DataWithStatus) => ({
+export const jobAsTableRow = ({ id, job }: Entity.DataWithStatus) => ({
     content: [
         <JobDisplayStatus {...{ job }} />,
         id,

@@ -1,13 +1,12 @@
 import { HTMLProps } from "react";
 
-import { MulticallTokenWhitelistDiffKey, type MulticallSettingsDiff } from "../../../shared/lib/contracts/multicall";
-import { MIModule } from "../../../entities";
+import { MulticallTokenWhitelistDiffKey, MulticallSettingsDiff } from "../../../shared/lib/contracts/multicall";
 import { DesignContext } from "../../../shared/ui/design";
 
-export namespace TokenWhitelistChange {
+export namespace Feature {
     export type DiffKey = MulticallTokenWhitelistDiffKey;
 
-    export interface Inputs extends Omit<HTMLProps<HTMLDivElement>, "onChange">, MIModule.Inputs {
+    export interface Inputs extends Omit<HTMLProps<HTMLDivElement>, "onChange"> {
         onEdit: (payload: Pick<MulticallSettingsDiff, DiffKey>) => void;
         resetTrigger: { subscribe: (callback: EventListener) => () => void };
     }

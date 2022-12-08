@@ -5,7 +5,7 @@ import { toYocto } from "../../shared/lib/converter";
 /**
  * Type declaration for Multicall Instance entity
  */
-export namespace MI {
+export namespace Entity {
     export interface Inputs {
         daoAddress: SputnikDAO["address"];
     }

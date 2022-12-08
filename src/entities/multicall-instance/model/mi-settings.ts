@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 
 import { ArgsAccount } from "../../../shared/lib/args-old";
 import { Multicall } from "../../../shared/lib/contracts/multicall";
-import { MI } from "../module-context";
+import { Entity } from "../module-context";
 
 export class MISettingsModel {
     public static readonly data: {
@@ -23,7 +23,7 @@ export class MISettingsModel {
      * @param callback Stateful data fetch callback
      */
     private static readonly dataFetchFx = async (
-        daoAddress: MI.Inputs["daoAddress"],
+        daoAddress: Entity.Inputs["daoAddress"],
         callback: (result: typeof MISettingsModel.data) => void
     ) =>
         callback(
@@ -39,7 +39,7 @@ export class MISettingsModel {
     /**
      * For context provider usage only.
      */
-    public static readonly useData = (daoAddress: MI.Inputs["daoAddress"]) => {
+    public static readonly useData = (daoAddress: Entity.Inputs["daoAddress"]) => {
         const [state, stateUpdate] = useState<typeof MISettingsModel.data>(MISettingsModel.data);
 
         useEffect(() => void MISettingsModel.dataFetchFx(daoAddress, stateUpdate), [daoAddress, stateUpdate]);

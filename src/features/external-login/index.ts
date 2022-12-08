@@ -1,8 +1,8 @@
 import { ModuleContext } from "./module-context";
-import { ELDialogs } from "./ui/el-dialogs";
-import { ELMenu } from "./ui/el-menu";
+import { Dialogs } from "./ui/external-login-dialogs";
+import { Menu } from "./ui/external-login-menu";
 
 export class ExternalLogin extends ModuleContext {
-    static Dialogs = ELDialogs;
-    static Menu = ELMenu;
+    static Dialogs = Dialogs;
+    static Menu = Menu;
 }

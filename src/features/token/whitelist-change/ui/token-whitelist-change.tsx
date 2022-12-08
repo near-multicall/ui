@@ -5,19 +5,17 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { TextInput, Tooltip } from "../../../../shared/ui/design";
 import { ArgsString } from "../../../../shared/lib/args-old";
 import { MI } from "../../../../entities";
-import { ModuleContext, TokenWhitelistChange } from "../module-context";
+import { ModuleContext, Feature } from "../module-context";
 
-export const TokenWhitelistForm = ({
-    className,
-    daoAddress,
-    disabled,
-    onEdit,
-    resetTrigger,
-}: TokenWhitelistChange.Inputs) => {
+import "./token-whitelist-change.scss";
+
+const _TokenWhitelistChange = "TokenWhitelistChange";
+
+export const Form = ({ disabled, onEdit, resetTrigger }: Feature.Inputs) => {
     const [editModeEnabled, editModeSwitch] = useState(false);
 
-    const [addTokens, markForAddition] = useState<TokenWhitelistChange.FormStates["addTokens"]>(new Set()),
-        [removeTokens, markForRemoval] = useState<TokenWhitelistChange.FormStates["removeTokens"]>(new Set());
+    const [addTokens, markForAddition] = useState<Feature.FormStates["addTokens"]>(new Set()),
+        [removeTokens, markForRemoval] = useState<Feature.FormStates["removeTokens"]>(new Set());
 
     const tokenToAddAddress = useMemo(() => new ArgsString(""), []);
 
@@ -89,6 +87,7 @@ export const TokenWhitelistForm = ({
                         void null,
                 },
             }}
+            className={_TokenWhitelistChange}
             headerSlots={{
                 end: editModeEnabled ? (
                     <Tooltip content="Cancel & Reset">
@@ -124,7 +123,8 @@ export const TokenWhitelistForm = ({
                     void null
                 )
             }
-            {...{ className, daoAddress }}
         />
     );
 };
+
+Form.displayName = _TokenWhitelistChange;

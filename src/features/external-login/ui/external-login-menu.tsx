@@ -2,24 +2,28 @@ import { PreviewOutlined } from "@mui/icons-material";
 import { ComponentProps } from "react";
 
 import { PopupMenu } from "../../../shared/ui/design";
-import { ModuleContext as ModuleContext } from "../module-context";
-import { ELDialogsModel } from "../model/el-dialogs";
+import { ModuleContext } from "../module-context";
+import { ExternalLoginDialogsModel } from "../model/external-login-dialogs";
 
-interface ELMenuProps extends Pick<ComponentProps<typeof PopupMenu>, "triggerClassName"> {
+interface MenuProps extends Pick<ComponentProps<typeof PopupMenu>, "triggerClassName"> {
     FeatureFlags: {
         ExternalLogin: Record<keyof typeof ModuleContext.METHODS, boolean>;
     };
 }
 
-export const ELMenu = ({ FeatureFlags, triggerClassName }: ELMenuProps) => (
+const _ExternalLoginMenu = "ExternalLoginMenu";
+
+export const Menu = ({ FeatureFlags, triggerClassName }: MenuProps) => (
     <PopupMenu
         icon={<PreviewOutlined />}
         items={Object.values(ModuleContext.METHODS).map(({ title, type }) => ({
             disabled: !FeatureFlags.ExternalLogin[type],
             key: type,
-            onClick: () => ELDialogsModel.dialogOpenRequested(type),
+            onClick: () => ExternalLoginDialogsModel.dialogOpenRequested(type),
             title,
         }))}
         {...{ triggerClassName }}
     />
 );
+
+Menu.displayName = _ExternalLoginMenu;

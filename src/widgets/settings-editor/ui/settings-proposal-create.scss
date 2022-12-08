@@ -2,8 +2,8 @@
 @use "sass/mixin";
 @use "sass/size";
 
-.SettingsEditor-proposalForm {
-    grid-area: SEProposalForm;
+.SettingsProposalCreate {
+    grid-area: SettingsProposalCreate;
     gap: size.$gap * 0.4;
 
     &-hint {

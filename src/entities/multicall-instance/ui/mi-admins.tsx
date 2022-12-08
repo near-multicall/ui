@@ -1,10 +1,9 @@
 import { Scrollable, Table, Tile } from "../../../shared/ui/design";
 import { MISettingsModel } from "../model/mi-settings";
-import { MI } from "../module-context";
 
 import { miAdminAsTableRow, MIAdminProps } from "./mi-admin";
 
-interface MIAdminsTableProps extends MI.Inputs {
+interface MIAdminsTableProps {
     className?: string;
     itemsAdditional?: MIAdminProps["address"][];
 }

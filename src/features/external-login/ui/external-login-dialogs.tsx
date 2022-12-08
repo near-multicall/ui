@@ -7,9 +7,9 @@ import { STORAGE } from "../../../shared/lib/persistent";
 import { Validation } from "../../../shared/lib/validation";
 import { Dialog, TextInput, Tooltip } from "../../../shared/ui/design";
 import { ModuleContext } from "../module-context";
-import { ELDialogsModel } from "../model/el-dialogs";
+import { ExternalLoginDialogsModel } from "../model/external-login-dialogs";
 
-import "./el-dialog.scss";
+import "./external-login-dialog.scss";
 
 interface ExternalLoginDialogProps
     extends Pick<ComponentProps<typeof Dialog>, "className" | "onClose" | "open" | "title"> {
@@ -77,8 +77,8 @@ const ExternalLoginDialog = ({ className, method, onClose, open, title }: Extern
     );
 };
 
-export const ELDialogs = () => {
-    const { dialogsVisibility, closeHandlerBinding } = ELDialogsModel.useVisibilityState();
+export const Dialogs = () => {
+    const { dialogsVisibility, closeHandlerBinding } = ExternalLoginDialogsModel.useVisibilityState();
 
     return Object.values(ModuleContext.METHODS).map((loginMethod) => (
         <ExternalLoginDialog
@@ -90,3 +90,5 @@ export const ELDialogs = () => {
         />
     ));
 };
+
+Dialogs.displayName = `${_ExternalLoginDialog}s`;

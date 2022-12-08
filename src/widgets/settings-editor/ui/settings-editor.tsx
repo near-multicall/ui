@@ -8,7 +8,7 @@ import { Multicall } from "../../../shared/lib/contracts/multicall";
 import { signAndSendTxs } from "../../../shared/lib/wallet";
 import { ModuleContext, SettingsEditor } from "../module-context";
 
-import { SEProposalForm } from "./se-proposal-form";
+import { SettingsProposalCreate } from "./settings-proposal-create";
 import "./settings-editor.scss";
 
 const _SettingsEditor = "SettingsEditor";
@@ -88,31 +88,22 @@ export const SettingsEditorUI = ({ className, adapters }: SettingsEditor.Inputs)
     return (
         <MI.SettingsProvider daoAddress={adapters.dao.address}>
             <div className={clsx(_SettingsEditor, className)}>
-                {false && (
-                    <MI.AdminsTable
-                        className={`${_SettingsEditor}-admins`}
-                        daoAddress={adapters.dao.address}
-                    />
-                )}
+                {false && <MI.AdminsTable className={`${_SettingsEditor}-admins`} />}
 
                 <TokenWhitelistChange.Form
                     className={`${_SettingsEditor}-tokenWhitelist`}
-                    daoAddress={adapters.dao.address}
                     disabled={!proposalCreationPermitted}
                     resetTrigger={childFormsResetRequested}
                     {...{ onEdit }}
                 />
 
                 <SchedulingSettingsChange.Form
-                    className={`${_SettingsEditor}-jobsSettings`}
-                    daoAddress={adapters.dao.address}
                     disabled={!proposalCreationPermitted}
                     resetTrigger={childFormsResetRequested}
                     {...{ adapters, onEdit }}
                 />
 
-                <SEProposalForm
-                    classNameRoot={_SettingsEditor}
+                <SettingsProposalCreate
                     description={proposalDescription}
                     disabled={!proposalCreationPermitted}
                     onDescriptionUpdate={proposalDescriptionUpdate}

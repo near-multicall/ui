@@ -1,10 +1,9 @@
 import { Scrollable, Table, type TableProps, Tile, TileProps } from "../../../shared/ui/design";
 import { MISettingsModel } from "../model/mi-settings";
-import { MI } from "../module-context";
 
 import { MIWhitelistedTokenProps, miWhitelistedTokenAsTableRow } from "./mi-whitelisted-token";
 
-interface MITokenWhitelistTableProps extends MI.Inputs, Pick<TileProps, "footer" | "headerSlots" | "subheader"> {
+interface MITokenWhitelistTableProps extends Pick<TileProps, "footer" | "headerSlots" | "subheader"> {
     ItemProps?: TableProps["RowProps"];
     className?: string;
     itemsAdditional?: MIWhitelistedTokenProps["address"][];
@@ -14,7 +13,6 @@ interface MITokenWhitelistTableProps extends MI.Inputs, Pick<TileProps, "footer"
 export const MITokenWhitelistTable = ({
     ItemProps,
     className,
-    daoAddress,
     footer,
     headerSlots,
     itemsAdditional,

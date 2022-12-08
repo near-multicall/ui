@@ -1,7 +1,7 @@
 import { Base64 } from "js-base64";
 
 import { Big } from "../../../shared/lib/converter";
-import { ModuleContext, Job } from "../module-context";
+import { ModuleContext, Entity } from "../module-context";
 
 /**
  * Job status is:
@@ -10,7 +10,7 @@ import { ModuleContext, Job } from "../module-context";
  * - Expired: job not active, and execution moment is in the past.
  * - Inactive: job not active, but execution moment in the future.
  */
-const jobToStatus = ({ job }: Job.Data): Job.Status => {
+const jobToStatus = ({ job }: Entity.Data): Entity.Status => {
     if (job.is_active) {
         if (job.run_count > -1) return ModuleContext.Status.Running;
         else return ModuleContext.Status.Active;
@@ -29,7 +29,7 @@ const jobToStatus = ({ job }: Job.Data): Job.Status => {
  *
  * @returns Updated job data structure.
  */
-const jobToJobWithMulticallsDataDecoded = ({ id, job }: Job.Data): Job.Data => ({
+const jobToJobWithMulticallsDataDecoded = ({ id, job }: Entity.Data): Entity.Data => ({
     id,
 
     job: {
@@ -61,7 +61,7 @@ const jobToJobWithMulticallsDataDecoded = ({ id, job }: Job.Data): Job.Data => (
  *
  * @returns Extended job data structure.
  */
-const jobToJobWithStatus = (job: Job.Data): Job.DataWithStatus => ({
+const jobToJobWithStatus = (job: Entity.Data): Entity.DataWithStatus => ({
     ...job,
     job: { ...job.job, status: ModuleContext.Status[jobToStatus(job)] },
 });

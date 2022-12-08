@@ -19,7 +19,7 @@ const dialogOpenRequested = {
     },
 };
 
-export class ELDialogsModel {
+export class ExternalLoginDialogsModel {
     static dialogOpenRequested = dialogOpenRequested.dispatch;
 
     static useVisibilityState = () => {
