@@ -1,18 +1,18 @@
 import clsx from "clsx";
 
 import { Scrollable, Table, Tile } from "../../../shared/ui/design";
-import { JobModel } from "../model/job-model";
-import { Job } from "../module-context";
+import { JobInfoModel } from "../model/job-info";
+import { Entity } from "../module-context";
 
 import { jobAsTableRow } from "./job";
 import "./jobs-table.scss";
 
-interface JobsTableProps extends Job.Inputs {}
+interface JobsTableProps extends Entity.Inputs {}
 
 const _JobsTable = "JobsTable";
 
 export const JobsTable = ({ className, adapters }: JobsTableProps) => {
-    const { data, error, loading } = JobModel.useAllEntries(adapters),
+    const { data, error, loading } = JobInfoModel.useAllEntries(adapters),
         items = Object.values(data ?? {});
 
     return (
