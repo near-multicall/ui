@@ -1,5 +1,5 @@
 import "@near-wallet-selector/modal-ui/styles.css";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import { AppPage } from "./pages/app";
@@ -8,7 +8,11 @@ import { Wallet } from "./entities";
 import { DialogsLayer, Sidebar } from "./widgets";
 import "./shared/lib/persistent";
 
-ReactDOM.render(
+const appMountPoint = document.querySelector("#root") ?? document.createElement("div");
+
+appMountPoint.setAttribute("id", "root");
+
+createRoot(appMountPoint).render(
     <Wallet.SelectorContextProvider>
         <HashRouter>
             <Routes>
@@ -45,7 +49,5 @@ ReactDOM.render(
                 />
             </Routes>
         </HashRouter>
-    </Wallet.SelectorContextProvider>,
-
-    document.querySelector("#root")
+    </Wallet.SelectorContextProvider>
 );
