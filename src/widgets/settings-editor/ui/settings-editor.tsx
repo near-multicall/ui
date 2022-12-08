@@ -86,37 +86,39 @@ export const SettingsEditorUI = ({ className, adapters }: SettingsEditor.Inputs)
     );
 
     return (
-        <div className={clsx(_SettingsEditor, className)}>
-            {/*
-              <MI.AdminsTable
-                  className={`${_SettingsEditor}-admins`}
-                  daoAddress={adapters.dao.address}
-              />
-            */}
+        <MI.SettingsProvider daoAddress={adapters.dao.address}>
+            <div className={clsx(_SettingsEditor, className)}>
+                {false && (
+                    <MI.AdminsTable
+                        className={`${_SettingsEditor}-admins`}
+                        daoAddress={adapters.dao.address}
+                    />
+                )}
 
-            <TokenWhitelistChange.Form
-                className={`${_SettingsEditor}-tokenWhitelist`}
-                daoAddress={adapters.dao.address}
-                disabled={!proposalCreationPermitted}
-                resetTrigger={childFormsResetRequested}
-                {...{ onEdit }}
-            />
+                <TokenWhitelistChange.Form
+                    className={`${_SettingsEditor}-tokenWhitelist`}
+                    daoAddress={adapters.dao.address}
+                    disabled={!proposalCreationPermitted}
+                    resetTrigger={childFormsResetRequested}
+                    {...{ onEdit }}
+                />
 
-            <SchedulingSettingsChange.Form
-                className={`${_SettingsEditor}-jobsSettings`}
-                daoAddress={adapters.dao.address}
-                disabled={!proposalCreationPermitted}
-                resetTrigger={childFormsResetRequested}
-                {...{ adapters, onEdit }}
-            />
+                <SchedulingSettingsChange.Form
+                    className={`${_SettingsEditor}-jobsSettings`}
+                    daoAddress={adapters.dao.address}
+                    disabled={!proposalCreationPermitted}
+                    resetTrigger={childFormsResetRequested}
+                    {...{ adapters, onEdit }}
+                />
 
-            <SEProposalForm
-                classNameRoot={_SettingsEditor}
-                description={proposalDescription}
-                disabled={!proposalCreationPermitted}
-                onDescriptionUpdate={proposalDescriptionUpdate}
-                {...{ changesDiff, editMode, formValues, onCancel, onSubmit }}
-            />
-        </div>
+                <SEProposalForm
+                    classNameRoot={_SettingsEditor}
+                    description={proposalDescription}
+                    disabled={!proposalCreationPermitted}
+                    onDescriptionUpdate={proposalDescriptionUpdate}
+                    {...{ changesDiff, editMode, formValues, onCancel, onSubmit }}
+                />
+            </div>
+        </MI.SettingsProvider>
     );
 };

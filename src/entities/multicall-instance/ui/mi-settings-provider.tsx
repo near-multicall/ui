@@ -1,8 +1,7 @@
 import { PropsWithChildren } from "react";
 
 import { MI } from "../module-context";
-
-import { MISettingsModel } from "./mi-settings";
+import { MISettingsModel } from "../model/mi-settings";
 
 interface MISettingsProviderProps extends PropsWithChildren, Pick<MI.Inputs, "daoAddress"> {}
 
