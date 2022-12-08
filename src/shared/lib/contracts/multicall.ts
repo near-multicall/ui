@@ -2,7 +2,7 @@ import { Big, toGas, dateToCron, toYocto } from "../converter";
 import { AccountId, Base64String, U128String, U64String } from "../types";
 import { viewAccount, viewState, view } from "../wallet";
 
-import type { FunctionCallAction as daoFunctionCallAction } from "./sputnik-dao";
+import { FunctionCallAction as daoFunctionCallAction } from "./sputnik-dao";
 
 const FACTORY_ADDRESS_SELECTOR: Record<string, AccountId> = {
     mainnet: "v1.multicall.near",
