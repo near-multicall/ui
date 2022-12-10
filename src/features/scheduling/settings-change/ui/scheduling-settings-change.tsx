@@ -2,6 +2,7 @@ import { CancelOutlined, EditOutlined, VisibilityOutlined } from "@mui/icons-mat
 import { IconButton, TextField, TextFieldProps } from "@mui/material";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { MI } from "../../../../entities";
 import { ArgsString } from "../../../../shared/lib/args-old";
 import { toNEAR, toYocto } from "../../../../shared/lib/converter";
 import { IconLabel, NearIcon, NearLink, Table, Tile, Tooltip } from "../../../../shared/ui/design";
@@ -11,7 +12,9 @@ import "./scheduling-settings-change.scss";
 
 const _SchedulingSettingsChange = "SchedulingSettingsChange";
 
-export const Form = ({ adapters: { multicallInstance }, disabled, onEdit, resetTrigger }: Feature.Inputs) => {
+export const Form = ({ disabled, onEdit, resetTrigger }: Feature.Inputs) => {
+    const { data: MISettings } = MI.useSettings();
+
     const [editModeEnabled, editModeSwitch] = useState(false);
 
     const formInitialState: Feature.FormState = {
@@ -25,33 +28,32 @@ export const Form = ({ adapters: { multicallInstance }, disabled, onEdit, resetT
     ];
 
     const formFields = {
-        croncatManager: useMemo(() => new ArgsString(multicallInstance.croncatManager), [multicallInstance]),
+        croncatManager: useMemo(() => new ArgsString(MISettings.croncatManager), [MISettings]),
 
         jobBond: useMemo(
-            () => new ArgsString(multicallInstance.jobBond !== "" ? toNEAR(multicallInstance.jobBond) : ""),
-            [multicallInstance]
+            () => new ArgsString(MISettings.jobBond !== "" ? toNEAR(MISettings.jobBond) : ""),
+
+            [MISettings]
         ),
     };
 
     const onCroncatManagerChange = useCallback<Required<TextFieldProps>["onChange"]>(
         ({ target: { value } }) =>
-            void croncatManagerUpdate(
-                value !== multicallInstance.croncatManager ? value : formInitialState.croncatManager
-            ),
+            void croncatManagerUpdate(value !== MISettings.croncatManager ? value : formInitialState.croncatManager),
 
         [croncatManagerUpdate]
     );
 
     const onJobBondChange = useCallback<Required<TextFieldProps>["onChange"]>(
         ({ target: { value } }) =>
-            void jobBondUpdate(value !== toNEAR(multicallInstance.jobBond) ? toYocto(value) : formInitialState.jobBond),
+            void jobBondUpdate(value !== toNEAR(MISettings.jobBond) ? toYocto(value) : formInitialState.jobBond),
 
         [jobBondUpdate]
     );
 
     const formReset = useCallback(() => {
-        formFields.croncatManager.value = multicallInstance.croncatManager;
-        formFields.jobBond.value = toNEAR(multicallInstance.jobBond);
+        formFields.croncatManager.value = MISettings.croncatManager;
+        formFields.jobBond.value = toNEAR(MISettings.jobBond);
 
         void croncatManagerUpdate(formInitialState.croncatManager);
         void jobBondUpdate(formInitialState.jobBond);
@@ -103,7 +105,7 @@ export const Form = ({ adapters: { multicallInstance }, disabled, onEdit, resetT
 
                     idToHighlightColor: (id) =>
                         ({ croncatManager, jobBond }[id] === formInitialState[id as Feature.DiffKey] ||
-                        { croncatManager, jobBond }[id] === multicallInstance[id as Feature.DiffKey]
+                        { croncatManager, jobBond }[id] === MISettings[id as Feature.DiffKey]
                             ? null
                             : "blue"),
 
@@ -124,10 +126,10 @@ export const Form = ({ adapters: { multicallInstance }, disabled, onEdit, resetT
                                 <TextField
                                     fullWidth
                                     onChange={onCroncatManagerChange}
-                                    value={croncatManager || multicallInstance.croncatManager}
+                                    value={croncatManager || MISettings.croncatManager}
                                 />
                             ) : (
-                                <NearLink address={croncatManager || multicallInstance.croncatManager} />
+                                <NearLink address={croncatManager || MISettings.croncatManager} />
                             ),
                         ],
                     },
@@ -146,14 +148,14 @@ export const Form = ({ adapters: { multicallInstance }, disabled, onEdit, resetT
                                     fullWidth
                                     onChange={onJobBondChange}
                                     type="number"
-                                    value={toNEAR(jobBond || multicallInstance.jobBond)}
+                                    value={toNEAR(jobBond || MISettings.jobBond)}
                                 />
                             ) : (
                                 <IconLabel
                                     icon={NearIcon.NATIVE_TOKEN_CHARACTER}
                                     label={
-                                        jobBond || multicallInstance.jobBond !== ""
-                                            ? toNEAR(jobBond || multicallInstance.jobBond)
+                                        jobBond || MISettings.jobBond !== ""
+                                            ? toNEAR(jobBond || MISettings.jobBond)
                                             : "..."
                                     }
                                     reversed

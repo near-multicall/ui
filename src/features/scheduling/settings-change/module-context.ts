@@ -10,10 +10,6 @@ export namespace Feature {
     export type FormState = Pick<MulticallSettingsDiff, MIEntity.ParamKey>;
 
     export interface Inputs extends Omit<HTMLProps<HTMLDivElement>, "onChange"> {
-        adapters: {
-            multicallInstance: Multicall;
-        };
-
         onEdit: (payload: FormState) => void;
         resetTrigger: { subscribe: (callback: EventListener) => () => void };
     }

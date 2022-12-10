@@ -6,11 +6,11 @@ import { Entity } from "../module-context";
 
 export class MISettingsModel {
     public static readonly data: {
-        data: Multicall | null;
+        data: Multicall;
         error: Error | null;
         loading: boolean;
     } = {
-        data: null,
+        data: new Multicall(""),
         error: null,
         loading: true,
     };
@@ -30,7 +30,7 @@ export class MISettingsModel {
             await Multicall.init(
                 `${ArgsAccount.deconstructAddress(daoAddress).name}.${Multicall.FACTORY_ADDRESS}`
             ).then((multicallInstance) => ({
-                data: multicallInstance.ready ? multicallInstance : null,
+                data: multicallInstance,
                 error: multicallInstance.ready ? null : new Error("Unable to connect to Multicall Instance"),
                 loading: false,
             }))

@@ -16,12 +16,12 @@ import "./settings-editor.scss";
 const _SettingsEditor = "SettingsEditor";
 
 export interface SettingsEditorProps extends HTMLProps<HTMLDivElement> {
-    adapters: { dao: SputnikDAO; multicallInstance: Multicall };
+    adapters: { dao: SputnikDAO };
 }
 
 export const SettingsEditor = ({ className, adapters }: SettingsEditorProps) => {
     const wallet = useContext(Wallet.SelectorContext),
-        settings = MI.useSettings();
+        { data: MISettings, error: MIError } = MI.useSettings();
 
     const proposalCreationPermitted =
         !wallet?.accountId || adapters.dao.checkUserPermission(wallet?.accountId, "AddProposal", "FunctionCall");
@@ -77,7 +77,7 @@ export const SettingsEditor = ({ className, adapters }: SettingsEditorProps) => 
             void adapters.dao
                 .proposeFunctionCall(
                     proposalDescription,
-                    adapters.multicallInstance.address,
+                    MISettings.address,
                     Multicall.configDiffToProposalActions(changesDiff)
                 )
                 .then((someTx) => signAndSendTxs([someTx]))
@@ -93,10 +93,10 @@ export const SettingsEditor = ({ className, adapters }: SettingsEditorProps) => 
     );
 
     return (
-        <div className={clsx(_SettingsEditor, { "is-displayingError": settings.error !== null }, className)}>
+        <div className={clsx(_SettingsEditor, { "is-displayingError": MIError !== null }, className)}>
             <Tile
                 classes={{ root: `${_SettingsEditor}-error` }}
-                error={settings.error}
+                error={MIError}
             />
 
             {false && <MI.AdminsTable className={`${_SettingsEditor}-admins`} />}

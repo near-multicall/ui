@@ -1,4 +1,4 @@
-import { DeleteOutline, EditOutlined, PauseOutlined, PlayArrowOutlined } from "@mui/icons-material";
+import clsx from "clsx";
 import { Base64 } from "js-base64";
 import debounce from "lodash.debounce";
 import { Component, ContextType } from "react";
@@ -8,18 +8,18 @@ import { Form, Formik } from "formik";
 import { args } from "../../shared/lib/args/args";
 import { fields } from "../../shared/lib/args/args-types/args-object";
 import { Multicall } from "../../shared/lib/contracts/multicall";
-import type { ProposalOutput } from "../../shared/lib/contracts/sputnik-dao";
+import { ProposalOutput } from "../../shared/lib/contracts/sputnik-dao";
 import { SputnikDAO, SputnikUI } from "../../shared/lib/contracts/sputnik-dao";
 import { Big, toGas, toYocto } from "../../shared/lib/converter";
 import { STORAGE } from "../../shared/lib/persistent";
 import { signAndSendTxs } from "../../shared/lib/wallet";
 import { Tabs } from "../../shared/ui/design";
-
 import { TextField } from "../../shared/ui/form";
+
 import { DaoSettingsTab } from "./settings/settings";
-import "./dao.scss";
 import { DaoFundsTab } from "./funds/funds";
 import { DaoJobsTab } from "./jobs/jobs";
+import "./dao.scss";
 
 const Ctx = Wallet.trySelectorContext();
 
@@ -182,7 +182,6 @@ export class DaoPage extends Component<Props, State> {
         const multicallAddress = this.toMulticallAddress(formData.addr);
 
         const depo = Big(this.fee).plus(MI.MIN_BALANCE);
-        const daoSearchInput: HTMLInputElement = document.querySelector(".DaoSearch input")!;
 
         /**
          * Can user propose a FunctionCall to DAO?
@@ -208,7 +207,7 @@ export class DaoPage extends Component<Props, State> {
                                     JSON.stringify({
                                         multicall_init_args: {
                                             admin_accounts: [dao.address],
-                                            croncat_manager: window.nearModuleContext.CRONCAT_MANAGER_ADDRESS,
+                                            croncat_manager: window.nearConfig.CRONCAT_MANAGER_ADDRESS,
                                             job_bond: dao.policy.proposal_bond,
                                         },
 
@@ -230,7 +229,7 @@ export class DaoPage extends Component<Props, State> {
             !noDao.isBad() && // base.sputnik-dao.near does not exist
             !loading &&
             // disappear while debouncing
-            this.lastAddr === daoSearchInput.value
+            this.lastAddr === formData.addr
         ) {
             if (proposed === -1) {
                 // no create multicall proposal exists
@@ -343,32 +342,6 @@ export class DaoPage extends Component<Props, State> {
         }
     }
 
-    toLink(address: string, deleteIcon = true) {
-        return (
-            <span>
-                <a
-                    href={args.string().address().intoUrl().cast(address)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    {address}
-                </a>
-                {deleteIcon ? <DeleteOutline /> : null}
-            </span>
-        );
-    }
-
-    job(job: any) {
-        return (
-            <div className="JobsList-item">
-                <EditOutlined />
-                <DeleteOutline />
-                {job.is_active ? <PauseOutlined /> : <PlayArrowOutlined />}
-                <pre>{JSON.stringify(job, null, "  ")}</pre>
-            </div>
-        );
-    }
-
     tryLoadInfo() {
         if (this.lastAddr === this.state.formData.addr) return;
         this.lastAddr = this.state.formData.addr;
@@ -460,18 +433,27 @@ export class DaoPage extends Component<Props, State> {
         });
     }
 
-    getContent() {
+    componentDidMount(): void {
+        window.SIDEBAR.switchPage("dao");
+        document.addEventListener("onaddressesupdated", (event) => this.onAddressesUpdated(event as CustomEvent));
+    }
+
+    render() {
         const { selector: walletSelector } = this.context!;
-        const { dao, loading, multicallInstance } = this.state;
+        const { dao, multicallInstance } = this.state;
 
         // if user not logged in, remind them to sign in.
         // TODO: only require signIn when DAO has no multicall instance (to know if user can propose or vote on existing proposal to create multicall)
         if (!walletSelector.isSignedIn()) {
-            return <div className="DaoPage-content error">Please sign in to continue</div>;
+            return (
+                <div className={_DaoPage}>
+                    <div className={clsx(`${_DaoPage}-content`, "error")}>Please sign in to continue</div>
+                </div>
+            );
         }
 
-        // errors to display
         const displayErrorsList = ["noAddress", "noDao", "noMulticall"];
+
         const displayErrors = Object.entries(fields(this.schema, "addr"))
             .filter(([k, v]) => v.isBad() && displayErrorsList.includes(k))
             .map(([k, v]) => (
@@ -486,52 +468,24 @@ export class DaoPage extends Component<Props, State> {
 
         if (displayErrors.length > 0)
             return (
-                <>
-                    <div className="DaoPage-content error">
+                <div className={_DaoPage}>
+                    <div className={clsx(`${_DaoPage}-content`, "error")}>
                         <div>{displayErrors}</div>
                         {this.createMulticall()}
                     </div>
-                </>
+                </div>
             );
-
-        if (loading) return <div className="DaoPage-content loader" />;
 
         /*
          * Everything should be loaded
          */
         if (!multicallInstance.admins || !multicallInstance.tokensWhitelist || !multicallInstance.jobBond) {
-            console.error("multicall infos incomplete", multicallInstance);
             console.error("Unexpected error! Multicall might be outdated.");
         }
 
         return (
-            <Tabs
-                classes={{
-                    root: "DaoPage-tabs",
-                    buttonsPanel: "DaoPage-tabs-buttonsPanel",
-                    contentSpace: "DaoPage-tabs-contentSpace",
-                }}
-                items={[
-                    DaoSettingsTab.render({
-                        className: `${_DaoPage}-content`,
-                        adapters: { dao, multicallInstance },
-                    }),
-                    DaoFundsTab.render({ className: `${_DaoPage}-content`, adapters: { dao, multicallInstance } }),
-                    DaoJobsTab.render({ className: `${_DaoPage}-content`, adapters: { multicallInstance } }),
-                ]}
-            />
-        );
-    }
-
-    componentDidMount(): void {
-        window.SIDEBAR.switchPage("dao");
-        document.addEventListener("onaddressesupdated", (event) => this.onAddressesUpdated(event as CustomEvent));
-    }
-
-    render() {
-        return (
-            <div className="DaoPage">
-                <div className="DaoPage-header">
+            <div className={_DaoPage}>
+                <div className={`${_DaoPage}-header`}>
                     <div className="DaoSearch">
                         <Formik
                             initialValues={{ addr: STORAGE.addresses.dao ?? "" }}
@@ -560,7 +514,18 @@ export class DaoPage extends Component<Props, State> {
                     </div>
                 </div>
 
-                {this.getContent()}
+                <Tabs
+                    classes={{
+                        root: `${_DaoPage}-tabs`,
+                        buttonsPanel: `${_DaoPage}-tabs-buttonsPanel`,
+                        contentSpace: `${_DaoPage}-tabs-contentSpace`,
+                    }}
+                    items={[
+                        DaoSettingsTab.render({ className: `${_DaoPage}-content`, adapters: { dao } }),
+                        DaoFundsTab.render({ className: `${_DaoPage}-content`, adapters: { dao, multicallInstance } }),
+                        DaoJobsTab.render({ className: `${_DaoPage}-content`, adapters: { multicallInstance } }),
+                    ]}
+                />
             </div>
         );
     }
