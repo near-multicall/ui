@@ -55,7 +55,7 @@ function getConfig(env: string) {
                 masterAccount: "test.near",
             };
         default:
-            throw Error(`Unconfigured environment '${env}'. Can be configured in src/config.js.`);
+            throw Error(`Unconfigured environment '${env}'. Can be configured in src/shared/config/near-protocol.ts.`);
     }
 }
 
