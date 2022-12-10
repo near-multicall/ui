@@ -5,11 +5,11 @@ import { Job } from "../../../entities";
 
 import "./jobs.scss";
 
-interface DaoJobsTabUIProps extends HTMLProps<HTMLDivElement>, ComponentProps<typeof Job.EntriesTable> {}
-
 const _DaoJobsTab = "DaoJobsTab";
 
-const DaoJobsTabUI = ({ className, adapters, ...props }: DaoJobsTabUIProps) => (
+interface DaoJobsTabProps extends HTMLProps<HTMLDivElement>, ComponentProps<typeof Job.EntriesTable> {}
+
+const Content = ({ className, adapters, ...props }: DaoJobsTabProps) => (
     <div
         className={clsx(_DaoJobsTab, className)}
         {...props}
@@ -18,9 +18,11 @@ const DaoJobsTabUI = ({ className, adapters, ...props }: DaoJobsTabUIProps) => (
     </div>
 );
 
+Content.displayName = _DaoJobsTab;
+
 export const DaoJobsTab = {
-    uiConnect: (props: DaoJobsTabUIProps) => ({
-        content: <DaoJobsTabUI {...props} />,
+    render: (props: DaoJobsTabProps) => ({
+        content: <Content {...props} />,
         lazy: true,
         name: "Jobs",
     }),

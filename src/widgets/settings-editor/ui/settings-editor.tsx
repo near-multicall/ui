@@ -1,34 +1,41 @@
 import clsx from "clsx";
-import { useCallback, useMemo, useState, FormEventHandler, useEffect, useContext } from "react";
+import { useCallback, useMemo, useState, FormEventHandler, useEffect, useContext, HTMLProps } from "react";
 
 import { MI, Wallet } from "../../../entities";
 import { SchedulingSettingsChange, TokenWhitelistChange } from "../../../features";
 import { ArgsString } from "../../../shared/lib/args-old";
-import { Multicall } from "../../../shared/lib/contracts/multicall";
+import { Multicall, MulticallSettingsDiff } from "../../../shared/lib/contracts/multicall";
+import { SputnikDAO } from "../../../shared/lib/contracts/sputnik-dao";
 import { signAndSendTxs } from "../../../shared/lib/wallet";
-import { ModuleContext, SettingsEditor } from "../module-context";
+import { ModuleContext } from "../module-context";
+import { Tile } from "../../../shared/ui/design";
 
 import { SettingsProposalCreate } from "./settings-proposal-create";
 import "./settings-editor.scss";
 
 const _SettingsEditor = "SettingsEditor";
 
-export const SettingsEditorUI = ({ className, adapters }: SettingsEditor.Inputs) => {
-    const wallet = useContext(Wallet.SelectorContext);
+export interface SettingsEditorProps extends HTMLProps<HTMLDivElement> {
+    adapters: { dao: SputnikDAO; multicallInstance: Multicall };
+}
+
+export const SettingsEditor = ({ className, adapters }: SettingsEditorProps) => {
+    const wallet = useContext(Wallet.SelectorContext),
+        settings = MI.useSettings();
 
     const proposalCreationPermitted =
         !wallet?.accountId || adapters.dao.checkUserPermission(wallet?.accountId, "AddProposal", "FunctionCall");
 
     const [editMode, editModeSwitch] = useState(false);
 
-    const changesDiffInitialState: SettingsEditor.Diff = {
+    const changesDiffInitialState: MulticallSettingsDiff = {
         [ModuleContext.DiffKey.removeTokens]: [],
         [ModuleContext.DiffKey.addTokens]: [],
         [ModuleContext.DiffKey.jobBond]: "",
         [ModuleContext.DiffKey.croncatManager]: "",
     };
 
-    const [changesDiff, changesDiffUpdate] = useState<SettingsEditor.Diff>(changesDiffInitialState),
+    const [changesDiff, changesDiffUpdate] = useState<MulticallSettingsDiff>(changesDiffInitialState),
         formValues = { proposalDescription: useMemo(() => new ArgsString(""), []) },
         [proposalDescription, proposalDescriptionUpdate] = useState(formValues.proposalDescription.value),
         _childFormsResetRequested = "childFormsResetRequested";
@@ -57,7 +64,7 @@ export const SettingsEditorUI = ({ className, adapters }: SettingsEditor.Inputs)
     }, [editMode, editModeSwitch, formReset]);
 
     const onEdit = useCallback(
-        (update: Partial<SettingsEditor.Diff>) =>
+        (update: Partial<MulticallSettingsDiff>) =>
             void changesDiffUpdate((latestState) => ({ ...latestState, ...update })),
 
         [changesDiffUpdate]
@@ -86,30 +93,33 @@ export const SettingsEditorUI = ({ className, adapters }: SettingsEditor.Inputs)
     );
 
     return (
-        <MI.SettingsProvider daoAddress={adapters.dao.address}>
-            <div className={clsx(_SettingsEditor, className)}>
-                {false && <MI.AdminsTable className={`${_SettingsEditor}-admins`} />}
+        <div className={clsx(_SettingsEditor, { "is-displayingError": settings.error !== null }, className)}>
+            <Tile
+                classes={{ root: `${_SettingsEditor}-error` }}
+                error={settings.error}
+            />
 
-                <TokenWhitelistChange.Form
-                    className={`${_SettingsEditor}-tokenWhitelist`}
-                    disabled={!proposalCreationPermitted}
-                    resetTrigger={childFormsResetRequested}
-                    {...{ onEdit }}
-                />
+            {false && <MI.AdminsTable className={`${_SettingsEditor}-admins`} />}
 
-                <SchedulingSettingsChange.Form
-                    disabled={!proposalCreationPermitted}
-                    resetTrigger={childFormsResetRequested}
-                    {...{ adapters, onEdit }}
-                />
+            <TokenWhitelistChange.Form
+                className={`${_SettingsEditor}-tokenWhitelist`}
+                disabled={!proposalCreationPermitted}
+                resetTrigger={childFormsResetRequested}
+                {...{ onEdit }}
+            />
 
-                <SettingsProposalCreate
-                    description={proposalDescription}
-                    disabled={!proposalCreationPermitted}
-                    onDescriptionUpdate={proposalDescriptionUpdate}
-                    {...{ changesDiff, editMode, formValues, onCancel, onSubmit }}
-                />
-            </div>
-        </MI.SettingsProvider>
+            <SchedulingSettingsChange.Form
+                disabled={!proposalCreationPermitted}
+                resetTrigger={childFormsResetRequested}
+                {...{ adapters, onEdit }}
+            />
+
+            <SettingsProposalCreate
+                description={proposalDescription}
+                disabled={!proposalCreationPermitted}
+                onDescriptionUpdate={proposalDescriptionUpdate}
+                {...{ changesDiff, editMode, formValues, onCancel, onSubmit }}
+            />
+        </div>
     );
 };

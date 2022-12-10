@@ -501,7 +501,7 @@ export class DaoPage extends Component<Props, State> {
          */
         if (!multicallInstance.admins || !multicallInstance.tokensWhitelist || !multicallInstance.jobBond) {
             console.error("multicall infos incomplete", multicallInstance);
-            return <div className="DaoPage-content error">Unexpected error! Multicall might be outdated.</div>;
+            console.error("Unexpected error! Multicall might be outdated.");
         }
 
         return (
@@ -512,12 +512,12 @@ export class DaoPage extends Component<Props, State> {
                     contentSpace: "DaoPage-tabs-contentSpace",
                 }}
                 items={[
-                    DaoSettingsTab.uiConnect({
+                    DaoSettingsTab.render({
                         className: `${_DaoPage}-content`,
                         adapters: { dao, multicallInstance },
                     }),
-                    DaoFundsTab.uiConnect({ className: `${_DaoPage}-content`, adapters: { dao, multicallInstance } }),
-                    DaoJobsTab.uiConnect({ className: `${_DaoPage}-content`, adapters: { multicallInstance } }),
+                    DaoFundsTab.render({ className: `${_DaoPage}-content`, adapters: { dao, multicallInstance } }),
+                    DaoJobsTab.render({ className: `${_DaoPage}-content`, adapters: { multicallInstance } }),
                 ]}
             />
         );

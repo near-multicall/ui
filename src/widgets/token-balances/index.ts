@@ -1,8 +1,1 @@
-import { TokenBalancesUI } from "./ui/token-balances";
-import { TokenBalances as TokenBalancesModule } from "./module-context";
-
-class TokenBalances {
-    static UI = TokenBalancesUI;
-}
-
-export { TokenBalances, type TokenBalancesModule };
+export { TokenBalances, type TokenBalancesProps } from "./ui/token-balances";

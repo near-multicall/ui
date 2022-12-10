@@ -5,13 +5,13 @@ import { PopupMenu } from "../../../shared/ui/design";
 import { ModuleContext } from "../module-context";
 import { ExternalLoginDialogsModel } from "../model/external-login-dialogs";
 
+const _ExternalLoginMenu = "ExternalLoginMenu";
+
 interface MenuProps extends Pick<ComponentProps<typeof PopupMenu>, "triggerClassName"> {
     FeatureFlags: {
         ExternalLogin: Record<keyof typeof ModuleContext.METHODS, boolean>;
     };
 }
-
-const _ExternalLoginMenu = "ExternalLoginMenu";
 
 export const Menu = ({ FeatureFlags, triggerClassName }: MenuProps) => (
     <PopupMenu

@@ -1,14 +1,17 @@
 import clsx from "clsx";
 
 import { Tile, Scrollable, Table } from "../../../shared/ui/design";
-import { FT, NEARToken } from "../../../entities";
-import { type TokenBalances } from "../module-context";
+import { FT, FTModule, NEARToken, NEARTokenModule } from "../../../entities";
 
 import "./token-balances.scss";
 
 const _TokenBalances = "TokenBalances";
 
-export const TokenBalancesUI = ({ className, adapters }: TokenBalances.Inputs) => {
+export interface TokenBalancesProps extends NEARTokenModule.Inputs, FTModule.Inputs {
+    className?: string;
+}
+
+export const TokenBalances = ({ className, adapters }: TokenBalancesProps) => {
     const nearTokenBalances = NEARToken.balancesRender({ adapters }),
         fungibleTokenBalances = FT.balances({ adapters });
 

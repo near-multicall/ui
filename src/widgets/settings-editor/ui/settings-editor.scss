@@ -11,4 +11,22 @@
     grid-template-areas:
         "TokenWhitelistChange SchedulingSettingsChange"
         "TokenWhitelistChange SettingsProposalCreate";
+
+    &-error {
+        grid-area: SettingsEditorError;
+    }
+
+    &.is-displayingError {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr;
+        grid-template-areas: "SettingsEditorError";
+    }
+
+    &.is-displayingError > *:not(&-error) {
+        display: none;
+    }
+
+    &:not(&.is-displayingError) &-error {
+        display: none;
+    }
 }

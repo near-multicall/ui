@@ -1,26 +1,31 @@
 import clsx from "clsx";
 import { HTMLProps } from "react";
 
-import { SettingsEditor, SettingsEditorModule } from "../../../widgets";
+import { MI } from "../../../entities";
+import { SettingsEditor, SettingsEditorProps } from "../../../widgets";
 
 import "./settings.scss";
 
-interface DaoSettingsTabUIProps extends HTMLProps<HTMLDivElement>, SettingsEditorModule.Inputs {}
-
 const _DaoSettingsTab = "DaoSettingsTab";
 
-const DaoSettingsTabUI = ({ className, adapters, ...props }: DaoSettingsTabUIProps) => (
-    <div
-        className={clsx(_DaoSettingsTab, className)}
-        {...props}
-    >
-        <SettingsEditor.UI {...{ adapters }} />
-    </div>
+interface DaoSettingsTabProps extends HTMLProps<HTMLDivElement>, SettingsEditorProps {}
+
+const Content = ({ className, adapters, ...props }: DaoSettingsTabProps) => (
+    <MI.SettingsProvider daoAddress={adapters.dao.address}>
+        <div
+            className={clsx(_DaoSettingsTab, className)}
+            {...props}
+        >
+            <SettingsEditor {...{ adapters }} />
+        </div>
+    </MI.SettingsProvider>
 );
 
+Content.displayName = _DaoSettingsTab;
+
 export const DaoSettingsTab = {
-    uiConnect: (props: DaoSettingsTabUIProps) => ({
-        content: <DaoSettingsTabUI {...props} />,
+    render: (props: DaoSettingsTabProps) => ({
+        content: <Content {...props} />,
         name: "Settings",
     }),
 };
