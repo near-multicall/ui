@@ -97,12 +97,14 @@ export const Form = ({ disabled, onEdit, resetTrigger }: Feature.Inputs) => {
                     </Tooltip>
                 ) : (
                     <Tooltip content={disabled ? "You are in read-only mode" : "Propose changes"}>
-                        <IconButton
-                            onClick={() => void editModeSwitch(true)}
-                            {...{ disabled }}
-                        >
-                            <EditOutlined />
-                        </IconButton>
+                        <span>
+                            <IconButton
+                                onClick={() => void editModeSwitch(true)}
+                                {...{ disabled }}
+                            >
+                                <EditOutlined />
+                            </IconButton>
+                        </span>
                     </Tooltip>
                 ),
             }}
