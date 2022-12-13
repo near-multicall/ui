@@ -1,23 +1,11 @@
-import { MulticallSettingsParamKey } from "../../shared/lib/contracts/multicall";
-import { SputnikDAO } from "../../shared/lib/contracts/sputnik-dao";
+import { MulticallPropertyKey } from "../../shared/lib/contracts/multicall";
 import { toYocto } from "../../shared/lib/converter";
 
 /**
- * Type declaration for Multicall Instance entity
- */
-export namespace Entity {
-    export interface Inputs {
-        daoAddress: SputnikDAO["address"];
-    }
-
-    export type ParamKey = MulticallSettingsParamKey;
-}
-
-/**
- * Multicall Instance entity config
+ * Multicall Instance entity context.
  */
 export class ModuleContext {
-    public static readonly ParamKey = MulticallSettingsParamKey;
+    public static readonly ParamKey = MulticallPropertyKey;
 
     /**
      * Minimum balance needed for storage + state.

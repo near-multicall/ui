@@ -31,8 +31,8 @@ export class Sidebar extends Component {
                 initialized: false,
 
                 ExternalLogin: {
-                    [ExternalLogin.METHODS.dao.type]: true,
-                    [ExternalLogin.METHODS.multicall.type]: false,
+                    [ExternalLogin.methods.dao.type]: true,
+                    [ExternalLogin.methods.multicall.type]: false,
                 },
             },
 
@@ -58,7 +58,7 @@ export class Sidebar extends Component {
 
                         ExternalLogin: {
                             ...this.state.FeatureFlags.ExternalLogin,
-                            [ExternalLogin.METHODS.multicall.type]: true,
+                            [ExternalLogin.methods.multicall.type]: true,
                         },
                     },
                 })
@@ -71,7 +71,7 @@ export class Sidebar extends Component {
 
                         ExternalLogin: {
                             ...this.state.FeatureFlags.ExternalLogin,
-                            [ExternalLogin.METHODS.multicall.type]: false,
+                            [ExternalLogin.methods.multicall.type]: false,
                         },
                     },
                 })

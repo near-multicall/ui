@@ -1,22 +1,8 @@
-import { HTMLProps } from "react";
-
-import { MI, MIEntity } from "../../../entities";
-import { MulticallSettingsDiff, Multicall } from "../../../shared/lib/contracts/multicall";
+import { MulticallInstance } from "../../../entities";
 import { DesignContext } from "../../../shared/ui/design";
 
-export namespace Feature {
-    export type DiffKey = MIEntity.ParamKey;
-
-    export type FormState = Pick<MulticallSettingsDiff, MIEntity.ParamKey>;
-
-    export interface Inputs extends Omit<HTMLProps<HTMLDivElement>, "onChange"> {
-        onEdit: (payload: FormState) => void;
-        resetTrigger: { subscribe: (callback: EventListener) => () => void };
-    }
-}
-
 export class ModuleContext {
-    public static readonly DiffKey = MI.ParamKey;
+    public static readonly DiffKey = MulticallInstance.ParamKey;
 
     public static readonly DiffMeta = {
         [ModuleContext.DiffKey.croncatManager]: {

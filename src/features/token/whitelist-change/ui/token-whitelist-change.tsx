@@ -4,14 +4,14 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { TextInput, Tooltip } from "../../../../shared/ui/design";
 import { ArgsString } from "../../../../shared/lib/args-old";
-import { MI } from "../../../../entities";
+import { MulticallInstance } from "../../../../entities";
 import { ModuleContext, Feature } from "../module-context";
 
 import "./token-whitelist-change.scss";
 
 const _TokenWhitelistChange = "TokenWhitelistChange";
 
-export const Form = ({ disabled, onEdit, resetTrigger }: Feature.Inputs) => {
+export const TokenWhitelistChangeUI = ({ disabled, onEdit, resetTrigger }: Feature.Inputs) => {
     const [editModeEnabled, editModeSwitch] = useState(false);
 
     const [addTokens, markForAddition] = useState<Feature.FormStates["addTokens"]>(new Set()),
@@ -64,7 +64,7 @@ export const Form = ({ disabled, onEdit, resetTrigger }: Feature.Inputs) => {
     );
 
     return (
-        <MI.TokenWhitelistTable
+        <MulticallInstance.TokenWhitelistTable
             ItemProps={{
                 idToHighlightColor: (id) =>
                     (addTokens.has(id) && ModuleContext.DiffMeta.addTokens.color) ||
@@ -128,5 +128,3 @@ export const Form = ({ disabled, onEdit, resetTrigger }: Feature.Inputs) => {
         />
     );
 };
-
-Form.displayName = _TokenWhitelistChange;

@@ -1,8 +1,8 @@
 import { ModuleContext, Feature as TokenWhitelistChangeFeature } from "./module-context";
-import { Form } from "./ui/token-whitelist-change";
+import { TokenWhitelistChangeUI } from "./ui/token-whitelist-change";
 
 export { type TokenWhitelistChangeFeature };
 
 export class TokenWhitelistChange extends ModuleContext {
-    public static readonly Form = Form;
+    public static readonly UI = TokenWhitelistChangeUI;
 }

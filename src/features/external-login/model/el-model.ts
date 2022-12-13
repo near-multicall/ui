@@ -9,7 +9,7 @@ import { ModuleContext } from "../module-context";
 const _dialogOpenRequested = "dialogOpenRequested";
 
 const dialogOpenRequested = {
-    dispatch: (dialogKey: keyof typeof ModuleContext.METHODS) =>
+    dispatch: (dialogKey: keyof typeof ModuleContext.methods) =>
         document.dispatchEvent(new CustomEvent(_dialogOpenRequested, { detail: { dialogKey } })),
 
     subscribe: (callback: EventListener) => {
@@ -19,14 +19,14 @@ const dialogOpenRequested = {
     },
 };
 
-export class ExternalLoginDialogsModel {
+export class ELModel {
     static dialogOpenRequested = dialogOpenRequested.dispatch;
 
-    static useVisibilityState = () => {
+    static useDialogsState = () => {
         const [dialogsVisibility, dialogVisibilitySwitch] = useState<
-            Record<keyof typeof ModuleContext.METHODS, boolean> | {}
+            Record<keyof typeof ModuleContext.methods, boolean> | {}
         >(
-            Object.values(ModuleContext.METHODS).reduce(
+            Object.values(ModuleContext.methods).reduce(
                 (visibilityState, { type }) => ({ ...visibilityState, [type]: false }),
                 {}
             )

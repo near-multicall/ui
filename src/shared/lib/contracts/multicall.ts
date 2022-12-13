@@ -1,6 +1,6 @@
 import { Big, toGas, dateToCron, toYocto } from "../converter";
 import { AccountId, Base64String, U128String, U64String } from "../types";
-import { viewAccount, viewState, view } from "../wallet";
+import { viewAccount, viewState, view, Tx } from "../wallet";
 
 import { FunctionCallAction as daoFunctionCallAction } from "./sputnik-dao";
 
@@ -58,7 +58,7 @@ type MulticallArgs = {
     calls: BatchCall[][];
 };
 
-enum MulticallSettingsParamKey {
+enum MulticallPropertyKey {
     croncatManager = "croncatManager",
     jobBond = "jobBond",
 }
@@ -68,12 +68,12 @@ enum MulticallTokenWhitelistDiffKey {
     removeTokens = "removeTokens",
 }
 
-type MulticallSettingsDiff = {
+interface MulticallSettingsChange {
     [MulticallTokenWhitelistDiffKey.addTokens]: AccountId[];
-    [MulticallSettingsParamKey.croncatManager]: AccountId;
-    [MulticallSettingsParamKey.jobBond]: U128String;
+    [MulticallPropertyKey.croncatManager]: AccountId;
+    [MulticallPropertyKey.jobBond]: U128String;
     [MulticallTokenWhitelistDiffKey.removeTokens]: AccountId[];
-};
+}
 
 class Multicall {
     static FACTORY_ADDRESS: AccountId = FACTORY_ADDRESS_SELECTOR[window.NEAR_ENV];
@@ -83,12 +83,12 @@ class Multicall {
 
     address: AccountId;
     admins: AccountId[] = [];
-    [MulticallSettingsParamKey.croncatManager]: AccountId = "";
+    [MulticallPropertyKey.croncatManager]: AccountId = "";
     // only whitelisted tokens can be attached to multicalls or job activations.
     tokensWhitelist: AccountId[] = [];
     // job bond amount must be attached as deposit when adding new jobs.
     // needs initialization, but start with "" because it's distinguishable from a real value (string encoded numbers).
-    [MulticallSettingsParamKey.jobBond]: U128String = "";
+    [MulticallPropertyKey.jobBond]: U128String = "";
     // Multicall instance is ready when info (admins...) are fetched & assigned correctly.
     ready: boolean = false;
 
@@ -166,7 +166,7 @@ class Multicall {
         addTokens = [],
         jobBond = "",
         croncatManager = "",
-    }: MulticallSettingsDiff): daoFunctionCallAction[] {
+    }: MulticallSettingsChange): daoFunctionCallAction[] {
         const actions: daoFunctionCallAction[] = [];
 
         // action: change croncat manager address
@@ -292,5 +292,5 @@ class Multicall {
     }
 }
 
-export { Multicall, MulticallSettingsParamKey, MulticallTokenWhitelistDiffKey };
-export type { JobData, MulticallArgs, MulticallSettingsDiff };
+export { Multicall, MulticallPropertyKey, MulticallTokenWhitelistDiffKey };
+export type { JobData, MulticallArgs, MulticallSettingsChange };

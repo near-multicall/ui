@@ -1,15 +1,15 @@
 export class ModuleContext {
-    static KEYS = {
+    static keys = {
         all: "ed25519%3A9jeqkc8ybv7aYSA7uLNFUEn8cgKo759yue4771bBWsSr",
         public: "ed25519%3ADEaoD65LomNHAMzhNZva15LC85ntwBHdcTbCnZRXciZH",
     };
 
-    static METHODS: Record<"dao" | "multicall", { title: string; type: keyof typeof ModuleContext.METHODS }> = {
+    static methods: Record<"dao" | "multicall", { title: string; type: keyof typeof ModuleContext.methods }> = {
         dao: { title: "Login in dApps as DAO", type: "dao" },
         multicall: { title: "Login in dApps as Multicall", type: "multicall" },
     };
 
-    static STEP_BY_STEP_GUIDE = [
+    static stepByStepGuide = [
         {
             text: "Open the dApp in another browser tab",
         },

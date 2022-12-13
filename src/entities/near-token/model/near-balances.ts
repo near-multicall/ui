@@ -4,14 +4,14 @@ import { Big, formatTokenAmount } from "../../../shared/lib/converter";
 import { viewAccount } from "../../../shared/lib/wallet";
 import { ModuleContext, type NEARToken } from "../module-context";
 
-type NEARTokenDataFxResponse = {
+type NEARTokenDataResponse = {
     data: { dao: string; multicall: string; total: string } | null;
     loading: boolean;
 };
 
-const nearTokenDataFx = async (
+const nearTokenData = async (
     { dao, multicallInstance }: NEARToken.Inputs["adapters"],
-    callback: (result: NEARTokenDataFxResponse) => void
+    callback: (result: NEARTokenDataResponse) => void
 ) => {
     const [daoAccInfo, multicallAccInfo] = await Promise.all([
         viewAccount(dao.address),
@@ -38,9 +38,9 @@ const nearTokenDataFx = async (
 };
 
 const useNEARTokenData = (adapters: NEARToken.Inputs["adapters"]) => {
-    const [state, stateUpdate] = useState<NEARTokenDataFxResponse>({ data: null, loading: true });
+    const [state, stateUpdate] = useState<NEARTokenDataResponse>({ data: null, loading: true });
 
-    useEffect(() => void nearTokenDataFx(adapters, stateUpdate), [adapters, stateUpdate]);
+    useEffect(() => void nearTokenData(adapters, stateUpdate), [adapters, stateUpdate]);
 
     return state;
 };

@@ -1,10 +1,10 @@
 import clsx from "clsx";
 import { useCallback, useMemo, useState, FormEventHandler, useEffect, useContext, HTMLProps } from "react";
 
-import { MI, Wallet } from "../../../entities";
+import { MulticallInstance, Wallet } from "../../../entities";
 import { SchedulingSettingsChange, TokenWhitelistChange } from "../../../features";
 import { ArgsString } from "../../../shared/lib/args-old";
-import { Multicall, MulticallSettingsDiff } from "../../../shared/lib/contracts/multicall";
+import { Multicall, MulticallSettingsChange } from "../../../shared/lib/contracts/multicall";
 import { SputnikDAO } from "../../../shared/lib/contracts/sputnik-dao";
 import { signAndSendTxs } from "../../../shared/lib/wallet";
 import { ModuleContext } from "../module-context";
@@ -21,21 +21,21 @@ export interface SettingsEditorProps extends HTMLProps<HTMLDivElement> {
 
 export const SettingsEditor = ({ className, adapters }: SettingsEditorProps) => {
     const wallet = useContext(Wallet.SelectorContext),
-        { data: MIProperties, error: MIError } = MI.useProperties();
+        { data: MIProperties, error: MIError } = MulticallInstance.useProperties();
 
     const proposalCreationPermitted =
         !wallet?.accountId || adapters.dao.checkUserPermission(wallet?.accountId, "AddProposal", "FunctionCall");
 
     const [editMode, editModeSwitch] = useState(false);
 
-    const changesDiffInitialState: MulticallSettingsDiff = {
+    const changesDiffInitialState: MulticallSettingsChange = {
         [ModuleContext.DiffKey.removeTokens]: [],
         [ModuleContext.DiffKey.addTokens]: [],
         [ModuleContext.DiffKey.jobBond]: "",
         [ModuleContext.DiffKey.croncatManager]: "",
     };
 
-    const [changesDiff, changesDiffUpdate] = useState<MulticallSettingsDiff>(changesDiffInitialState),
+    const [changesDiff, changesDiffUpdate] = useState<MulticallSettingsChange>(changesDiffInitialState),
         formValues = { proposalDescription: useMemo(() => new ArgsString(""), []) },
         [proposalDescription, proposalDescriptionUpdate] = useState(formValues.proposalDescription.value),
         _childFormsResetRequested = "childFormsResetRequested";
@@ -64,7 +64,7 @@ export const SettingsEditor = ({ className, adapters }: SettingsEditorProps) => 
     }, [editMode, editModeSwitch, formReset]);
 
     const onEdit = useCallback(
-        (update: Partial<MulticallSettingsDiff>) =>
+        (update: Partial<MulticallSettingsChange>) =>
             void changesDiffUpdate((latestState) => ({ ...latestState, ...update })),
 
         [changesDiffUpdate]
@@ -99,16 +99,16 @@ export const SettingsEditor = ({ className, adapters }: SettingsEditorProps) => 
                 error={MIError}
             />
 
-            {false && <MI.AdminsTable className={`${_SettingsEditor}-admins`} />}
+            {false && <MulticallInstance.AdminsTable className={`${_SettingsEditor}-admins`} />}
 
-            <TokenWhitelistChange.Form
+            <TokenWhitelistChange.UI
                 className={`${_SettingsEditor}-tokenWhitelist`}
                 disabled={!proposalCreationPermitted}
                 resetTrigger={childFormsResetRequested}
                 {...{ onEdit }}
             />
 
-            <SchedulingSettingsChange.Form
+            <SchedulingSettingsChange.UI
                 disabled={!proposalCreationPermitted}
                 resetTrigger={childFormsResetRequested}
                 {...{ adapters, onEdit }}

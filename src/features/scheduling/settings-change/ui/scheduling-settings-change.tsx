@@ -1,30 +1,38 @@
 import { CancelOutlined, EditOutlined, VisibilityOutlined } from "@mui/icons-material";
 import { IconButton, TextField, TextFieldProps } from "@mui/material";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { HTMLProps, useCallback, useEffect, useMemo, useState } from "react";
 
-import { MI } from "../../../../entities";
+import { MulticallInstance } from "../../../../entities";
 import { ArgsString } from "../../../../shared/lib/args-old";
+import { MulticallSettingsChange, MulticallPropertyKey } from "../../../../shared/lib/contracts/multicall";
 import { toNEAR, toYocto } from "../../../../shared/lib/converter";
 import { IconLabel, NearIcon, NearLink, Table, Tile, Tooltip } from "../../../../shared/ui/design";
-import { ModuleContext, Feature } from "../module-context";
+import { ModuleContext } from "../module-context";
 
 import "./scheduling-settings-change.scss";
 
 const _SchedulingSettingsChange = "SchedulingSettingsChange";
 
-export const Form = ({ disabled, onEdit, resetTrigger }: Feature.Inputs) => {
-    const { data: MIProperties } = MI.useProperties();
+type FormState = Pick<MulticallSettingsChange, MulticallPropertyKey>;
+
+interface SchedulingSettingsChangeUIProps extends Omit<HTMLProps<HTMLDivElement>, "onChange"> {
+    onEdit: (payload: FormState) => void;
+    resetTrigger: { subscribe: (callback: EventListener) => () => void };
+}
+
+export const SchedulingSettingsChangeUI = ({ disabled, onEdit, resetTrigger }: SchedulingSettingsChangeUIProps) => {
+    const { data: MIProperties } = MulticallInstance.useProperties();
 
     const [editModeEnabled, editModeSwitch] = useState(false);
 
-    const formInitialState: Feature.FormState = {
+    const formInitialState: FormState = {
         [ModuleContext.DiffKey.croncatManager]: "",
         [ModuleContext.DiffKey.jobBond]: "",
     };
 
     const [[croncatManager, croncatManagerUpdate], [jobBond, jobBondUpdate]] = [
-        useState<Feature.FormState["croncatManager"]>(formInitialState.croncatManager),
-        useState<Feature.FormState["jobBond"]>(formInitialState.jobBond),
+        useState<typeof formInitialState["croncatManager"]>(formInitialState.croncatManager),
+        useState<typeof formInitialState["jobBond"]>(formInitialState.jobBond),
     ];
 
     const formFields = {
@@ -61,7 +69,6 @@ export const Form = ({ disabled, onEdit, resetTrigger }: Feature.Inputs) => {
     }, [croncatManagerUpdate, editModeSwitch, formInitialState, jobBondUpdate]);
 
     useEffect(() => resetTrigger.subscribe(formReset), [formReset, resetTrigger]);
-
     useEffect(() => void onEdit({ croncatManager, jobBond }), [croncatManager, jobBond, onEdit]);
 
     return (
@@ -104,8 +111,9 @@ export const Form = ({ disabled, onEdit, resetTrigger }: Feature.Inputs) => {
                     centeredTitle: true,
 
                     idToHighlightColor: (id) =>
-                        ({ croncatManager, jobBond }[id] === formInitialState[id as Feature.DiffKey] ||
-                        { croncatManager, jobBond }[id] === MIProperties[id as Feature.DiffKey]
+                        ({ croncatManager, jobBond }[id] ===
+                            formInitialState[id as keyof typeof ModuleContext["DiffKey"]] ||
+                        { croncatManager, jobBond }[id] === MIProperties[id as keyof typeof ModuleContext["DiffKey"]]
                             ? null
                             : "blue"),
 
@@ -168,5 +176,3 @@ export const Form = ({ disabled, onEdit, resetTrigger }: Feature.Inputs) => {
         </Tile>
     );
 };
-
-Form.displayName = _SchedulingSettingsChange;

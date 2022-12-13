@@ -2,7 +2,7 @@ import clsx from "clsx";
 import { FormEventHandler, HTMLProps } from "react";
 
 import { ArgsString } from "../../../shared/lib/args-old";
-import { MulticallSettingsDiff } from "../../../shared/lib/contracts/multicall";
+import { MulticallSettingsChange } from "../../../shared/lib/contracts/multicall";
 import { SputnikDAO } from "../../../shared/lib/contracts/sputnik-dao";
 import { toNEAR } from "../../../shared/lib/converter";
 import { Button, ButtonGroup, NearIcon, TextInput, Tile } from "../../../shared/ui/design";
@@ -13,7 +13,7 @@ import "./settings-proposal-create.scss";
 const _SettingsProposalCreate = "SettingsProposalCreate";
 
 export interface SettingsProposalCreateProps extends HTMLProps<HTMLDivElement> {
-    changesDiff: MulticallSettingsDiff;
+    changesDiff: MulticallSettingsChange;
     description: Parameters<SputnikDAO["proposeFunctionCall"]>[0];
     formValues: { proposalDescription: ArgsString };
     editMode: boolean;

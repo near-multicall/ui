@@ -1,7 +1,7 @@
 @use "sass/size";
 @use "sass/mixin";
 
-.ExternalLoginDialog {
+.ELDialog {
     &-stepByStepGuide {
         padding: 0 size.$gap;
         list-style-type: decimal;

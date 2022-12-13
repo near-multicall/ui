@@ -10,7 +10,7 @@ type FTInfo = {
 };
 
 export class FTInfoModel {
-    private static readonly nonZeroBalancesFetchFx = async (
+    private static readonly nonZeroBalancesFetch = async (
         { dao, multicallInstance }: FT.Inputs["adapters"],
         callback: (result: FTInfo) => void
     ) => {
@@ -57,7 +57,7 @@ export class FTInfoModel {
     public static readonly useNonZeroBalances = (adapters: FT.Inputs["adapters"]) => {
         const [state, stateUpdate] = useState<FTInfo>({ data: null, loading: true });
 
-        useEffect(() => void FTInfoModel.nonZeroBalancesFetchFx(adapters, stateUpdate), [adapters, stateUpdate]);
+        useEffect(() => void FTInfoModel.nonZeroBalancesFetch(adapters, stateUpdate), [adapters, stateUpdate]);
 
         return state;
     };

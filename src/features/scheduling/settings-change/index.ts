@@ -1,8 +1,6 @@
-import { ModuleContext, Feature as SchedulingSettingsChangeFeature } from "./module-context";
-import { Form } from "./ui/scheduling-settings-change";
-
-export { type SchedulingSettingsChangeFeature };
+import { ModuleContext } from "./module-context";
+import { SchedulingSettingsChangeUI } from "./ui/scheduling-settings-change";
 
 export class SchedulingSettingsChange extends ModuleContext {
-    public static readonly Form = Form;
+    public static readonly UI = SchedulingSettingsChangeUI;
 }

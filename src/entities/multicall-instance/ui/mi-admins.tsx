@@ -1,5 +1,5 @@
 import { Scrollable, Table, Tile } from "../../../shared/ui/design";
-import { MIPropertiesModel } from "../model/mi-properties";
+import { MIModel } from "../model/mi-model";
 
 import { miAdminAsTableRow, MIAdminProps } from "./mi-admin";
 
@@ -9,7 +9,7 @@ interface MIAdminsTableProps {
 }
 
 export const MIAdminsTable = ({ className, itemsAdditional }: MIAdminsTableProps) => {
-    const { data, error, loading } = MIPropertiesModel.useContext(),
+    const { data, error, loading } = MIModel.useProperties(),
         items = (data?.admins ?? []).concat(itemsAdditional ?? []);
 
     return (

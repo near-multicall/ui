@@ -2,10 +2,14 @@ import { createContext, useContext, useEffect, useState } from "react";
 
 import { ArgsAccount } from "../../../shared/lib/args-old";
 import { Multicall } from "../../../shared/lib/contracts/multicall";
-import { Entity } from "../module-context";
+import { SputnikDAO } from "../../../shared/lib/contracts/sputnik-dao";
 
-export class MIPropertiesModel {
-    public static readonly data: {
+export interface MIModelInputs {
+    daoAddress: SputnikDAO["address"];
+}
+
+export class MIModel {
+    public static readonly properties: {
         data: Multicall;
         error: Error | null;
         loading: boolean;
@@ -15,6 +19,9 @@ export class MIPropertiesModel {
         loading: true,
     };
 
+    public static readonly PropertiesContext = createContext(MIModel.properties);
+    public static readonly useProperties = () => useContext(MIModel.PropertiesContext);
+
     /**
      * Calls the given callback with a result of multicall contract instantiation,
      * represented as stateful response.
@@ -22,9 +29,9 @@ export class MIPropertiesModel {
      * @param daoAddress DAO contract address
      * @param callback Stateful data fetch callback
      */
-    private static readonly dataFetchFx = async (
-        daoAddress: Entity.Inputs["daoAddress"],
-        callback: (result: typeof MIPropertiesModel.data) => void
+    private static readonly propertiesFetch = async (
+        daoAddress: MIModelInputs["daoAddress"],
+        callback: (result: typeof MIModel.properties) => void
     ) =>
         callback(
             await Multicall.init(
@@ -36,17 +43,11 @@ export class MIPropertiesModel {
             }))
         );
 
-    /**
-     * For context provider usage only.
-     */
-    public static readonly useData = (daoAddress: Entity.Inputs["daoAddress"]) => {
-        const [state, stateUpdate] = useState<typeof MIPropertiesModel.data>(MIPropertiesModel.data);
+    public static readonly usePropertiesState = (daoAddress: MIModelInputs["daoAddress"]) => {
+        const [state, stateUpdate] = useState<typeof MIModel.properties>(MIModel.properties);
 
-        useEffect(() => void MIPropertiesModel.dataFetchFx(daoAddress, stateUpdate), [daoAddress, stateUpdate]);
+        useEffect(() => void MIModel.propertiesFetch(daoAddress, stateUpdate), [daoAddress, stateUpdate]);
 
         return state;
     };
-
-    public static readonly Context = createContext(MIPropertiesModel.data);
-    public static readonly useContext = () => useContext(MIPropertiesModel.Context);
 }

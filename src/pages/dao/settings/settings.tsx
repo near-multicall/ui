@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { HTMLProps } from "react";
 
-import { MI } from "../../../entities";
+import { MulticallInstance } from "../../../entities";
 import { SettingsEditor, SettingsEditorProps } from "../../../widgets";
 
 import "./settings.scss";
@@ -11,14 +11,14 @@ const _DaoSettingsTab = "DaoSettingsTab";
 interface DaoSettingsTabProps extends HTMLProps<HTMLDivElement>, SettingsEditorProps {}
 
 const Content = ({ className, adapters, ...props }: DaoSettingsTabProps) => (
-    <MI.PropertiesProvider daoAddress={adapters.dao.address}>
+    <MulticallInstance.PropertiesProvider daoAddress={adapters.dao.address}>
         <div
             className={clsx(_DaoSettingsTab, className)}
             {...props}
         >
             <SettingsEditor {...{ adapters }} />
         </div>
-    </MI.PropertiesProvider>
+    </MulticallInstance.PropertiesProvider>
 );
 
 Content.displayName = _DaoSettingsTab;

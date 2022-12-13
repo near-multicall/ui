@@ -7,18 +7,16 @@ import { STORAGE } from "../../../shared/lib/persistent";
 import { Validation } from "../../../shared/lib/validation";
 import { Dialog, TextInput, Tooltip } from "../../../shared/ui/design";
 import { ModuleContext } from "../module-context";
-import { ExternalLoginDialogsModel } from "../model/external-login-dialogs";
 
-import "./external-login-dialog.scss";
+import "./el-dialog.scss";
 
-interface ExternalLoginDialogProps
-    extends Pick<ComponentProps<typeof Dialog>, "className" | "onClose" | "open" | "title"> {
+interface ELDialogProps extends Pick<ComponentProps<typeof Dialog>, "className" | "onClose" | "open" | "title"> {
     method: "dao" | "multicall";
 }
 
-const _ExternalLoginDialog = "ExternalLoginDialog";
+const _ELDialog = "ELDialog";
 
-const ExternalLoginDialog = ({ className, method, onClose, open, title }: ExternalLoginDialogProps) => {
+export const ELDialog = ({ className, method, onClose, open, title }: ELDialogProps) => {
     const dAppURL = useMemo(() => new ArgsString(""), []);
 
     const URLInvalid = ArgsError.useInstance("Invalid URL", Validation.isUrl, true);
@@ -30,8 +28,8 @@ const ExternalLoginDialog = ({ className, method, onClose, open, title }: Extern
             } else {
                 const url = new URL(value);
                 url.searchParams.set("account_id", STORAGE.addresses[method]);
-                url.searchParams.set("public_key", ModuleContext.KEYS.public);
-                url.searchParams.set("all_keys", ModuleContext.KEYS.all);
+                url.searchParams.set("public_key", ModuleContext.keys.public);
+                url.searchParams.set("all_keys", ModuleContext.keys.all);
                 return url.toString();
             }
         },
@@ -40,14 +38,14 @@ const ExternalLoginDialog = ({ className, method, onClose, open, title }: Extern
 
     return (
         <Dialog
-            className={clsx(_ExternalLoginDialog, className)}
+            className={clsx(_ELDialog, className)}
             doneRename="Proceed"
             noSubmit={URLInvalid.$detected}
             onSubmit={() => window.open(requestURL, "_blank")}
             {...{ onClose, open, title }}
         >
-            <ul className={`${_ExternalLoginDialog}-stepByStepGuide`}>
-                {ModuleContext.STEP_BY_STEP_GUIDE.map((step) => (
+            <ul className={`${_ELDialog}-stepByStepGuide`}>
+                {ModuleContext.stepByStepGuide.map((step) => (
                     <li key={step.text}>
                         <span>
                             {step.text}
@@ -76,24 +74,3 @@ const ExternalLoginDialog = ({ className, method, onClose, open, title }: Extern
         </Dialog>
     );
 };
-
-export const Dialogs = () => {
-    const { dialogsVisibility, closeHandlerBinding } = ExternalLoginDialogsModel.useVisibilityState();
-
-    return (
-        <>
-            {" "}
-            {Object.values(ModuleContext.METHODS).map((loginMethod) => (
-                <ExternalLoginDialog
-                    key={loginMethod.type}
-                    method={loginMethod.type}
-                    onClose={closeHandlerBinding(loginMethod.type)}
-                    open={dialogsVisibility[loginMethod.type]}
-                    {...loginMethod}
-                />
-            ))}
-        </>
-    );
-};
-
-Dialogs.displayName = `${_ExternalLoginDialog}s`;

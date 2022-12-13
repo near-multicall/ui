@@ -1,12 +1,14 @@
 import { PropsWithChildren } from "react";
 
-import { Entity } from "../module-context";
-import { MIPropertiesModel } from "../model/mi-properties";
+import { SputnikDAO } from "../../../shared/lib/contracts/sputnik-dao";
+import { MIModel } from "../model/mi-model";
 
-interface MIPropertiesProviderProps extends PropsWithChildren, Pick<Entity.Inputs, "daoAddress"> {}
+export interface MIPropertiesProviderProps extends PropsWithChildren {
+    daoAddress: SputnikDAO["address"];
+}
 
 export const MIPropertiesProvider = ({ children, daoAddress }: MIPropertiesProviderProps) => (
-    <MIPropertiesModel.Context.Provider value={MIPropertiesModel.useData(daoAddress)}>
+    <MIModel.PropertiesContext.Provider value={MIModel.usePropertiesState(daoAddress)}>
         {children}
-    </MIPropertiesModel.Context.Provider>
+    </MIModel.PropertiesContext.Provider>
 );

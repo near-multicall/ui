@@ -11,7 +11,7 @@ type Jobs = {
 };
 
 export class JobInfoModel {
-    static allEntriesFetchFx = async (
+    static allEntriesFetch = async (
         { multicallInstance }: Entity.Inputs["adapters"],
         callback: (result: Jobs) => void
     ) =>
@@ -40,7 +40,7 @@ export class JobInfoModel {
     static useAllEntries = (adapters: Entity.Inputs["adapters"]) => {
         const [state, stateUpdate] = useState<Jobs>({ data: null, error: null, loading: true });
 
-        useEffect(() => void JobInfoModel.allEntriesFetchFx(adapters, stateUpdate), [adapters, stateUpdate]);
+        useEffect(() => void JobInfoModel.allEntriesFetch(adapters, stateUpdate), [adapters, stateUpdate]);
 
         useEffect(() => {
             state.error instanceof Error && void console.error(state.error);
