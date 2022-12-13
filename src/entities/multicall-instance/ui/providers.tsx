@@ -1,12 +1,12 @@
 import { PropsWithChildren } from "react";
 
 import { Entity } from "../module-context";
-import { MISettingsModel } from "../model/mi-settings";
+import { MIPropertiesModel } from "../model/mi-properties";
 
-interface MISettingsProviderProps extends PropsWithChildren, Pick<Entity.Inputs, "daoAddress"> {}
+interface MIPropertiesProviderProps extends PropsWithChildren, Pick<Entity.Inputs, "daoAddress"> {}
 
-export const MISettingsProvider = ({ children, daoAddress }: MISettingsProviderProps) => (
-    <MISettingsModel.Context.Provider value={MISettingsModel.useData(daoAddress)}>
+export const MIPropertiesProvider = ({ children, daoAddress }: MIPropertiesProviderProps) => (
+    <MIPropertiesModel.Context.Provider value={MIPropertiesModel.useData(daoAddress)}>
         {children}
-    </MISettingsModel.Context.Provider>
+    </MIPropertiesModel.Context.Provider>
 );

@@ -11,14 +11,14 @@ const _DaoSettingsTab = "DaoSettingsTab";
 interface DaoSettingsTabProps extends HTMLProps<HTMLDivElement>, SettingsEditorProps {}
 
 const Content = ({ className, adapters, ...props }: DaoSettingsTabProps) => (
-    <MI.SettingsProvider daoAddress={adapters.dao.address}>
+    <MI.PropertiesProvider daoAddress={adapters.dao.address}>
         <div
             className={clsx(_DaoSettingsTab, className)}
             {...props}
         >
             <SettingsEditor {...{ adapters }} />
         </div>
-    </MI.SettingsProvider>
+    </MI.PropertiesProvider>
 );
 
 Content.displayName = _DaoSettingsTab;

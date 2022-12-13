@@ -21,7 +21,7 @@ export interface SettingsEditorProps extends HTMLProps<HTMLDivElement> {
 
 export const SettingsEditor = ({ className, adapters }: SettingsEditorProps) => {
     const wallet = useContext(Wallet.SelectorContext),
-        { data: MISettings, error: MIError } = MI.useSettings();
+        { data: MIProperties, error: MIError } = MI.useProperties();
 
     const proposalCreationPermitted =
         !wallet?.accountId || adapters.dao.checkUserPermission(wallet?.accountId, "AddProposal", "FunctionCall");
@@ -77,7 +77,7 @@ export const SettingsEditor = ({ className, adapters }: SettingsEditorProps) => 
             void adapters.dao
                 .proposeFunctionCall(
                     proposalDescription,
-                    MISettings.address,
+                    MIProperties.address,
                     Multicall.configDiffToProposalActions(changesDiff)
                 )
                 .then((someTx) => signAndSendTxs([someTx]))

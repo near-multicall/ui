@@ -4,7 +4,7 @@ import { ArgsAccount } from "../../../shared/lib/args-old";
 import { Multicall } from "../../../shared/lib/contracts/multicall";
 import { Entity } from "../module-context";
 
-export class MISettingsModel {
+export class MIPropertiesModel {
     public static readonly data: {
         data: Multicall;
         error: Error | null;
@@ -24,7 +24,7 @@ export class MISettingsModel {
      */
     private static readonly dataFetchFx = async (
         daoAddress: Entity.Inputs["daoAddress"],
-        callback: (result: typeof MISettingsModel.data) => void
+        callback: (result: typeof MIPropertiesModel.data) => void
     ) =>
         callback(
             await Multicall.init(
@@ -40,13 +40,13 @@ export class MISettingsModel {
      * For context provider usage only.
      */
     public static readonly useData = (daoAddress: Entity.Inputs["daoAddress"]) => {
-        const [state, stateUpdate] = useState<typeof MISettingsModel.data>(MISettingsModel.data);
+        const [state, stateUpdate] = useState<typeof MIPropertiesModel.data>(MIPropertiesModel.data);
 
-        useEffect(() => void MISettingsModel.dataFetchFx(daoAddress, stateUpdate), [daoAddress, stateUpdate]);
+        useEffect(() => void MIPropertiesModel.dataFetchFx(daoAddress, stateUpdate), [daoAddress, stateUpdate]);
 
         return state;
     };
 
-    public static readonly Context = createContext(MISettingsModel.data);
-    public static readonly useContext = () => useContext(MISettingsModel.Context);
+    public static readonly Context = createContext(MIPropertiesModel.data);
+    public static readonly useContext = () => useContext(MIPropertiesModel.Context);
 }

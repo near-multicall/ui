@@ -1,5 +1,5 @@
 import { Scrollable, Table, type TableProps, Tile, TileProps } from "../../../shared/ui/design";
-import { MISettingsModel } from "../model/mi-settings";
+import { MIPropertiesModel } from "../model/mi-properties";
 
 import { MIWhitelistedTokenProps, miWhitelistedTokenAsTableRow } from "./mi-whitelisted-token";
 
@@ -19,7 +19,7 @@ export const MITokenWhitelistTable = ({
     onItemsSelected,
     subheader,
 }: MITokenWhitelistTableProps) => {
-    const { data, error, loading } = MISettingsModel.useContext(),
+    const { data, error, loading } = MIPropertiesModel.useContext(),
         items = (data?.tokensWhitelist ?? []).concat(itemsAdditional ?? []);
 
     return (

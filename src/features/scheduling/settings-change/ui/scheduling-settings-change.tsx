@@ -13,7 +13,7 @@ import "./scheduling-settings-change.scss";
 const _SchedulingSettingsChange = "SchedulingSettingsChange";
 
 export const Form = ({ disabled, onEdit, resetTrigger }: Feature.Inputs) => {
-    const { data: MISettings } = MI.useSettings();
+    const { data: MIProperties } = MI.useProperties();
 
     const [editModeEnabled, editModeSwitch] = useState(false);
 
@@ -28,32 +28,32 @@ export const Form = ({ disabled, onEdit, resetTrigger }: Feature.Inputs) => {
     ];
 
     const formFields = {
-        croncatManager: useMemo(() => new ArgsString(MISettings.croncatManager), [MISettings]),
+        croncatManager: useMemo(() => new ArgsString(MIProperties.croncatManager), [MIProperties]),
 
         jobBond: useMemo(
-            () => new ArgsString(MISettings.jobBond !== "" ? toNEAR(MISettings.jobBond) : ""),
+            () => new ArgsString(MIProperties.jobBond !== "" ? toNEAR(MIProperties.jobBond) : ""),
 
-            [MISettings]
+            [MIProperties]
         ),
     };
 
     const onCroncatManagerChange = useCallback<Required<TextFieldProps>["onChange"]>(
         ({ target: { value } }) =>
-            void croncatManagerUpdate(value !== MISettings.croncatManager ? value : formInitialState.croncatManager),
+            void croncatManagerUpdate(value !== MIProperties.croncatManager ? value : formInitialState.croncatManager),
 
         [croncatManagerUpdate]
     );
 
     const onJobBondChange = useCallback<Required<TextFieldProps>["onChange"]>(
         ({ target: { value } }) =>
-            void jobBondUpdate(value !== toNEAR(MISettings.jobBond) ? toYocto(value) : formInitialState.jobBond),
+            void jobBondUpdate(value !== toNEAR(MIProperties.jobBond) ? toYocto(value) : formInitialState.jobBond),
 
         [jobBondUpdate]
     );
 
     const formReset = useCallback(() => {
-        formFields.croncatManager.value = MISettings.croncatManager;
-        formFields.jobBond.value = toNEAR(MISettings.jobBond);
+        formFields.croncatManager.value = MIProperties.croncatManager;
+        formFields.jobBond.value = toNEAR(MIProperties.jobBond);
 
         void croncatManagerUpdate(formInitialState.croncatManager);
         void jobBondUpdate(formInitialState.jobBond);
@@ -105,7 +105,7 @@ export const Form = ({ disabled, onEdit, resetTrigger }: Feature.Inputs) => {
 
                     idToHighlightColor: (id) =>
                         ({ croncatManager, jobBond }[id] === formInitialState[id as Feature.DiffKey] ||
-                        { croncatManager, jobBond }[id] === MISettings[id as Feature.DiffKey]
+                        { croncatManager, jobBond }[id] === MIProperties[id as Feature.DiffKey]
                             ? null
                             : "blue"),
 
@@ -126,10 +126,10 @@ export const Form = ({ disabled, onEdit, resetTrigger }: Feature.Inputs) => {
                                 <TextField
                                     fullWidth
                                     onChange={onCroncatManagerChange}
-                                    value={croncatManager || MISettings.croncatManager}
+                                    value={croncatManager || MIProperties.croncatManager}
                                 />
                             ) : (
-                                <NearLink address={croncatManager || MISettings.croncatManager} />
+                                <NearLink address={croncatManager || MIProperties.croncatManager} />
                             ),
                         ],
                     },
@@ -148,14 +148,14 @@ export const Form = ({ disabled, onEdit, resetTrigger }: Feature.Inputs) => {
                                     fullWidth
                                     onChange={onJobBondChange}
                                     type="number"
-                                    value={toNEAR(jobBond || MISettings.jobBond)}
+                                    value={toNEAR(jobBond || MIProperties.jobBond)}
                                 />
                             ) : (
                                 <IconLabel
                                     icon={NearIcon.NATIVE_TOKEN_CHARACTER}
                                     label={
-                                        jobBond || MISettings.jobBond !== ""
-                                            ? toNEAR(jobBond || MISettings.jobBond)
+                                        jobBond || MIProperties.jobBond !== ""
+                                            ? toNEAR(jobBond || MIProperties.jobBond)
                                             : "..."
                                     }
                                     reversed
