@@ -8,6 +8,10 @@ import { ModuleContext } from "../module-context";
 
 const _dialogOpenRequested = "dialogOpenRequested";
 
+type DialogOpenRequestedEvent = CustomEventInit<{
+    dialogKey: "dao" | "multicall";
+}>;
+
 const dialogOpenRequested = {
     dispatch: (dialogKey: keyof typeof ModuleContext.methods) =>
         document.dispatchEvent(new CustomEvent(_dialogOpenRequested, { detail: { dialogKey } })),
@@ -34,12 +38,12 @@ export class ELModel {
 
         useEffect(
             () =>
-                dialogOpenRequested.subscribe(({ detail }) =>
+                dialogOpenRequested.subscribe(({ detail }: DialogOpenRequestedEvent) =>
                     dialogVisibilitySwitch(
                         Object.keys(dialogsVisibility).reduce(
                             (visibilityState, someDialogKey) => ({
                                 ...visibilityState,
-                                [someDialogKey]: someDialogKey === detail.dialogKey ? true : false,
+                                [someDialogKey]: someDialogKey === detail?.dialogKey ? true : false,
                             }),
 
                             dialogsVisibility
