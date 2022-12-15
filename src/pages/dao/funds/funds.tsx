@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { HTMLProps } from "react";
 
-import { TokenBalances, type TokenBalancesProps } from "../../../widgets";
+import { TokenBalances, TokenBalancesProps } from "../../../widgets";
 
 import "./funds.scss";
 

@@ -1,21 +1,31 @@
 import { CancelOutlined, DeleteOutlined, EditOutlined, SettingsBackupRestoreOutlined } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { HTMLProps, useCallback, useEffect, useMemo, useState } from "react";
 
+import { MulticallSettingsChange, MulticallTokenWhitelistDiffKey } from "../../../../shared/lib/contracts/multicall";
 import { TextInput, Tooltip } from "../../../../shared/ui/design";
 import { ArgsString } from "../../../../shared/lib/args-old";
 import { MulticallInstance } from "../../../../entities";
-import { ModuleContext, Feature } from "../module-context";
+import { ModuleContext } from "../module-context";
 
 import "./token-whitelist-change.scss";
 
 const _TokenWhitelistChange = "TokenWhitelistChange";
 
-export const TokenWhitelistChangeUI = ({ disabled, onEdit, resetTrigger }: Feature.Inputs) => {
+type FormState = Pick<MulticallSettingsChange, MulticallTokenWhitelistDiffKey>;
+
+interface TokenWhitelistChangeUIProps extends Omit<HTMLProps<HTMLDivElement>, "onChange"> {
+    onEdit: (payload: FormState) => void;
+    resetTrigger: { subscribe: (callback: EventListener) => () => void };
+}
+
+interface FormStates extends Record<keyof FormState, Set<MulticallSettingsChange[keyof FormState][number]>> {}
+
+export const TokenWhitelistChangeUI = ({ disabled, onEdit, resetTrigger }: TokenWhitelistChangeUIProps) => {
     const [editModeEnabled, editModeSwitch] = useState(false);
 
-    const [addTokens, markForAddition] = useState<Feature.FormStates["addTokens"]>(new Set()),
-        [removeTokens, markForRemoval] = useState<Feature.FormStates["removeTokens"]>(new Set());
+    const [addTokens, markForAddition] = useState<FormStates["addTokens"]>(new Set()),
+        [removeTokens, markForRemoval] = useState<FormStates["removeTokens"]>(new Set());
 
     const tokenToAddAddress = useMemo(() => new ArgsString(""), []);
 
