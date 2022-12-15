@@ -1,7 +1,7 @@
 @use "sass/font";
 
-.TokenBalances {
-    grid-area: TokenBalances;
+.Balances {
+    grid-area: Balances;
 
     .TableRow-content--compact {
         &:not(&:first-of-type) {

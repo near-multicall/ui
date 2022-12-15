@@ -64,7 +64,7 @@ export class WalletComponent extends Component<Props, State> {
                 })
                 .transform((_, addr) => ({
                     noAddress: addr,
-                    noMulticall: this.toMulticallAddress(addr),
+                    noMulticall: Multicall.getInstanceAddress(addr),
                 }))
                 .retain(),
         })
@@ -110,15 +110,6 @@ export class WalletComponent extends Component<Props, State> {
         }
     }
 
-    toMulticallAddress(addr: string): string {
-        return args
-            .string()
-            .ensure()
-            .intoBaseAddress()
-            .append("." + Multicall.FACTORY_ADDRESS)
-            .cast(addr);
-    }
-
     signIn() {
         const { modal } = this.context!;
         modal.show();
@@ -137,7 +128,7 @@ export class WalletComponent extends Component<Props, State> {
     connectDao(dao: SputnikDAO["address"]) {
         const { accountId } = this.context!;
 
-        const multicallAddress = this.toMulticallAddress(dao);
+        const multicallAddress = Multicall.getInstanceAddress(dao);
 
         Promise.all([
             SputnikDAO.init(dao).catch(() => {
@@ -270,7 +261,7 @@ export class WalletComponent extends Component<Props, State> {
                             onInputChange={(e, newValue) => {
                                 // set STORAGE.addresses to have no delay, thus no rubber banding
                                 STORAGE.addresses.dao = newValue;
-                                STORAGE.addresses.multicall = this.toMulticallAddress(newValue);
+                                STORAGE.addresses.multicall = Multicall.getInstanceAddress(newValue);
                                 this.daoSearchDebounced(newValue);
                             }}
                         />

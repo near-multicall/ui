@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 
 import { ArgsAccount } from "../../../shared/lib/args-old";
 import { Multicall } from "../../../shared/lib/contracts/multicall";
@@ -19,8 +19,7 @@ export class MIModel {
         loading: true,
     };
 
-    public static readonly PropertiesContext = createContext(MIModel.properties);
-    public static readonly useProperties = () => useContext(MIModel.PropertiesContext);
+    public static readonly Context = createContext(MIModel.properties);
 
     /**
      * Calls the given callback with a result of multicall contract instantiation,
@@ -30,7 +29,7 @@ export class MIModel {
      * @param callback Stateful data fetch callback
      */
     private static readonly propertiesFetch = async (
-        daoAddress: MIModelInputs["daoAddress"],
+        { daoAddress }: MIModelInputs,
         callback: (result: typeof MIModel.properties) => void
     ) =>
         callback(
@@ -43,10 +42,10 @@ export class MIModel {
             }))
         );
 
-    public static readonly usePropertiesState = (daoAddress: MIModelInputs["daoAddress"]) => {
-        const [state, stateUpdate] = useState<typeof MIModel.properties>(MIModel.properties);
+    public static readonly usePropertiesState = (inputs: MIModelInputs) => {
+        const [state, stateUpdate] = useState(MIModel.properties);
 
-        useEffect(() => void MIModel.propertiesFetch(daoAddress, stateUpdate), [daoAddress, stateUpdate]);
+        useEffect(() => void MIModel.propertiesFetch(inputs, stateUpdate), [inputs, stateUpdate]);
 
         return state;
     };

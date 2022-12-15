@@ -1,5 +1,5 @@
-import { MulticallTokenWhitelistDiffKey } from "../../../shared/lib/contracts/multicall";
-import { Color } from "../../../shared/ui/design";
+import { MulticallTokenWhitelistDiffKey } from "../../shared/lib/contracts/multicall";
+import { Color } from "../../shared/ui/design";
 
 export class ModuleContext {
     public static readonly DiffKey = MulticallTokenWhitelistDiffKey;

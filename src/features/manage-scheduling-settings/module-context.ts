@@ -1,5 +1,5 @@
-import { MulticallInstance } from "../../../entities";
-import { Color } from "../../../shared/ui/design";
+import { MulticallInstance } from "../../entities";
+import { Color } from "../../shared/ui/design";
 
 export class ModuleContext {
     public static readonly DiffKey = MulticallInstance.ParamKey;

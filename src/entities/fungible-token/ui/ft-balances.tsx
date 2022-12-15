@@ -1,16 +1,18 @@
+import { useContext } from "react";
 import { IconLabel, NearIcon } from "../../../shared/ui/design";
 import { FTFormat } from "../lib/ft-format";
-import { FTInfoModel } from "../model/ft-info";
-import { FT } from "../module-context";
+import { FTModel } from "../model/ft-model";
 
-interface FTBalancesProps extends FT.Inputs {}
+export interface FTBalancesProps {
+    nonZeroOnly?: boolean;
+}
 
-export const ftBalances = ({ adapters }: FTBalancesProps) => {
-    const { data } = FTInfoModel.useNonZeroBalances(adapters);
+export const ftBalancesRender = ({ nonZeroOnly = false }: FTBalancesProps) => {
+    const { data } = useContext(FTModel.BalancesContext);
 
     return !data
         ? null
-        : data.map(({ dao, metadata, multicall, total }) => ({
+        : data.map(({ account, metadata, multicall, total }) => ({
               content: [
                   <IconLabel
                       icon={metadata.icon ?? <NearIcon.GenericTokenFilled />}
@@ -18,7 +20,7 @@ export const ftBalances = ({ adapters }: FTBalancesProps) => {
                   />,
 
                   FTFormat.amountToDisplayAmount(multicall, metadata.decimals),
-                  FTFormat.amountToDisplayAmount(dao, metadata.decimals),
+                  FTFormat.amountToDisplayAmount(account, metadata.decimals),
                   FTFormat.amountToDisplayAmount(total, metadata.decimals),
               ],
 

@@ -1,13 +1,13 @@
-import { SchedulingSettingsChange, TokenWhitelistChange } from "../../features";
+import { ManageScheduleSettings, ManageTokenWhitelist } from "../../features";
 
 export class ModuleContext {
     public static readonly DiffKey = {
-        ...SchedulingSettingsChange.DiffKey,
-        ...TokenWhitelistChange.DiffKey,
+        ...ManageScheduleSettings.DiffKey,
+        ...ManageTokenWhitelist.DiffKey,
     };
 
     public static readonly DiffMeta = {
-        ...SchedulingSettingsChange.DiffMeta,
-        ...TokenWhitelistChange.DiffMeta,
+        ...ManageScheduleSettings.DiffMeta,
+        ...ManageTokenWhitelist.DiffMeta,
     };
 }

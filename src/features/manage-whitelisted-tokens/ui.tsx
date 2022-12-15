@@ -2,26 +2,26 @@ import { CancelOutlined, DeleteOutlined, EditOutlined, SettingsBackupRestoreOutl
 import { IconButton } from "@mui/material";
 import { HTMLProps, useCallback, useEffect, useMemo, useState } from "react";
 
-import { MulticallSettingsChange, MulticallTokenWhitelistDiffKey } from "../../../../shared/lib/contracts/multicall";
-import { TextInput, Tooltip } from "../../../../shared/ui/design";
-import { ArgsString } from "../../../../shared/lib/args-old";
-import { MulticallInstance } from "../../../../entities";
-import { ModuleContext } from "../module-context";
+import { MulticallSettingsChange, MulticallTokenWhitelistDiffKey } from "../../shared/lib/contracts/multicall";
+import { TextInput, Tooltip } from "../../shared/ui/design";
+import { ArgsString } from "../../shared/lib/args-old";
+import { MulticallInstance } from "../../entities";
+import { ModuleContext } from "./module-context";
 
-import "./token-whitelist-change.scss";
+import "./ui.scss";
 
-const _TokenWhitelistChange = "TokenWhitelistChange";
+const _ManageTokenWhitelist = "ManageTokenWhitelist";
 
 type FormState = Pick<MulticallSettingsChange, MulticallTokenWhitelistDiffKey>;
 
-interface TokenWhitelistChangeUIProps extends Omit<HTMLProps<HTMLDivElement>, "onChange"> {
+interface ManageTokenWhitelistUIProps extends Omit<HTMLProps<HTMLDivElement>, "onChange"> {
     onEdit: (payload: FormState) => void;
     resetTrigger: { subscribe: (callback: EventListener) => () => void };
 }
 
 interface FormStates extends Record<keyof FormState, Set<MulticallSettingsChange[keyof FormState][number]>> {}
 
-export const TokenWhitelistChangeUI = ({ disabled, onEdit, resetTrigger }: TokenWhitelistChangeUIProps) => {
+export const ManageTokenWhitelistUI = ({ disabled, onEdit, resetTrigger }: ManageTokenWhitelistUIProps) => {
     const [editModeEnabled, editModeSwitch] = useState(false);
 
     const [addTokens, markForAddition] = useState<FormStates["addTokens"]>(new Set()),
@@ -97,7 +97,7 @@ export const TokenWhitelistChangeUI = ({ disabled, onEdit, resetTrigger }: Token
                         void null,
                 },
             }}
-            className={_TokenWhitelistChange}
+            className={_ManageTokenWhitelist}
             headerSlots={{
                 end: editModeEnabled ? (
                     <Tooltip content="Cancel & Reset">

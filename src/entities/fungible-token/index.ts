@@ -1,8 +1,10 @@
-import { ModuleContext, FT as FTModule } from "./module-context";
-import { ftBalances } from "./ui/ft-balances";
-
-export { type FTModule };
+import { ModuleContext } from "./module-context";
+import { FTBalancesProps, ftBalancesRender } from "./ui/ft-balances";
+import { FTBalancesProvider, FTBalancesProviderProps } from "./ui/ft-providers";
 
 export class FT extends ModuleContext {
-    static balances = ftBalances;
+    static BalancesProvider = FTBalancesProvider;
+    static balancesRender = ftBalancesRender;
 }
+
+export type { FTBalancesProps, FTBalancesProviderProps };

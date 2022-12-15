@@ -1,3 +1,5 @@
+import { useContext } from "react";
+
 import { Scrollable, Table, TableProps, Tile, TileProps } from "../../../shared/ui/design";
 import { MIModel } from "../model/mi-model";
 
@@ -19,15 +21,16 @@ export const MITokenWhitelistTable = ({
     onItemsSelected,
     subheader,
 }: MITokenWhitelistTableProps) => {
-    const { data, error, loading } = MIModel.useProperties(),
-        items = (data?.tokensWhitelist ?? []).concat(itemsAdditional ?? []);
+    const multicallInstance = useContext(MIModel.Context),
+        items = (multicallInstance.data?.tokensWhitelist ?? []).concat(itemsAdditional ?? []),
+        tileProps = { ...multicallInstance, footer, headerSlots, subheader };
 
     return (
         <Tile
             classes={{ root: className }}
             heading="Token whitelist"
             noData={items.length === 0}
-            {...{ error, footer, headerSlots, loading, subheader }}
+            {...tileProps}
         >
             <Scrollable>
                 <Table

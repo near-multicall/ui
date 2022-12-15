@@ -9,20 +9,17 @@ const _DaoJobsTab = "DaoJobsTab";
 
 interface DaoJobsTabProps extends HTMLProps<HTMLDivElement>, ComponentProps<typeof Job.EntriesTable> {}
 
-const Content = ({ className, adapters, ...props }: DaoJobsTabProps) => (
-    <div
-        className={clsx(_DaoJobsTab, className)}
-        {...props}
-    >
-        <Job.EntriesTable {...{ adapters }} />
-    </div>
-);
-
-Content.displayName = _DaoJobsTab;
-
 export const DaoJobsTab = {
-    render: (props: DaoJobsTabProps) => ({
-        content: <Content {...props} />,
+    render: ({ className, adapters, ...props }: DaoJobsTabProps) => ({
+        content: (
+            <div
+                className={clsx("DaoJobsTab", className)}
+                {...props}
+            >
+                <Job.EntriesTable {...{ adapters }} />
+            </div>
+        ),
+
         lazy: true,
         name: "Jobs",
     }),

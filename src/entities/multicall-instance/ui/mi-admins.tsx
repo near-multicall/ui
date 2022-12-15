@@ -1,3 +1,4 @@
+import { useContext } from "react";
 import { Scrollable, Table, Tile } from "../../../shared/ui/design";
 import { MIModel } from "../model/mi-model";
 
@@ -9,7 +10,7 @@ interface MIAdminsTableProps {
 }
 
 export const MIAdminsTable = ({ className, itemsAdditional }: MIAdminsTableProps) => {
-    const { data, error, loading } = MIModel.useProperties(),
+    const { data, error, loading } = useContext(MIModel.Context),
         items = (data?.admins ?? []).concat(itemsAdditional ?? []);
 
     return (

@@ -1,8 +1,9 @@
+import { args } from "../args/args";
 import { Big, toGas, dateToCron, toYocto } from "../converter";
 import { AccountId, Base64String, U128String, U64String } from "../types";
 import { viewAccount, viewState, view, Tx } from "../wallet";
 
-import { FunctionCallAction as daoFunctionCallAction } from "./sputnik-dao";
+import { FunctionCallAction as daoFunctionCallAction, SputnikDAO } from "./sputnik-dao";
 
 const FACTORY_ADDRESS_SELECTOR: Record<string, AccountId> = {
     mainnet: "v1.multicall.near",
@@ -60,6 +61,11 @@ type MulticallArgs = {
 
 enum MulticallPropertyKey {
     croncatManager = "croncatManager",
+
+    /**
+     * Job bond amount must be attached as deposit when adding new jobs.
+     * Needs initialization, but start with "" because it's distinguishable from a real value (string encoded numbers).
+     */
     jobBond = "jobBond",
 }
 
@@ -78,31 +84,40 @@ interface MulticallSettingsChange {
 class Multicall {
     static FACTORY_ADDRESS: AccountId = FACTORY_ADDRESS_SELECTOR[window.NEAR_ENV];
     static CONTRACT_CODE_HASHES: AccountId[] = CONTRACT_CODE_HASHES_SELECTOR[window.NEAR_ENV];
-    // 0.025 NEAR is the min required by croncat for a non-recurring task. Assume trigger of 270 Tgas and 0 NEAR.
+
+    /**
+     * 0.025 NEAR is the min required by croncat for a non-recurring task. Assume trigger of 270 Tgas and 0 NEAR.
+     */
     static CRONCAT_FEE: U128String = toYocto("0.0275");
 
     address: AccountId;
+
     admins: AccountId[] = [];
     [MulticallPropertyKey.croncatManager]: AccountId = "";
-    // only whitelisted tokens can be attached to multicalls or job activations.
+
+    /**
+     * Only whitelisted tokens can be attached to multicalls or job activations.
+     */
     tokensWhitelist: AccountId[] = [];
-    // job bond amount must be attached as deposit when adding new jobs.
-    // needs initialization, but start with "" because it's distinguishable from a real value (string encoded numbers).
+
     [MulticallPropertyKey.jobBond]: U128String = "";
-    // Multicall instance is ready when info (admins...) are fetched & assigned correctly.
+
+    /**
+     * Multicall instance is ready when info (admins...) are fetched & assigned correctly.
+     */
     ready: boolean = false;
 
-    constructor(multicallAddress: AccountId) {
-        this.address = multicallAddress;
+    constructor(instanceAddress: AccountId) {
+        this.address = instanceAddress;
     }
 
     // used to create and initialize a Multicall instance
-    static async init(multicallAddress: AccountId): Promise<Multicall> {
+    static async init(instanceAddress: AccountId): Promise<Multicall> {
         // verify address is a Multicall instance, fetch its info and mark it ready
-        const multicallInstance = new Multicall(multicallAddress);
+        const multicallInstance = new Multicall(instanceAddress);
         const [isMulticall, admins, croncatManager, tokensWhitelist, jobBond] = await Promise.all([
             // on failure set isMulticall to false
-            Multicall.isMulticall(multicallAddress).catch((err) => {
+            Multicall.isMulticall(instanceAddress).catch((err) => {
                 return false;
             }),
             // on failure set admins list to be empty
@@ -215,6 +230,22 @@ class Multicall {
     async getAdmins(): Promise<AccountId[]> {
         return view(this.address, "get_admins", {});
     }
+
+    static getInstanceAddress = (spawnerAccountId: AccountId): Multicall["address"] =>
+        args
+            .string()
+            .ensure()
+            .intoBaseAddress()
+            .append("." + Multicall.FACTORY_ADDRESS)
+            .cast(spawnerAccountId);
+
+    static getSputnikDAOAddress = (instanceAccountId: AccountId): SputnikDAO["address"] =>
+        args
+            .string()
+            .ensure()
+            .intoBaseAddress()
+            .append("." + SputnikDAO.FACTORY_ADDRESS)
+            .cast(instanceAccountId);
 
     /**
      * get whitelisted tokens

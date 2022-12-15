@@ -58,7 +58,7 @@ export class DaoPage extends Component<Props, State> {
                 .transform((_, addr) => ({
                     noAddress: addr,
                     noDao: addr,
-                    noMulticall: this.toMulticallAddress(addr),
+                    noMulticall: Multicall.getInstanceAddress(addr),
                 }))
                 .retain(),
         })
@@ -81,7 +81,7 @@ export class DaoPage extends Component<Props, State> {
             },
 
             dao: new SputnikDAO(addr),
-            multicallInstance: new Multicall(this.toMulticallAddress(addr)),
+            multicallInstance: new Multicall(Multicall.getInstanceAddress(addr)),
             loading: false,
             proposed: -1,
             proposedInfo: null,
@@ -107,15 +107,6 @@ export class DaoPage extends Component<Props, State> {
             },
             callback
         );
-    }
-
-    toMulticallAddress(addr: string): string {
-        return args
-            .string()
-            .ensure()
-            .intoBaseAddress()
-            .append("." + Multicall.FACTORY_ADDRESS)
-            .cast(addr);
     }
 
     /**
@@ -160,7 +151,7 @@ export class DaoPage extends Component<Props, State> {
     onAddressesUpdated(e: CustomEvent<{ dao: string }>) {
         if (e.detail.dao !== this.state.formData.addr) {
             this.setState({
-                multicallInstance: new Multicall(this.toMulticallAddress(e.detail.dao)),
+                multicallInstance: new Multicall(Multicall.getInstanceAddress(e.detail.dao)),
             });
             this.formikSetValues?.({ addr: e.detail.dao });
         }
@@ -179,7 +170,7 @@ export class DaoPage extends Component<Props, State> {
             return null;
         }
 
-        const multicallAddress = this.toMulticallAddress(formData.addr);
+        const multicallAddress = Multicall.getInstanceAddress(formData.addr);
 
         const depo = Big(this.fee).plus(MulticallInstance.MIN_BALANCE);
 
@@ -367,7 +358,7 @@ export class DaoPage extends Component<Props, State> {
     confidentlyLoadOnlyDaoInfo() {
         const { addr } = this.state.formData;
 
-        const multicallAddress = this.toMulticallAddress(addr);
+        const multicallAddress = Multicall.getInstanceAddress(addr);
 
         this.setState({ loading: true });
 
@@ -402,7 +393,7 @@ export class DaoPage extends Component<Props, State> {
     confidentlyLoadInfo() {
         const { addr: daoAddress } = this.state.formData;
 
-        const multicallAddress = this.toMulticallAddress(daoAddress);
+        const multicallAddress = Multicall.getInstanceAddress(daoAddress);
 
         this.setState({ loading: true });
 
@@ -484,49 +475,51 @@ export class DaoPage extends Component<Props, State> {
         }
 
         return (
-            <div className={_DaoPage}>
-                <div className={`${_DaoPage}-header`}>
-                    <div className="DaoSearch">
-                        <Formik
-                            initialValues={{ addr: STORAGE.addresses.dao ?? "" }}
-                            validate={(values) => {
-                                this.setFormData({ addr: values.addr });
-                                this.tryLoadInfoDebounced();
-                            }}
-                            onSubmit={() => {}}
-                        >
-                            {({ setValues }) => {
-                                this.formikSetValues = setValues;
+            <MulticallInstance.ContextProvider daoAddress={this.state.dao.address}>
+                <div className={_DaoPage}>
+                    <div className={`${_DaoPage}-header`}>
+                        <div className="DaoSearch">
+                            <Formik
+                                initialValues={{ addr: STORAGE.addresses.dao ?? "" }}
+                                validate={(values) => {
+                                    this.setFormData({ addr: values.addr });
+                                    this.tryLoadInfoDebounced();
+                                }}
+                                onSubmit={() => {}}
+                            >
+                                {({ setValues }) => {
+                                    this.formikSetValues = setValues;
 
-                                return (
-                                    <Form>
-                                        <TextField
-                                            name="addr"
-                                            placeholder="Search for DAOs"
-                                            hiddenLabel={true}
-                                            variant="standard"
-                                            autoFocus
-                                        />
-                                    </Form>
-                                );
-                            }}
-                        </Formik>
+                                    return (
+                                        <Form>
+                                            <TextField
+                                                name="addr"
+                                                placeholder="Search for DAOs"
+                                                hiddenLabel={true}
+                                                variant="standard"
+                                                autoFocus
+                                            />
+                                        </Form>
+                                    );
+                                }}
+                            </Formik>
+                        </div>
                     </div>
-                </div>
 
-                <Tabs
-                    classes={{
-                        root: `${_DaoPage}-tabs`,
-                        buttonsPanel: `${_DaoPage}-tabs-buttonsPanel`,
-                        contentSpace: `${_DaoPage}-tabs-contentSpace`,
-                    }}
-                    items={[
-                        DaoSettingsTab.render({ className: `${_DaoPage}-content`, adapters: { dao } }),
-                        DaoFundsTab.render({ className: `${_DaoPage}-content`, adapters: { dao, multicallInstance } }),
-                        DaoJobsTab.render({ className: `${_DaoPage}-content`, adapters: { multicallInstance } }),
-                    ]}
-                />
-            </div>
+                    <Tabs
+                        classes={{
+                            root: `${_DaoPage}-tabs`,
+                            buttonsPanel: `${_DaoPage}-tabs-buttonsPanel`,
+                            contentSpace: `${_DaoPage}-tabs-contentSpace`,
+                        }}
+                        items={[
+                            DaoSettingsTab.render({ className: `${_DaoPage}-content`, adapters: { dao } }),
+                            DaoFundsTab.render({ accountId: dao.address, className: `${_DaoPage}-content` }),
+                            DaoJobsTab.render({ className: `${_DaoPage}-content`, adapters: { multicallInstance } }),
+                        ]}
+                    />
+                </div>
+            </MulticallInstance.ContextProvider>
         );
     }
 }

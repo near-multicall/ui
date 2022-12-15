@@ -1,27 +1,27 @@
 import { CancelOutlined, EditOutlined, VisibilityOutlined } from "@mui/icons-material";
 import { IconButton, TextField, TextFieldProps } from "@mui/material";
-import { HTMLProps, useCallback, useEffect, useMemo, useState } from "react";
+import { HTMLProps, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
-import { MulticallInstance } from "../../../../entities";
-import { ArgsString } from "../../../../shared/lib/args-old";
-import { MulticallSettingsChange, MulticallPropertyKey } from "../../../../shared/lib/contracts/multicall";
-import { toNEAR, toYocto } from "../../../../shared/lib/converter";
-import { IconLabel, NearIcon, NearLink, Table, Tile, Tooltip } from "../../../../shared/ui/design";
-import { ModuleContext } from "../module-context";
+import { MulticallInstance } from "../../entities";
+import { ArgsString } from "../../shared/lib/args-old";
+import { MulticallSettingsChange, MulticallPropertyKey } from "../../shared/lib/contracts/multicall";
+import { toNEAR, toYocto } from "../../shared/lib/converter";
+import { IconLabel, NearIcon, NearLink, Table, Tile, Tooltip } from "../../shared/ui/design";
+import { ModuleContext } from "./module-context";
 
-import "./scheduling-settings-change.scss";
+import "./ui.scss";
 
-const _SchedulingSettingsChange = "SchedulingSettingsChange";
+const _ManageScheduleSettings = "ManageScheduleSettings";
 
 type FormState = Pick<MulticallSettingsChange, MulticallPropertyKey>;
 
-interface SchedulingSettingsChangeUIProps extends Omit<HTMLProps<HTMLDivElement>, "onChange"> {
+interface ManageScheduleSettingsUIProps extends Omit<HTMLProps<HTMLDivElement>, "onChange"> {
     onEdit: (payload: FormState) => void;
     resetTrigger: { subscribe: (callback: EventListener) => () => void };
 }
 
-export const SchedulingSettingsChangeUI = ({ disabled, onEdit, resetTrigger }: SchedulingSettingsChangeUIProps) => {
-    const { data: MIProperties } = MulticallInstance.useProperties();
+export const ManageScheduleSettingsUI = ({ disabled, onEdit, resetTrigger }: ManageScheduleSettingsUIProps) => {
+    const multicallInstance = useContext(MulticallInstance.Context);
 
     const [editModeEnabled, editModeSwitch] = useState(false);
 
@@ -36,32 +36,36 @@ export const SchedulingSettingsChangeUI = ({ disabled, onEdit, resetTrigger }: S
     ];
 
     const formFields = {
-        croncatManager: useMemo(() => new ArgsString(MIProperties.croncatManager), [MIProperties]),
+        croncatManager: useMemo(() => new ArgsString(multicallInstance.data.croncatManager), [multicallInstance.data]),
 
         jobBond: useMemo(
-            () => new ArgsString(MIProperties.jobBond !== "" ? toNEAR(MIProperties.jobBond) : ""),
+            () => new ArgsString(multicallInstance.data.jobBond !== "" ? toNEAR(multicallInstance.data.jobBond) : ""),
 
-            [MIProperties]
+            [multicallInstance.data]
         ),
     };
 
     const onCroncatManagerChange = useCallback<Required<TextFieldProps>["onChange"]>(
         ({ target: { value } }) =>
-            void croncatManagerUpdate(value !== MIProperties.croncatManager ? value : formInitialState.croncatManager),
+            void croncatManagerUpdate(
+                value !== multicallInstance.data.croncatManager ? value : formInitialState.croncatManager
+            ),
 
         [croncatManagerUpdate]
     );
 
     const onJobBondChange = useCallback<Required<TextFieldProps>["onChange"]>(
         ({ target: { value } }) =>
-            void jobBondUpdate(value !== toNEAR(MIProperties.jobBond) ? toYocto(value) : formInitialState.jobBond),
+            void jobBondUpdate(
+                value !== toNEAR(multicallInstance.data.jobBond) ? toYocto(value) : formInitialState.jobBond
+            ),
 
         [jobBondUpdate]
     );
 
     const formReset = useCallback(() => {
-        formFields.croncatManager.value = MIProperties.croncatManager;
-        formFields.jobBond.value = toNEAR(MIProperties.jobBond);
+        formFields.croncatManager.value = multicallInstance.data.croncatManager;
+        formFields.jobBond.value = toNEAR(multicallInstance.data.jobBond);
 
         void croncatManagerUpdate(formInitialState.croncatManager);
         void jobBondUpdate(formInitialState.jobBond);
@@ -73,7 +77,7 @@ export const SchedulingSettingsChangeUI = ({ disabled, onEdit, resetTrigger }: S
 
     return (
         <Tile
-            classes={{ root: _SchedulingSettingsChange }}
+            classes={{ root: _ManageScheduleSettings }}
             heading="Scheduling"
             headerSlots={{
                 end: editModeEnabled ? (
@@ -113,7 +117,8 @@ export const SchedulingSettingsChangeUI = ({ disabled, onEdit, resetTrigger }: S
                     idToHighlightColor: (id) =>
                         ({ croncatManager, jobBond }[id] ===
                             formInitialState[id as keyof typeof ModuleContext["DiffKey"]] ||
-                        { croncatManager, jobBond }[id] === MIProperties[id as keyof typeof ModuleContext["DiffKey"]]
+                        { croncatManager, jobBond }[id] ===
+                            multicallInstance.data[id as keyof typeof ModuleContext["DiffKey"]]
                             ? null
                             : "blue"),
 
@@ -134,10 +139,10 @@ export const SchedulingSettingsChangeUI = ({ disabled, onEdit, resetTrigger }: S
                                 <TextField
                                     fullWidth
                                     onChange={onCroncatManagerChange}
-                                    value={croncatManager || MIProperties.croncatManager}
+                                    value={croncatManager || multicallInstance.data.croncatManager}
                                 />
                             ) : (
-                                <NearLink address={croncatManager || MIProperties.croncatManager} />
+                                <NearLink address={croncatManager || multicallInstance.data.croncatManager} />
                             ),
                         ],
                     },
@@ -156,14 +161,14 @@ export const SchedulingSettingsChangeUI = ({ disabled, onEdit, resetTrigger }: S
                                     fullWidth
                                     onChange={onJobBondChange}
                                     type="number"
-                                    value={toNEAR(jobBond || MIProperties.jobBond)}
+                                    value={toNEAR(jobBond || multicallInstance.data.jobBond)}
                                 />
                             ) : (
                                 <IconLabel
                                     icon={NearIcon.NATIVE_TOKEN_CHARACTER}
                                     label={
-                                        jobBond || MIProperties.jobBond !== ""
-                                            ? toNEAR(jobBond || MIProperties.jobBond)
+                                        jobBond || multicallInstance.data.jobBond !== ""
+                                            ? toNEAR(jobBond || multicallInstance.data.jobBond)
                                             : "..."
                                     }
                                     reversed

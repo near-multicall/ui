@@ -1,3 +1,4 @@
 export { ExternalLogin } from "./external-login";
-export { SchedulingSettingsChange } from "./scheduling/settings-change";
-export { TokenWhitelistChange } from "./token/whitelist-change";
+export { ManageScheduleSettings } from "./manage-scheduling-settings";
+export { ManageTokenWhitelist } from "./manage-whitelisted-tokens";
+export { ProposeSettings } from "./propose-settings";

@@ -9,8 +9,8 @@
     height: 100%;
 
     grid-template-areas:
-        "TokenWhitelistChange SchedulingSettingsChange"
-        "TokenWhitelistChange SettingsProposalCreate";
+        "ManageTokenWhitelist ManageScheduleSettings"
+        "ManageTokenWhitelist ProposeSettings";
 
     &-error {
         grid-area: SettingsEditorError;
