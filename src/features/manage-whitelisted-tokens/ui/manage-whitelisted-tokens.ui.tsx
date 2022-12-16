@@ -2,13 +2,13 @@ import { CancelOutlined, DeleteOutlined, EditOutlined, SettingsBackupRestoreOutl
 import { IconButton } from "@mui/material";
 import { HTMLProps, useCallback, useEffect, useMemo, useState } from "react";
 
-import { MulticallSettingsChange, MulticallTokenWhitelistDiffKey } from "../../shared/lib/contracts/multicall";
-import { TextInput, Tooltip } from "../../shared/ui/design";
-import { ArgsString } from "../../shared/lib/args-old";
-import { MulticallInstance } from "../../entities";
-import { ModuleContext } from "./module-context";
+import { MulticallSettingsChange, MulticallTokenWhitelistDiffKey } from "../../../shared/lib/contracts/multicall";
+import { TextInput, Tooltip } from "../../../shared/ui/design";
+import { ArgsString } from "../../../shared/lib/args-old";
+import { MulticallInstance } from "../../../entities";
+import { ModuleContext } from "../module-context";
 
-import "./ui.scss";
+import "./manage-whitelisted-tokens.ui.scss";
 
 const _ManageTokenWhitelist = "ManageTokenWhitelist";
 

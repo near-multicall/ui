@@ -3,7 +3,7 @@ import { ComponentProps } from "react";
 
 import { PopupMenu } from "../../../shared/ui/design";
 import { ModuleContext } from "../module-context";
-import { ELModel } from "../model/el-model";
+import { ELModel } from "../model/external-login.model";
 
 interface ELMenuProps extends Pick<ComponentProps<typeof PopupMenu>, "triggerClassName"> {
     FeatureFlags: {

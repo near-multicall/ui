@@ -28,7 +28,7 @@ export class ELModel {
 
     static useDialogsState = () => {
         const [dialogsVisibility, dialogVisibilitySwitch] = useState<
-            Record<keyof typeof ModuleContext.methods, boolean> | {}
+            Record<keyof typeof ModuleContext.methods, boolean>
         >(
             Object.values(ModuleContext.methods).reduce(
                 (visibilityState, { type }) => ({ ...visibilityState, [type]: false }),

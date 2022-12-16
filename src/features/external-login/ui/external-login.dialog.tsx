@@ -8,7 +8,7 @@ import { Validation } from "../../../shared/lib/validation";
 import { Dialog, TextInput, Tooltip } from "../../../shared/ui/design";
 import { ModuleContext } from "../module-context";
 
-import "./el-dialog.scss";
+import "./external-login.dialog.scss";
 
 interface ELDialogProps extends Pick<ComponentProps<typeof Dialog>, "className" | "onClose" | "open" | "title"> {
     method: "dao" | "multicall";

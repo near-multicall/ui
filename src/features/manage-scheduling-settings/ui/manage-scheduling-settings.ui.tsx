@@ -2,14 +2,14 @@ import { CancelOutlined, EditOutlined, VisibilityOutlined } from "@mui/icons-mat
 import { IconButton, TextField, TextFieldProps } from "@mui/material";
 import { HTMLProps, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
-import { MulticallInstance } from "../../entities";
-import { ArgsString } from "../../shared/lib/args-old";
-import { MulticallSettingsChange, MulticallPropertyKey } from "../../shared/lib/contracts/multicall";
-import { toNEAR, toYocto } from "../../shared/lib/converter";
-import { IconLabel, NearIcon, NearLink, Table, Tile, Tooltip } from "../../shared/ui/design";
-import { ModuleContext } from "./module-context";
+import { MulticallInstance } from "../../../entities";
+import { ArgsString } from "../../../shared/lib/args-old";
+import { MulticallSettingsChange, MulticallPropertyKey } from "../../../shared/lib/contracts/multicall";
+import { toNEAR, toYocto } from "../../../shared/lib/converter";
+import { IconLabel, NearIcon, NearLink, Table, Tile, Tooltip } from "../../../shared/ui/design";
+import { ModuleContext } from "../module-context";
 
-import "./ui.scss";
+import "./manage-scheduling-settings.ui.scss";
 
 const _ManageScheduleSettings = "ManageScheduleSettings";
 

@@ -1,16 +1,16 @@
 import clsx from "clsx";
 import { FormEventHandler, HTMLProps, useCallback, useContext, useMemo, useState } from "react";
 
-import { MulticallInstance } from "../../entities";
-import { ArgsString } from "../../shared/lib/args-old";
-import { Multicall, MulticallSettingsChange } from "../../shared/lib/contracts/multicall";
-import { SputnikDAO } from "../../shared/lib/contracts/sputnik-dao";
-import { toNEAR } from "../../shared/lib/converter";
-import { signAndSendTxs } from "../../shared/lib/wallet";
-import { Button, ButtonGroup, NearIcon, TextInput, Tile } from "../../shared/ui/design";
+import { MulticallInstance } from "../../../entities";
+import { ArgsString } from "../../../shared/lib/args-old";
+import { Multicall, MulticallSettingsChange } from "../../../shared/lib/contracts/multicall";
+import { SputnikDAO } from "../../../shared/lib/contracts/sputnik-dao";
+import { toNEAR } from "../../../shared/lib/converter";
+import { signAndSendTxs } from "../../../shared/lib/wallet";
+import { Button, ButtonGroup, NearIcon, TextInput, Tile } from "../../../shared/ui/design";
 
-import { ModuleContext } from "../../widgets/settings-editor/module-context";
-import "./ui.scss";
+import { ModuleContext } from "../../../widgets/settings-editor/module-context";
+import "./propose-settings.ui.scss";
 
 const _ProposeSettings = "ProposeSettings";
 
