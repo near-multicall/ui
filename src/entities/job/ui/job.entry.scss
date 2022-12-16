@@ -19,6 +19,7 @@
         color: darken(color.$blue, 30%) !important;
         background-color: rgba(color.$blue, 0.2);
         float: right;
+
         &:hover {
             background-color: color.$blue;
         }

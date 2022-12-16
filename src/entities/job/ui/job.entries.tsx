@@ -1,23 +1,25 @@
 import clsx from "clsx";
 
 import { Scrollable, Table, Tile } from "../../../shared/ui/design";
-import { JobInfoModel } from "../model/job-info";
-import { Entity } from "../module-context";
+import { JobModel, JobModelInputs } from "../model/job.model";
 
-import { jobAsTableRow } from "./job";
-import "./jobs-table.scss";
+import { jobAsTableRow } from "./job.entry";
+import "./job.entries.scss";
+import { Context } from "react";
 
-interface JobsTableProps extends Entity.Inputs {}
+const _JobEntriesTable = "JobEntriesTable";
 
-const _JobsTable = "JobsTable";
+export interface JobEntriesTableProps extends JobModelInputs {
+    className?: string;
+}
 
-export const JobsTable = ({ className, adapters }: JobsTableProps) => {
-    const { data, error, loading } = JobInfoModel.useAllEntries(adapters),
+export const JobEntriesTable = ({ className, ...modelInputs }: JobEntriesTableProps) => {
+    const { data, error, loading } = JobModel.useAllEntriesState(modelInputs),
         items = Object.values(data ?? {});
 
     return (
         <Tile
-            classes={{ root: clsx(_JobsTable, className) }}
+            classes={{ root: clsx(_JobEntriesTable, className) }}
             heading="All jobs"
             noData={data !== null && items.length === 0}
             {...{ error, loading }}
@@ -25,7 +27,7 @@ export const JobsTable = ({ className, adapters }: JobsTableProps) => {
             <Scrollable>
                 <Table
                     RowProps={{ withTitle: true }}
-                    className={`${_JobsTable}-body`}
+                    className={`${_JobEntriesTable}-body`}
                     displayMode="compact"
                     header={["Status", "ID", "Start at", "Croncat hash", "Creator", "Trigger gas", "Multicalls"]}
                     rows={items.map(jobAsTableRow).reverse()}

@@ -1,14 +1,8 @@
 import clsx from "clsx";
+import { ComponentProps } from "react";
 
 import { Tile, Scrollable, Table } from "../../../shared/ui/design";
-import {
-    FT,
-    FTBalancesProps,
-    FTBalancesProviderProps,
-    NEARToken,
-    NEARTokenBalancesProps,
-    NEARTokenBalancesProviderProps,
-} from "../../../entities";
+import { FT, FTBalancesProps, NEARToken, NEARTokenBalancesProps } from "../../../entities";
 
 import "./balances.ui.scss";
 
@@ -16,9 +10,9 @@ const _Balances = "Balances";
 
 export interface BalancesProps
     extends FTBalancesProps,
-        FTBalancesProviderProps,
+        ComponentProps<typeof FT["BalancesProvider"]>,
         NEARTokenBalancesProps,
-        NEARTokenBalancesProviderProps {
+        ComponentProps<typeof NEARToken["BalancesProvider"]> {
     accountName: string;
     className?: string;
 }

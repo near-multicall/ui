@@ -513,9 +513,9 @@ export class DaoPage extends Component<Props, State> {
                             contentSpace: `${_DaoPage}-tabs-contentSpace`,
                         }}
                         items={[
-                            DaoSettingsTab.render({ className: `${_DaoPage}-content`, adapters: { dao } }),
+                            DaoSettingsTab.render({ className: `${_DaoPage}-content`, dao }),
                             DaoFundsTab.render({ accountId: dao.address, className: `${_DaoPage}-content` }),
-                            DaoJobsTab.render({ className: `${_DaoPage}-content`, adapters: { multicallInstance } }),
+                            DaoJobsTab.render({ className: `${_DaoPage}-content` }),
                         ]}
                     />
                 </div>

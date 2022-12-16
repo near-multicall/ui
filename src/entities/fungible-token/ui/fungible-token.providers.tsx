@@ -2,7 +2,7 @@ import { PropsWithChildren } from "react";
 
 import { FTModel, FTModelInputs } from "../model/fungible-token.model";
 
-export interface FTBalancesProviderProps
+interface FTBalancesProviderProps
     extends Pick<PropsWithChildren, "children">,
         Pick<FTModelInputs["balances"], "accountId"> {}
 

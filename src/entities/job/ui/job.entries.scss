@@ -2,8 +2,8 @@
 @use "sass/font";
 @use "sass/size";
 
-.JobsTable {
-    grid-area: JobsTable;
+.JobEntriesTable {
+    grid-area: JobEntriesTable;
 
     &-body {
         .TableRow-content--compact {

@@ -2,29 +2,35 @@ import { NavLink } from "react-router-dom";
 
 import { Big, toTGas } from "../../../shared/lib/converter";
 import { DataInspector, IconLabel } from "../../../shared/ui/design";
-import { ModuleContext, Entity } from "../module-context";
+import { JobDataWithStatus, JobStatus } from "../model/job.model";
 
-import "./job.scss";
+import "./job.entry.scss";
 
 const _Job = "Job";
 
-const JobDisplayStatus = ({ job }: Pick<Entity.DataWithStatus, "job">) => {
+const JobStatusIcons = {
+    [JobStatus.Inactive]: "🟡",
+    [JobStatus.Expired]: "🔴",
+    [JobStatus.Active]: "🟢",
+    [JobStatus.Running]: "🟣",
+    [JobStatus.Unknown]: "❔",
+};
+
+const JobDisplayStatus = ({ job }: Pick<JobDataWithStatus, "job">) => {
     const statusTextByStatus = {
-        ...ModuleContext.Status,
-        [ModuleContext.Status.Running]: `${ModuleContext.Status.Running}: ${job.run_count + 1}/${
-            job.multicalls.length
-        }`,
+        ...JobStatus,
+        [JobStatus.Running]: `${JobStatus.Running}: ${job.run_count + 1}/${job.multicalls.length}`,
     };
 
     return (
         <IconLabel
-            icon={ModuleContext.StatusIcons[job.status]}
+            icon={JobStatusIcons[job.status]}
             label={statusTextByStatus[job.status]}
         />
     );
 };
 
-export const jobAsTableRow = ({ id, job }: Entity.DataWithStatus) => ({
+export const jobAsTableRow = ({ id, job }: JobDataWithStatus) => ({
     content: [
         <JobDisplayStatus {...{ job }} />,
         id,
