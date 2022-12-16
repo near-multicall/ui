@@ -1,1 +1,1 @@
-export { SettingsEditor, type SettingsEditorProps } from "./ui";
+export { SettingsEditor, type SettingsEditorProps } from "./ui/settings-editor.ui";

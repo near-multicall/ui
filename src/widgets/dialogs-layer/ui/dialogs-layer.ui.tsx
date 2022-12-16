@@ -1,4 +1,4 @@
-import { ExternalLogin } from "../../features/external-login";
+import { ExternalLogin } from "../../../features/external-login";
 
 export const DialogsLayer = () => (
     <>

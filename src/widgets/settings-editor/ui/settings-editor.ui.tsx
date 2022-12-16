@@ -1,14 +1,14 @@
 import clsx from "clsx";
 import { useCallback, useState, useEffect, useContext, HTMLProps } from "react";
 
-import { MulticallInstance, Wallet } from "../../entities";
-import { ManageScheduleSettings, ManageTokenWhitelist, ProposeSettings } from "../../features";
-import { MulticallSettingsChange } from "../../shared/lib/contracts/multicall";
-import { SputnikDAO } from "../../shared/lib/contracts/sputnik-dao";
-import { ModuleContext } from "./module-context";
-import { Tile } from "../../shared/ui/design";
+import { MulticallInstance, Wallet } from "../../../entities";
+import { ManageScheduleSettings, ManageTokenWhitelist, ProposeSettings } from "../../../features";
+import { MulticallSettingsChange } from "../../../shared/lib/contracts/multicall";
+import { SputnikDAO } from "../../../shared/lib/contracts/sputnik-dao";
+import { ModuleContext } from "../module-context";
+import { Tile } from "../../../shared/ui/design";
 
-import "./ui.scss";
+import "./settings-editor.ui.scss";
 
 const _SettingsEditor = "SettingsEditor";
 

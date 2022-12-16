@@ -1,6 +1,6 @@
 import clsx from "clsx";
 
-import { Tile, Scrollable, Table } from "../../shared/ui/design";
+import { Tile, Scrollable, Table } from "../../../shared/ui/design";
 import {
     FT,
     FTBalancesProps,
@@ -8,9 +8,9 @@ import {
     NEARToken,
     NEARTokenBalancesProps,
     NEARTokenBalancesProviderProps,
-} from "../../entities";
+} from "../../../entities";
 
-import "./ui.scss";
+import "./balances.ui.scss";
 
 const _Balances = "Balances";
 
