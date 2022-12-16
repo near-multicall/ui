@@ -5,7 +5,6 @@ import { JobModel, JobModelInputs } from "../model/job.model";
 
 import { jobAsTableRow } from "./job.entry";
 import "./job.entries.scss";
-import { Context } from "react";
 
 const _JobEntriesTable = "JobEntriesTable";
 

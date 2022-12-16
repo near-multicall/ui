@@ -1,10 +1,10 @@
 import clsx from "clsx";
+import { Form, Formik } from "formik";
 import { Base64 } from "js-base64";
 import debounce from "lodash.debounce";
 import { Component, ContextType } from "react";
 
 import { MulticallInstance, Wallet } from "../../entities";
-import { Form, Formik } from "formik";
 import { args } from "../../shared/lib/args/args";
 import { fields } from "../../shared/lib/args/args-types/args-object";
 import { Multicall } from "../../shared/lib/contracts/multicall";
@@ -153,6 +153,7 @@ export class DaoPage extends Component<Props, State> {
             this.setState({
                 multicallInstance: new Multicall(Multicall.getInstanceAddress(e.detail.dao)),
             });
+
             this.formikSetValues?.({ addr: e.detail.dao });
         }
     }
