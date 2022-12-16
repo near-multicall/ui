@@ -1,6 +1,6 @@
 import { IconLabel, NearIcon } from "../../../shared/ui/design";
 
-import { NEARTokenBalancesModel } from "../model/nt-model";
+import { NEARTokenBalancesModel } from "../model/near-token.model";
 import { NEARToken } from "../module-context";
 
 export interface NEARTokenBalancesProps extends NEARToken.Inputs {}

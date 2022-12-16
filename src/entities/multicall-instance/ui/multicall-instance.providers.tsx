@@ -1,6 +1,6 @@
 import { PropsWithChildren } from "react";
 
-import { MIModel, MIModelInputs } from "../model/mi-model";
+import { MIModel, MIModelInputs } from "../model/multicall-instance.model";
 
 export interface MIContextProviderProps extends Pick<PropsWithChildren, "children">, MIModelInputs {}
 

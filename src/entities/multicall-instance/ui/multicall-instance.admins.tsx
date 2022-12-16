@@ -1,8 +1,8 @@
 import { useContext } from "react";
 import { Scrollable, Table, Tile } from "../../../shared/ui/design";
-import { MIModel } from "../model/mi-model";
+import { MIModel } from "../model/multicall-instance.model";
 
-import { miAdminAsTableRow, MIAdminProps } from "./mi-admin";
+import { miAdminAsTableRow, MIAdminProps } from "./multicall-instance.admin";
 
 interface MIAdminsTableProps {
     className?: string;

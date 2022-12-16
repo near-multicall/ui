@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { IconLabel, NearIcon } from "../../../shared/ui/design";
-import { FTFormat } from "../lib/ft-format";
-import { FTModel } from "../model/ft-model";
+import { FTFormat } from "../lib/fungible-token.format";
+import { FTModel } from "../model/fungible-token.model";
 
 export interface FTBalancesProps {
     nonZeroOnly?: boolean;

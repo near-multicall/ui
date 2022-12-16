@@ -1,9 +1,9 @@
 import { useContext } from "react";
 
 import { Scrollable, Table, TableProps, Tile, TileProps } from "../../../shared/ui/design";
-import { MIModel } from "../model/mi-model";
+import { MIModel } from "../model/multicall-instance.model";
 
-import { MIWhitelistedTokenProps, miWhitelistedTokenAsTableRow } from "./mi-whitelisted-token";
+import { MIWhitelistedTokenProps, miWhitelistedTokenAsTableRow } from "./multicall-instance.whitelisted-token";
 
 interface MITokenWhitelistTableProps extends Pick<TileProps, "footer" | "headerSlots" | "subheader"> {
     ItemProps?: TableProps["RowProps"];
