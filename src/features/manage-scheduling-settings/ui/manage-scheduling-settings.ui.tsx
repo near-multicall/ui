@@ -23,6 +23,11 @@ interface ManageScheduleSettingsUIProps extends Omit<HTMLProps<HTMLDivElement>, 
 export const ManageScheduleSettingsUI = ({ disabled, onEdit, resetTrigger }: ManageScheduleSettingsUIProps) => {
     const multicallInstance = useContext(MulticallInstance.Context);
 
+    const error =
+        multicallInstance.data.ready && multicallInstance.data.jobBond === ""
+            ? new Error("Error while getting Multicall Instance job bond")
+            : null;
+
     const [editModeEnabled, editModeSwitch] = useState(false);
 
     const formInitialState: FormState = {
@@ -109,6 +114,7 @@ export const ManageScheduleSettingsUI = ({ disabled, onEdit, resetTrigger }: Man
                     </Tooltip>
                 ),
             }}
+            {...{ error }}
         >
             <Table
                 RowProps={{
