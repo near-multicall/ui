@@ -1,6 +1,5 @@
 import { createContext, useEffect, useState } from "react";
 
-import { ArgsAccount } from "../../../shared/lib/args-old";
 import { Multicall } from "../../../shared/lib/contracts/multicall";
 import { SputnikDAO } from "../../../shared/lib/contracts/sputnik-dao";
 
@@ -33,9 +32,7 @@ export class MIModel {
         callback: (result: typeof MIModel.properties) => void
     ) =>
         callback(
-            await Multicall.init(
-                `${ArgsAccount.deconstructAddress(daoAddress).name}.${Multicall.FACTORY_ADDRESS}`
-            ).then((multicallInstance) => ({
+            await Multicall.init(Multicall.getInstanceAddress(daoAddress)).then((multicallInstance) => ({
                 data: multicallInstance,
                 error: multicallInstance.ready ? null : new Error("Unable to connect to Multicall Instance"),
                 loading: false,
