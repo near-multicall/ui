@@ -1,6 +1,5 @@
-import { ModuleContext } from "./module-context";
 import { ProposeSettingsUI } from "./ui/propose-settings.ui";
 
-export class ProposeSettings extends ModuleContext {
+export class ProposeSettings {
     public static readonly UI = ProposeSettingsUI;
 }

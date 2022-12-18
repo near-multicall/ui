@@ -6,7 +6,6 @@ import { MulticallSettingsChange, MulticallTokenWhitelistDiffKey } from "../../.
 import { TextInput, Tooltip } from "../../../shared/ui/design";
 import { ArgsString } from "../../../shared/lib/args-old";
 import { MulticallInstance } from "../../../entities";
-import { ModuleContext } from "../module-context";
 
 import "./manage-whitelisted-tokens.ui.scss";
 
@@ -77,8 +76,8 @@ export const ManageTokenWhitelistUI = ({ disabled, onEdit, resetTrigger }: Manag
         <MulticallInstance.TokenWhitelistTable
             ItemProps={{
                 idToHighlightColor: (id) =>
-                    (addTokens.has(id) && ModuleContext.DiffMeta.addTokens.color) ||
-                    (removeTokens.has(id) && ModuleContext.DiffMeta.removeTokens.color) ||
+                    (addTokens.has(id) && MulticallInstance.SettingsDiffMeta.addTokens.color) ||
+                    (removeTokens.has(id) && MulticallInstance.SettingsDiffMeta.removeTokens.color) ||
                     null,
 
                 slots: {

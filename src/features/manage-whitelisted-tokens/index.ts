@@ -1,6 +1,5 @@
-import { ModuleContext } from "./module-context";
 import { ManageTokenWhitelistUI } from "./ui/manage-whitelisted-tokens.ui";
 
-export class ManageTokenWhitelist extends ModuleContext {
+export class ManageTokenWhitelist {
     public static readonly UI = ManageTokenWhitelistUI;
 }

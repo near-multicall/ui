@@ -1,12 +1,15 @@
 import clsx from "clsx";
 import { useCallback, useState, useEffect, useContext, HTMLProps } from "react";
 
+import {
+    MulticallPropertyKey,
+    MulticallSettingsChange,
+    MulticallTokenWhitelistDiffKey,
+} from "../../../shared/lib/contracts/multicall";
+import { SputnikDAO } from "../../../shared/lib/contracts/sputnik-dao";
+import { Tile } from "../../../shared/ui/design";
 import { MulticallInstance, Wallet } from "../../../entities";
 import { ManageScheduleSettings, ManageTokenWhitelist, ProposeSettings } from "../../../features";
-import { MulticallSettingsChange } from "../../../shared/lib/contracts/multicall";
-import { SputnikDAO } from "../../../shared/lib/contracts/sputnik-dao";
-import { ModuleContext } from "../module-context";
-import { Tile } from "../../../shared/ui/design";
 
 import "./settings-editor.ui.scss";
 
@@ -24,10 +27,10 @@ export const SettingsEditor = ({ className, dao }: SettingsEditorProps) => {
         !wallet?.accountId || dao.checkUserPermission(wallet?.accountId, "AddProposal", "FunctionCall");
 
     const initialDiff: MulticallSettingsChange = {
-        [ModuleContext.DiffKey.removeTokens]: [],
-        [ModuleContext.DiffKey.addTokens]: [],
-        [ModuleContext.DiffKey.jobBond]: "",
-        [ModuleContext.DiffKey.croncatManager]: "",
+        [MulticallTokenWhitelistDiffKey.removeTokens]: [],
+        [MulticallTokenWhitelistDiffKey.addTokens]: [],
+        [MulticallPropertyKey.jobBond]: "",
+        [MulticallPropertyKey.croncatManager]: "",
     };
 
     const [editMode, editModeSwitch] = useState(false),

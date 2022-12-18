@@ -2,12 +2,11 @@ import { CancelOutlined, EditOutlined, VisibilityOutlined } from "@mui/icons-mat
 import { IconButton, TextField, TextFieldProps } from "@mui/material";
 import { HTMLProps, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
-import { MulticallInstance } from "../../../entities";
-import { ArgsString } from "../../../shared/lib/args-old";
 import { MulticallSettingsChange, MulticallPropertyKey } from "../../../shared/lib/contracts/multicall";
+import { ArgsString } from "../../../shared/lib/args-old";
 import { toNEAR, toYocto } from "../../../shared/lib/converter";
 import { IconLabel, NearIcon, NearLink, Table, Tile, Tooltip } from "../../../shared/ui/design";
-import { ModuleContext } from "../module-context";
+import { MulticallInstance } from "../../../entities";
 
 import "./manage-scheduling-settings.ui.scss";
 
@@ -31,8 +30,8 @@ export const ManageScheduleSettingsUI = ({ disabled, onEdit, resetTrigger }: Man
     const [editModeEnabled, editModeSwitch] = useState(false);
 
     const formInitialState: FormState = {
-        [ModuleContext.DiffKey.croncatManager]: "",
-        [ModuleContext.DiffKey.jobBond]: "",
+        [MulticallPropertyKey.croncatManager]: "",
+        [MulticallPropertyKey.jobBond]: "",
     };
 
     const [[croncatManager, croncatManagerUpdate], [jobBond, jobBondUpdate]] = [
@@ -121,10 +120,8 @@ export const ManageScheduleSettingsUI = ({ disabled, onEdit, resetTrigger }: Man
                     centeredTitle: true,
 
                     idToHighlightColor: (id) =>
-                        ({ croncatManager, jobBond }[id] ===
-                            formInitialState[id as keyof typeof ModuleContext["DiffKey"]] ||
-                        { croncatManager, jobBond }[id] ===
-                            multicallInstance.data[id as keyof typeof ModuleContext["DiffKey"]]
+                        ({ croncatManager, jobBond }[id] === formInitialState[id as MulticallPropertyKey] ||
+                        { croncatManager, jobBond }[id] === multicallInstance.data[id as MulticallPropertyKey]
                             ? null
                             : "blue"),
 
@@ -136,10 +133,10 @@ export const ManageScheduleSettingsUI = ({ disabled, onEdit, resetTrigger }: Man
                 header={["Option", "Value"]}
                 rows={[
                     {
-                        id: ModuleContext.DiffKey.croncatManager,
+                        id: MulticallPropertyKey.croncatManager,
 
                         content: [
-                            ModuleContext.DiffMeta[ModuleContext.DiffKey.croncatManager].description,
+                            MulticallInstance.SettingsDiffMeta[MulticallPropertyKey.croncatManager].description,
 
                             editModeEnabled ? (
                                 <TextField
@@ -153,10 +150,10 @@ export const ManageScheduleSettingsUI = ({ disabled, onEdit, resetTrigger }: Man
                         ],
                     },
                     {
-                        id: ModuleContext.DiffKey.jobBond,
+                        id: MulticallPropertyKey.jobBond,
 
                         content: [
-                            ModuleContext.DiffMeta[ModuleContext.DiffKey.jobBond].description,
+                            MulticallInstance.SettingsDiffMeta[MulticallPropertyKey.jobBond].description,
 
                             editModeEnabled ? (
                                 <TextField

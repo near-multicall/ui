@@ -3,13 +3,17 @@ import { FormEventHandler, HTMLProps, useCallback, useContext, useMemo, useState
 
 import { MulticallInstance } from "../../../entities";
 import { ArgsString } from "../../../shared/lib/args-old";
-import { Multicall, MulticallSettingsChange } from "../../../shared/lib/contracts/multicall";
+import {
+    Multicall,
+    MulticallPropertyKey,
+    MulticallSettingsChange,
+    MulticallTokenWhitelistDiffKey,
+} from "../../../shared/lib/contracts/multicall";
 import { SputnikDAO } from "../../../shared/lib/contracts/sputnik-dao";
 import { toNEAR } from "../../../shared/lib/converter";
 import { signAndSendTxs } from "../../../shared/lib/wallet";
 import { Button, ButtonGroup, NearIcon, TextInput, Tile } from "../../../shared/ui/design";
 
-import { ModuleContext } from "../../../widgets/settings-editor/module-context";
 import "./propose-settings.ui.scss";
 
 const _ProposeSettings = "ProposeSettings";
@@ -65,19 +69,19 @@ export const ProposeSettingsUI = ({ className, dao, diff, disabled, editMode, ..
             </p>
 
             <div className={`${_ProposeSettings}-summary`}>
-                {Object.values(ModuleContext.DiffKey).map(
-                    (DiffKey) =>
-                        diff[DiffKey].length > 0 && (
+                {Object.values({ ...MulticallPropertyKey, ...MulticallTokenWhitelistDiffKey }).map(
+                    (diffKey) =>
+                        diff[diffKey].length > 0 && (
                             <div
                                 className={`${_ProposeSettings}-summary-entry`}
-                                key={DiffKey}
+                                key={diffKey}
                             >
                                 <h3 className={`${_ProposeSettings}-summary-entry-description`}>
-                                    {ModuleContext.DiffMeta[DiffKey].description + ":"}
+                                    {MulticallInstance.SettingsDiffMeta[diffKey].description + ":"}
                                 </h3>
 
                                 <ul className={`${_ProposeSettings}-summary-entry-data`}>
-                                    {(Array.isArray(diff[DiffKey]) ? Array.from(diff[DiffKey]) : [diff[DiffKey]]).map(
+                                    {(Array.isArray(diff[diffKey]) ? Array.from(diff[diffKey]) : [diff[diffKey]]).map(
                                         (data) => (
                                             <li
                                                 className={clsx(
@@ -85,11 +89,11 @@ export const ProposeSettingsUI = ({ className, dao, diff, disabled, editMode, ..
 
                                                     `${_ProposeSettings}-summary-entry-data-chip` +
                                                         "--" +
-                                                        ModuleContext.DiffMeta[DiffKey].color
+                                                        MulticallInstance.SettingsDiffMeta[diffKey].color
                                                 )}
                                                 key={data as string}
                                             >
-                                                {!Number.isNaN(data) && DiffKey === ModuleContext.DiffKey.jobBond
+                                                {!Number.isNaN(data) && diffKey === MulticallPropertyKey.jobBond
                                                     ? `${toNEAR(data as string)} ${NearIcon.NATIVE_TOKEN_CHARACTER}`
                                                     : (data as string)}
                                             </li>
