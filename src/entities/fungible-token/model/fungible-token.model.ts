@@ -11,7 +11,14 @@ export interface FTModelInputs {
 
 export class FTModel {
     public static readonly balances: {
-        data: (Pick<FungibleToken, "metadata"> & { account: string; multicall: string; total: string })[] | null;
+        data:
+            | null
+            | (Pick<FungibleToken, "metadata"> & {
+                  account: string;
+                  multicallInstance: string;
+                  total: string;
+              })[];
+
         error: Error | null;
         loading: boolean;
     } = {
@@ -26,45 +33,40 @@ export class FTModel {
         { accountId }: FTModelInputs["balances"],
         callback: (result: typeof FTModel.balances) => void
     ) => {
-        const multicallInstanceAddress = Multicall.getInstanceAddress(accountId);
+        const miAddress = Multicall.getInstanceAddress(accountId);
 
         /**
          * Get LikelyTokens list on account and its Multicall Instance
          */
-        const [accountLikelyTokensList, multicallLikelyTokensList] = await Promise.all([
+        const [accountLikelyTokensList, miLikelyTokensList] = await Promise.all([
             FungibleToken.getLikelyTokenContracts(accountId),
-            FungibleToken.getLikelyTokenContracts(multicallInstanceAddress),
+            FungibleToken.getLikelyTokenContracts(miAddress),
         ]);
 
         /* Merge and de-duplicate both token lists */
-        const likelyTokensAddressesList = [...new Set([...accountLikelyTokensList, ...multicallLikelyTokensList])];
+        const likelyTokensAddressesList = [...new Set([...accountLikelyTokensList, ...miLikelyTokensList])];
 
         const likelyTokensList = await Promise.all(
             likelyTokensAddressesList.map((address) => FungibleToken.init(address))
         );
 
-        const rawBalances = await Promise.all(
-            likelyTokensList
-                .filter((token) => token.ready === true)
-                .map(async (token) => {
-                    const [accountRawBalance, multicallRawBalance] = await Promise.all([
-                        token.ftBalanceOf(accountId),
-                        token.ftBalanceOf(multicallInstanceAddress),
-                    ]);
-
-                    return {
-                        account: accountRawBalance,
-                        metadata: token.metadata,
-                        multicall: multicallRawBalance,
-                        total: Big(multicallRawBalance).add(accountRawBalance).toFixed(),
-                    };
-                })
-        );
-
         return callback({
-            data: rawBalances.filter(
-                /** Removes tokens with 0 total balance */
-                ({ total }) => Big(total).gt("0")
+            data: await Promise.all(
+                likelyTokensList
+                    .filter((token) => token.ready === true)
+                    .map(async (token) => {
+                        const [account, multicallInstance] = await Promise.all([
+                            token.ftBalanceOf(accountId),
+                            token.ftBalanceOf(miAddress),
+                        ]);
+
+                        return {
+                            account,
+                            metadata: token.metadata,
+                            multicallInstance,
+                            total: Big(multicallInstance).add(account).toFixed(),
+                        };
+                    })
             ),
 
             error: null,

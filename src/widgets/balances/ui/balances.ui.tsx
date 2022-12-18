@@ -18,7 +18,7 @@ export interface BalancesProps
 }
 
 export const Balances = ({ className, accountId, accountName, nonZeroOnly = true }: BalancesProps) => {
-    const nearTokenBalances = NEARToken.balancesRender({ nonZeroOnly }),
+    const nearTokenBalances = NEARToken.balancesRender(),
         fungibleTokenBalances = FT.balancesRender({ nonZeroOnly });
 
     return (

@@ -10,6 +10,6 @@ const amountToDisplayAmount = (amount: string, decimals: number): string => {
         : formatTokenAmount(amount, decimals, ModuleContext.FRACTIONAL_PART_LENGTH);
 };
 
-export const FTFormat = {
+export const NEARTokenFormat = {
     amountToDisplayAmount,
 };

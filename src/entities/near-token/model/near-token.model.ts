@@ -1,50 +1,58 @@
-import { useEffect, useState } from "react";
+import { Account } from "@near-wallet-selector/core";
+import { createContext, useEffect, useState } from "react";
 
-import { Big, formatTokenAmount } from "../../../shared/lib/converter";
+import { Big } from "../../../shared/lib/converter";
 import { viewAccount } from "../../../shared/lib/wallet";
-import { ModuleContext, type NEARToken } from "../module-context";
+import { Multicall } from "../../../shared/lib/contracts/multicall";
 
-type NEARTokenDataResponse = {
-    data: { dao: string; multicall: string; total: string } | null;
-    loading: boolean;
-};
+export interface NEARTokenModelInputs {
+    balances: Pick<Account, "accountId">;
+}
 
-const nearTokenData = async (
-    { dao, multicallInstance }: NEARToken.Inputs["adapters"],
-    callback: (result: NEARTokenDataResponse) => void
-) => {
-    const [daoAccInfo, multicallAccInfo] = await Promise.all([
-        viewAccount(dao.address),
-        viewAccount(multicallInstance.address),
-    ]);
+export class NEARTokenModel {
+    public static readonly balances: {
+        data: null | {
+            account: string;
+            multicallInstance: string;
+            total: string;
+        };
 
-    const daoRawBalance = daoAccInfo.amount,
-        multicallRawBalance = multicallAccInfo.amount;
+        error: Error | null;
+        loading: boolean;
+    } = {
+        data: null,
+        error: null,
+        loading: true,
+    };
 
-    return callback({
-        data: {
-            dao: formatTokenAmount(daoRawBalance, 24, ModuleContext.FRACTIONAL_PART_LENGTH),
-            multicall: formatTokenAmount(multicallRawBalance, 24, ModuleContext.FRACTIONAL_PART_LENGTH),
+    public static readonly BalancesContext = createContext(NEARTokenModel.balances);
 
-            total: formatTokenAmount(
-                Big(daoRawBalance).add(multicallRawBalance).toFixed(),
-                24,
-                ModuleContext.FRACTIONAL_PART_LENGTH
-            ),
-        },
+    private static readonly balancesFetch = async (
+        { accountId }: NEARTokenModelInputs["balances"],
+        callback: (result: typeof NEARTokenModel.balances) => void
+    ) => {
+        const [{ amount: account }, { amount: multicallInstance }] = await Promise.all([
+            viewAccount(accountId),
+            viewAccount(Multicall.getInstanceAddress(accountId)),
+        ]);
 
-        loading: false,
-    });
-};
+        return callback({
+            data: {
+                account,
+                multicallInstance,
+                total: Big(account).add(multicallInstance).toFixed(),
+            },
 
-const useNEARTokenData = (adapters: NEARToken.Inputs["adapters"]) => {
-    const [state, stateUpdate] = useState<NEARTokenDataResponse>({ data: null, loading: true });
+            error: null,
+            loading: false,
+        });
+    };
 
-    useEffect(() => void nearTokenData(adapters, stateUpdate), [adapters, stateUpdate]);
+    public static readonly useBalancesState = (inputs: NEARTokenModelInputs["balances"]) => {
+        const [state, stateUpdate] = useState(NEARTokenModel.balances);
 
-    return state;
-};
+        useEffect(() => void NEARTokenModel.balancesFetch(inputs, stateUpdate), [inputs, stateUpdate]);
 
-export class NEARTokenBalancesModel {
-    static useTokenFrom = useNEARTokenData;
+        return state;
+    };
 }
