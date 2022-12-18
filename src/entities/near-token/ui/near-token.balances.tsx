@@ -5,8 +5,6 @@ import { IconLabel, NearIcon } from "../../../shared/ui/design";
 import { NEARTokenModel } from "../model/near-token.model";
 import { ModuleContext } from "../module-context";
 
-export interface NEARTokenBalancesProps {}
-
 export const nearTokenBalancesRender = () => {
     const { data } = useContext(NEARTokenModel.BalancesContext);
 

@@ -1,7 +1,7 @@
 import { ModuleContext } from "./module-context";
 import { NEARTokenFormat } from "./lib/near-token.format";
 import { NEARTokenModel } from "./model/near-token.model";
-import { nearTokenBalancesRender, type NEARTokenBalancesProps } from "./ui/near-token.balances";
+import { nearTokenBalancesRender } from "./ui/near-token.balances";
 import { NEARTokenBalancesProvider } from "./ui/near-token.providers";
 
 export class NEARToken extends ModuleContext {
@@ -10,5 +10,3 @@ export class NEARToken extends ModuleContext {
     static balancesRender = nearTokenBalancesRender;
     static format = NEARTokenFormat;
 }
-
-export type { NEARTokenBalancesProps };

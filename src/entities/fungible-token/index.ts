@@ -1,7 +1,7 @@
 import { ModuleContext } from "./module-context";
 import { FTFormat } from "./lib/fungible-token.format";
 import { FTModel } from "./model/fungible-token.model";
-import { FTBalancesProps, ftBalancesRender } from "./ui/fungible-token.balances";
+import { ftBalancesRender } from "./ui/fungible-token.balances";
 import { FTBalancesProvider } from "./ui/fungible-token.providers";
 
 export class FT extends ModuleContext {
@@ -10,5 +10,3 @@ export class FT extends ModuleContext {
     static balancesRender = ftBalancesRender;
     static format = FTFormat;
 }
-
-export type { FTBalancesProps };

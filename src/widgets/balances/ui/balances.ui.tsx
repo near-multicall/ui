@@ -2,24 +2,22 @@ import clsx from "clsx";
 import { ComponentProps } from "react";
 
 import { Tile, Scrollable, Table } from "../../../shared/ui/design";
-import { FT, FTBalancesProps, NEARToken, NEARTokenBalancesProps } from "../../../entities";
+import { FT, NEARToken } from "../../../entities";
 
 import "./balances.ui.scss";
 
 const _Balances = "Balances";
 
 export interface BalancesProps
-    extends FTBalancesProps,
-        ComponentProps<typeof FT["BalancesProvider"]>,
-        NEARTokenBalancesProps,
+    extends ComponentProps<typeof FT["BalancesProvider"]>,
         ComponentProps<typeof NEARToken["BalancesProvider"]> {
     accountName: string;
     className?: string;
 }
 
-export const Balances = ({ className, accountId, accountName, nonZeroOnly = true }: BalancesProps) => {
+export const Balances = ({ className, accountId, accountName }: BalancesProps) => {
     const nearTokenBalances = NEARToken.balancesRender(),
-        fungibleTokenBalances = FT.balancesRender({ nonZeroOnly });
+        fungibleTokenBalances = FT.balancesRender({ nonZeroOnly: true });
 
     return (
         <NEARToken.BalancesProvider {...{ accountId }}>

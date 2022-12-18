@@ -5,7 +5,7 @@ import { IconLabel, NearIcon } from "../../../shared/ui/design";
 import { FTFormat } from "../lib/fungible-token.format";
 import { FTModel } from "../model/fungible-token.model";
 
-export interface FTBalancesProps {
+interface FTBalancesProps {
     nonZeroOnly?: boolean;
 }
 
