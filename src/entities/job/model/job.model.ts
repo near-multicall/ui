@@ -50,11 +50,7 @@ export class JobModel {
                     error: null,
                     loading: false,
                 }))
-                .catch((error) => ({
-                    data: null,
-                    error: new Error(error),
-                    loading: false,
-                }))
+                .catch((error) => ({ data: null, error, loading: false }))
         );
 
     public static readonly useAllEntriesState = (inputs: JobModelInputs) => {
