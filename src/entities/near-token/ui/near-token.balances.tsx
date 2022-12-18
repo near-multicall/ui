@@ -1,9 +1,8 @@
 import { useContext } from "react";
 
-import { formatTokenAmount } from "../../../shared/lib/converter";
 import { IconLabel, NearIcon } from "../../../shared/ui/design";
+import { NEARTokenFormat } from "../lib/near-token.format";
 import { NEARTokenModel } from "../model/near-token.model";
-import { ModuleContext } from "../module-context";
 
 export const nearTokenBalancesRender = () => {
     const { data } = useContext(NEARTokenModel.BalancesContext);
@@ -17,9 +16,9 @@ export const nearTokenBalancesRender = () => {
                       label="NEAR"
                   />,
 
-                  formatTokenAmount(data.multicallInstance, 24, ModuleContext.FRACTIONAL_PART_LENGTH),
-                  formatTokenAmount(data.account, 24, ModuleContext.FRACTIONAL_PART_LENGTH),
-                  formatTokenAmount(data.total, 24, ModuleContext.FRACTIONAL_PART_LENGTH),
+                  NEARTokenFormat.amountToDisplayAmount(data.multicallInstance),
+                  NEARTokenFormat.amountToDisplayAmount(data.account),
+                  NEARTokenFormat.amountToDisplayAmount(data.total),
               ],
 
               id: "NEAR",
