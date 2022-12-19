@@ -1,5 +1,5 @@
 import { FungibleToken } from "../../../shared/lib/standards/fungibleToken";
-import { NearLink } from "../../../shared/ui/design";
+import { NEARLink } from "../../../shared/ui/design";
 
 export interface MIWhitelistedTokenProps {
     address: FungibleToken["address"];
@@ -7,7 +7,7 @@ export interface MIWhitelistedTokenProps {
 
 const MIWhitelistedToken = ({ address }: MIWhitelistedTokenProps) => (
     <span>
-        <NearLink {...{ address }} />
+        <NEARLink {...{ address }} />
     </span>
 );
 

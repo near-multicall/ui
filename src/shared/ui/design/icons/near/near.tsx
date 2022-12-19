@@ -42,7 +42,7 @@ const GenericTokenIconFilled = ({ className }: GenericTokenIconProps) => (
     </svg>
 );
 
-export const NearIcon = {
+export const NEARIcon = {
     GenericTokenFilled: GenericTokenIconFilled,
     NativeTokenFilled: NativeTokenIconFilled,
     NATIVE_TOKEN_CHARACTER: NEAR_NATIVE_TOKEN_CHARACTER,

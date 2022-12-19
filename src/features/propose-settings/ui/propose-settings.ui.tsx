@@ -12,7 +12,7 @@ import {
 import { SputnikDAO } from "../../../shared/lib/contracts/sputnik-dao";
 import { toNEAR } from "../../../shared/lib/converter";
 import { signAndSendTxs } from "../../../shared/lib/wallet";
-import { Button, ButtonGroup, NearIcon, TextInput, Tile } from "../../../shared/ui/design";
+import { Button, ButtonGroup, NEARIcon, TextInput, Tile } from "../../../shared/ui/design";
 
 import "./propose-settings.ui.scss";
 
@@ -94,7 +94,7 @@ export const ProposeSettingsUI = ({ className, dao, diff, disabled, editMode, ..
                                                 key={data as string}
                                             >
                                                 {!Number.isNaN(data) && diffKey === MulticallPropertyKey.jobBond
-                                                    ? `${toNEAR(data as string)} ${NearIcon.NATIVE_TOKEN_CHARACTER}`
+                                                    ? `${toNEAR(data as string)} ${NEARIcon.NATIVE_TOKEN_CHARACTER}`
                                                     : (data as string)}
                                             </li>
                                         )

@@ -1,1 +1,1 @@
-export { DaoPage } from "./dao";
+export { DAOPage } from "./dao";

@@ -5,15 +5,15 @@ import { Link, LinkProps } from "../link";
 
 import "./near-link.scss";
 
-export interface NearLinkProps extends Omit<LinkProps, "href"> {
+export interface NEARLinkProps extends Omit<LinkProps, "href"> {
     address: Account["accountId"];
 }
 
-const _NearLink = "NearLink";
+const _NEARLink = "NEARLink";
 
-export const NearLink = ({ address }: NearLinkProps) => (
+export const NEARLink = ({ address }: NEARLinkProps) => (
     <Link
-        className={_NearLink}
+        className={_NEARLink}
         href={args.string().address().intoUrl().cast(address) ?? "#"}
         label={address}
         rel="noopener noreferrer"

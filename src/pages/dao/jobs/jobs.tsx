@@ -5,21 +5,21 @@ import { Job, MulticallInstance } from "../../../entities";
 
 import "./jobs.scss";
 
-const _DaoJobsTab = "DaoJobsTab";
+const _DAOJobsTab = "DAOJobsTab";
 
-interface DaoJobsTabProps extends HTMLProps<HTMLDivElement> {}
+interface DAOJobsTabProps extends HTMLProps<HTMLDivElement> {}
 
-const DAOJobsTabContent = ({ className, ...props }: DaoJobsTabProps) => (
+const DAOJobsTabContent = ({ className, ...props }: DAOJobsTabProps) => (
     <div
-        className={clsx("DaoJobsTab", className)}
+        className={clsx(_DAOJobsTab, className)}
         {...props}
     >
         <Job.EntriesTable multicallInstance={useContext(MulticallInstance.Context).data} />
     </div>
 );
 
-export const DaoJobsTab = {
-    render: (props: DaoJobsTabProps) => ({
+export const DAOJobsTab = {
+    render: (props: DAOJobsTabProps) => ({
         content: <DAOJobsTabContent {...props} />,
         lazy: true,
         name: "Jobs",

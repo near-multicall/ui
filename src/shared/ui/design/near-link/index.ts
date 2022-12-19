@@ -1,1 +1,1 @@
-export { NearLink, type NearLinkProps } from "./near-link";
+export { NEARLink, type NEARLinkProps } from "./near-link";

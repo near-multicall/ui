@@ -5,15 +5,15 @@ import { SettingsEditor, SettingsEditorProps } from "../../../widgets";
 
 import "./settings.scss";
 
-const _DaoSettingsTab = "DaoSettingsTab";
+const _DAOSettingsTab = "DAOSettingsTab";
 
-interface DaoSettingsTabProps extends HTMLProps<HTMLDivElement>, SettingsEditorProps {}
+interface DAOSettingsTabProps extends HTMLProps<HTMLDivElement>, SettingsEditorProps {}
 
-export const DaoSettingsTab = {
-    render: ({ className, dao, ...props }: DaoSettingsTabProps) => ({
+export const DAOSettingsTab = {
+    render: ({ className, dao, ...props }: DAOSettingsTabProps) => ({
         content: (
             <div
-                className={clsx(_DaoSettingsTab, className)}
+                className={clsx(_DAOSettingsTab, className)}
                 {...props}
             >
                 <SettingsEditor {...{ dao }} />

@@ -1,10 +1,10 @@
-import { NearLink, NearLinkProps } from "../../../shared/ui/design";
+import { NEARLink, NEARLinkProps } from "../../../shared/ui/design";
 
-export interface MIAdminProps extends NearLinkProps {}
+export interface MIAdminProps extends NEARLinkProps {}
 
 const MIAdmin = ({ address }: MIAdminProps) => (
     <span>
-        <NearLink {...{ address }} />
+        <NEARLink {...{ address }} />
     </span>
 );
 

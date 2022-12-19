@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import { AppPage } from "./pages/app";
-import { DaoPage } from "./pages/dao/dao";
+import { DAOPage } from "./pages/dao/dao";
 import { Wallet } from "./entities";
 import { DialogsLayer, Sidebar } from "./widgets";
 import "./shared/lib/persistent";
@@ -42,7 +42,7 @@ createRoot(appMountPoint).render(
                     element={
                         <>
                             <Sidebar full={true} />
-                            <DaoPage />
+                            <DAOPage />
                             <DialogsLayer />
                         </>
                     }

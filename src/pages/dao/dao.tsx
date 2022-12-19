@@ -16,9 +16,9 @@ import { signAndSendTxs } from "../../shared/lib/wallet";
 import { Tabs } from "../../shared/ui/design";
 import { TextField } from "../../shared/ui/form";
 
-import { DaoSettingsTab } from "./settings/settings";
-import { DaoFundsTab } from "./funds/funds";
-import { DaoJobsTab } from "./jobs/jobs";
+import { DAOSettingsTab } from "./settings/settings";
+import { DAOFundsTab } from "./funds/funds";
+import { DAOJobsTab } from "./jobs/jobs";
 import "./dao.scss";
 
 const Ctx = Wallet.trySelectorContext();
@@ -33,9 +33,9 @@ interface State {
     proposedInfo: ProposalOutput | null;
 }
 
-const _DaoPage = "DaoPage";
+const _DAOPage = "DAOPage";
 
-export class DaoPage extends Component<Props, State> {
+export class DAOPage extends Component<Props, State> {
     static contextType = Ctx;
     declare context: ContextType<typeof Ctx>;
 
@@ -407,8 +407,8 @@ export class DaoPage extends Component<Props, State> {
         // TODO: only require signIn when DAO has no multicall instance (to know if user can propose or vote on existing proposal to create multicall)
         if (!walletSelector.isSignedIn()) {
             return (
-                <div className={_DaoPage}>
-                    <div className={clsx(`${_DaoPage}-content`, "error")}>Please sign in to continue</div>
+                <div className={_DAOPage}>
+                    <div className={clsx(`${_DAOPage}-content`, "error")}>Please sign in to continue</div>
                 </div>
             );
         }
@@ -429,8 +429,8 @@ export class DaoPage extends Component<Props, State> {
 
         if (displayErrors.length > 0)
             return (
-                <div className={_DaoPage}>
-                    <div className={clsx(`${_DaoPage}-content`, "error")}>
+                <div className={_DAOPage}>
+                    <div className={clsx(`${_DAOPage}-content`, "error")}>
                         <div>{displayErrors}</div>
                         {this.createMulticall()}
                     </div>
@@ -439,8 +439,8 @@ export class DaoPage extends Component<Props, State> {
 
         return (
             <MulticallInstance.ContextProvider daoAddress={this.state.dao.address}>
-                <div className={_DaoPage}>
-                    <div className={`${_DaoPage}-header`}>
+                <div className={_DAOPage}>
+                    <div className={`${_DAOPage}-header`}>
                         <div className="DaoSearch">
                             <Formik
                                 initialValues={{ addr: STORAGE.addresses.dao ?? "" }}
@@ -471,14 +471,14 @@ export class DaoPage extends Component<Props, State> {
 
                     <Tabs
                         classes={{
-                            root: `${_DaoPage}-tabs`,
-                            buttonsPanel: `${_DaoPage}-tabs-buttonsPanel`,
-                            contentSpace: `${_DaoPage}-tabs-contentSpace`,
+                            root: `${_DAOPage}-tabs`,
+                            buttonsPanel: `${_DAOPage}-tabs-buttonsPanel`,
+                            contentSpace: `${_DAOPage}-tabs-contentSpace`,
                         }}
                         items={[
-                            DaoSettingsTab.render({ className: `${_DaoPage}-content`, dao: this.state.dao }),
-                            DaoFundsTab.render({ accountId: this.state.dao.address, className: `${_DaoPage}-content` }),
-                            DaoJobsTab.render({ className: `${_DaoPage}-content` }),
+                            DAOSettingsTab.render({ className: `${_DAOPage}-content`, dao: this.state.dao }),
+                            DAOFundsTab.render({ accountId: this.state.dao.address, className: `${_DAOPage}-content` }),
+                            DAOJobsTab.render({ className: `${_DAOPage}-content` }),
                         ]}
                     />
                 </div>

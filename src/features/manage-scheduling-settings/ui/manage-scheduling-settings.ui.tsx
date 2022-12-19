@@ -5,7 +5,7 @@ import { HTMLProps, useCallback, useContext, useEffect, useMemo, useState } from
 import { MulticallSettingsChange, MulticallPropertyKey } from "../../../shared/lib/contracts/multicall";
 import { ArgsString } from "../../../shared/lib/args-old";
 import { toNEAR, toYocto } from "../../../shared/lib/converter";
-import { IconLabel, NearIcon, NearLink, Table, Tile, Tooltip } from "../../../shared/ui/design";
+import { IconLabel, NEARIcon, NEARLink, Table, Tile, Tooltip } from "../../../shared/ui/design";
 import { MulticallInstance } from "../../../entities";
 
 import "./manage-scheduling-settings.ui.scss";
@@ -145,7 +145,7 @@ export const ManageScheduleSettingsUI = ({ disabled, onEdit, resetTrigger }: Man
                                     value={croncatManager || multicallInstance.data.croncatManager}
                                 />
                             ) : (
-                                <NearLink address={croncatManager || multicallInstance.data.croncatManager} />
+                                <NEARLink address={croncatManager || multicallInstance.data.croncatManager} />
                             ),
                         ],
                     },
@@ -158,7 +158,7 @@ export const ManageScheduleSettingsUI = ({ disabled, onEdit, resetTrigger }: Man
                             editModeEnabled ? (
                                 <TextField
                                     InputProps={{
-                                        endAdornment: NearIcon.NATIVE_TOKEN_CHARACTER,
+                                        endAdornment: NEARIcon.NATIVE_TOKEN_CHARACTER,
                                         inputProps: { min: 0, step: 0.001 },
                                     }}
                                     fullWidth
@@ -168,7 +168,7 @@ export const ManageScheduleSettingsUI = ({ disabled, onEdit, resetTrigger }: Man
                                 />
                             ) : (
                                 <IconLabel
-                                    icon={NearIcon.NATIVE_TOKEN_CHARACTER}
+                                    icon={NEARIcon.NATIVE_TOKEN_CHARACTER}
                                     label={
                                         jobBond || multicallInstance.data.jobBond !== ""
                                             ? toNEAR(jobBond || multicallInstance.data.jobBond)

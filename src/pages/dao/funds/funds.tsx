@@ -5,15 +5,15 @@ import { Balances, BalancesProps } from "../../../widgets";
 
 import "./funds.scss";
 
-const _DaoFundsTab = "DaoFundsTab";
+const _DAOFundsTab = "DAOFundsTab";
 
-interface DaoFundsTabProps extends HTMLProps<HTMLDivElement>, Omit<BalancesProps, "accountName"> {}
+interface DAOFundsTabProps extends HTMLProps<HTMLDivElement>, Omit<BalancesProps, "accountName"> {}
 
-export const DaoFundsTab = {
-    render: ({ className, accountId, ...props }: DaoFundsTabProps) => ({
+export const DAOFundsTab = {
+    render: ({ className, accountId, ...props }: DAOFundsTabProps) => ({
         content: (
             <div
-                className={clsx(_DaoFundsTab, className)}
+                className={clsx(_DAOFundsTab, className)}
                 {...props}
             >
                 <Balances
