@@ -1,36 +1,28 @@
 import clsx from "clsx";
-import { ComponentProps, HTMLProps } from "react";
+import { HTMLProps } from "react";
 
-import { FT, NEARToken } from "../../../entities";
-import { Balances } from "../../../widgets";
+import { Balances, BalancesProps } from "../../../widgets";
 
 import "./funds.scss";
 
 const _DAOFundsTab = "DAOFundsTab";
 
-interface DAOFundsTabProps
-    extends HTMLProps<HTMLDivElement>,
-        ComponentProps<typeof FT["BalancesProvider"]>,
-        ComponentProps<typeof NEARToken["BalancesProvider"]> {
-    className?: string;
-}
+interface DAOFundsTabProps extends HTMLProps<HTMLDivElement>, BalancesProps {}
 
-const DAOFundsTabContent = ({ className, accountId, ...props }: DAOFundsTabProps) => (
-    <NEARToken.BalancesProvider {...{ accountId }}>
-        <FT.BalancesProvider {...{ accountId }}>
+export const DAOFundsTab = {
+    render: ({ className, accountId, ...props }: DAOFundsTabProps) => ({
+        content: (
             <div
                 className={clsx(_DAOFundsTab, className)}
                 {...props}
             >
-                <Balances accountName="DAO" />
+                <Balances
+                    accountName="DAO"
+                    {...{ accountId }}
+                />
             </div>
-        </FT.BalancesProvider>
-    </NEARToken.BalancesProvider>
-);
+        ),
 
-export const DAOFundsTab = {
-    render: (props: DAOFundsTabProps) => ({
-        content: <DAOFundsTabContent {...props} />,
         lazy: true,
         name: "Funds",
     }),

@@ -1,5 +1,4 @@
 import clsx from "clsx";
-import { ComponentProps } from "react";
 
 import { Tile, Scrollable, Table } from "../../../shared/ui/design";
 import { FT, NEARToken } from "../../../entities";
@@ -8,12 +7,12 @@ import "./balances.ui.scss";
 
 const _Balances = "Balances";
 
-export interface BalancesProps {
+export interface BalancesUIProps {
     accountName: string;
     className?: string;
 }
 
-export const Balances = ({ className, accountName }: BalancesProps) => {
+export const BalancesUI = ({ className, accountName }: BalancesUIProps) => {
     const nearTokenBalances = NEARToken.balancesRender(),
         fungibleTokenBalances = FT.balancesRender({ nonZeroOnly: true });
 
