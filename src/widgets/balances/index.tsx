@@ -1,6 +1,7 @@
 import { ComponentProps } from "react";
 
 import { FT, NEARToken } from "../../entities";
+
 import { BalancesUI, BalancesUIProps } from "./ui/balances.ui";
 
 export interface BalancesProps
