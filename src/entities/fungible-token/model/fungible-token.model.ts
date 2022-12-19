@@ -83,6 +83,6 @@ export class FTModel {
             state.error instanceof Error && void console.error(state.error);
         }, [state.error]);
 
-        return useMemo(() => state, [...Object.values(inputs), state]);
+        return useMemo(() => state, [...Object.values(inputs), ...Object.values(state)]);
     };
 }

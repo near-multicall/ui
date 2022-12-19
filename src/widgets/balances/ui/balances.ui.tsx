@@ -8,40 +8,31 @@ import "./balances.ui.scss";
 
 const _Balances = "Balances";
 
-export interface BalancesProps
-    extends ComponentProps<typeof FT["BalancesProvider"]>,
-        ComponentProps<typeof NEARToken["BalancesProvider"]> {
+export interface BalancesProps {
     accountName: string;
     className?: string;
 }
 
-export const Balances = ({ className, accountId, accountName }: BalancesProps) => {
+export const Balances = ({ className, accountName }: BalancesProps) => {
     const nearTokenBalances = NEARToken.balancesRender(),
         fungibleTokenBalances = FT.balancesRender({ nonZeroOnly: true });
 
     return (
-        <NEARToken.BalancesProvider {...{ accountId }}>
-            <FT.BalancesProvider {...{ accountId }}>
-                <Tile
-                    classes={{ root: clsx(_Balances, className) }}
-                    heading="Token balances"
-                >
-                    {(nearTokenBalances ?? fungibleTokenBalances) && (
-                        <Scrollable>
-                            <Table
-                                RowProps={{ withTitle: true }}
-                                header={["Token", "Multicall", accountName, "Total"]}
-                                rows={[
-                                    ...(nearTokenBalances ? [nearTokenBalances] : []),
-                                    ...(fungibleTokenBalances ?? []),
-                                ]}
-                            />
-                        </Scrollable>
-                    )}
+        <Tile
+            classes={{ root: clsx(_Balances, className) }}
+            heading="Token balances"
+        >
+            {(nearTokenBalances ?? fungibleTokenBalances) && (
+                <Scrollable>
+                    <Table
+                        RowProps={{ withTitle: true }}
+                        header={["Token", "Multicall", accountName, "Total"]}
+                        rows={[...(nearTokenBalances ? [nearTokenBalances] : []), ...(fungibleTokenBalances ?? [])]}
+                    />
+                </Scrollable>
+            )}
 
-                    {(!nearTokenBalances || !fungibleTokenBalances) && <div className="loader" />}
-                </Tile>
-            </FT.BalancesProvider>
-        </NEARToken.BalancesProvider>
+            {(!nearTokenBalances || !fungibleTokenBalances) && <div className="loader" />}
+        </Tile>
     );
 };

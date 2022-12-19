@@ -1,7 +1,7 @@
 import Big from "big.js";
 import { useContext } from "react";
 
-import { IconLabel, NearIcon } from "../../../shared/ui/design";
+import { IconLabel, NEARIcon } from "../../../shared/ui/design";
 import { FTFormat } from "../lib/fungible-token.format";
 import { FTModel } from "../model/fungible-token.model";
 
@@ -17,7 +17,7 @@ export const ftBalancesRender = ({ nonZeroOnly = false }: FTBalancesProps) => {
         items?.map(({ account, metadata, multicallInstance, total }) => ({
             content: [
                 <IconLabel
-                    icon={metadata.icon ?? <NearIcon.GenericTokenFilled />}
+                    icon={metadata.icon ?? <NEARIcon.GenericTokenFilled />}
                     label={metadata.symbol}
                 />,
 
