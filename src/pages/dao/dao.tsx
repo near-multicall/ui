@@ -10,7 +10,7 @@ import { fields } from "../../shared/lib/args/args-types/args-object";
 import { Multicall } from "../../shared/lib/contracts/multicall";
 import { ProposalOutput } from "../../shared/lib/contracts/sputnik-dao";
 import { SputnikDAO, SputnikUI } from "../../shared/lib/contracts/sputnik-dao";
-import { Big, toGas, toYocto } from "../../shared/lib/converter";
+import { Big, toGas } from "../../shared/lib/converter";
 import { STORAGE } from "../../shared/lib/persistent";
 import { signAndSendTxs } from "../../shared/lib/wallet";
 import { Tabs } from "../../shared/ui/design";
@@ -26,9 +26,7 @@ const Ctx = Wallet.trySelectorContext();
 interface Props {}
 
 interface State {
-    formData: {
-        addr: string;
-    };
+    formData: { addr: string };
     dao: SputnikDAO;
     loading: boolean;
     proposed: number;
@@ -93,15 +91,7 @@ export class DaoPage extends Component<Props, State> {
     }
 
     setFormData(newFormData: State["formData"], callback?: () => void | undefined) {
-        this.setState(
-            {
-                formData: {
-                    ...this.state.formData,
-                    ...newFormData,
-                },
-            },
-            callback
-        );
+        this.setState({ formData: { ...this.state.formData, ...newFormData } }, callback);
     }
 
     /**
@@ -118,16 +108,17 @@ export class DaoPage extends Component<Props, State> {
         const lastProposalId = dao.lastProposalId;
         const proposalPeriod = dao.policy.proposal_period;
 
-        // get last 100 DAO proposals
-        const proposals = await dao.getProposals({
+        const last100Proposals = await dao.getProposals({
             from_index: lastProposalId < 100 ? 0 : lastProposalId - 100,
             limit: 100,
         });
-        // Look for active "Create multicall" proposals
-        const activeProposals = proposals.filter(
-            (proposal) =>
-                // discard if not active proposal to create multicall instance
 
+        // Look for active "Create multicall" proposals
+        const activeProposals = last100Proposals.filter(
+            /**
+             * Discard if not active proposal to create multicall instance
+             */
+            (proposal) =>
                 proposal.kind?.FunctionCall?.receiver_id === Multicall.FACTORY_ADDRESS &&
                 proposal.kind?.FunctionCall?.actions?.[0]?.method_name === "create" &&
                 proposal.status === "InProgress" &&
@@ -251,7 +242,8 @@ export class DaoPage extends Component<Props, State> {
                     return (
                         <div className="Alert">
                             {/* hint: you can use "ref-community-board-testnet" as DAO to get to this message */}
-                            {`This DAO has no multicall instance. A DAO member with proposing permissions should make a proposal.`}
+                            {"This DAO has no multicall instance. "}
+                            {"A DAO member with proposal creation permission should make a proposal."}
                         </div>
                     );
                 }
@@ -263,8 +255,10 @@ export class DaoPage extends Component<Props, State> {
 
                     return (
                         <div className="Alert">
-                            {`Proposal to create a multicall exists (#${proposed}), but you have no voting permissions on this DAO.`}
+                            {"Proposal to create a multicall exists (#${proposed}),"}
+                            {" but you have no voting permissions on this DAO."}
                             <br />
+
                             <a
                                 target="_blank"
                                 href={dao.getProposalUrl(SputnikUI.ASTRO_UI, proposed)}
@@ -279,8 +273,10 @@ export class DaoPage extends Component<Props, State> {
 
                     return (
                         <div className="Alert">
-                            {`You have voted on creating a multicall instance for this DAO. It will be created as soon as the proposal passes voting.`}
+                            {"You have voted on creating a multicall instance for this DAO. "}
+                            {"It will be created as soon as the proposal passes voting."}
                             <br />
+
                             <a
                                 target="_blank"
                                 href={dao.getProposalUrl(SputnikUI.ASTRO_UI, proposed)}
@@ -448,11 +444,11 @@ export class DaoPage extends Component<Props, State> {
                         <div className="DaoSearch">
                             <Formik
                                 initialValues={{ addr: STORAGE.addresses.dao ?? "" }}
-                                validate={(values) => {
-                                    this.setFormData({ addr: values.addr });
-                                    this.tryLoadInfoDebounced();
+                                validate={({ addr }) => {
+                                    void this.setFormData({ addr });
+                                    void this.tryLoadInfoDebounced();
                                 }}
-                                onSubmit={() => {}}
+                                onSubmit={() => void null}
                             >
                                 {({ setValues }) => {
                                     this.formikSetValues = setValues;
