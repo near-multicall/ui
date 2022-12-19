@@ -55,7 +55,7 @@ export const ManageScheduleSettingsUI = ({ disabled, onEdit, resetTrigger }: Man
                 value !== multicallInstance.data.croncatManager ? value : formInitialState.croncatManager
             ),
 
-        [croncatManagerUpdate]
+        [croncatManagerUpdate, multicallInstance.data]
     );
 
     const onJobBondChange = useCallback<Required<TextFieldProps>["onChange"]>(
@@ -64,7 +64,7 @@ export const ManageScheduleSettingsUI = ({ disabled, onEdit, resetTrigger }: Man
                 value !== toNEAR(multicallInstance.data.jobBond) ? toYocto(value) : formInitialState.jobBond
             ),
 
-        [jobBondUpdate]
+        [jobBondUpdate, multicallInstance.data]
     );
 
     const formReset = useCallback(() => {
