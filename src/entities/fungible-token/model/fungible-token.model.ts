@@ -1,5 +1,5 @@
 import { Account } from "@near-wallet-selector/core";
-import { createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useMemo, useState } from "react";
 
 import { Multicall } from "../../../shared/lib/contracts/multicall";
 import { Big } from "../../../shared/lib/converter";
@@ -77,8 +77,12 @@ export class FTModel {
     public static readonly useBalancesState = (inputs: FTModelInputs["balances"]) => {
         const [state, stateUpdate] = useState(FTModel.balances);
 
-        useEffect(() => void FTModel.balancesFetch(inputs, stateUpdate), [inputs, stateUpdate]);
+        useEffect(() => void FTModel.balancesFetch(inputs, stateUpdate), [...Object.values(inputs), stateUpdate]);
 
-        return state;
+        useEffect(() => {
+            state.error instanceof Error && void console.error(state.error);
+        }, [state.error]);
+
+        return useMemo(() => state, [...Object.values(inputs), state]);
     };
 }

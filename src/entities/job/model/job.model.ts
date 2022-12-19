@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { JobData, Multicall } from "../../../shared/lib/contracts/multicall";
 import { JobFormat } from "../lib/job.format";
@@ -56,12 +56,12 @@ export class JobModel {
     public static readonly useAllEntriesState = (inputs: JobModelInputs) => {
         const [state, stateUpdate] = useState(JobModel.allEntries);
 
-        useEffect(() => void JobModel.allEntriesFetch(inputs, stateUpdate), [inputs, stateUpdate]);
+        useEffect(() => void JobModel.allEntriesFetch(inputs, stateUpdate), [...Object.values(inputs), stateUpdate]);
 
         useEffect(() => {
             state.error instanceof Error && void console.error(state.error);
-        }, [state]);
+        }, [state.error]);
 
-        return state;
+        return useMemo(() => state, [...Object.values(inputs), state]);
     };
 }

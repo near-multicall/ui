@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useMemo, useState } from "react";
 
 import { Multicall } from "../../../shared/lib/contracts/multicall";
 import { SputnikDAO } from "../../../shared/lib/contracts/sputnik-dao";
@@ -42,8 +42,12 @@ export class MIModel {
     public static readonly usePropertiesState = (inputs: MIModelInputs) => {
         const [state, stateUpdate] = useState(MIModel.properties);
 
-        useEffect(() => void MIModel.propertiesFetch(inputs, stateUpdate), [inputs, stateUpdate]);
+        useEffect(() => void MIModel.propertiesFetch(inputs, stateUpdate), [...Object.values(inputs), stateUpdate]);
 
-        return state;
+        useEffect(() => {
+            state.error instanceof Error && void console.error(state.error);
+        }, [state.error]);
+
+        return useMemo(() => state, [...Object.values(inputs), state]);
     };
 }

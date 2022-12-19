@@ -1,5 +1,5 @@
 import { Account } from "@near-wallet-selector/core";
-import { createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useMemo, useState } from "react";
 
 import { Big } from "../../../shared/lib/converter";
 import { viewAccount } from "../../../shared/lib/wallet";
@@ -51,8 +51,15 @@ export class NEARTokenModel {
     public static readonly useBalancesState = (inputs: NEARTokenModelInputs["balances"]) => {
         const [state, stateUpdate] = useState(NEARTokenModel.balances);
 
-        useEffect(() => void NEARTokenModel.balancesFetch(inputs, stateUpdate), [inputs, stateUpdate]);
+        useEffect(
+            () => void NEARTokenModel.balancesFetch(inputs, stateUpdate),
+            [...Object.values(inputs), stateUpdate]
+        );
 
-        return state;
+        useEffect(() => {
+            state.error instanceof Error && void console.error(state.error);
+        }, [state.error]);
+
+        return useMemo(() => state, [...Object.values(inputs), state]);
     };
 }
