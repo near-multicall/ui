@@ -4,4 +4,4 @@
 npx lint-staged
 # other commands, like tests, go here
 
-npx lint-staged --quiet
+npm run typecheck

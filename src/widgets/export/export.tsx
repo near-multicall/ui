@@ -23,7 +23,7 @@ import "./export.scss";
 const Ctx = Wallet.trySelectorContext();
 
 type FormData = {
-    description: boolean;
+    description: string;
     gas: string;
     gasUnit: unit | number;
     depo: string;
