@@ -1,5 +1,10 @@
-import { addMethod, ValidationError } from "yup";
+import { addMethod, ValidationError, BaseSchema } from "yup";
 import { ValidateOptions } from "yup/lib/types";
+
+// tell TypeScript that BaseSchema has ErrorMethods
+declare module "yup" {
+    interface BaseSchema extends ErrorMethods {}
+}
 
 // default error messages go here
 const locale = {
@@ -325,6 +330,9 @@ function addErrorMethods(schema: any): void {
         requiredWhen,
     });
 }
+
+// Add errorMethods to BaseSchema => All Schemas will have it
+addErrorMethods(BaseSchema);
 
 export { addMethods, addErrorMethods, locale };
 export type { RetainOptions, RetainedData, ErrorMethods };

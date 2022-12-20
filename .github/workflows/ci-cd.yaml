@@ -43,6 +43,10 @@ jobs:
       - name: install dependencies
         run: npm install
 
+      # check for typescript errors
+      - name: typecheck
+        run: npm run typecheck
+
       # Initializes the CodeQL tools for scanning.
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2

@@ -77,16 +77,20 @@ const ExternalLoginDialog = ({ className, method, onClose, open, title }: Extern
     );
 };
 
-export const ELDialogs = () => {
+export const ELDialogs = (): JSX.Element => {
     const { dialogsVisibility, closeHandlerBinding } = ELDialogsModel.useVisibilityState();
 
-    return Object.values(ModuleContext.METHODS).map((loginMethod) => (
-        <ExternalLoginDialog
-            key={loginMethod.type}
-            method={loginMethod.type}
-            onClose={closeHandlerBinding(loginMethod.type)}
-            open={dialogsVisibility[loginMethod.type]}
-            {...loginMethod}
-        />
-    ));
+    return (
+        <>
+            {Object.values(ModuleContext.METHODS).map((loginMethod) => (
+                <ExternalLoginDialog
+                    key={loginMethod.type}
+                    method={loginMethod.type}
+                    onClose={closeHandlerBinding(loginMethod.type)}
+                    open={dialogsVisibility[loginMethod.type]}
+                    {...loginMethod}
+                />
+            ))}
+        </>
+    );
 };

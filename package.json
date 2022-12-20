@@ -15,7 +15,8 @@
         "start:mainnet": "NEAR_ENV=mainnet npm run start",
         "test": "jest test --runInBand",
         "prettier": "prettier --write \"./**/*.{ts,tsx,js,jsx,css,scss,html}\"",
-        "prepare": "husky install"
+        "prepare": "husky install",
+        "typecheck": "tsc --noEmit"
     },
     "lint-staged": {
         "*.{ts,tsx}": [
@@ -71,8 +72,11 @@
         "@near-wallet-selector/my-near-wallet": "^7.3.0",
         "@near-wallet-selector/near-wallet": "^7.3.0",
         "@near-wallet-selector/sender": "^7.3.0",
+        "@types/babel__generator": "^7.6.4",
+        "@types/babel__template": "^7.4.1",
         "@types/luxon": "^3.0.1",
         "@types/react": "^18.0.0",
+        "@types/scheduler": "^0.16.2",
         "big.js": "^6.2.1",
         "clsx": "^1.2.1",
         "cron-parser": "^4.6.0",

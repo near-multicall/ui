@@ -1,10 +1,6 @@
-// @ts-ignore
 import nearWalletIconUrl from "@near-wallet-selector/near-wallet/assets/near-wallet-icon.png";
-// @ts-ignore
 import senderIconUrl from "@near-wallet-selector/sender/assets/sender-icon.png";
-// @ts-ignore
 import myNearWalletIconUrl from "@near-wallet-selector/my-near-wallet/assets/my-near-wallet-icon.png";
-// @ts-ignore
 import { setupWalletSelector } from "@near-wallet-selector/core";
 import type { WalletSelector, AccountState } from "@near-wallet-selector/core";
 import { setupModal } from "@near-wallet-selector/modal-ui";

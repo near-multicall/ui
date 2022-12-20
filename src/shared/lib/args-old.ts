@@ -1,3 +1,4 @@
+// @ts-nocheck deprecated args structure
 import { useEffect, useMemo, useReducer } from "react";
 import { BigSource } from "big.js";
 import { Validation } from "./validation";

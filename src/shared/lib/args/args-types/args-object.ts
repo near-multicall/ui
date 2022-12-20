@@ -1,8 +1,8 @@
-import { addMethod, AnySchema, array, BaseSchema, object, ObjectSchema as _ObjectSchema, reach } from "yup";
-import { addErrorMethods, ErrorMethods, RetainOptions } from "../args-error";
+import { addMethod, AnySchema, ObjectSchema as _ObjectSchema, reach } from "yup";
+import { RetainOptions } from "../args-error";
 
 declare module "yup" {
-    interface ObjectSchema<TShape, TContext, TIn, TOut> extends BaseSchema<TIn, TContext, TOut>, ErrorMethods {
+    interface ObjectSchema<TShape, TContext, TIn, TOut> {
         requireAll(options?: Partial<ApplyToAllOptions>): this;
         retainAll(options?: Partial<ApplyToAllOptions>, retainOptions?: Partial<RetainOptions>): this;
     }
@@ -46,8 +46,6 @@ addMethod(
         return this.retain();
     }
 );
-
-addErrorMethods(_ObjectSchema);
 
 /**
  * get subschema at path
