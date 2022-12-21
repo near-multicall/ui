@@ -7,7 +7,7 @@ import "./funds.scss";
 
 const _DAOFundsTab = "DAOFundsTab";
 
-interface DAOFundsTabProps extends HTMLProps<HTMLDivElement>, BalancesProps {}
+interface DAOFundsTabProps extends HTMLProps<HTMLDivElement>, Omit<BalancesProps, "accountName"> {}
 
 export const DAOFundsTab = {
     render: ({ className, accountId, ...props }: DAOFundsTabProps) => ({
