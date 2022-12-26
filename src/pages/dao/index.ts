@@ -1,1 +1,1 @@
-export { DAOPage } from "./dao";
+export { DAOPage } from "./dao-page.ui";

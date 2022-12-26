@@ -15,11 +15,9 @@ import { STORAGE } from "../../shared/lib/persistent";
 import { signAndSendTxs } from "../../shared/lib/wallet";
 import { Tabs } from "../../shared/ui/design";
 import { TextField } from "../../shared/ui/form";
+import { MulticallScheduleOverview, FundsOverview, MulticallSettingsManager } from "../../widgets";
 
-import { DAOSettingsTab } from "./settings/settings";
-import { DAOFundsTab } from "./funds/funds";
-import { DAOJobsTab } from "./jobs/jobs";
-import "./dao.scss";
+import "./dao-page.ui.scss";
 
 const Ctx = Wallet.trySelectorContext();
 
@@ -33,7 +31,7 @@ interface State {
     proposedInfo: ProposalOutput | null;
 }
 
-const _DAOPage = "DAOPage";
+export const _DAOPage = "DAOPage";
 
 export class DAOPage extends Component<Props, State> {
     static contextType = Ctx;
@@ -438,51 +436,79 @@ export class DAOPage extends Component<Props, State> {
             );
 
         return (
-            <MulticallInstance.ContextProvider daoAddress={this.state.dao.address}>
-                <div className={_DAOPage}>
-                    <div className={`${_DAOPage}-header`}>
-                        <div className="DaoSearch">
-                            <Formik
-                                initialValues={{ addr: STORAGE.addresses.dao ?? "" }}
-                                validate={({ addr }) => {
-                                    void this.setFormData({ addr });
-                                    void this.tryLoadInfoDebounced();
-                                }}
-                                onSubmit={() => void null}
-                            >
-                                {({ setValues }) => {
-                                    this.formikSetValues = setValues;
+            <div className={_DAOPage}>
+                <div className={`${_DAOPage}-header`}>
+                    <div className="DaoSearch">
+                        <Formik
+                            initialValues={{ addr: STORAGE.addresses.dao ?? "" }}
+                            validate={({ addr }) => {
+                                void this.setFormData({ addr });
+                                void this.tryLoadInfoDebounced();
+                            }}
+                            onSubmit={() => void null}
+                        >
+                            {({ setValues }) => {
+                                this.formikSetValues = setValues;
 
-                                    return (
-                                        <Form>
-                                            <TextField
-                                                name="addr"
-                                                placeholder="Search for DAOs"
-                                                hiddenLabel={true}
-                                                variant="standard"
-                                                autoFocus
-                                            />
-                                        </Form>
-                                    );
-                                }}
-                            </Formik>
-                        </div>
+                                return (
+                                    <Form>
+                                        <TextField
+                                            name="addr"
+                                            placeholder="Search for DAOs"
+                                            hiddenLabel={true}
+                                            variant="standard"
+                                            autoFocus
+                                        />
+                                    </Form>
+                                );
+                            }}
+                        </Formik>
                     </div>
-
-                    <Tabs
-                        classes={{
-                            root: `${_DAOPage}-tabs`,
-                            buttonsPanel: `${_DAOPage}-tabs-buttonsPanel`,
-                            contentSpace: `${_DAOPage}-tabs-contentSpace`,
-                        }}
-                        items={[
-                            DAOSettingsTab.render({ className: `${_DAOPage}-content`, dao: this.state.dao }),
-                            DAOFundsTab.render({ accountId: this.state.dao.address, className: `${_DAOPage}-content` }),
-                            DAOJobsTab.render({ className: `${_DAOPage}-content` }),
-                        ]}
-                    />
                 </div>
-            </MulticallInstance.ContextProvider>
+
+                <Tabs
+                    classes={{
+                        root: `${_DAOPage}-tabs`,
+                        buttonsPanel: `${_DAOPage}-tabs-buttonsPanel`,
+                        contentSpace: `${_DAOPage}-tabs-contentSpace`,
+                    }}
+                    items={[
+                        {
+                            name: "Settings",
+                            ui: (
+                                <MulticallSettingsManager
+                                    accountId={this.state.dao.address}
+                                    dao={this.state.dao}
+                                    className={`${_DAOPage}-content`}
+                                />
+                            ),
+                        },
+
+                        {
+                            lazy: true,
+                            name: "Funds",
+                            ui: (
+                                <FundsOverview
+                                    accountId={this.state.dao.address}
+                                    accountName="DAO"
+                                    className={`${_DAOPage}-content`}
+                                />
+                            ),
+                        },
+
+                        {
+                            lazy: true,
+                            name: "Jobs",
+                            ui: (
+                                <MulticallScheduleOverview
+                                    accountId={this.state.dao.address}
+                                    className={`${_DAOPage}-content`}
+                                />
+                            ),
+                        },
+                    ]}
+                />
+            </div>
         );
     }
 }

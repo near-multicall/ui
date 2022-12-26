@@ -11,15 +11,15 @@ import { Tile } from "../../../shared/ui/design";
 import { MulticallInstance, Wallet } from "../../../entities";
 import { ManageScheduleSettings, ManageTokenWhitelist, ProposeSettings } from "../../../features";
 
-import "./settings-editor.ui.scss";
+import "./multicall-settings-manager.ui.scss";
 
-const _SettingsEditor = "SettingsEditor";
+const _MulticallSettingsManager = "MulticallSettingsManager";
 
-export interface SettingsEditorProps extends HTMLProps<HTMLDivElement> {
+export interface MulticallSettingsManagerUIProps extends HTMLProps<HTMLDivElement> {
     dao: SputnikDAO;
 }
 
-export const SettingsEditor = ({ className, dao }: SettingsEditorProps) => {
+export const MulticallSettingsManagerUI = ({ className, dao }: MulticallSettingsManagerUIProps) => {
     const wallet = useContext(Wallet.SelectorContext),
         multicallInstance = useContext(MulticallInstance.Context);
 
@@ -69,16 +69,22 @@ export const SettingsEditor = ({ className, dao }: SettingsEditorProps) => {
     );
 
     return (
-        <div className={clsx(_SettingsEditor, { "is-displayingError": multicallInstance.error !== null }, className)}>
+        <div
+            className={clsx(
+                _MulticallSettingsManager,
+                { "is-displayingError": multicallInstance.error !== null },
+                className
+            )}
+        >
             <Tile
-                classes={{ root: `${_SettingsEditor}-error` }}
+                classes={{ root: `${_MulticallSettingsManager}-error` }}
                 error={multicallInstance.error}
             />
 
-            {false && <MulticallInstance.AdminsTable className={`${_SettingsEditor}-admins`} />}
+            {false && <MulticallInstance.AdminsTable className={`${_MulticallSettingsManager}-admins`} />}
 
             <ManageTokenWhitelist.UI
-                className={`${_SettingsEditor}-tokenWhitelist`}
+                className={`${_MulticallSettingsManager}-tokenWhitelist`}
                 disabled={!canCreateProposals}
                 {...{ onEdit, resetTrigger }}
             />
