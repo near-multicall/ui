@@ -107,17 +107,17 @@ class Multicall {
      */
     ready: boolean = false;
 
-    constructor(instanceAddress: AccountId) {
-        this.address = instanceAddress;
+    constructor(accountId: AccountId) {
+        this.address = accountId;
     }
 
     // used to create and initialize a Multicall instance
-    static async init(instanceAddress: AccountId): Promise<Multicall> {
+    static async init(accountId: AccountId): Promise<Multicall> {
         // verify address is a Multicall instance, fetch its info and mark it ready
-        const multicallInstance = new Multicall(instanceAddress);
+        const multicallInstance = new Multicall(accountId);
         const [isMulticall, admins, croncatManager, tokensWhitelist, jobBond] = await Promise.all([
             // on failure set isMulticall to false
-            Multicall.isMulticall(instanceAddress).catch((err) => {
+            Multicall.isMulticall(accountId).catch((err) => {
                 return false;
             }),
             // on failure set admins list to be empty
