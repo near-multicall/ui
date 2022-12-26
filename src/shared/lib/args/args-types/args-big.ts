@@ -1,11 +1,8 @@
 import { BigSource } from "big.js";
 import { MixedSchema } from "yup";
 import { Big, formatTokenAmount, parseTokenAmount, toGas, unit, unitToDecimals } from "../../converter";
-import { addErrorMethods, ErrorMethods, locale } from "../args-error";
+import { locale } from "../args-error";
 
-declare module "yup" {
-    interface BigSchema extends ErrorMethods {}
-}
 class BigSchema extends MixedSchema<Big> {
     constructor() {
         super({ type: "big" });
@@ -101,7 +98,7 @@ class BigSchema extends MixedSchema<Big> {
      * @returns
      */
     oneYocto() {
-        return this.token().max(1);
+        return this.token().min(1).max(1);
     }
 
     /**
@@ -156,7 +153,5 @@ class BigSchema extends MixedSchema<Big> {
         });
     }
 }
-
-addErrorMethods(BigSchema);
 
 export { BigSchema };

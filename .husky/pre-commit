@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-yarn lint-staged
+npx lint-staged
 # other commands, like tests, go here
 
-npx lint-staged --quiet
+npm run typecheck

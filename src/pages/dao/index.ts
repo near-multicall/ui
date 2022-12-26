@@ -1,1 +1,2 @@
-export { DaoPage } from "./dao";
+import { DaoPage } from "./dao";
+export default DaoPage;

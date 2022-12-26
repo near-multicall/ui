@@ -3,7 +3,7 @@ import { Component } from "react";
 
 import { Sidebar, Menu, Editor } from "../../widgets";
 import { Task } from "../../entities";
-import { AppPage } from "../../pages/app";
+import AppPage from "../../pages/app";
 import { WalletComponent } from "../../entities/wallet/ui/wallet";
 
 type CardInfo = {
