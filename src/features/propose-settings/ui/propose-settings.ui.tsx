@@ -1,8 +1,9 @@
 import clsx from "clsx";
-import { FormEventHandler, HTMLProps, useCallback, useContext, useMemo, useState } from "react";
+import { Form, Formik, FormikHelpers } from "formik";
+import { HTMLProps, useCallback, useContext } from "react";
+import { InferType } from "yup";
 
-import { MulticallInstance } from "../../../entities";
-import { ArgsString } from "../../../shared/lib/args-old";
+import { args } from "../../../shared/lib/args/args";
 import {
     Multicall,
     MulticallPropertyKey,
@@ -12,7 +13,9 @@ import {
 import { SputnikDAO } from "../../../shared/lib/contracts/sputnik-dao";
 import { toNEAR } from "../../../shared/lib/converter";
 import { signAndSendTxs } from "../../../shared/lib/wallet";
-import { Button, ButtonGroup, NEARIcon, TextInput, Tile } from "../../../shared/ui/design";
+import { Button, ButtonGroup, NEARIcon, Tile } from "../../../shared/ui/design";
+import { TextField } from "../../../shared/ui/form";
+import { MulticallInstance } from "../../../entities";
 
 import "./propose-settings.ui.scss";
 
@@ -25,23 +28,32 @@ export interface ProposeSettingsUIProps extends HTMLProps<HTMLDivElement> {
     onCancel: VoidFunction;
 }
 
-export const ProposeSettingsUI = ({ className, dao, diff, disabled, editMode, ...props }: ProposeSettingsUIProps) => {
+export const ProposeSettingsUI = ({
+    className,
+    dao,
+    diff,
+    disabled,
+    editMode,
+    onCancel,
+    ...props
+}: ProposeSettingsUIProps) => {
     const multicallInstance = useContext(MulticallInstance.Context);
 
-    const formValues = { description: useMemo(() => new ArgsString(""), []) },
-        [description, descriptionUpdate] = useState(formValues.description.value);
+    const schema = args.object().shape({
+        description: args.string().default("").required("Proposal description is required"),
+    });
 
-    const onCancel = useCallback(() => {
-        void props.onCancel();
-        void descriptionUpdate("");
+    const onReset = useCallback(
+        (_values: InferType<typeof schema>, { setValues }: FormikHelpers<InferType<typeof schema>>) => {
+            void setValues(schema.getDefault());
+            void onCancel();
+        },
 
-        formValues.description.value = "";
-    }, [props.onCancel, descriptionUpdate]);
+        [onCancel]
+    );
 
-    const onSubmit = useCallback<FormEventHandler>(
-        (event) => {
-            void event.preventDefault();
-
+    const onSubmit = useCallback(
+        ({ description }: InferType<typeof schema>) =>
             void dao
                 .proposeFunctionCall(
                     description,
@@ -49,10 +61,9 @@ export const ProposeSettingsUI = ({ className, dao, diff, disabled, editMode, ..
                     Multicall.configDiffToProposalActions(diff)
                 )
                 .then((someTx) => signAndSendTxs([someTx]))
-                .catch(console.error);
-        },
+                .catch(console.error),
 
-        [dao, diff, description]
+        [dao, diff]
     );
 
     return (
@@ -105,39 +116,39 @@ export const ProposeSettingsUI = ({ className, dao, diff, disabled, editMode, ..
                 )}
             </div>
 
-            <form className={`${_ProposeSettings}-submit`}>
-                <div>
-                    <TextInput
-                        fullWidth
-                        label="Description:"
-                        minRows={2}
-                        multiline
-                        required
-                        update={(event) => void descriptionUpdate(event.target.value)}
-                        value={formValues.description}
-                    />
-                </div>
+            <Formik
+                initialValues={schema.getDefault()}
+                validationSchema={schema}
+                {...{ onReset, onSubmit }}
+            >
+                <Form className={`${_ProposeSettings}-submit`}>
+                    <div>
+                        <TextField
+                            fullWidth
+                            label="Description"
+                            minRows={2}
+                            multiline
+                            name="description"
+                            required
+                        />
+                    </div>
 
-                <ButtonGroup>
-                    <Button
-                        color="error"
-                        label="Cancel"
-                        onClick={onCancel}
-                        type="reset"
-                    />
+                    <ButtonGroup>
+                        <Button
+                            color="error"
+                            label="Cancel"
+                            type="reset"
+                        />
 
-                    <Button
-                        color="success"
-                        disabled={
-                            !(Object.values(diff).filter(({ length }) => length > 0).length > 0) ||
-                            description.length === 0
-                        }
-                        label="Submit"
-                        onClick={onSubmit}
-                        type="submit"
-                    />
-                </ButtonGroup>
-            </form>
+                        <Button
+                            color="success"
+                            disabled={!(Object.values(diff).filter(({ length }) => length > 0).length > 0)}
+                            label="Submit"
+                            type="submit"
+                        />
+                    </ButtonGroup>
+                </Form>
+            </Formik>
         </Tile>
     );
 };
