@@ -28,23 +28,17 @@ export interface ProposeSettingsUIProps extends HTMLProps<HTMLDivElement> {
     onCancel: VoidFunction;
 }
 
-export const ProposeSettingsUI = ({
-    className,
-    dao,
-    diff,
-    disabled,
-    editMode,
-    onCancel,
-    ...props
-}: ProposeSettingsUIProps) => {
+export const ProposeSettingsUI = ({ className, dao, diff, disabled, editMode, onCancel }: ProposeSettingsUIProps) => {
     const multicallInstance = useContext(MulticallInstance.Context);
 
     const schema = args.object().shape({
         description: args.string().default("").required("Proposal description is required"),
     });
 
+    type Schema = InferType<typeof schema>;
+
     const onReset = useCallback(
-        (_values: InferType<typeof schema>, { setValues }: FormikHelpers<InferType<typeof schema>>) => {
+        (_values: Schema, { setValues }: FormikHelpers<Schema>) => {
             void setValues(schema.getDefault());
             void onCancel();
         },
@@ -53,7 +47,7 @@ export const ProposeSettingsUI = ({
     );
 
     const onSubmit = useCallback(
-        ({ description }: InferType<typeof schema>) =>
+        ({ description }: Schema) =>
             void dao
                 .proposeFunctionCall(
                     description,
