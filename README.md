@@ -19,7 +19,7 @@ Try it out at [NEAR Mainnet](https://multicall.app) or [NEAR Testnet](https://te
 ##### Install dependencies
 
 ```sh
-yarn
+npm install
 ```
 
 ##### Run development server
@@ -27,13 +27,13 @@ yarn
 For **NEAR Testnet**:
 
 ```sh
-yarn start:testnet
+npm run start:testnet
 ```
 
 For **NEAR Mainnet**:
 
 ```sh
-yarn start:mainnet
+npm run start:mainnet
 ```
 
 #### Architectural specification

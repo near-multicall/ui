@@ -1,12 +1,15 @@
 import "@near-wallet-selector/modal-ui/styles.css";
+import { lazy, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 
-import { AppPage } from "./pages/app";
-import { DAOPage } from "./pages/dao/dao-page.ui";
 import { Wallet } from "./entities";
 import { DialogsLayer, Sidebar } from "./widgets";
+
 import "./shared/lib/persistent";
+
+const AppPage = lazy(() => import("./pages/app"));
+const DAOPage = lazy(() => import("./pages/dao"));
 
 const appMountPoint = document.querySelector("#root") ?? document.createElement("div");
 
@@ -31,7 +34,9 @@ createRoot(appMountPoint).render(
                     element={
                         <>
                             <Sidebar full={true} />
-                            <AppPage />
+                            <Suspense fallback={<div>Loading...</div>}>
+                                <AppPage />
+                            </Suspense>
                             <DialogsLayer />
                         </>
                     }
@@ -42,7 +47,9 @@ createRoot(appMountPoint).render(
                     element={
                         <>
                             <Sidebar full={true} />
-                            <DAOPage />
+                            <Suspense fallback={<div>Loading...</div>}>
+                                <DAOPage />
+                            </Suspense>
                             <DialogsLayer />
                         </>
                     }

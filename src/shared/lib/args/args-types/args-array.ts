@@ -1,10 +1,7 @@
-import { ArraySchema as _ArraySchema, BaseSchema } from "yup";
-import { addErrorMethods, ErrorMethods } from "../args-error";
+import { ArraySchema as _ArraySchema } from "yup";
 
 declare module "yup" {
-    interface ArraySchema<T, C, TIn, TOut> extends BaseSchema<TIn, C, TOut>, ErrorMethods {}
+    interface ArraySchema<T, C, TIn, TOut> {}
 }
-
-addErrorMethods(_ArraySchema);
 
 export { _ArraySchema as ArraySchema };

@@ -8,10 +8,10 @@ import { StakingPool } from "../../contracts/staking-pool";
 import { FungibleToken } from "../../standards/fungibleToken";
 import { MultiFungibleToken } from "../../standards/multiFungibleToken";
 import { NonFungibleToken } from "../../standards/nonFungibleToken";
-import { locale, addErrorMethods, ErrorMethods } from "../args-error";
+import { locale } from "../args-error";
 
 declare module "yup" {
-    interface StringSchema extends ErrorMethods {
+    interface StringSchema {
         json(message?: string): this;
         dataUrl(message?: string): this;
         address(message?: string): this;
@@ -261,7 +261,5 @@ addMethod(
 addMethod(_StringSchema, "append", function append(appendStr: string) {
     return this.transform((value) => `${value}${appendStr}`);
 });
-
-addErrorMethods(_StringSchema);
 
 export { _StringSchema as StringSchema };

@@ -565,13 +565,14 @@ export class Export extends Component<Props, State> {
 
                 <div className={`${_Export}-section`}>
                     <div className="header">
-                        <Icon
-                            className="icon collapse"
-                            onClick={() => this.toggleShowArgs()}
-                            collapsed={showArgs ? "no" : "yes"}
-                        >
-                            expand_more
-                        </Icon>
+                        {
+                            //@ts-ignore Propery "collapsed" used in export.scss
+                            <Icon
+                                className="icon collapse"
+                                onClick={() => this.toggleShowArgs()}
+                                collapsed={showArgs ? "no" : "yes"}
+                            ></Icon>
+                        }
 
                         <h3 onClick={() => this.toggleShowArgs()}>Multicall args</h3>
 

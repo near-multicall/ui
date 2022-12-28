@@ -6,7 +6,7 @@ import "./popup-menu.scss";
 
 interface PopupMenuProps {
     icon: ReactNode;
-    align: "top" | "bottom";
+    align?: "top" | "bottom";
     items: { disabled?: boolean; label?: string; onClick?: VoidFunction; title: string }[];
     triggerClassName: string;
 }

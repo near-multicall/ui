@@ -3,7 +3,7 @@ import { ELModel } from "../model/external-login.model";
 
 import { ELDialog } from "./external-login.dialog";
 
-export const ELDialogs = () => {
+export const ELDialogs = (): JSX.Element => {
     const { dialogsVisibility, closeHandlerBinding } = ELModel.useDialogsState();
 
     return (

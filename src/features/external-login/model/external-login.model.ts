@@ -29,21 +29,19 @@ export class ELModel {
     static useDialogsState = () => {
         const [dialogsVisibility, dialogVisibilitySwitch] = useState<
             Record<keyof typeof ModuleContext.methods, boolean>
-        >(
-            Object.values(ModuleContext.methods).reduce(
-                (visibilityState, { type }) => ({ ...visibilityState, [type]: false }),
-                {}
-            )
-        );
+        >({
+            dao: false,
+            multicall: false,
+        });
 
         useEffect(
             () =>
-                dialogOpenRequested.subscribe(({ detail }: DialogOpenRequestedEvent) =>
+                dialogOpenRequested.subscribe((event) =>
                     dialogVisibilitySwitch(
                         Object.keys(dialogsVisibility).reduce(
                             (visibilityState, someDialogKey) => ({
                                 ...visibilityState,
-                                [someDialogKey]: someDialogKey === detail?.dialogKey ? true : false,
+                                [someDialogKey]: someDialogKey === (<CustomEvent>event).detail.dialogKey ? true : false,
                             }),
 
                             dialogsVisibility

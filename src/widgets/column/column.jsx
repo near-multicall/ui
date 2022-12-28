@@ -1,8 +1,7 @@
 import Icon from "@mui/material/Icon";
 import hash from "object-hash";
-import React, { Component } from "react";
-import clsx from "clsx";
-import { Droppable, Draggable } from "react-beautiful-dnd";
+import { Component } from "react";
+import { Draggable, Droppable } from "react-beautiful-dnd";
 
 import { Task } from "../../entities";
 import "./column.scss";

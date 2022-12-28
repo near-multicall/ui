@@ -205,6 +205,7 @@ export class WalletComponent extends Component<Props, State> {
             <div className="wallet">
                 <div
                     className="user"
+                    //@ts-ignore used in wallet.scss
                     expand={expanded.user || !walletSelector.isSignedIn() ? "yes" : "no"}
                 >
                     <Icon
@@ -237,6 +238,7 @@ export class WalletComponent extends Component<Props, State> {
 
                 <div
                     className={`dao ${color}`}
+                    //@ts-ignore used in wallet.scss
                     expand={expanded.dao ? "yes" : "no"}
                 >
                     <Icon
