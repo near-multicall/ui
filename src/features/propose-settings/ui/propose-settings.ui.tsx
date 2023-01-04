@@ -118,6 +118,7 @@ export const ProposeSettingsUI = ({ className, dao, diff, disabled, editMode, on
                 <Form className={`${_ProposeSettings}-submit`}>
                     <div>
                         <TextField
+                            invertedColors
                             fullWidth
                             label="Description"
                             minRows={2}
