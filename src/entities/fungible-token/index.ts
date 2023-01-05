@@ -7,6 +7,6 @@ import { FTBalancesProvider } from "./ui/fungible-token.providers";
 export class FT extends ModuleContext {
     static BalancesContext = FTModel.BalancesContext;
     static BalancesProvider = FTBalancesProvider;
+    static Format = FTFormat;
     static balancesRender = ftBalancesRender;
-    static format = FTFormat;
 }
