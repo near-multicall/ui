@@ -35,22 +35,25 @@ export class JobModel {
         { multicallInstance }: JobModelInputs,
         callback: (result: typeof JobModel.allEntries) => void
     ) =>
-        callback(
-            await multicallInstance
-                .getJobs()
-                .then((data) => ({
-                    data: data.reduce(
-                        (jobsIndexedById, job) => ({
-                            ...jobsIndexedById,
-                            [job.id]: JobFormat.withMulticallsDataDecoded(JobFormat.withStatus(job)),
-                        }),
-                        {}
-                    ),
+        void (
+            multicallInstance.ready &&
+            callback(
+                await multicallInstance
+                    .getJobs()
+                    .then((data) => ({
+                        data: data.reduce(
+                            (jobsIndexedById, job) => ({
+                                ...jobsIndexedById,
+                                [job.id]: JobFormat.withMulticallsDataDecoded(JobFormat.withStatus(job)),
+                            }),
+                            {}
+                        ),
 
-                    error: null,
-                    loading: false,
-                }))
-                .catch((error) => ({ data: null, error, loading: false }))
+                        error: null,
+                        loading: false,
+                    }))
+                    .catch((error) => ({ data: null, error, loading: false }))
+            )
         );
 
     public static readonly useAllEntriesState = (inputs: JobModelInputs) => {
