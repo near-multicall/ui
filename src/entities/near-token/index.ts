@@ -7,6 +7,6 @@ import { NEARTokenBalancesProvider } from "./ui/near-token.providers";
 export class NEARToken extends ModuleContext {
     static BalancesContext = NEARTokenModel.BalancesContext;
     static BalancesProvider = NEARTokenBalancesProvider;
+    static Format = NEARTokenFormat;
     static balancesRender = nearTokenBalancesRender;
-    static format = NEARTokenFormat;
 }
