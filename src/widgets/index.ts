@@ -5,6 +5,6 @@ export { Editor } from "./editor/editor.jsx";
 export { Export } from "./export";
 export { FundsOverview, type FundsOverviewProps } from "./funds-overview";
 export { Menu } from "./menu/menu.jsx";
-export { MulticallScheduleOverview, type MulticallScheduleOverviewProps } from "./multicall-schedule-overview";
-export { MulticallSettingsManager, type MulticallSettingsManagerProps } from "./multicall-settings-manager";
+export { ScheduleOverview, type ScheduleOverviewProps } from "./schedule-overview";
+export { SettingsManager, type SettingsManagerProps } from "./settings-manager";
 export { Sidebar } from "./sidebar/sidebar.jsx";

@@ -1,4 +1,4 @@
 export { ExternalLogin } from "./external-login";
-export { ManageScheduleSettings } from "./manage-scheduling-settings";
+export { ConfigureScheduling } from "./configure-scheduling";
 export { ManageTokenWhitelist } from "./manage-token-whitelist";
 export { ProposeSettings } from "./propose-settings";

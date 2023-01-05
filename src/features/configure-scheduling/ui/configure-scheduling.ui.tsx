@@ -8,18 +8,18 @@ import { toNEAR, toYocto } from "../../../shared/lib/converter";
 import { IconLabel, NEARIcon, NEARLink, Table, Tile, Tooltip } from "../../../shared/ui/design";
 import { MulticallInstance } from "../../../entities";
 
-import "./manage-scheduling-settings.ui.scss";
+import "./configure-scheduling.ui.scss";
 
-const _ManageScheduleSettings = "ManageScheduleSettings";
+const _ConfigureScheduling = "ConfigureScheduling";
 
 type FormState = Pick<MulticallSettingsChange, MulticallPropertyKey>;
 
-interface ManageScheduleSettingsUIProps extends Omit<HTMLProps<HTMLDivElement>, "onChange"> {
+interface ConfigureSchedulingUIProps extends Omit<HTMLProps<HTMLDivElement>, "onChange"> {
     onEdit: (payload: FormState) => void;
     resetTrigger: { subscribe: (callback: EventListener) => () => void };
 }
 
-export const ManageScheduleSettingsUI = ({ disabled, onEdit, resetTrigger }: ManageScheduleSettingsUIProps) => {
+export const ConfigureSchedulingUI = ({ disabled, onEdit, resetTrigger }: ConfigureSchedulingUIProps) => {
     const multicallInstance = useContext(MulticallInstance.Context);
 
     const error =
@@ -81,7 +81,7 @@ export const ManageScheduleSettingsUI = ({ disabled, onEdit, resetTrigger }: Man
 
     return (
         <Tile
-            classes={{ root: _ManageScheduleSettings }}
+            classes={{ root: _ConfigureScheduling }}
             heading="Scheduling"
             headerSlots={{
                 end: editModeEnabled ? (

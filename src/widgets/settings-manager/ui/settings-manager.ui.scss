@@ -1,8 +1,8 @@
 @use "sass/mixin";
 @use "sass/size";
 
-.MulticallSettingsManager {
-    grid-area: MulticallSettingsManager;
+.SettingsManager {
+    grid-area: SettingsManager;
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr;
@@ -15,7 +15,7 @@
     @include mixin.no-scrollbar;
 
     grid-template-areas:
-        "ManageTokenWhitelist ManageScheduleSettings"
+        "ManageTokenWhitelist ConfigureScheduling"
         "ManageTokenWhitelist ProposeSettings";
 
     &-error {

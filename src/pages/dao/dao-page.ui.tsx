@@ -15,7 +15,7 @@ import { STORAGE } from "../../shared/lib/persistent";
 import { signAndSendTxs } from "../../shared/lib/wallet";
 import { Tabs } from "../../shared/ui/design";
 import { TextField } from "../../shared/ui/form";
-import { MulticallScheduleOverview, FundsOverview, MulticallSettingsManager } from "../../widgets";
+import { ScheduleOverview, FundsOverview, SettingsManager } from "../../widgets";
 
 import "./dao-page.ui.scss";
 
@@ -476,7 +476,7 @@ export class DAOPage extends Component<Props, State> {
                         {
                             name: "Settings",
                             ui: (
-                                <MulticallSettingsManager
+                                <SettingsManager
                                     accountId={this.state.dao.address}
                                     dao={this.state.dao}
                                     className={`${_DAOPage}-content`}
@@ -500,7 +500,7 @@ export class DAOPage extends Component<Props, State> {
                             lazy: true,
                             name: "Jobs",
                             ui: (
-                                <MulticallScheduleOverview
+                                <ScheduleOverview
                                     accountId={this.state.dao.address}
                                     className={`${_DAOPage}-content`}
                                 />

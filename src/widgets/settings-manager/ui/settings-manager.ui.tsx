@@ -9,17 +9,17 @@ import {
 import { SputnikDAO } from "../../../shared/lib/contracts/sputnik-dao";
 import { Tile } from "../../../shared/ui/design";
 import { MulticallInstance, Wallet } from "../../../entities";
-import { ManageScheduleSettings, ManageTokenWhitelist, ProposeSettings } from "../../../features";
+import { ConfigureScheduling, ManageTokenWhitelist, ProposeSettings } from "../../../features";
 
-import "./multicall-settings-manager.ui.scss";
+import "./settings-manager.ui.scss";
 
-const _MulticallSettingsManager = "MulticallSettingsManager";
+const _SettingsManager = "SettingsManager";
 
-export interface MulticallSettingsManagerUIProps extends HTMLProps<HTMLDivElement> {
+export interface SettingsManagerUIProps extends HTMLProps<HTMLDivElement> {
     dao: SputnikDAO;
 }
 
-export const MulticallSettingsManagerUI = ({ className, dao }: MulticallSettingsManagerUIProps) => {
+export const SettingsManagerUI = ({ className, dao }: SettingsManagerUIProps) => {
     const wallet = useContext(Wallet.SelectorContext),
         multicallInstance = useContext(MulticallInstance.Context);
 
@@ -69,27 +69,21 @@ export const MulticallSettingsManagerUI = ({ className, dao }: MulticallSettings
     );
 
     return (
-        <div
-            className={clsx(
-                _MulticallSettingsManager,
-                { "is-displayingError": multicallInstance.error !== null },
-                className
-            )}
-        >
+        <div className={clsx(_SettingsManager, { "is-displayingError": multicallInstance.error !== null }, className)}>
             <Tile
-                classes={{ root: `${_MulticallSettingsManager}-error` }}
+                classes={{ root: `${_SettingsManager}-error` }}
                 error={multicallInstance.error}
             />
 
-            {false && <MulticallInstance.AdminsTable className={`${_MulticallSettingsManager}-admins`} />}
+            {false && <MulticallInstance.AdminsTable className={`${_SettingsManager}-admins`} />}
 
             <ManageTokenWhitelist.UI
-                className={`${_MulticallSettingsManager}-tokenWhitelist`}
+                className={`${_SettingsManager}-tokenWhitelist`}
                 disabled={!canCreateProposals}
                 {...{ onEdit, resetTrigger }}
             />
 
-            <ManageScheduleSettings.UI
+            <ConfigureScheduling.UI
                 disabled={!canCreateProposals}
                 {...{ onEdit, resetTrigger }}
             />
