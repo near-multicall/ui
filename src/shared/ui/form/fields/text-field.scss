@@ -72,11 +72,8 @@
                     }
                 }
 
+                &.Mui-focused fieldset,
                 &:hover fieldset {
-                    border-color: color.$white;
-                }
-
-                &.Mui-focused fieldset {
                     border-color: color.$white;
                 }
 
@@ -144,6 +141,11 @@
             .MuiOutlinedInput-root {
                 .MuiOutlinedInput-input {
                     color: color.$black;
+                }
+
+                &.Mui-focused fieldset,
+                &:hover fieldset {
+                    border-color: color.$black;
                 }
             }
         }
