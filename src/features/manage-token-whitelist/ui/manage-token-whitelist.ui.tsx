@@ -11,7 +11,6 @@ import { TextField } from "../../../shared/ui/form";
 import { MulticallInstance } from "../../../entities";
 
 import "./manage-token-whitelist.ui.scss";
-import { Props } from "../../../shared/lib/props";
 
 const _ManageTokenWhitelist = "ManageTokenWhitelist";
 
