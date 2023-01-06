@@ -1,2 +1,0 @@
-// silence TS
-export {};

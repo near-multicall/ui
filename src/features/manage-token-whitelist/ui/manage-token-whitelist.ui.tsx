@@ -26,24 +26,24 @@ interface FormStates extends Record<keyof FormState, Set<MulticallSettingsChange
 export const ManageTokenWhitelistUI = ({ disabled, onEdit, resetTrigger }: ManageTokenWhitelistUIProps) => {
     const [editModeEnabled, editModeSwitch] = useState(false);
 
-    const fungibleTokenSchema = args.object().shape({
-        address: args.string().lowercase().address().default(""),
+    const schema = args.object().shape({
+        address: args.string().ft().default(""),
     });
 
-    type FungibleTokenSchema = InferType<typeof fungibleTokenSchema>;
+    type Schema = InferType<typeof schema>;
 
     const [included, include] = useState<FormStates["addTokens"]>(new Set()),
         [discarded, discard] = useState<FormStates["removeTokens"]>(new Set());
 
     const onSubmit = useCallback(
-        ({ address }: FungibleTokenSchema, { setTouched, setValues }: FormikHelpers<FungibleTokenSchema>) => {
+        ({ address }: Schema, { setTouched, setValues }: FormikHelpers<Schema>) => {
             if (discarded.has(address)) {
                 discard((addresses) => (addresses.delete(address) ? new Set(addresses) : addresses));
             } else {
                 include((addresses) => (address.length > 0 ? new Set(addresses.add(address)) : addresses));
             }
 
-            setValues(fungibleTokenSchema.getDefault());
+            setValues(schema.getDefault());
             setTouched({});
         },
 
@@ -51,7 +51,7 @@ export const ManageTokenWhitelistUI = ({ disabled, onEdit, resetTrigger }: Manag
     );
 
     const onDiscard = useCallback(
-        ({ address }: FungibleTokenSchema) => {
+        ({ address }: Schema) => {
             if (included.has(address)) {
                 include((addresses) => (addresses.delete(address) ? new Set(addresses) : addresses));
             } else {
@@ -79,8 +79,8 @@ export const ManageTokenWhitelistUI = ({ disabled, onEdit, resetTrigger }: Manag
 
     return (
         <Formik
-            initialValues={fungibleTokenSchema.getDefault()}
-            validationSchema={fungibleTokenSchema}
+            initialValues={schema.getDefault()}
+            validationSchema={schema}
             {...{ onReset, onSubmit }}
         >
             <Form className={_ManageTokenWhitelist}>
@@ -94,7 +94,7 @@ export const ManageTokenWhitelistUI = ({ disabled, onEdit, resetTrigger }: Manag
                         slots: {
                             End: editModeEnabled
                                 ? ({ rowId: address }) => (
-                                      <IconButton onClick={() => onDiscard({ address } as FungibleTokenSchema)}>
+                                      <IconButton onClick={() => onDiscard({ address } as Schema)}>
                                           {discarded.has(address) ? (
                                               <SettingsBackupRestoreOutlined fontSize="large" />
                                           ) : (
