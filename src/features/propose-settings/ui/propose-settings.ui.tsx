@@ -36,8 +36,8 @@ export const ProposeSettingsUI = ({ className, dao, diff, disabled, editMode, on
 
     const onReset = useCallback(
         (_values: Schema, { setValues }: FormikHelpers<Schema>) => {
-            void setValues(schema.getDefault());
-            void onCancel();
+            setValues(schema.getDefault());
+            onCancel();
         },
 
         [onCancel]
