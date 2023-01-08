@@ -103,7 +103,8 @@ export const ConfigureSchedulingUI = ({ disabled, onEdit, resetTrigger }: Config
                     centeredTitle: true,
 
                     idToHighlightColor: (id) =>
-                        ({ jobBond }[id] === formInitialState[id] || { jobBond }[id] === multicallInstance.data[id]
+                        ({ jobBond }[id] === formInitialState[id as keyof MISchedulingSettingsDiff] ||
+                        { jobBond }[id] === multicallInstance.data[id as keyof MISchedulingSettingsDiff]
                             ? null
                             : "blue"),
 
