@@ -2,20 +2,20 @@ import { CancelOutlined, EditOutlined, VisibilityOutlined } from "@mui/icons-mat
 import { IconButton, TextField, TextFieldProps } from "@mui/material";
 import { HTMLProps, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
-import { MulticallSettingsChange, MulticallPropertyKey } from "../../../shared/lib/contracts/multicall";
 import { ArgsString } from "../../../shared/lib/args-old";
+import { Multicall } from "../../../shared/lib/contracts/multicall";
 import { toNEAR, toYocto } from "../../../shared/lib/converter";
-import { IconLabel, NEARIcon, NEARLink, Table, Tile, Tooltip } from "../../../shared/ui/design";
+import { IconLabel, NEARIcon, Table, Tile, Tooltip } from "../../../shared/ui/design";
 import { MulticallInstance } from "../../../entities";
 
 import "./configure-scheduling.ui.scss";
 
 const _ConfigureScheduling = "ConfigureScheduling";
 
-type FormState = Pick<MulticallSettingsChange, MulticallPropertyKey>;
+type MISchedulingSettingsDiff = Pick<Multicall, "jobBond">;
 
 interface ConfigureSchedulingUIProps extends Omit<HTMLProps<HTMLDivElement>, "onChange"> {
-    onEdit: (payload: FormState) => void;
+    onEdit: (diff: MISchedulingSettingsDiff) => void;
     resetTrigger: { subscribe: (callback: EventListener) => () => void };
 }
 
@@ -29,34 +29,19 @@ export const ConfigureSchedulingUI = ({ disabled, onEdit, resetTrigger }: Config
 
     const [editModeEnabled, editModeSwitch] = useState(false);
 
-    const formInitialState: FormState = {
-        [MulticallPropertyKey.croncatManager]: "",
-        [MulticallPropertyKey.jobBond]: "",
+    const formInitialState: MISchedulingSettingsDiff = {
+        jobBond: "",
     };
 
-    const [[croncatManager, croncatManagerUpdate], [jobBond, jobBondUpdate]] = [
-        useState<typeof formInitialState["croncatManager"]>(formInitialState.croncatManager),
-        useState<typeof formInitialState["jobBond"]>(formInitialState.jobBond),
-    ];
+    const [jobBond, jobBondUpdate] = useState(formInitialState.jobBond);
 
     const formFields = {
-        croncatManager: useMemo(() => new ArgsString(multicallInstance.data.croncatManager), [multicallInstance.data]),
-
         jobBond: useMemo(
             () => new ArgsString(multicallInstance.data.jobBond !== "" ? toNEAR(multicallInstance.data.jobBond) : ""),
 
             [multicallInstance.data]
         ),
     };
-
-    const onCroncatManagerChange = useCallback<Required<TextFieldProps>["onChange"]>(
-        ({ target: { value } }) =>
-            void croncatManagerUpdate(
-                value !== multicallInstance.data.croncatManager ? value : formInitialState.croncatManager
-            ),
-
-        [croncatManagerUpdate, multicallInstance.data]
-    );
 
     const onJobBondChange = useCallback<Required<TextFieldProps>["onChange"]>(
         ({ target: { value } }) =>
@@ -68,16 +53,14 @@ export const ConfigureSchedulingUI = ({ disabled, onEdit, resetTrigger }: Config
     );
 
     const formReset = useCallback(() => {
-        formFields.croncatManager.value = multicallInstance.data.croncatManager;
         formFields.jobBond.value = toNEAR(multicallInstance.data.jobBond);
 
-        void croncatManagerUpdate(formInitialState.croncatManager);
         void jobBondUpdate(formInitialState.jobBond);
         void editModeSwitch(false);
-    }, [croncatManagerUpdate, editModeSwitch, formInitialState, jobBondUpdate]);
+    }, [editModeSwitch, formInitialState, jobBondUpdate]);
 
     useEffect(() => resetTrigger.subscribe(formReset), [formReset, resetTrigger]);
-    useEffect(() => void onEdit({ croncatManager, jobBond }), [croncatManager, jobBond, onEdit]);
+    useEffect(() => void onEdit({ jobBond }), [jobBond, onEdit]);
 
     return (
         <Tile
@@ -92,7 +75,7 @@ export const ConfigureSchedulingUI = ({ disabled, onEdit, resetTrigger }: Config
                             </IconButton>
                         </Tooltip>
 
-                        {(croncatManager.length > 0 || jobBond.length > 0) && (
+                        {jobBond.length > 0 && (
                             <Tooltip content="Preview">
                                 <IconButton onClick={() => void editModeSwitch(false)}>
                                     <VisibilityOutlined />
@@ -120,8 +103,7 @@ export const ConfigureSchedulingUI = ({ disabled, onEdit, resetTrigger }: Config
                     centeredTitle: true,
 
                     idToHighlightColor: (id) =>
-                        ({ croncatManager, jobBond }[id] === formInitialState[id as MulticallPropertyKey] ||
-                        { croncatManager, jobBond }[id] === multicallInstance.data[id as MulticallPropertyKey]
+                        ({ jobBond }[id] === formInitialState[id] || { jobBond }[id] === multicallInstance.data[id]
                             ? null
                             : "blue"),
 
@@ -133,27 +115,10 @@ export const ConfigureSchedulingUI = ({ disabled, onEdit, resetTrigger }: Config
                 header={["Option", "Value"]}
                 rows={[
                     {
-                        id: MulticallPropertyKey.croncatManager,
+                        id: "jobBond",
 
                         content: [
-                            MulticallInstance.SettingsDiffMeta[MulticallPropertyKey.croncatManager].description,
-
-                            editModeEnabled ? (
-                                <TextField
-                                    fullWidth
-                                    onChange={onCroncatManagerChange}
-                                    value={croncatManager || multicallInstance.data.croncatManager}
-                                />
-                            ) : (
-                                <NEARLink address={croncatManager || multicallInstance.data.croncatManager} />
-                            ),
-                        ],
-                    },
-                    {
-                        id: MulticallPropertyKey.jobBond,
-
-                        content: [
-                            MulticallInstance.SettingsDiffMeta[MulticallPropertyKey.jobBond].description,
+                            MulticallInstance.SettingsDiffMeta.jobBond.description,
 
                             editModeEnabled ? (
                                 <TextField

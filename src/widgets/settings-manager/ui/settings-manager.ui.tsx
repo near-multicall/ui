@@ -1,11 +1,6 @@
 import clsx from "clsx";
-import { useCallback, useState, useEffect, useContext, HTMLProps } from "react";
+import { useCallback, useState, useEffect, useContext, HTMLProps, ComponentProps } from "react";
 
-import {
-    MulticallPropertyKey,
-    MulticallSettingsChange,
-    MulticallTokenWhitelistDiffKey,
-} from "../../../shared/lib/contracts/multicall";
 import { SputnikDAO } from "../../../shared/lib/contracts/sputnik-dao";
 import { Tile } from "../../../shared/ui/design";
 import { MulticallInstance, Wallet } from "../../../entities";
@@ -14,6 +9,8 @@ import { ConfigureScheduling, ManageTokenWhitelist, ProposeSettings } from "../.
 import "./settings-manager.ui.scss";
 
 const _SettingsManager = "SettingsManager";
+
+type MISettingsDiff = ComponentProps<typeof ProposeSettings["UI"]>["diff"];
 
 export interface SettingsManagerUIProps extends HTMLProps<HTMLDivElement> {
     dao: SputnikDAO;
@@ -26,15 +23,14 @@ export const SettingsManagerUI = ({ className, dao }: SettingsManagerUIProps) =>
     const canCreateProposals =
         !wallet?.accountId || dao.checkUserPermission(wallet?.accountId, "AddProposal", "FunctionCall");
 
-    const initialDiff: MulticallSettingsChange = {
-        [MulticallTokenWhitelistDiffKey.removeTokens]: [],
-        [MulticallTokenWhitelistDiffKey.addTokens]: [],
-        [MulticallPropertyKey.jobBond]: "",
-        [MulticallPropertyKey.croncatManager]: "",
+    const initialDiff: MISettingsDiff = {
+        addTokens: [],
+        jobBond: "",
+        removeTokens: [],
     };
 
     const [editMode, editModeSwitch] = useState(false),
-        [diff, diffUpdate] = useState<MulticallSettingsChange>(initialDiff),
+        [diff, diffUpdate] = useState(initialDiff),
         _childFormsResetRequested = "childFormsResetRequested";
 
     const resetTrigger = {
@@ -58,7 +54,7 @@ export const SettingsManagerUI = ({ className, dao }: SettingsManagerUIProps) =>
     }, [editMode, editModeSwitch, formReset]);
 
     const onEdit = useCallback(
-        (update: Partial<MulticallSettingsChange>) => void diffUpdate((latestState) => ({ ...latestState, ...update })),
+        (update: Partial<MISettingsDiff>) => void diffUpdate((latestState) => ({ ...latestState, ...update })),
 
         [diffUpdate]
     );

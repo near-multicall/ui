@@ -6,7 +6,6 @@ import { args } from "../args/args";
 import { toGas, Big } from "../converter";
 import { STORAGE } from "../persistent";
 import { FungibleToken } from "../standards/fungibleToken";
-import { AccountId } from "../types";
 import { Tx, view, viewAccount } from "../wallet";
 
 import { MulticallArgs } from "./multicall";

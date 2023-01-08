@@ -1,6 +1,5 @@
 import { args } from "../args/args";
 import { Big, toGas, dateToCron, toYocto } from "../converter";
-import { AccountId, Base64String, U128String, U64String } from "../types";
 import { viewAccount, viewState, view, Tx } from "../wallet";
 
 import { FunctionCallAction as daoFunctionCallAction, SputnikDAO } from "./sputnik-dao";
@@ -32,11 +31,11 @@ type JobData = {
     job: {
         croncat_hash: string;
         creator: AccountId;
-        bond: U128String; // string encoded number (u128)
+        bond: U128String;
         cadence: string;
-        trigger_gas: U64String; // string encoded number (u64)
-        croncat_budget: U128String; // string encoded number (u128)
-        start_at: U64String; // string encoded number (u64)
+        trigger_gas: U64String;
+        croncat_budget: U128String;
+        start_at: U64String;
         run_count: number;
         is_active: boolean;
         multicalls: MulticallArgs[];
@@ -45,9 +44,9 @@ type JobData = {
 
 type FunctionCall = {
     func: string;
-    args: Base64String; // base64 encoded JSON args
-    gas: U64String; // string encoded number (u64)
-    depo: U128String; // string encoded number (u128)
+    args: Base64String;
+    gas: U64String;
+    depo: U128String;
 };
 
 type BatchCall = {
@@ -58,28 +57,6 @@ type BatchCall = {
 type MulticallArgs = {
     calls: BatchCall[][];
 };
-
-enum MulticallPropertyKey {
-    croncatManager = "croncatManager",
-
-    /**
-     * Job bond amount must be attached as deposit when adding new jobs.
-     * Needs initialization, but start with "" because it's distinguishable from a real value (string encoded numbers).
-     */
-    jobBond = "jobBond",
-}
-
-enum MulticallTokenWhitelistDiffKey {
-    addTokens = "addTokens",
-    removeTokens = "removeTokens",
-}
-
-interface MulticallSettingsChange {
-    [MulticallTokenWhitelistDiffKey.addTokens]: AccountId[];
-    [MulticallPropertyKey.croncatManager]: AccountId;
-    [MulticallPropertyKey.jobBond]: U128String;
-    [MulticallTokenWhitelistDiffKey.removeTokens]: AccountId[];
-}
 
 class Multicall {
     static FACTORY_ADDRESS: AccountId = FACTORY_ADDRESS_SELECTOR[window.NEAR_ENV];
@@ -93,14 +70,18 @@ class Multicall {
     address: AccountId;
 
     admins: AccountId[] = [];
-    [MulticallPropertyKey.croncatManager]: AccountId = "";
+    croncatManager: AccountId = "";
 
     /**
      * Only whitelisted tokens can be attached to multicalls or job activations.
      */
     tokensWhitelist: AccountId[] = [];
 
-    [MulticallPropertyKey.jobBond]: U128String = "";
+    /**
+     * Job bond amount must be attached as deposit when adding new jobs.
+     * Needs initialization, but start with "" because it's distinguishable from a real value (string encoded numbers).
+     */
+    jobBond: U128String = "";
 
     /**
      * Multicall instance is ready when info (admins...) are fetched & assigned correctly.
@@ -177,22 +158,16 @@ class Multicall {
      * @returns actions that can be passed to JSON for DAO "add_proposal".
      */
     static configDiffToProposalActions({
-        removeTokens = [],
         addTokens = [],
         jobBond = "",
-        croncatManager = "",
-    }: MulticallSettingsChange): daoFunctionCallAction[] {
+        removeTokens = [],
+    }: {
+        addTokens: Multicall["tokensWhitelist"];
+        jobBond: Multicall["jobBond"];
+        removeTokens: Multicall["tokensWhitelist"];
+    }): daoFunctionCallAction[] {
         const actions: daoFunctionCallAction[] = [];
 
-        // action: change croncat manager address
-        if (croncatManager !== "") {
-            actions.push({
-                method_name: "set_croncat_manager",
-                args: { address: croncatManager },
-                deposit: "1", // 1 yocto
-                gas: toGas("10"), // 10 Tgas
-            });
-        }
         // action: change amount of job bond
         if (jobBond !== "") {
             actions.push({
@@ -323,5 +298,5 @@ class Multicall {
     }
 }
 
-export { Multicall, MulticallPropertyKey, MulticallTokenWhitelistDiffKey };
-export type { JobData, MulticallArgs, MulticallSettingsChange };
+export { Multicall };
+export type { JobData, MulticallArgs };

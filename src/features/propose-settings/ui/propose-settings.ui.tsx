@@ -4,12 +4,7 @@ import { HTMLProps, useCallback, useContext } from "react";
 import { InferType } from "yup";
 
 import { args } from "../../../shared/lib/args/args";
-import {
-    Multicall,
-    MulticallPropertyKey,
-    MulticallSettingsChange,
-    MulticallTokenWhitelistDiffKey,
-} from "../../../shared/lib/contracts/multicall";
+import { Multicall } from "../../../shared/lib/contracts/multicall";
 import { SputnikDAO } from "../../../shared/lib/contracts/sputnik-dao";
 import { toNEAR } from "../../../shared/lib/converter";
 import { signAndSendTxs } from "../../../shared/lib/wallet";
@@ -23,7 +18,7 @@ const _ProposeSettings = "ProposeSettings";
 
 export interface ProposeSettingsUIProps extends HTMLProps<HTMLDivElement> {
     dao: SputnikDAO;
-    diff: MulticallSettingsChange;
+    diff: Arguments<typeof Multicall["configDiffToProposalActions"]>[0];
     editMode: boolean;
     onCancel: VoidFunction;
 }
@@ -74,7 +69,7 @@ export const ProposeSettingsUI = ({ className, dao, diff, disabled, editMode, on
             </p>
 
             <div className={`${_ProposeSettings}-summary`}>
-                {Object.values({ ...MulticallPropertyKey, ...MulticallTokenWhitelistDiffKey }).map(
+                {Object.keys(MulticallInstance.SettingsDiffMeta).map(
                     (diffKey) =>
                         diff[diffKey].length > 0 && (
                             <div
@@ -98,7 +93,7 @@ export const ProposeSettingsUI = ({ className, dao, diff, disabled, editMode, on
                                                 )}
                                                 key={data as string}
                                             >
-                                                {!Number.isNaN(data) && diffKey === MulticallPropertyKey.jobBond
+                                                {!Number.isNaN(data) && diffKey === "jobBond"
                                                     ? `${toNEAR(data as string)} ${NEARIcon.NATIVE_TOKEN_CHARACTER}`
                                                     : (data as string)}
                                             </li>

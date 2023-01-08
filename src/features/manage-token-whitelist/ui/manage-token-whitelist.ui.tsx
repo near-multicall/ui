@@ -5,7 +5,7 @@ import { HTMLProps, useCallback, useEffect, useState } from "react";
 import { InferType } from "yup";
 
 import { args } from "../../../shared/lib/args/args";
-import { MulticallSettingsChange, MulticallTokenWhitelistDiffKey } from "../../../shared/lib/contracts/multicall";
+import { Multicall } from "../../../shared/lib/contracts/multicall";
 import { Tooltip } from "../../../shared/ui/design";
 import { TextField } from "../../../shared/ui/form";
 import { MulticallInstance } from "../../../entities";
@@ -14,14 +14,15 @@ import "./manage-token-whitelist.ui.scss";
 
 const _ManageTokenWhitelist = "ManageTokenWhitelist";
 
-type FormState = Pick<MulticallSettingsChange, MulticallTokenWhitelistDiffKey>;
+type MITokenWhitelistDiff = Pick<
+    Arguments<typeof Multicall["configDiffToProposalActions"]>[0],
+    "addTokens" | "removeTokens"
+>;
 
 interface ManageTokenWhitelistUIProps extends Omit<HTMLProps<HTMLDivElement>, "onChange"> {
-    onEdit: (payload: FormState) => void;
+    onEdit: (diff: MITokenWhitelistDiff) => void;
     resetTrigger: { subscribe: (callback: EventListener) => () => void };
 }
-
-interface FormStates extends Record<keyof FormState, Set<MulticallSettingsChange[keyof FormState][number]>> {}
 
 export const ManageTokenWhitelistUI = ({ disabled, onEdit, resetTrigger }: ManageTokenWhitelistUIProps) => {
     const [editModeEnabled, editModeSwitch] = useState(false);
@@ -32,8 +33,8 @@ export const ManageTokenWhitelistUI = ({ disabled, onEdit, resetTrigger }: Manag
 
     type Schema = InferType<typeof schema>;
 
-    const [included, include] = useState<FormStates["addTokens"]>(new Set()),
-        [discarded, discard] = useState<FormStates["removeTokens"]>(new Set());
+    const [included, include] = useState<Set<MITokenWhitelistDiff["addTokens"][number]>>(new Set()),
+        [discarded, discard] = useState<Set<MITokenWhitelistDiff["removeTokens"][number]>>(new Set());
 
     const onSubmit = useCallback(
         ({ address }: Schema, { setTouched, setValues }: FormikHelpers<Schema>) => {
