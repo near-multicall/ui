@@ -16,9 +16,11 @@ import "./propose-settings.ui.scss";
 
 const _ProposeSettings = "ProposeSettings";
 
+type MISettingsDiff = Arguments<typeof Multicall["configDiffToProposalActions"]>[0];
+
 export interface ProposeSettingsUIProps extends HTMLProps<HTMLDivElement> {
     dao: SputnikDAO;
-    diff: Arguments<typeof Multicall["configDiffToProposalActions"]>[0];
+    diff: MISettingsDiff;
     editMode: boolean;
     onCancel: VoidFunction;
 }
@@ -69,36 +71,32 @@ export const ProposeSettingsUI = ({ className, dao, diff, disabled, editMode, on
             </p>
 
             <div className={`${_ProposeSettings}-summary`}>
-                {Object.keys(MulticallInstance.SettingsDiffMeta).map(
-                    (diffKey) =>
-                        diff[diffKey].length > 0 && (
+                {Object.entries(MulticallInstance.SettingsDiffMeta).map(
+                    ([key, { color, description }]) =>
+                        diff[key as keyof MISettingsDiff].length > 0 && (
                             <div
                                 className={`${_ProposeSettings}-summary-entry`}
-                                key={diffKey}
+                                {...{ key }}
                             >
-                                <h3 className={`${_ProposeSettings}-summary-entry-description`}>
-                                    {MulticallInstance.SettingsDiffMeta[diffKey].description + ":"}
-                                </h3>
+                                <h3 className={`${_ProposeSettings}-summary-entry-description`}>{description + ":"}</h3>
 
                                 <ul className={`${_ProposeSettings}-summary-entry-data`}>
-                                    {(Array.isArray(diff[diffKey]) ? Array.from(diff[diffKey]) : [diff[diffKey]]).map(
-                                        (data) => (
-                                            <li
-                                                className={clsx(
-                                                    `${_ProposeSettings}-summary-entry-data-chip`,
-
-                                                    `${_ProposeSettings}-summary-entry-data-chip` +
-                                                        "--" +
-                                                        MulticallInstance.SettingsDiffMeta[diffKey].color
-                                                )}
-                                                key={data as string}
-                                            >
-                                                {!Number.isNaN(data) && diffKey === "jobBond"
-                                                    ? `${toNEAR(data as string)} ${NEARIcon.NATIVE_TOKEN_CHARACTER}`
-                                                    : (data as string)}
-                                            </li>
-                                        )
-                                    )}
+                                    {(Array.isArray(diff[key as keyof MISettingsDiff])
+                                        ? Array.from(diff[key as keyof MISettingsDiff])
+                                        : [diff[key as keyof MISettingsDiff]]
+                                    ).map((data) => (
+                                        <li
+                                            className={clsx(
+                                                `${_ProposeSettings}-summary-entry-data-chip`,
+                                                `${_ProposeSettings}-summary-entry-data-chip--${color}`
+                                            )}
+                                            key={data as string}
+                                        >
+                                            {!Number.isNaN(data) && key === "jobBond"
+                                                ? `${toNEAR(data as string)} ${NEARIcon.NATIVE_TOKEN_CHARACTER}`
+                                                : (data as string)}
+                                        </li>
+                                    ))}
                                 </ul>
                             </div>
                         )

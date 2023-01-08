@@ -10,8 +10,6 @@ import "./settings-manager.ui.scss";
 
 const _SettingsManager = "SettingsManager";
 
-type MISettingsDiff = ComponentProps<typeof ProposeSettings["UI"]>["diff"];
-
 export interface SettingsManagerUIProps extends HTMLProps<HTMLDivElement> {
     dao: SputnikDAO;
 }
@@ -23,7 +21,7 @@ export const SettingsManagerUI = ({ className, dao }: SettingsManagerUIProps) =>
     const canCreateProposals =
         !wallet?.accountId || dao.checkUserPermission(wallet?.accountId, "AddProposal", "FunctionCall");
 
-    const initialDiff: MISettingsDiff = {
+    const initialDiff: ComponentProps<typeof ProposeSettings["UI"]>["diff"] = {
         addTokens: [],
         jobBond: "",
         removeTokens: [],
@@ -54,8 +52,7 @@ export const SettingsManagerUI = ({ className, dao }: SettingsManagerUIProps) =>
     }, [editMode, editModeSwitch, formReset]);
 
     const onEdit = useCallback(
-        (update: Partial<MISettingsDiff>) => void diffUpdate((latestState) => ({ ...latestState, ...update })),
-
+        (update: Partial<typeof initialDiff>) => void diffUpdate((latestState) => ({ ...latestState, ...update })),
         [diffUpdate]
     );
 
