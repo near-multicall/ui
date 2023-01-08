@@ -5,7 +5,7 @@
     grid-area: SettingsManager;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
+    grid-template-rows: 1fr 2fr;
     gap: size.$gap;
     margin: size.$gap !important;
     border-radius: size.$task-radius;
