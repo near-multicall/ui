@@ -571,7 +571,9 @@ export class Export extends Component<Props, State> {
                                 className="icon collapse"
                                 onClick={() => this.toggleShowArgs()}
                                 collapsed={showArgs ? "no" : "yes"}
-                            ></Icon>
+                            >
+                                expand_more
+                            </Icon>
                         }
 
                         <h3 onClick={() => this.toggleShowArgs()}>Multicall args</h3>
