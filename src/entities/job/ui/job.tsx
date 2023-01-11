@@ -1,3 +1,4 @@
+import { Icon } from "@mui/material";
 import { NavLink } from "react-router-dom";
 
 import { Big, toTGas } from "../../../shared/lib/converter";
@@ -50,6 +51,24 @@ export const jobAsTableRow = ({ id, job }: Job.DataWithStatus) => ({
                     Open in Editor
                 </NavLink>
             )}
+
+            <button
+                className={`${_Job}-action`}
+                onClick={(e: React.MouseEvent) => {
+                    navigator.clipboard.writeText(JSON.stringify(job.multicalls, null, 2));
+                    const target = e.target as HTMLElement;
+                    if (target.innerHTML === "Copied!") return;
+
+                    const oldIcon = target.innerHTML;
+                    target.innerHTML = "Copied!";
+
+                    setTimeout(() => {
+                        target.innerHTML = oldIcon;
+                    }, 1000);
+                }}
+            >
+                Copy
+            </button>
         </>,
     ],
 
