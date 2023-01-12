@@ -96,6 +96,10 @@
                 margin-bottom: 0;
             }
 
+            span {
+                max-width: 100%;
+            }
+
             & > span {
                 &:first-of-type {
                     flex: 1;
@@ -161,9 +165,7 @@
             }
 
             &--dense {
-                & > span {
-                    font-size: size.$text;
-                }
+                font-size: size.$text;
             }
 
             &--dense.TableRow-content--compact--withTitle {

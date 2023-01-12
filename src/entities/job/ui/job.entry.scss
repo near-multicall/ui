@@ -1,5 +1,6 @@
 @use "sass/color";
 @use "sass/size";
+@use "sass/mixin";
 
 .Job {
     &-dataInspector {
@@ -11,6 +12,7 @@
 
     &-action {
         margin-top: 0.5 * size.$gap;
+        margin-left: 0.5 * size.$gap;
         padding: 0 1em;
         border-radius: size.$task-radius;
         border: 2px solid color.$blue;

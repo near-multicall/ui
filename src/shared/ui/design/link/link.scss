@@ -2,10 +2,12 @@
 @use "sass/size";
 
 .Link {
-    line-height: 1;
     color: darken(color.$blue, 30%);
     text-decoration: none;
     cursor: pointer;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    display: block;
 
     &-tooltip {
         padding: 0;
