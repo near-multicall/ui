@@ -1,10 +1,14 @@
-import { CancelOutlined, EditOutlined, VisibilityOutlined } from "@mui/icons-material";
-import { IconButton, TextField, TextFieldProps } from "@mui/material";
-import { HTMLProps, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { CancelOutlined, EditOutlined } from "@mui/icons-material";
+import { IconButton } from "@mui/material";
+import { Form, Formik } from "formik";
+import { HTMLProps, useCallback, useContext, useEffect, useState } from "react";
+import { InferType } from "yup";
 
-import { ArgsString } from "../../../shared/lib/args-old";
+import { args } from "../../../shared/lib/args/args";
 import { Multicall } from "../../../shared/lib/contracts/multicall";
-import { toNEAR, toYocto } from "../../../shared/lib/converter";
+import { Big, toNEAR, toYocto } from "../../../shared/lib/converter";
+import { Props } from "../../../shared/lib/props";
+import { TextField } from "../../../shared/ui/form";
 import { IconLabel, NEARIcon, Table, Tile, Tooltip } from "../../../shared/ui/design";
 import { MulticallInstance } from "../../../entities";
 
@@ -20,133 +24,121 @@ interface ConfigureSchedulingUIProps extends Omit<HTMLProps<HTMLDivElement>, "on
 }
 
 export const ConfigureSchedulingUI = ({ disabled, onEdit, resetTrigger }: ConfigureSchedulingUIProps) => {
-    const multicallInstance = useContext(MulticallInstance.Context);
+    const [editModeEnabled, editModeSwitch] = useState(false),
+        mi = useContext(MulticallInstance.Context);
 
     const error =
-        multicallInstance.data.ready && multicallInstance.data.jobBond === ""
+        mi.data.ready && mi.data.jobBond === ""
             ? new Error("Error while getting Multicall Instance job bond")
-            : null;
+            : mi.error;
 
-    const [editModeEnabled, editModeSwitch] = useState(false);
+    const schema = args.object().shape({
+        jobBond: args
+            .big()
+            .token()
+            .default(Big(toNEAR(mi.data.jobBond))),
+    });
 
-    const formInitialState: MISchedulingSettingsDiff = {
-        jobBond: "",
-    };
+    type Schema = InferType<typeof schema>;
 
-    const [jobBond, jobBondUpdate] = useState(formInitialState.jobBond);
+    const onReset = useCallback(() => {
+        void editModeSwitch(false);
+    }, [editModeSwitch]);
 
-    const formFields = {
-        jobBond: useMemo(
-            () => new ArgsString(multicallInstance.data.jobBond !== "" ? toNEAR(multicallInstance.data.jobBond) : ""),
+    const onSubmit = useCallback(
+        (values: Schema) => {
+            onEdit(
+                Props.evolve(
+                    { jobBond: (amount) => (amount !== toNEAR(mi.data.jobBond) ? toYocto(amount) : "") },
+                    values
+                )
+            );
 
-            [multicallInstance.data]
-        ),
-    };
-
-    const onJobBondChange = useCallback<Required<TextFieldProps>["onChange"]>(
-        ({ target: { value } }) =>
-            void jobBondUpdate(
-                value !== toNEAR(multicallInstance.data.jobBond) ? toYocto(value) : formInitialState.jobBond
-            ),
-
-        [jobBondUpdate, multicallInstance.data]
+            editModeSwitch(false);
+        },
+        [editModeSwitch, onEdit]
     );
 
-    const formReset = useCallback(() => {
-        formFields.jobBond.value = toNEAR(multicallInstance.data.jobBond);
+    useEffect(() => resetTrigger.subscribe(onReset), [onReset, resetTrigger]);
 
-        void jobBondUpdate(formInitialState.jobBond);
-        void editModeSwitch(false);
-    }, [editModeSwitch, formInitialState, jobBondUpdate]);
-
-    useEffect(() => resetTrigger.subscribe(formReset), [formReset, resetTrigger]);
-    useEffect(() => void onEdit({ jobBond }), [jobBond, onEdit]);
+    const jobBond = false; // TODO: get jobBond from the form
 
     return (
-        <Tile
-            classes={{ root: _ConfigureScheduling }}
-            heading="Scheduling"
-            headerSlots={{
-                end: editModeEnabled ? (
-                    <>
-                        <Tooltip content="Cancel & Reset">
-                            <IconButton onClick={formReset}>
-                                <CancelOutlined />
-                            </IconButton>
-                        </Tooltip>
-
-                        {jobBond.length > 0 && (
-                            <Tooltip content="Preview">
-                                <IconButton onClick={() => void editModeSwitch(false)}>
-                                    <VisibilityOutlined />
+        <Formik
+            initialValues={schema.getDefault()}
+            validationSchema={schema}
+            {...{ onReset, onSubmit }}
+        >
+            <Form className={_ConfigureScheduling}>
+                <Tile
+                    classes={{ root: `${_ConfigureScheduling}-controls` }}
+                    heading="Scheduling"
+                    headerSlots={{
+                        end: editModeEnabled ? (
+                            <Tooltip content="Cancel & Reset">
+                                <IconButton type="reset">
+                                    <CancelOutlined />
                                 </IconButton>
                             </Tooltip>
-                        )}
-                    </>
-                ) : (
-                    <Tooltip content={disabled ? "You are in read-only mode" : "Propose changes"}>
-                        <span>
-                            <IconButton
-                                onClick={() => void editModeSwitch(true)}
-                                {...{ disabled }}
-                            >
-                                <EditOutlined />
-                            </IconButton>
-                        </span>
-                    </Tooltip>
-                ),
-            }}
-            {...{ error }}
-        >
-            <Table
-                RowProps={{
-                    centeredTitle: true,
+                        ) : (
+                            <Tooltip content={disabled ? "You are in read-only mode" : "Propose changes"}>
+                                <span>
+                                    <IconButton
+                                        onClick={() => void editModeSwitch(true)}
+                                        {...{ disabled }}
+                                    >
+                                        <EditOutlined />
+                                    </IconButton>
+                                </span>
+                            </Tooltip>
+                        ),
+                    }}
+                    {...{ error }}
+                >
+                    <Table
+                        RowProps={{
+                            centeredTitle: true,
+                            idToHighlight: (id) => (id === "jobBond" ? null : "blue"),
+                            withTitle: true,
+                            noKeys: true,
+                        }}
+                        displayMode="compact"
+                        dense
+                        header={["Option", "Value"]}
+                        rows={[
+                            {
+                                id: "jobBond",
 
-                    idToHighlightColor: (id) =>
-                        ({ jobBond }[id] === formInitialState[id as keyof MISchedulingSettingsDiff] ||
-                        { jobBond }[id] === multicallInstance.data[id as keyof MISchedulingSettingsDiff]
-                            ? null
-                            : "blue"),
+                                content: [
+                                    MulticallInstance.SettingsDiffMeta.jobBond.description,
 
-                    withTitle: true,
-                    noKeys: true,
-                }}
-                displayMode="compact"
-                dense
-                header={["Option", "Value"]}
-                rows={[
-                    {
-                        id: "jobBond",
-
-                        content: [
-                            MulticallInstance.SettingsDiffMeta.jobBond.description,
-
-                            editModeEnabled ? (
-                                <TextField
-                                    InputProps={{
-                                        endAdornment: NEARIcon.NATIVE_TOKEN_CHARACTER,
-                                        inputProps: { min: 0, step: 0.001 },
-                                    }}
-                                    fullWidth
-                                    onChange={onJobBondChange}
-                                    type="number"
-                                    value={toNEAR(jobBond || multicallInstance.data.jobBond)}
-                                />
-                            ) : (
-                                <IconLabel
-                                    icon={NEARIcon.NATIVE_TOKEN_CHARACTER}
-                                    label={
-                                        jobBond || multicallInstance.data.jobBond !== ""
-                                            ? toNEAR(jobBond || multicallInstance.data.jobBond)
-                                            : "..."
-                                    }
-                                    reversed
-                                />
-                            ),
-                        ],
-                    },
-                ]}
-            />
-        </Tile>
+                                    editModeEnabled ? (
+                                        <TextField
+                                            InputProps={{
+                                                endAdornment: NEARIcon.NativeTokenCharacter,
+                                                inputProps: { min: 0, step: 0.001 },
+                                            }}
+                                            fullWidth
+                                            name="jobBond"
+                                            type="number"
+                                        />
+                                    ) : (
+                                        <IconLabel
+                                            icon={NEARIcon.NativeTokenCharacter}
+                                            label={
+                                                jobBond || mi.data.jobBond !== ""
+                                                    ? toNEAR(jobBond || mi.data.jobBond)
+                                                    : "..."
+                                            }
+                                            reversed
+                                        />
+                                    ),
+                                ],
+                            },
+                        ]}
+                    />
+                </Tile>
+            </Form>
+        </Formik>
     );
 };
