@@ -39,7 +39,6 @@ export const ProposeSettingsUI = ({ className, dao, diff, disabled, editMode, on
             setValues(schema.getDefault());
             onCancel();
         },
-
         [onCancel]
     );
 
@@ -53,61 +52,62 @@ export const ProposeSettingsUI = ({ className, dao, diff, disabled, editMode, on
                 )
                 .then((someTx) => signAndSendTxs([someTx]))
                 .catch(console.error),
-
         [dao, diff]
     );
 
     return (
-        <Tile
-            classes={{
-                content: clsx(_ProposeSettings, { "is-inEditMode": Boolean(editMode) }, className),
-            }}
-            heading={editMode ? "Summary" : null}
+        <Formik
+            initialValues={schema.getDefault()}
+            validationSchema={schema}
+            {...{ onReset, onSubmit }}
         >
-            <p className={`${_ProposeSettings}-hint`}>
-                {disabled
-                    ? "Current account has no permission to propose changes"
-                    : "Start editing to create config changes proposal template"}
-            </p>
-
-            <div className={`${_ProposeSettings}-summary`}>
-                {Object.entries(MulticallInstance.SettingsDiffMeta).map(
-                    ([key, { color, description }]) =>
-                        diff[key as keyof MISettingsDiff].length > 0 && (
-                            <div
-                                className={`${_ProposeSettings}-summary-entry`}
-                                {...{ key }}
-                            >
-                                <h3 className={`${_ProposeSettings}-summary-entry-description`}>{description + ":"}</h3>
-
-                                <ul className={`${_ProposeSettings}-summary-entry-data`}>
-                                    {(Array.isArray(diff[key as keyof MISettingsDiff])
-                                        ? Array.from(diff[key as keyof MISettingsDiff])
-                                        : [diff[key as keyof MISettingsDiff]]
-                                    ).map((data) => (
-                                        <li
-                                            className={clsx(
-                                                `${_ProposeSettings}-summary-entry-data-chip`,
-                                                `${_ProposeSettings}-summary-entry-data-chip--${color}`
-                                            )}
-                                            key={data as string}
-                                        >
-                                            {!Number.isNaN(data) && key === "jobBond"
-                                                ? `${toNEAR(data as string)} ${NEARIcon.NativeTokenCharacter}`
-                                                : (data as string)}
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        )
-                )}
-            </div>
-
-            <Formik
-                initialValues={schema.getDefault()}
-                validationSchema={schema}
-                {...{ onReset, onSubmit }}
+            <Tile
+                classes={{
+                    content: clsx(_ProposeSettings, { "is-inEditMode": Boolean(editMode) }, className),
+                }}
+                heading={editMode ? "Summary" : null}
             >
+                <p className={`${_ProposeSettings}-hint`}>
+                    {disabled
+                        ? "Current account has no permission to propose changes"
+                        : "Start editing to create config changes proposal template"}
+                </p>
+
+                <div className={`${_ProposeSettings}-summary`}>
+                    {Object.entries(MulticallInstance.SettingsDiffMeta).map(
+                        ([key, { color, description }]) =>
+                            diff[key as keyof MISettingsDiff].length > 0 && (
+                                <div
+                                    className={`${_ProposeSettings}-summary-entry`}
+                                    {...{ key }}
+                                >
+                                    <h3 className={`${_ProposeSettings}-summary-entry-description`}>
+                                        {description + ":"}
+                                    </h3>
+
+                                    <ul className={`${_ProposeSettings}-summary-entry-data`}>
+                                        {(Array.isArray(diff[key as keyof MISettingsDiff])
+                                            ? Array.from(diff[key as keyof MISettingsDiff])
+                                            : [diff[key as keyof MISettingsDiff]]
+                                        ).map((data) => (
+                                            <li
+                                                className={clsx(
+                                                    `${_ProposeSettings}-summary-entry-data-chip`,
+                                                    `${_ProposeSettings}-summary-entry-data-chip--${color}`
+                                                )}
+                                                key={data as string}
+                                            >
+                                                {!Number.isNaN(data) && key === "jobBond"
+                                                    ? `${toNEAR(data as string)} ${NEARIcon.NativeTokenCharacter}`
+                                                    : (data as string)}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )
+                    )}
+                </div>
+
                 <Form className={`${_ProposeSettings}-submit`}>
                     <div>
                         <TextField
@@ -136,7 +136,7 @@ export const ProposeSettingsUI = ({ className, dao, diff, disabled, editMode, on
                         />
                     </ButtonGroup>
                 </Form>
-            </Formik>
-        </Tile>
+            </Tile>
+        </Formik>
     );
 };

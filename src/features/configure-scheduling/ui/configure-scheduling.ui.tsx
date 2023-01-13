@@ -3,6 +3,7 @@ import { IconButton } from "@mui/material";
 import { Form, Formik } from "formik";
 import { HTMLProps, useCallback, useContext, useEffect, useState } from "react";
 import { InferType } from "yup";
+import { Maybe } from "yup/lib/types";
 
 import { args } from "../../../shared/lib/args/args";
 import { Multicall } from "../../../shared/lib/contracts/multicall";
@@ -13,7 +14,6 @@ import { IconLabel, NEARIcon, Table, Tile, Tooltip } from "../../../shared/ui/de
 import { MulticallInstance } from "../../../entities";
 
 import "./configure-scheduling.ui.scss";
-import { Maybe } from "yup/lib/types";
 
 const _ConfigureScheduling = "ConfigureScheduling";
 
