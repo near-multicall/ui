@@ -87,7 +87,7 @@ export const ManageTokenWhitelistUI = ({ disabled, onEdit, resetTrigger }: Manag
             <Form className={_ManageTokenWhitelist}>
                 <MulticallInstance.TokenWhitelistTable
                     ItemProps={{
-                        idToHighlightColor: (id) =>
+                        idToHighlight: (id) =>
                             (included.has(id) && MulticallInstance.SettingsDiffMeta.addTokens.color) ||
                             (discarded.has(id) && MulticallInstance.SettingsDiffMeta.removeTokens.color) ||
                             null,
@@ -106,7 +106,7 @@ export const ManageTokenWhitelistUI = ({ disabled, onEdit, resetTrigger }: Manag
                                 : void null,
                         },
                     }}
-                    className={`${_ManageTokenWhitelist}-table`}
+                    className={`${_ManageTokenWhitelist}-controls`}
                     headerSlots={{
                         end: editModeEnabled ? (
                             <Tooltip content="Cancel & Reset">

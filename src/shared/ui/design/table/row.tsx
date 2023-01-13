@@ -20,7 +20,7 @@ export interface TableRowProps {
     withTitle?: boolean;
     header: TableHeader;
     id: string;
-    idToHighlightColor?: (id: TableRowProps["id"]) => Color | null;
+    idToHighlight?: (id: TableRowProps["id"]) => Color | null;
     noKeys?: boolean;
     onSelect?: (selectedRow: { id: TableRowProps["id"]; checked: boolean }) => void;
     selectable: boolean;
@@ -47,7 +47,7 @@ export const TableRowCompact = ({
     withTitle,
     header,
     id,
-    idToHighlightColor,
+    idToHighlight,
     noKeys,
     onSelect,
     selectable,
@@ -62,7 +62,7 @@ export const TableRowCompact = ({
         <div
             className={clsx(`${_TableRow}--compact`, {
                 [`${_TableRow}--compact--dense`]: dense,
-                [`${_TableRow}--highlighted--${idToHighlightColor?.(id)}`]: Boolean(idToHighlightColor?.(id)),
+                [`${_TableRow}--highlighted--${idToHighlight?.(id)}`]: Boolean(idToHighlight?.(id)),
             })}
         >
             {header.map((headerCell, headerCellIndex) => (

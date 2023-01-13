@@ -37,7 +37,7 @@ export interface TableProps extends HTMLAttributes<HTMLDivElement>, Pick<TableRo
         | {
               id: TableRowProps["id"];
               content: TableRowProps["cells"];
-              idToHighlightColor?: TableRowProps["idToHighlightColor"];
+              idToHighlight?: TableRowProps["idToHighlight"];
           }[]
         | null;
 }

@@ -93,7 +93,7 @@ export const ProposeSettingsUI = ({ className, dao, diff, disabled, editMode, on
                                             key={data as string}
                                         >
                                             {!Number.isNaN(data) && key === "jobBond"
-                                                ? `${toNEAR(data as string)} ${NEARIcon.NATIVE_TOKEN_CHARACTER}`
+                                                ? `${toNEAR(data as string)} ${NEARIcon.NativeTokenCharacter}`
                                                 : (data as string)}
                                         </li>
                                     ))}
