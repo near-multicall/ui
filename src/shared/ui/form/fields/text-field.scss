@@ -59,11 +59,9 @@
                     border-radius: 0.25 * size.$task-radius;
 
                     legend {
-                        background-color: color.$black;
-                        margin-left: -2px;
-                        padding: 2px;
-                        border-radius: 20px;
                         visibility: visible;
+                        border-radius: 20px;
+                        background-color: color.$black;
                     }
 
                     legend > span {
@@ -139,6 +137,8 @@
             }
 
             .MuiOutlinedInput-root {
+                color: color.$black;
+
                 .MuiOutlinedInput-input {
                     color: color.$black;
                 }
