@@ -13,6 +13,7 @@ import { IconLabel, NEARIcon, Table, Tile, Tooltip } from "../../../shared/ui/de
 import { MulticallInstance } from "../../../entities";
 
 import "./configure-scheduling.ui.scss";
+import { Maybe } from "yup/lib/types";
 
 const _ConfigureScheduling = "ConfigureScheduling";
 
@@ -36,7 +37,7 @@ export const ConfigureSchedulingUI = ({ disabled, onEdit, resetTrigger }: Config
         jobBond: args
             .big()
             .token()
-            .default(Big(toNEAR(mi.data.jobBond))),
+            .default(mi.data.jobBond as unknown as Maybe<Big>),
     });
 
     type Schema = InferType<typeof schema>;
