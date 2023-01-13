@@ -69,8 +69,8 @@ export const ProposeSettingsUI = ({ className, dao, diff, disabled, editMode, on
             >
                 <p className={`${_ProposeSettings}-hint`}>
                     {disabled
-                        ? "Current account has no permission to propose changes"
-                        : "Start editing to create config changes proposal template"}
+                        ? "Your account has no permission to create proposals"
+                        : "Start editing to draft changes proposal"}
                 </p>
 
                 <div className={`${_ProposeSettings}-summary`}>
