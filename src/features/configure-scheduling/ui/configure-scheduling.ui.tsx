@@ -3,14 +3,13 @@ import { IconButton } from "@mui/material";
 import { Form, Formik } from "formik";
 import { HTMLProps, useCallback, useContext, useEffect, useState } from "react";
 import { InferType } from "yup";
-import { Maybe } from "yup/lib/types";
 
 import { args } from "../../../shared/lib/args/args";
 import { Multicall } from "../../../shared/lib/contracts/multicall";
-import { Big, toNEAR, toYocto } from "../../../shared/lib/converter";
+import { toNEAR, toYocto } from "../../../shared/lib/converter";
 import { Props } from "../../../shared/lib/props";
 import { TextField } from "../../../shared/ui/form";
-import { IconLabel, NEARIcon, Table, Tile, Tooltip } from "../../../shared/ui/design";
+import { NEARIcon, Table, Tile, Tooltip } from "../../../shared/ui/design";
 import { MulticallInstance } from "../../../entities";
 
 import "./configure-scheduling.ui.scss";
@@ -33,11 +32,13 @@ export const ConfigureSchedulingUI = ({ disabled, onEdit, resetTrigger }: Config
             ? new Error("Error while getting Multicall Instance job bond")
             : mi.error;
 
+    console.log({ jobBond: mi.data.jobBond });
+
     const schema = args.object().shape({
         jobBond: args
-            .big()
-            .token()
-            .default(mi.data.jobBond as unknown as Maybe<Big>),
+            .string()
+            .transform(toNEAR)
+            .default(mi.data.ready ? toNEAR(mi.data.jobBond) : "0.001"),
     });
 
     type Schema = InferType<typeof schema>;
@@ -61,8 +62,6 @@ export const ConfigureSchedulingUI = ({ disabled, onEdit, resetTrigger }: Config
     );
 
     useEffect(() => resetTrigger.subscribe(onReset), [onReset, resetTrigger]);
-
-    const jobBond = false; // TODO: get jobBond from the form
 
     return (
         <Formik
@@ -97,43 +96,26 @@ export const ConfigureSchedulingUI = ({ disabled, onEdit, resetTrigger }: Config
                     {...{ error }}
                 >
                     <Table
-                        RowProps={{
-                            centeredTitle: true,
-                            idToHighlight: (id) => (id === "jobBond" ? null : "blue"),
-                            withTitle: true,
-                            noKeys: true,
-                        }}
+                        RowProps={{ idToHighlight: (id) => (id === "jobBond" ? null : "blue") }}
                         displayMode="compact"
                         dense
-                        header={["Option", "Value"]}
+                        header={[MulticallInstance.SettingsDiffMeta.jobBond.description]}
                         rows={[
                             {
                                 id: "jobBond",
 
                                 content: [
-                                    MulticallInstance.SettingsDiffMeta.jobBond.description,
-
-                                    editModeEnabled ? (
-                                        <TextField
-                                            InputProps={{
-                                                endAdornment: NEARIcon.NativeTokenCharacter,
-                                                inputProps: { min: 0, step: 0.001 },
-                                            }}
-                                            fullWidth
-                                            name="jobBond"
-                                            type="number"
-                                        />
-                                    ) : (
-                                        <IconLabel
-                                            icon={NEARIcon.NativeTokenCharacter}
-                                            label={
-                                                jobBond || mi.data.jobBond !== ""
-                                                    ? toNEAR(jobBond || mi.data.jobBond)
-                                                    : "..."
-                                            }
-                                            reversed
-                                        />
-                                    ),
+                                    <TextField
+                                        InputProps={{
+                                            endAdornment: NEARIcon.NativeTokenCharacter,
+                                            inputProps: { min: 0, step: 0.001 },
+                                        }}
+                                        disabled={!editModeEnabled}
+                                        fullWidth
+                                        invertedColors
+                                        name="jobBond"
+                                        type="number"
+                                    />,
                                 ],
                             },
                         ]}
