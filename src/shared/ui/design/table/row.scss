@@ -168,16 +168,6 @@
                 font-size: size.$text;
             }
 
-            &--dense.TableRow-content--compact--withTitle {
-                &:not(:first-of-type) {
-                    padding: 0;
-
-                    & > span {
-                        padding: size.$gap * 0.4;
-                    }
-                }
-            }
-
             &--noKeys {
                 & > span {
                     &:first-of-type {
