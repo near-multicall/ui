@@ -32,13 +32,8 @@ export const ConfigureSchedulingUI = ({ disabled, onEdit, resetTrigger }: Config
             ? new Error("Error while getting Multicall Instance job bond")
             : mi.error;
 
-    console.log({ jobBond: mi.data.jobBond });
-
     const schema = args.object().shape({
-        jobBond: args
-            .string()
-            .transform(toNEAR)
-            .default(mi.data.ready ? toNEAR(mi.data.jobBond) : "0.001"),
+        jobBond: args.string().default(mi.data.ready ? toNEAR(mi.data.jobBond) : "0.001"),
     });
 
     type Schema = InferType<typeof schema>;
@@ -58,10 +53,12 @@ export const ConfigureSchedulingUI = ({ disabled, onEdit, resetTrigger }: Config
 
             editModeSwitch(false);
         },
-        [editModeSwitch, onEdit]
+        [editModeSwitch, mi.data, onEdit]
     );
 
     useEffect(() => resetTrigger.subscribe(onReset), [onReset, resetTrigger]);
+
+    console.log({ jobBond: mi.data.jobBond });
 
     return (
         <Formik
