@@ -8,6 +8,7 @@ const DaoPage = lazy(() => import("./pages/dao"));
 import { Wallet } from "./entities";
 import { DialogsLayer, Sidebar } from "./widgets";
 import "./shared/lib/persistent";
+import DocsPage from "./pages/docs";
 
 ReactDOM.render(
     <Wallet.SelectorContextProvider>
@@ -45,6 +46,18 @@ ReactDOM.render(
                                 <DaoPage />
                             </Suspense>
                             <DialogsLayer />
+                        </>
+                    }
+                />
+
+                <Route
+                    path="/docs"
+                    element={
+                        <>
+                            <Sidebar full={true} />
+                            <Suspense fallback={<div>Loading...</div>}>
+                                <DocsPage />
+                            </Suspense>
                         </>
                     }
                 />

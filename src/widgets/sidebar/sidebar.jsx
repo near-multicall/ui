@@ -160,6 +160,16 @@ export class Sidebar extends Component {
                         >
                             Dao
                         </NavLink>
+
+                        <NavLink
+                            className={({ isActive }) => (isActive ? "active" : "")}
+                            to="/docs"
+                            onClick={() => STORAGE.save()}
+                        >
+                            Docs
+                        </NavLink>
+
+                        {/* <a href="https://docs.multicall.app">Docs</a> */}
                     </nav>
                     <hr />
 

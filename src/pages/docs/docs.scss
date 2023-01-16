@@ -1,0 +1,6 @@
+@use "sass/mixin";
+
+.DocsPage {
+    @include mixin.page-wrapper;
+    border: none;
+}
