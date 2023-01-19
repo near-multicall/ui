@@ -332,7 +332,7 @@ export class AppPage extends Component {
             this.columnID++;
 
             for (let t in json[c]) {
-                let task = { id: `task-${this.taskID++}`, addr: "", func: "", json: json[c][t] };
+                let task = { id: `task-${this.taskID++}`, family: "", func: "", json: json[c][t] };
                 newLayout.columns[newColumn.id].taskIds.push(task.id);
                 newLayout.tasks[task.id] = task;
             }
@@ -383,7 +383,7 @@ export class AppPage extends Component {
                 const { address: jsonAddress, actions: jsonActions } = json[c][t];
                 let task = {
                     id: `task-${this.taskID++}`,
-                    addr: "",
+                    family: "",
                     func: "",
                     json: {
                         address: jsonAddress,

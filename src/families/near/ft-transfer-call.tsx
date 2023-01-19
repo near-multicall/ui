@@ -84,7 +84,7 @@ export class FtTransferCall extends BaseTask<FormData, Props, State> {
             const hasSd =
                 call.actions.length === 2 &&
                 call.actions[0].func === "storage_deposit" &&
-                call.actions[1].func === "ft_transfer";
+                call.actions[1].func === "ft_transfer_call";
             const fromCall = {
                 addr: call.address,
                 func: call.actions[hasSd ? 1 : 0].func,
