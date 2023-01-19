@@ -1,15 +1,15 @@
 import { ComponentProps } from "react";
 
-import { MulticallInstance } from "../../entities";
+import { MI } from "../../entities";
 
-import { SettingsManagerUI, type SettingsManagerUIProps } from "./ui/settings-manager.ui";
+import { SettingsManagerUI, type SettingsManagerUIProps } from "./settings-manager.ui";
 
-export interface SettingsManagerProps extends SettingsManagerUIProps {
-    accountId: ComponentProps<typeof MulticallInstance["ContextProvider"]>["daoAddress"];
+export interface ISettingsManager extends SettingsManagerUIProps {
+    accountId: ComponentProps<typeof MI["ContextProvider"]>["daoAddress"];
 }
 
-export const SettingsManager = ({ accountId, ...props }: SettingsManagerProps) => (
-    <MulticallInstance.ContextProvider daoAddress={accountId}>
+export const SettingsManager = ({ accountId, ...props }: ISettingsManager) => (
+    <MI.ContextProvider daoAddress={accountId}>
         <SettingsManagerUI {...props} />
-    </MulticallInstance.ContextProvider>
+    </MI.ContextProvider>
 );

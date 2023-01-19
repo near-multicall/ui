@@ -1,4 +1,4 @@
-import { JobEntriesTable, JobEntriesTableProps } from "./ui/job.entries";
+import { JobEntriesTable, JobEntriesTableProps } from "./job.ui";
 
 export class Job {
     static EntriesTable = JobEntriesTable;

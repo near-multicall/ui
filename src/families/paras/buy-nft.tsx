@@ -1,6 +1,6 @@
 import { Form, FormikErrors, useFormikContext } from "formik";
 import { useEffect } from "react";
-import ParasLogo from "../../app/static/paras/Paras_logo.svg";
+import ParasLogo from "../../shared/static/paras/Paras_logo.svg";
 import { args as arx } from "../../shared/lib/args/args";
 import { fields } from "../../shared/lib/args/args-types/args-object";
 import { Call, CallError } from "../../shared/lib/call";

@@ -1,18 +1,18 @@
 import { ComponentProps } from "react";
 
-import { FT, NEARToken } from "../../entities";
+import { FT, NEAR } from "../../entities";
 
-import { FundsOverviewUI, FundsOverviewUIProps } from "./ui/funds-overview.ui";
+import { FundsOverviewUI, FundsOverviewUIProps } from "./funds-overview.ui";
 
-export interface FundsOverviewProps
+export interface IFundsOverview
     extends ComponentProps<typeof FT["BalancesProvider"]>,
-        ComponentProps<typeof NEARToken["BalancesProvider"]>,
+        ComponentProps<typeof NEAR["BalancesProvider"]>,
         FundsOverviewUIProps {}
 
-export const FundsOverview = ({ accountId, ...props }: FundsOverviewProps) => (
-    <NEARToken.BalancesProvider {...{ accountId }}>
+export const FundsOverview = ({ accountId, ...props }: IFundsOverview) => (
+    <NEAR.BalancesProvider {...{ accountId }}>
         <FT.BalancesProvider {...{ accountId }}>
             <FundsOverviewUI {...props} />
         </FT.BalancesProvider>
-    </NEARToken.BalancesProvider>
+    </NEAR.BalancesProvider>
 );

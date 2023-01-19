@@ -1,10 +1,9 @@
-// TODO: de-deprecate near-wallet on wallet selector. Use patch
+import type { NetworkId, Transaction } from "@near-wallet-selector/core";
+import type { AccountView, ViewStateResult } from "near-api-js/lib/providers/provider";
 import { providers } from "near-api-js";
-import { getConfig } from "../config/near-protocol";
 import { Base64 } from "js-base64";
 
-import type { AccountView, ViewStateResult } from "near-api-js/lib/providers/provider";
-import type { NetworkId, Transaction } from "@near-wallet-selector/core";
+import { getNEARProtocolConfig } from "../params/near-protocol.params";
 
 declare global {
     interface Window {
@@ -16,7 +15,7 @@ declare global {
 type Tx = Omit<Transaction, "signerId">;
 
 window.NEAR_ENV = <NetworkId>process.env.NEAR_ENV ?? "testnet";
-window.nearConfig = getConfig(window.NEAR_ENV);
+window.nearConfig = getNEARProtocolConfig(window.NEAR_ENV);
 // create RPC Provider object.
 const rpcProvider = new providers.JsonRpcProvider({
     url: window.nearConfig.nodeUrl,

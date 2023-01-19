@@ -9,7 +9,7 @@ import { toGas } from "../../shared/lib/converter";
 import { MintbaseStore } from "../../shared/lib/contracts/mintbase";
 import { CheckboxField, TextField, UnitField } from "../../shared/ui/form";
 import { BaseTask, BaseTaskProps, BaseTaskState } from "../base";
-import MintbaseLogo from "../../app/static/mintbase/Mintbase_logo.svg";
+import MintbaseLogo from "../../shared/static/mintbase/Mintbase_logo.svg";
 import "./mintbase.scss";
 import { STORAGE } from "../../shared/lib/persistent";
 

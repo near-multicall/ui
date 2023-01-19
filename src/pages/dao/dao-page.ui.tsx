@@ -4,7 +4,7 @@ import { Base64 } from "js-base64";
 import debounce from "lodash.debounce";
 import { Component, ContextType } from "react";
 
-import { MulticallInstance, Wallet } from "../../entities";
+import { MI, Wallet } from "../../entities";
 import { args } from "../../shared/lib/args/args";
 import { fields } from "../../shared/lib/args/args-types/args-object";
 import { Multicall } from "../../shared/lib/contracts/multicall";
@@ -19,7 +19,7 @@ import { ScheduleOverview, FundsOverview, SettingsManager } from "../../widgets"
 
 import "./dao-page.ui.scss";
 
-const Ctx = Wallet.trySelectorContext();
+const Ctx = Wallet.tryContext();
 
 interface Props {}
 
@@ -31,9 +31,9 @@ interface State {
     proposedInfo: ProposalOutput | null;
 }
 
-export const _DAOPage = "DAOPage";
+const _DAOPage = "DAOPage";
 
-export class DAOPage extends Component<Props, State> {
+export default class DAOPageUI extends Component<Props, State> {
     static contextType = Ctx;
     declare context: ContextType<typeof Ctx>;
 
@@ -151,7 +151,7 @@ export class DAOPage extends Component<Props, State> {
             return null;
         }
 
-        const depo = Big(this.fee).plus(MulticallInstance.MIN_BALANCE);
+        const depo = Big(this.fee).plus(MI.MIN_BALANCE);
 
         /**
          * Can user propose a FunctionCall to DAO?
@@ -510,5 +510,11 @@ export class DAOPage extends Component<Props, State> {
                 />
             </div>
         );
+    }
+}
+
+declare global {
+    interface Window {
+        DAO_COMPONENT: DAOPageUI;
     }
 }

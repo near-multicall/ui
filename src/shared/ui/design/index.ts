@@ -1,4 +1,4 @@
-export { type Color } from "./module-context";
+export { type Color } from "./params";
 
 /** Atoms */
 export { Button } from "./button";

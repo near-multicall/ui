@@ -1,3 +1,3 @@
-import { DAOPage } from "./dao-page.ui";
+import { lazy } from "react";
 
-export default DAOPage;
+export const DAOPage = lazy(() => import("./dao-page.ui"));
