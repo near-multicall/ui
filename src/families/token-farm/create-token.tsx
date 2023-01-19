@@ -1,7 +1,7 @@
 import { InputAdornment } from "@mui/material";
 import { Form, FormikErrors, useFormikContext } from "formik";
 import { useEffect } from "react";
-import * as TokenFarmSymbol from "../../app/static/token-farm/TokenFarm_symbol.png";
+import * as TokenFarmSymbol from "../../shared/static/token-farm/TokenFarm_symbol.png";
 import { args as arx } from "../../shared/lib/args/args";
 import { fields } from "../../shared/lib/args/args-types/args-object";
 import { Call, CallError } from "../../shared/lib/call";

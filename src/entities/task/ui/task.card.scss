@@ -1,0 +1,10 @@
+@use "sass/size";
+@use "sass/color";
+
+.TaskCard {
+    width: size.$task-width;
+    min-height: size.$task-height;
+    border-radius: size.$task-radius;
+    margin-bottom: size.$gap;
+    overflow: hidden;
+}

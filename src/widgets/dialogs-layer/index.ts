@@ -1,1 +1,1 @@
-export { DialogsLayer } from "./ui/dialogs-layer.ui";
+export { DialogsLayer } from "./dialogs-layer.ui";

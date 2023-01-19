@@ -5,7 +5,7 @@ import { Call, CallError } from "../../shared/lib/call";
 import { GetAccountInfoResult, MetaPool } from "../../shared/lib/contracts/meta-pool";
 import { InfoField, TextField, UnitField } from "../../shared/ui/form";
 import { BaseTask, BaseTaskProps, BaseTaskState, DefaultFormData } from "../base";
-import * as MetaPoolLogo from "../../app/static/meta-pool/MetaPool_logo.png";
+import * as MetaPoolLogo from "../../shared/static/meta-pool/MetaPool_logo.png";
 import "./meta-pool.scss";
 import { STORAGE } from "../../shared/lib/persistent";
 

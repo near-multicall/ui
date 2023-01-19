@@ -1,0 +1,27 @@
+@use "sass/size";
+@use "sass/mixin";
+
+.ExtAuthDialog {
+    &-stepByStepGuide {
+        padding: 0 size.$gap;
+        list-style-type: decimal;
+        font-size: size.$text;
+
+        li {
+            span {
+                @include mixin.center-items(flex-start, center);
+                flex-flow: row nowrap;
+                gap: 0.5ch;
+                padding-left: 0.25 * size.$gap;
+
+                .MuiSvgIcon-root {
+                    @include mixin.light-icon;
+                }
+            }
+
+            &::marker {
+                font-weight: 800;
+            }
+        }
+    }
+}

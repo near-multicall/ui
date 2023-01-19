@@ -1,6 +1,6 @@
-export { Task } from "./task";
+export { FT } from "./ft";
 export { Job } from "./job";
-export { FT } from "./fungible-token";
-export { MulticallInstance } from "./multicall-instance";
-export { NEARToken } from "./near-token";
+export { MI } from "./mi";
+export { NEAR } from "./near";
+export { Task } from "./task";
 export { Wallet } from "./wallet";

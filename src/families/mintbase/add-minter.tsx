@@ -1,6 +1,6 @@
 import { Form, FormikErrors, useFormikContext } from "formik";
 import { useEffect } from "react";
-import MintbaseLogo from "../../app/static/mintbase/Mintbase_logo.svg";
+import MintbaseLogo from "../../shared/static/mintbase/Mintbase_logo.svg";
 import { args as arx } from "../../shared/lib/args/args";
 import { fields } from "../../shared/lib/args/args-types/args-object";
 import { Call, CallError } from "../../shared/lib/call";

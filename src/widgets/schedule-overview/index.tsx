@@ -1,15 +1,15 @@
 import { ComponentProps } from "react";
 
-import { MulticallInstance } from "../../entities";
+import { MI } from "../../entities";
 
-import { ScheduleOverviewUI, ScheduleOverviewUIProps } from "./ui/schedule-overview.ui";
+import { ScheduleOverviewUI, ScheduleOverviewUIProps } from "./schedule-overview.ui";
 
-export interface ScheduleOverviewProps extends ScheduleOverviewUIProps {
-    accountId: ComponentProps<typeof MulticallInstance["ContextProvider"]>["daoAddress"];
+export interface IScheduleOverview extends ScheduleOverviewUIProps {
+    accountId: ComponentProps<typeof MI["ContextProvider"]>["daoAddress"];
 }
 
-export const ScheduleOverview = ({ accountId, ...props }: ScheduleOverviewProps) => (
-    <MulticallInstance.ContextProvider daoAddress={accountId}>
+export const ScheduleOverview = ({ accountId, ...props }: IScheduleOverview) => (
+    <MI.ContextProvider daoAddress={accountId}>
         <ScheduleOverviewUI {...props} />
-    </MulticallInstance.ContextProvider>
+    </MI.ContextProvider>
 );
