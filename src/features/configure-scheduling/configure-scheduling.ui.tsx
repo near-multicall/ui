@@ -12,7 +12,6 @@ import { Props } from "../../shared/lib/props";
 import { TextField } from "../../shared/ui/form";
 import { NEARIcon, Table, Tile, Tooltip } from "../../shared/ui/design";
 
-import { ConfigureSchedulingParams } from "./params";
 import "./configure-scheduling.ui.scss";
 
 const _ConfigureScheduling = "ConfigureScheduling";
@@ -26,16 +25,18 @@ interface ConfigureSchedulingUIProps extends Omit<HTMLProps<HTMLDivElement>, "on
 
 export const ConfigureSchedulingUI = ({ disabled, onEdit, resetTrigger }: ConfigureSchedulingUIProps) => {
     const [editModeEnabled, editModeSwitch] = useState(false),
-        mi = useContext(MI.Context),
-        jobBondInitial = mi.data.ready ? toNEAR(mi.data.jobBond) : ConfigureSchedulingParams.minJobBondNEAR.toString();
+        mi = useContext(MI.Context);
 
-    const error =
-        mi.data.ready && mi.data.jobBond === ""
-            ? new Error("Error while getting Multicall Instance job bond")
-            : mi.error;
+    const error = useMemo(
+        () =>
+            mi.data.ready && mi.data.jobBond === ""
+                ? new Error("Error while getting Multicall Instance job bond")
+                : mi.error,
+        [mi.data.ready]
+    );
 
     const schema = args.object().shape({
-        jobBond: args.string().default(jobBondInitial),
+        jobBond: args.string().default(MI.minJobBondNEAR.toString()),
     });
 
     type Schema = InferType<typeof schema>;
@@ -88,6 +89,7 @@ export const ConfigureSchedulingUI = ({ disabled, onEdit, resetTrigger }: Config
                             </Tooltip>
                         ),
                     }}
+                    loading={mi.loading}
                     {...{ error }}
                 >
                     <Table
@@ -103,14 +105,13 @@ export const ConfigureSchedulingUI = ({ disabled, onEdit, resetTrigger }: Config
                                     <TextField
                                         InputProps={{
                                             endAdornment: NEARIcon.NativeTokenCharacter,
-                                            inputProps: { min: ConfigureSchedulingParams.minJobBondNEAR, step: 0.001 },
+                                            inputProps: { min: MI.minJobBondNEAR, step: 0.001 },
                                         }}
                                         disabled={!editModeEnabled}
                                         fullWidth
                                         invertedColors
                                         name="jobBond"
                                         type="number"
-                                        value={jobBondInitial}
                                     />,
                                 ],
                             },

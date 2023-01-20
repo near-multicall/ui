@@ -5,7 +5,9 @@ export class MIParams {
     /**
      * Minimum balance needed for storage + state.
      */
-    public static readonly MIN_BALANCE = toYocto(1);
+    public static readonly minBalanceYocto = toYocto(1);
+
+    public static readonly minJobBondNEAR = 0.001;
 
     public static readonly SettingsDiffMeta = {
         addTokens: {

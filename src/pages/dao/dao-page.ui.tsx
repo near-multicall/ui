@@ -151,7 +151,7 @@ export default class DAOPageUI extends Component<Props, State> {
             return null;
         }
 
-        const depo = Big(this.fee).plus(MI.MIN_BALANCE);
+        const depo = Big(this.fee).plus(MI.minBalanceYocto);
 
         /**
          * Can user propose a FunctionCall to DAO?
