@@ -64,6 +64,11 @@
             gap: size.$gap;
             font-size: size.$small-text;
 
+            &:first-of-type {
+                border-top-left-radius: size.$task-radius;
+                border-top-right-radius: size.$task-radius;
+            }
+
             &:last-of-type {
                 border-bottom-left-radius: size.$task-radius;
                 border-bottom-right-radius: size.$task-radius;

@@ -38,9 +38,7 @@ export const ConfigureSchedulingUI = ({ disabled, onEdit, resetTrigger }: Config
 
     type Schema = InferType<typeof schema>;
 
-    const onReset = useCallback(() => {
-        void editModeSwitch(false);
-    }, [editModeSwitch]);
+    const onReset = useCallback(() => editModeSwitch(false), [editModeSwitch]);
 
     const onSubmit = useCallback(
         (values: Schema) => {
