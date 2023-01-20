@@ -12,6 +12,7 @@ import { Props } from "../../shared/lib/props";
 import { TextField } from "../../shared/ui/form";
 import { NEARIcon, Table, Tile, Tooltip } from "../../shared/ui/design";
 
+import { ConfigureSchedulingParams } from "./params";
 import "./configure-scheduling.ui.scss";
 
 const _ConfigureScheduling = "ConfigureScheduling";
@@ -25,7 +26,8 @@ interface ConfigureSchedulingUIProps extends Omit<HTMLProps<HTMLDivElement>, "on
 
 export const ConfigureSchedulingUI = ({ disabled, onEdit, resetTrigger }: ConfigureSchedulingUIProps) => {
     const [editModeEnabled, editModeSwitch] = useState(false),
-        mi = useContext(MI.Context);
+        mi = useContext(MI.Context),
+        jobBondInitial = mi.data.ready ? toNEAR(mi.data.jobBond) : ConfigureSchedulingParams.minJobBondNEAR.toString();
 
     const error =
         mi.data.ready && mi.data.jobBond === ""
@@ -33,10 +35,8 @@ export const ConfigureSchedulingUI = ({ disabled, onEdit, resetTrigger }: Config
             : mi.error;
 
     const schema = args.object().shape({
-        jobBond: args.string().default(mi.data.ready ? toNEAR(mi.data.jobBond) : "0.001"),
+        jobBond: args.string().default(jobBondInitial),
     });
-
-    console.log(`Job bond: ${mi.data.ready ? toNEAR(mi.data.jobBond) : "0.001"} ${NEARIcon.NativeTokenCharacter}`);
 
     type Schema = InferType<typeof schema>;
 
@@ -103,13 +103,14 @@ export const ConfigureSchedulingUI = ({ disabled, onEdit, resetTrigger }: Config
                                     <TextField
                                         InputProps={{
                                             endAdornment: NEARIcon.NativeTokenCharacter,
-                                            inputProps: { min: 0, step: 0.001 },
+                                            inputProps: { min: ConfigureSchedulingParams.minJobBondNEAR, step: 0.001 },
                                         }}
                                         disabled={!editModeEnabled}
                                         fullWidth
                                         invertedColors
                                         name="jobBond"
                                         type="number"
+                                        value={jobBondInitial}
                                     />,
                                 ],
                             },
