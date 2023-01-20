@@ -62,6 +62,7 @@ export const ProposeSettingsUI = ({ className, dao, diff, disabled, editMode, on
                     content: clsx(_ProposeSettings, { "is-inEditMode": Boolean(editMode) }, className),
                 }}
                 heading={editMode ? "Summary" : null}
+                {...mi}
             >
                 <p className={`${_ProposeSettings}-hint`}>
                     {disabled

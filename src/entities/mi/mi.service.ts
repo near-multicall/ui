@@ -27,7 +27,7 @@ export class MIService {
             await Multicall.init(Multicall.getInstanceAddress(daoAddress)).then((multicallInstance) => ({
                 data: multicallInstance,
                 error: multicallInstance.ready ? null : new Error("Unable to connect to Multicall Instance"),
-                loading: false,
+                loading: !multicallInstance.ready,
             }))
         );
 

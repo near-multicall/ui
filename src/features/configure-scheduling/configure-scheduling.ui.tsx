@@ -36,7 +36,7 @@ export const ConfigureSchedulingUI = ({ disabled, onEdit, resetTrigger }: Config
     );
 
     const schema = args.object().shape({
-        jobBond: args.string().default(MI.minJobBondNEAR.toString()),
+        jobBond: args.string().default(mi.loading ? MI.minJobBondNEAR.toString() : toNEAR(mi.data.jobBond)),
     });
 
     type Schema = InferType<typeof schema>;
@@ -60,38 +60,38 @@ export const ConfigureSchedulingUI = ({ disabled, onEdit, resetTrigger }: Config
     useEffect(() => resetTrigger.subscribe(onReset), [onReset, resetTrigger]);
 
     return (
-        <Formik
-            initialValues={schema.getDefault()}
-            validationSchema={schema}
-            {...{ onReset, onSubmit }}
+        <Tile
+            classes={{ root: `${_ConfigureScheduling}` }}
+            heading="Scheduling"
+            headerSlots={{
+                end: editModeEnabled ? (
+                    <Tooltip content="Cancel & Reset">
+                        <IconButton type="reset">
+                            <CancelOutlined />
+                        </IconButton>
+                    </Tooltip>
+                ) : (
+                    <Tooltip content={disabled ? "You are in read-only mode" : "Propose changes"}>
+                        <span>
+                            <IconButton
+                                onClick={() => void editModeSwitch(true)}
+                                {...{ disabled }}
+                            >
+                                <EditOutlined />
+                            </IconButton>
+                        </span>
+                    </Tooltip>
+                ),
+            }}
+            loading={mi.loading}
+            {...{ error }}
         >
-            <Form className={_ConfigureScheduling}>
-                <Tile
-                    classes={{ root: `${_ConfigureScheduling}-controls` }}
-                    heading="Scheduling"
-                    headerSlots={{
-                        end: editModeEnabled ? (
-                            <Tooltip content="Cancel & Reset">
-                                <IconButton type="reset">
-                                    <CancelOutlined />
-                                </IconButton>
-                            </Tooltip>
-                        ) : (
-                            <Tooltip content={disabled ? "You are in read-only mode" : "Propose changes"}>
-                                <span>
-                                    <IconButton
-                                        onClick={() => void editModeSwitch(true)}
-                                        {...{ disabled }}
-                                    >
-                                        <EditOutlined />
-                                    </IconButton>
-                                </span>
-                            </Tooltip>
-                        ),
-                    }}
-                    loading={mi.loading}
-                    {...{ error }}
-                >
+            <Formik
+                initialValues={schema.getDefault()}
+                validationSchema={schema}
+                {...{ onReset, onSubmit }}
+            >
+                <Form className={_ConfigureScheduling}>
                     <Table
                         RowProps={{ idToHighlight: (id) => (id === "jobBond" ? null : "blue") }}
                         displayMode="compact"
@@ -117,8 +117,8 @@ export const ConfigureSchedulingUI = ({ disabled, onEdit, resetTrigger }: Config
                             },
                         ]}
                     />
-                </Tile>
-            </Form>
-        </Formik>
+                </Form>
+            </Formik>
+        </Tile>
     );
 };
