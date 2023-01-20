@@ -27,14 +27,6 @@ export const ConfigureSchedulingUI = ({ disabled, onEdit, resetTrigger }: Config
     const [editModeEnabled, editModeSwitch] = useState(false),
         mi = useContext(MI.Context);
 
-    const error = useMemo(
-        () =>
-            mi.data.ready && mi.data.jobBond === ""
-                ? new Error("Error while getting Multicall Instance job bond")
-                : mi.error,
-        [mi.data.ready]
-    );
-
     const schema = args.object().shape({
         jobBond: args.string().default(mi.loading ? MI.minJobBondNEAR.toString() : toNEAR(mi.data.jobBond)),
     });
@@ -83,8 +75,7 @@ export const ConfigureSchedulingUI = ({ disabled, onEdit, resetTrigger }: Config
                     </Tooltip>
                 ),
             }}
-            loading={mi.loading}
-            {...{ error }}
+            {...mi}
         >
             <Formik
                 initialValues={schema.getDefault()}
