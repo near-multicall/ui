@@ -82,7 +82,7 @@ export const ConfigureSchedulingUI = ({ disabled, onEdit, resetTrigger }: Config
                 validationSchema={schema}
                 {...{ onReset, onSubmit }}
             >
-                <Form className={_ConfigureScheduling}>
+                <Form>
                     <Table
                         RowProps={{ idToHighlight: (id) => (id === "jobBond" ? null : "blue") }}
                         displayMode="compact"
