@@ -1,7 +1,7 @@
 import { CancelOutlined, EditOutlined } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
 import { Form, Formik } from "formik";
-import { HTMLProps, useCallback, useContext, useEffect, useState } from "react";
+import { HTMLProps, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { InferType } from "yup";
 
 import { MI } from "../../entities";
@@ -36,6 +36,8 @@ export const ConfigureSchedulingUI = ({ disabled, onEdit, resetTrigger }: Config
         jobBond: args.string().default(mi.data.ready ? toNEAR(mi.data.jobBond) : "0.001"),
     });
 
+    console.log(`Job bond: ${mi.data.ready ? toNEAR(mi.data.jobBond) : "0.001"} ${NEARIcon.NativeTokenCharacter}`);
+
     type Schema = InferType<typeof schema>;
 
     const onReset = useCallback(() => editModeSwitch(false), [editModeSwitch]);
@@ -55,8 +57,6 @@ export const ConfigureSchedulingUI = ({ disabled, onEdit, resetTrigger }: Config
     );
 
     useEffect(() => resetTrigger.subscribe(onReset), [onReset, resetTrigger]);
-
-    console.log({ jobBond: mi.data.jobBond });
 
     return (
         <Formik
