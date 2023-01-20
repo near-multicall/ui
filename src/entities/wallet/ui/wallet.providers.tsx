@@ -61,11 +61,7 @@ export const WalletContextProvider: FC<any> = ({ children }) => {
                 map((state) => state.accounts),
                 distinctUntilChanged()
             )
-            .subscribe((nextAccounts) => {
-                console.log("Accounts Update", nextAccounts);
-
-                setAccounts(nextAccounts);
-            });
+            .subscribe((nextAccounts) => setAccounts(nextAccounts));
 
         return () => subscription.unsubscribe();
     }, [selector]);

@@ -114,13 +114,7 @@ export class WalletSelector extends Component<Props, State> {
     }
 
     async signOut() {
-        const { selector } = this.context!;
-        const wallet = await selector.wallet();
-
-        wallet.signOut().catch((err) => {
-            console.log("Failed to sign out");
-            console.error(err);
-        });
+        (await this.context!.selector.wallet()).signOut().catch((err) => console.error(err));
     }
 
     connectDao(dao: SputnikDAO["address"]) {
