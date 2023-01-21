@@ -9,7 +9,7 @@ import { fields } from "../../../shared/lib/args/args-types/args-object";
 import { SputnikDAO } from "../../../shared/lib/contracts/sputnik-dao";
 import { Multicall } from "../../../shared/lib/contracts/multicall";
 import { STORAGE } from "../../../shared/lib/persistent";
-import { WalletContext, tryWalletContext } from "../wallet.service";
+import { WalletService } from "../wallet.service";
 
 import "./wallet.selector.scss";
 
@@ -34,7 +34,7 @@ interface State {
 
 /* TODO: Decompose code */
 export class WalletSelector extends Component<Props, State> {
-    static contextType = tryWalletContext();
+    static contextType = WalletService.tryContext();
     declare context: ContextType<typeof WalletSelector.contextType>;
 
     schema = args
@@ -79,7 +79,7 @@ export class WalletSelector extends Component<Props, State> {
         400
     );
 
-    constructor(props: Props, context: ContextType<typeof WalletContext>) {
+    constructor(props: Props, context: ContextType<typeof WalletService.Context>) {
         super(props);
 
         const { accountId } = context!;

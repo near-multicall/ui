@@ -10,7 +10,7 @@ import { FC, useCallback, useEffect, useState } from "react";
 import { map, distinctUntilChanged } from "rxjs";
 
 import { Multicall } from "../../../shared/lib/contracts/multicall";
-import { WalletContext } from "../wallet.service";
+import { WalletService } from "../wallet.service";
 
 export const WalletContextProvider: FC<any> = ({ children }) => {
     const [selector, setSelector] = useState<WalletSelector | null>(null);
@@ -73,7 +73,7 @@ export const WalletContextProvider: FC<any> = ({ children }) => {
     const accountId = accounts.find((account) => account.active)?.accountId || null;
 
     return (
-        <WalletContext.Provider
+        <WalletService.Context.Provider
             value={{
                 selector,
                 modal,
@@ -82,6 +82,6 @@ export const WalletContextProvider: FC<any> = ({ children }) => {
             }}
         >
             {children}
-        </WalletContext.Provider>
+        </WalletService.Context.Provider>
     );
 };
