@@ -1,4 +1,4 @@
-import { Account, NetworkId } from "@near-wallet-selector/core";
+import { NetworkId } from "@near-wallet-selector/core";
 import { Component } from "react";
 
 import { Task, TaskCardCopy, TaskCardInfo, Wallet } from "../entities";
@@ -38,7 +38,7 @@ declare global {
     /**
      * NEAR Protocol account ID
      */
-    declare type AccountId = Account["accountId"];
+    declare type AccountId = string;
 
     interface Window {
         EXPORT: Component;
