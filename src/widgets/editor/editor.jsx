@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import hash from "object-hash";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import AutoAwesomeOutlinedIcon from "@mui/icons-material/AutoAwesomeOutlined";
 import { Formik } from "formik";
@@ -26,13 +27,17 @@ export class Editor extends Component {
         const { editingID } = this.state;
 
         const editing = window?.TASKS?.find((t) => t.id === editingID)?.instance.current;
+        const keyObj = {
+            card: editingID,
+            formData: editing?.state.formData,
+        };
 
         return editing ? (
             <Formik
                 initialValues={editing.state.formData}
                 validate={(values) => editing.validateForm(values)}
                 onSubmit={() => {}}
-                key={editingID}
+                key={hash(keyObj, { algorithm: "md5", encoding: "base64" })}
             >
                 <>
                     <editing.Editor />
