@@ -1,4 +1,4 @@
-import { AutoAwesomeOutlinedIcon, EditOutlinedIcon } from "@mui/icons-material";
+import { AutoAwesomeOutlined, EditOutlined } from "@mui/icons-material";
 import { Formik } from "formik";
 import hash from "object-hash";
 import { Component } from "react";
@@ -48,10 +48,9 @@ export class EditTaskUI extends Component {
             </Formik>
         ) : (
             <div className="placeholder">
-                <AutoAwesomeOutlinedIcon className="huge-icon" />
+                <AutoAwesomeOutlined className="huge-icon" />
                 <h3>
-                    Click the <EditOutlinedIcon className="icon" /> icon in the top right corner of a task to start
-                    editing!
+                    Click the <EditOutlined className="icon" /> icon in the top right corner of a task to start editing!
                 </h3>
             </div>
         );
