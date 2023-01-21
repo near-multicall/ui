@@ -61,7 +61,10 @@ export class FTService {
     public static readonly useBalancesState = (inputs: IFTService) => {
         const [state, stateUpdate] = useState(FTSchema.balances);
 
-        useEffect(() => void FTService.balancesFetch(inputs, stateUpdate), [...Object.values(inputs), stateUpdate]);
+        useEffect(() => {
+            stateUpdate(FTSchema.balances);
+            void FTService.balancesFetch(inputs, stateUpdate);
+        }, [...Object.values(inputs), stateUpdate]);
 
         useEffect(() => {
             state.error instanceof Error && void console.error(state.error);

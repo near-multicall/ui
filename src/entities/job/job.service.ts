@@ -38,7 +38,10 @@ export class JobService {
     public static readonly useAllEntriesState = (inputs: IJobService) => {
         const [state, stateUpdate] = useState(JobsSchema);
 
-        useEffect(() => void JobService.allEntriesFetch(inputs, stateUpdate), [...Object.values(inputs), stateUpdate]);
+        useEffect(() => {
+            stateUpdate(JobsSchema);
+            void JobService.allEntriesFetch(inputs, stateUpdate);
+        }, [...Object.values(inputs), stateUpdate]);
 
         useEffect(() => {
             state.error instanceof Error && void console.error(state.error);

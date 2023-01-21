@@ -37,7 +37,10 @@ export class NEARService {
     public static readonly useBalancesState = (inputs: INEARService) => {
         const [state, stateUpdate] = useState(NEARSchema.balances);
 
-        useEffect(() => void NEARService.balancesFetch(inputs, stateUpdate), [...Object.values(inputs), stateUpdate]);
+        useEffect(() => {
+            stateUpdate(NEARSchema.balances);
+            void NEARService.balancesFetch(inputs, stateUpdate);
+        }, [...Object.values(inputs), stateUpdate]);
 
         useEffect(() => {
             state.error instanceof Error && void console.error(state.error);

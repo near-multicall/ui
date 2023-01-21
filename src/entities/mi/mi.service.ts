@@ -34,9 +34,10 @@ export class MIService {
     public static readonly usePropertiesState = (inputs: IMIService) => {
         const [state, stateUpdate] = useState(MISchema);
 
-        useEffect(() => void MIService.propertiesFetch(inputs, stateUpdate), [...Object.values(inputs), stateUpdate]);
-
-        // TODO: onAddressUpdated -> { loading: true }
+        useEffect(() => {
+            stateUpdate(MISchema);
+            void MIService.propertiesFetch(inputs, stateUpdate);
+        }, [...Object.values(inputs), stateUpdate]);
 
         useEffect(() => {
             state.error instanceof Error && void console.error(state.error);
