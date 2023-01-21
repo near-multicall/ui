@@ -1,8 +1,6 @@
-import { Component } from "react";
-import hash from "object-hash";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import AutoAwesomeOutlinedIcon from "@mui/icons-material/AutoAwesomeOutlined";
+import { AutoAwesomeOutlinedIcon, EditOutlinedIcon } from "@mui/icons-material";
 import { Formik } from "formik";
+import hash from "object-hash";
 import { Component } from "react";
 
 import "./edit-task.ui.scss";
