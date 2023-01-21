@@ -28,7 +28,7 @@ export const ConfigureSchedulingUI = ({ disabled, onEdit, resetTrigger }: Config
         mi = useContext(MI.Context);
 
     const schema = args.object().shape({
-        jobBond: args.string().default(mi.loading ? MI.minJobBondNEAR.toString() : toNEAR(mi.data.jobBond)),
+        jobBond: args.string().default(() => (mi.loading ? MI.minJobBondNEAR.toString() : toNEAR(mi.data.jobBond))),
     });
 
     type Schema = InferType<typeof schema>;

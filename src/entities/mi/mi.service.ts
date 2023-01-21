@@ -36,6 +36,8 @@ export class MIService {
 
         useEffect(() => void MIService.propertiesFetch(inputs, stateUpdate), [...Object.values(inputs), stateUpdate]);
 
+        // TODO: onAddressUpdated -> { loading: true }
+
         useEffect(() => {
             state.error instanceof Error && void console.error(state.error);
         }, [state.error]);
