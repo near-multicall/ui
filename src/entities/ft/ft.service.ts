@@ -1,4 +1,3 @@
-import { Account } from "@near-wallet-selector/core";
 import { createContext, useEffect, useMemo, useState } from "react";
 
 import { Multicall } from "../../shared/lib/contracts/multicall";
@@ -7,7 +6,9 @@ import { FungibleToken } from "../../shared/lib/standards/fungibleToken";
 
 import { FTSchema } from "./ft.model";
 
-export interface IFTService extends Pick<Account, "accountId"> {}
+export interface IFTService {
+    accountId: AccountId;
+}
 
 export class FTService {
     public static readonly BalancesContext = createContext(FTSchema.balances);

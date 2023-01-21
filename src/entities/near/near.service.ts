@@ -1,4 +1,3 @@
-import { Account } from "@near-wallet-selector/core";
 import { createContext, useEffect, useMemo, useState } from "react";
 
 import { Big } from "../../shared/lib/converter";
@@ -7,7 +6,9 @@ import { Multicall } from "../../shared/lib/contracts/multicall";
 
 import { NEARSchema } from "./near.model";
 
-export interface INEARService extends Pick<Account, "accountId"> {}
+export interface INEARService {
+    accountId: AccountId;
+}
 
 export class NEARService {
     public static readonly BalancesContext = createContext(NEARSchema.balances);
