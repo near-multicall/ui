@@ -61,6 +61,7 @@ export class WorkflowExportUI extends Component<Props, State> {
             gas: args.big().gas(),
             depo: args.big().token(),
             attachment: args.array(),
+
             tokenAddress: args
                 .string()
                 .ft()
@@ -74,10 +75,12 @@ export class WorkflowExportUI extends Component<Props, State> {
                         ctx.options.context.tokensWhitelist.includes(value),
                 })
                 .requiredWhen("attachment", (attachment) => attachment.includes("ft")),
+
             tokenAmount: args
                 .big()
                 .token()
                 .requiredWhen("attachment", (attachment) => attachment.includes("ft")),
+
             hasErrors: args.boolean().retain({ dummy: true }),
         })
         .transform(({ attachment, gas, gasUnit, depo, depoUnit, tokenAddress, tokenAmount, ...rest }) => ({
@@ -124,20 +127,99 @@ export class WorkflowExportUI extends Component<Props, State> {
     }
 
     setFormData(newFormData: Partial<State["formData"]>, callback?: () => void) {
-        this.setState(
-            {
-                formData: {
-                    ...this.state.formData,
-                    ...newFormData,
-                },
-            },
-            callback
-        );
+        this.setState({ formData: { ...this.state.formData, ...newFormData } }, callback);
     }
 
     onAddressesUpdated(e: CustomEvent) {
         this.tryUpdateFt();
     }
+
+    onSubmit = async ({ multicallArgs }: { multicallArgs: MulticallArgs }) => {
+        const { currentDao: dao, currentMulticall: multicall } = window.WALLET_COMPONENT.state;
+
+        const {
+            attachment,
+            execution,
+            gas,
+            gasUnit,
+            depo,
+            depoUnit,
+            description,
+            tokenAddress,
+            tokenAmount,
+            dateTime,
+        } = this.state.formData;
+
+        // Case 1: immediate execution => basic multicall
+        if (!execution.includes("scheduled")) {
+            // multicall with attached FT
+            if (attachment.includes("ft")) {
+                const tx = await dao.proposeMulticallFT(
+                    description,
+                    multicallArgs,
+                    args.big().intoParsed(gasUnit).cast(gas).toFixed(),
+                    tokenAddress,
+                    args.big().intoParsed(this.state.token.metadata.decimals).cast(tokenAmount).toFixed()
+                );
+                signAndSendTxs([tx]);
+            }
+            // multicall with attached NEAR
+            else {
+                const tx = await dao.proposeMulticall(
+                    description,
+                    multicallArgs,
+                    // if attach NEAR disabled, ignore depo amount and attach 1 yocto.
+                    attachment.includes("near") ? args.big().intoParsed(depoUnit).cast(depo).toFixed() : "1",
+                    args.big().intoParsed(gasUnit).cast(gas).toFixed()
+                );
+                signAndSendTxs([tx]);
+            }
+        }
+        // Case2: scheduled execution => use jobs
+        else {
+            // Job with attached FT
+            if (attachment.includes("ft")) {
+                const jobCount = await multicall.getJobCount();
+
+                const [addJobTx, proposeJobTx] = await Promise.all([
+                    multicall.addJob(
+                        // TODO: support jobs with multiple multicalls
+                        [multicallArgs],
+                        dateTime,
+                        args.big().intoParsed(gasUnit).cast(gas).toFixed()
+                    ),
+                    dao.proposeJobActivationFT(
+                        description,
+                        jobCount,
+                        tokenAddress,
+                        args.big().intoParsed(this.state.token.metadata.decimals).cast(tokenAmount).toFixed()
+                    ),
+                ]);
+
+                signAndSendTxs([addJobTx, proposeJobTx]);
+            }
+            // Job with attached NEAR
+            else {
+                const jobCost = attachment.includes("near")
+                    ? args.big().intoParsed(depoUnit).cast(depo).add(Multicall.CRONCAT_FEE).toFixed()
+                    : Multicall.CRONCAT_FEE;
+
+                const jobCount = await multicall.getJobCount();
+
+                const [addJobTx, proposeJobTx] = await Promise.all([
+                    multicall.addJob(
+                        // TODO: support jobs with multiple multicalls
+                        [multicallArgs],
+                        dateTime,
+                        args.big().intoParsed(gasUnit).cast(gas).toFixed()
+                    ),
+                    dao.proposeJobActivation(description, jobCount, jobCost),
+                ]);
+
+                signAndSendTxs([addJobTx, proposeJobTx]);
+            }
+        }
+    };
 
     updateCopyIcon(e: React.MouseEvent) {
         const target = e.target as HTMLElement;
@@ -163,6 +245,7 @@ export class WorkflowExportUI extends Component<Props, State> {
 
     private tryUpdateFt(): Promise<boolean> {
         const multicall = window.WALLET_COMPONENT.state.currentMulticall;
+
         return new Promise<boolean>((resolve) => {
             this.schema
                 .check(this.state.formData, {
@@ -215,19 +298,8 @@ export class WorkflowExportUI extends Component<Props, State> {
         }
         // normal propose multicall to DAO functionality
         else {
-            const {
-                attachment,
-                execution,
-                gas,
-                gasUnit,
-                depo,
-                depoUnit,
-                description,
-                tokenAddress,
-                tokenAmount,
-                dateTime,
-            } = this.state.formData;
             const schema = fields(this.schema);
+
             const isProposeDisabled =
                 wallet.schema.isBad() ||
                 schema.depo.isBad() ||
@@ -240,83 +312,7 @@ export class WorkflowExportUI extends Component<Props, State> {
                 <button
                     className={clsx(`${_WorkflowExport}-action`, `${_WorkflowExport}-action--propose`)}
                     disabled={!!isProposeDisabled}
-                    onClick={async () => {
-                        const { currentDao: dao, currentMulticall: multicall } = window.WALLET_COMPONENT.state;
-                        // Case 1: immediate execution => basic multicall
-                        if (!execution.includes("scheduled")) {
-                            // multicall with attached FT
-                            if (attachment.includes("ft")) {
-                                const tx = await dao.proposeMulticallFT(
-                                    description,
-                                    multicallArgs,
-                                    args.big().intoParsed(gasUnit).cast(gas).toFixed(),
-                                    tokenAddress,
-                                    args
-                                        .big()
-                                        .intoParsed(this.state.token.metadata.decimals)
-                                        .cast(tokenAmount)
-                                        .toFixed()
-                                );
-                                signAndSendTxs([tx]);
-                            }
-                            // multicall with attached NEAR
-                            else {
-                                const tx = await dao.proposeMulticall(
-                                    description,
-                                    multicallArgs,
-                                    // if attach NEAR disabled, ignore depo amount and attach 1 yocto.
-                                    attachment.includes("near")
-                                        ? args.big().intoParsed(depoUnit).cast(depo).toFixed()
-                                        : "1",
-                                    args.big().intoParsed(gasUnit).cast(gas).toFixed()
-                                );
-                                signAndSendTxs([tx]);
-                            }
-                        }
-                        // Case2: scheduled execution => use jobs
-                        else {
-                            // Job with attached FT
-                            if (attachment.includes("ft")) {
-                                const jobCount = await multicall.getJobCount();
-                                const [addJobTx, proposeJobTx] = await Promise.all([
-                                    multicall.addJob(
-                                        // TODO: support jobs with multiple multicalls
-                                        [multicallArgs],
-                                        dateTime,
-                                        args.big().intoParsed(gasUnit).cast(gas).toFixed()
-                                    ),
-                                    dao.proposeJobActivationFT(
-                                        description,
-                                        jobCount,
-                                        tokenAddress,
-                                        args
-                                            .big()
-                                            .intoParsed(this.state.token.metadata.decimals)
-                                            .cast(tokenAmount)
-                                            .toFixed()
-                                    ),
-                                ]);
-                                signAndSendTxs([addJobTx, proposeJobTx]);
-                            }
-                            // Job with attached NEAR
-                            else {
-                                const jobCost = attachment.includes("near")
-                                    ? args.big().intoParsed(depoUnit).cast(depo).add(Multicall.CRONCAT_FEE).toFixed()
-                                    : Multicall.CRONCAT_FEE;
-                                const jobCount = await multicall.getJobCount();
-                                const [addJobTx, proposeJobTx] = await Promise.all([
-                                    multicall.addJob(
-                                        // TODO: support jobs with multiple multicalls
-                                        [multicallArgs],
-                                        dateTime,
-                                        args.big().intoParsed(gasUnit).cast(gas).toFixed()
-                                    ),
-                                    dao.proposeJobActivation(description, jobCount, jobCost),
-                                ]);
-                                signAndSendTxs([addJobTx, proposeJobTx]);
-                            }
-                        }
-                    }}
+                    onClick={() => this.onSubmit({ multicallArgs })}
                 >
                     {`Propose on ${STORAGE.addresses.dao}`}
                     {wallet.schema.isBad() ? <p>{wallet.schema.message()}</p> : <></>}
@@ -326,21 +322,11 @@ export class WorkflowExportUI extends Component<Props, State> {
     }
 
     render() {
-        const LAYOUT = this.props.layout; // usually global parameter
-        const { showArgs } = this.state;
-        const {
-            attachment,
-            execution,
-            gas,
-            gasUnit,
-            depo,
-            depoUnit,
-            description,
-            tokenAddress,
-            tokenAmount,
-            dateTime,
-        } = this.state.formData;
-        const multicall = window.WALLET_COMPONENT.state.currentMulticall;
+        const LAYOUT = this.props.layout,
+            { showArgs } = this.state,
+            multicall = window.WALLET_COMPONENT.state.currentMulticall;
+
+        const { attachment, tokenAmount, dateTime } = this.state.formData;
 
         // do not schedule jobs in the past
         const currentDate = new Date();
@@ -359,11 +345,13 @@ export class WorkflowExportUI extends Component<Props, State> {
         // toBase64 might throw on failure
         try {
             multicallArgs = { calls: LAYOUT.toBase64() };
+
             multicallArgsText = !attachment.includes("ft")
                 ? JSON.stringify(multicallArgs)
                 : JSON.stringify({
                       receiver_id: STORAGE.addresses.multicall,
                       amount: args.big().intoParsed(this.state.token.metadata.decimals).cast(tokenAmount).toFixed(),
+
                       msg: JSON.stringify({
                           function_id: "multicall",
                           args: Base64.encode(JSON.stringify(multicallArgs).toString()),
@@ -385,9 +373,11 @@ export class WorkflowExportUI extends Component<Props, State> {
                         this.setFormData({ ...values, dateTime: this.state.formData.dateTime });
                         await new Promise((resolve) => this.resolveDebounced(resolve));
                         await this.tryUpdateFt();
+
                         await this.schema.check(
                             (({ tokenAmount, ...rest }) => ({
                                 ...rest,
+
                                 tokenAmount: this.state.token.ready
                                     ? args
                                           .big()
@@ -396,17 +386,17 @@ export class WorkflowExportUI extends Component<Props, State> {
                                           ?.toFixed() ?? null
                                     : tokenAmount,
                             }))(values),
-                            {
-                                context: { tokensWhitelist: multicall.ready ? multicall.tokensWhitelist : null },
-                            }
+
+                            { context: { tokensWhitelist: multicall.ready ? multicall.tokensWhitelist : null } }
                         );
+
                         return Object.fromEntries(
                             Object.entries(fields(this.schema))
                                 .map(([k, v]) => [k, v?.message() ?? ""])
                                 .filter(([_, v]) => v !== "")
                         );
                     }}
-                    onSubmit={() => {}}
+                    onSubmit={() => void null}
                 >
                     {() => (
                         <Form className={`${_WorkflowExport}-params`}>
@@ -444,6 +434,7 @@ export class WorkflowExportUI extends Component<Props, State> {
                                                         multicall.ready ? multicall.tokensWhitelist : undefined
                                                     }
                                                 />
+
                                                 <TextField
                                                     name="tokenAmount"
                                                     label="Amount"
@@ -472,7 +463,9 @@ export class WorkflowExportUI extends Component<Props, State> {
                                         >
                                             NEAR
                                         </button>
+
                                         <p>or</p>
+
                                         <button
                                             type="button"
                                             className={clsx({ selected: isActive("ft") })}
@@ -486,6 +479,7 @@ export class WorkflowExportUI extends Component<Props, State> {
                                     </>
                                 )}
                             </ChoiceField>
+
                             <ChoiceField
                                 name="execution"
                                 initial={["immediate"]}
@@ -517,6 +511,7 @@ export class WorkflowExportUI extends Component<Props, State> {
                                 {({ isActive, choose }) => (
                                     <>
                                         <p>Execute</p>
+
                                         <button
                                             type="button"
                                             className={clsx({ selected: isActive("immediate") })}
@@ -524,7 +519,9 @@ export class WorkflowExportUI extends Component<Props, State> {
                                         >
                                             immediately
                                         </button>
+
                                         <p>or</p>
+
                                         <button
                                             type="button"
                                             className={clsx({ selected: isActive("scheduled") })}
@@ -554,6 +551,7 @@ export class WorkflowExportUI extends Component<Props, State> {
                                     key={`error-${i}`}
                                 >
                                     <p className="msg">{`[${e.task.state.formData.name}] Error: ${e.message}`}</p>
+
                                     <EditOutlinedIcon
                                         className="icon"
                                         onClick={() => {
@@ -592,18 +590,14 @@ export class WorkflowExportUI extends Component<Props, State> {
                             >
                                 content_copy
                             </Icon>
-                        ) : (
-                            <></>
-                        )}
+                        ) : null}
                     </div>
 
                     {showArgs ? (
                         <div className="value">
                             <pre className="code">{multicallArgsText}</pre>
                         </div>
-                    ) : (
-                        <></>
-                    )}
+                    ) : null}
                 </div>
 
                 {this.renderProposeButton(multicallArgs)}

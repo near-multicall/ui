@@ -46,15 +46,18 @@ export class WalletSelector extends Component<Props, State> {
                 .test({
                     name: "hasPermission",
                     message: "User does not have required permissions on this dao",
+
                     test: (value) =>
                         value == null ||
                         this.state.currentDao.checkUserPermission(value, "AddProposal", "FunctionCall"),
                 })
                 .retain(),
+
             dao: args
                 .object()
                 .shape({
                     noDao: args.string().sputnikDao().retain({ initial: true }),
+
                     noMulticall: args.string().multicall().retain({
                         customMessage: "DAO does not have a multicall instance",
                         initial: true,
