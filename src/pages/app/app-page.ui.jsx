@@ -6,7 +6,7 @@ import { Task } from "../../entities";
 import { WorkflowEditorConfig } from "../../shared/params/workflow-editor.params";
 import { STORAGE } from "../../shared/lib/persistent";
 import { fromCall } from "../../shared/lib/call";
-import { WorkflowEditorMenu } from "../../widgets";
+import { WorkflowTools } from "../../widgets";
 
 import "./app-page.ui.scss";
 
@@ -531,7 +531,8 @@ export default class AppPageUI extends Component {
                         </div>
                     )}
                 </Droppable>
-                <WorkflowEditorMenu layout={this} />
+
+                <WorkflowTools layout={this} />
             </DragDropContext>
         );
     }

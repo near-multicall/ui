@@ -6,9 +6,9 @@ import { Task } from "../../entities";
 import { EditTask, WorkflowExport } from "../../features";
 import { Tabs } from "../../shared/ui/design";
 
-import "./workflow-editor.ui.scss";
+import "./workflow-tools.ui.scss";
 
-export class WorkflowEditorMenu extends Component {
+export class WorkflowTools extends Component {
     constructor(props) {
         super(props);
 
@@ -33,16 +33,16 @@ export class WorkflowEditorMenu extends Component {
         const LAYOUT = this.props.layout;
 
         return (
-            <div className={`WorkflowEditorMenu ${expanded ? "WorkflowEditorMenu--expanded" : ""}`}>
-                <div className="WorkflowEditorMenu-tabs">
+            <div className={`WorkflowTools ${expanded ? "WorkflowTools--expanded" : ""}`}>
+                <div className="WorkflowTools-tabs">
                     <Tabs
                         invertedColors
                         activeItemIndexOverride={activeTabIndex}
                         activeItemSwitchOverride={this.activeTabSwitch}
                         classes={{
-                            root: "WorkflowEditorMenu-tabs",
-                            buttonsPanel: "WorkflowEditorMenu-tabs-buttonsPanel",
-                            contentSpace: "WorkflowEditorMenu-tabs-contentSpace",
+                            root: "WorkflowTools-tabs",
+                            buttonsPanel: "WorkflowTools-tabs-buttonsPanel",
+                            contentSpace: "WorkflowTools-tabs-contentSpace",
                         }}
                         items={[
                             {
