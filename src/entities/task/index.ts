@@ -1,7 +1,6 @@
-import { Task } from "./task";
-import { TaskTemplates } from "./task.ui";
+import { Task } from "./task.ui";
 
-export { Task, TaskTemplates };
+export { Task };
 
 type TaskInfo = {
     formData: object;

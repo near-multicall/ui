@@ -1,0 +1,55 @@
+@use "sass/color";
+@use "sass/mixin";
+@use "sass/font";
+@use "../base";
+
+$mintbase-blue: #070c2b;
+$mintbase-red: #ff2424;
+
+.mintbase-create-store-task,
+.mintbase-transfer-store-ownership-task,
+.mintbase-add-minter-task,
+.mintbase-remove-minter-task,
+.mintbase-buy-nft-task {
+    background-color: $mintbase-blue;
+    background-image: url("../../../../shared/static/mintbase/Mintbase_symbol.svg");
+    background-position-x: 42rem;
+    background-position-y: 239rem;
+    background-size: 77rem;
+    @include base.task-theme(color.$light-text);
+}
+
+.mintbase-add-minter-task-edit,
+.mintbase-remove-minter-task-edit {
+    .InfoField-content {
+        display: flex;
+        flex-flow: column nowrap;
+        .minter-account-id {
+            align-self: flex-end;
+        }
+    }
+}
+
+.mintbase-buy-nft-task-edit {
+    .InfoField-content {
+        display: flex;
+        flex-flow: column nowrap;
+        .entry {
+            @include mixin.center-items(space-between, center);
+            height: 2em;
+            flex-flow: row nowrap;
+            max-width: 100%;
+        }
+        .key {
+            font-weight: 800;
+            white-space: nowrap;
+        }
+        .value {
+            font-family: font.$code;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-left: 2em;
+        }
+    }
+}

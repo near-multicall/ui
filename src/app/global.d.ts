@@ -2,7 +2,6 @@ import { NetworkId } from "@near-wallet-selector/core";
 import { Component } from "react";
 
 import { Task, TaskCopy, TaskInfo, Wallet } from "../entities";
-import { EditTask } from "../features";
 import { AppPage } from "../pages/app";
 import { Sidebar } from "../widgets";
 
