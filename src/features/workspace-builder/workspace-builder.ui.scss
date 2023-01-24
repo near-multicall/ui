@@ -3,7 +3,7 @@
 @use "sass/color";
 @use "sass/base";
 
-.TaskCardsList {
+.WorkspaceBuilder {
     @include mixin.center-items(flex-start);
     gap: size.$gap;
 
