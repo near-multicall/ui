@@ -4,7 +4,7 @@ import { Component } from "react";
 import { Droppable } from "react-beautiful-dnd";
 
 import { TextField } from "../../shared/ui/form";
-import { TaskParams } from "../../entities/task/task.keywords";
+import { keywords } from "../../entities/task/task.keywords";
 
 import { TaskList } from "../../entities/task-list/task-list.ui.jsx";
 import "./workspace-builder.ui.scss";
@@ -39,7 +39,7 @@ export class WorkspaceBuilder extends Component {
         return tasks.filter((task) => {
             return (
                 searchTerm === "" ||
-                (TaskParams.keywords[task.family]?.[task.func] ?? [])
+                (keywords[task.family]?.[task.func] ?? [])
                     .concat(task.family, task.func)
                     .some((kw) => normalize(kw).includes(normalize(searchTerm)))
             );
