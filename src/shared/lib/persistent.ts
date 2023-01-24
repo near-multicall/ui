@@ -1,6 +1,6 @@
 import debounce from "lodash.debounce";
 
-import { WorkflowEditorConfig } from "../params/workflow-editor.params";
+import { AutomationToolsParams } from "../params/automation-tools.params";
 
 const STORAGE_KEY_ADDRESSES = "multicall_addresses";
 const STORAGE_KEY_JSON = "multicall_json";
@@ -10,7 +10,7 @@ class Persistent {
     // addresses relevant to multicall interactions. Initialize with empty strings.
     addresses: { user: string; multicall: string; dao: string } = { user: "", multicall: "", dao: "" };
     // TODO: type layout
-    layout: object = JSON.parse(JSON.stringify(WorkflowEditorConfig));
+    layout: object = JSON.parse(JSON.stringify(AutomationToolsParams));
 
     constructor() {
         // try initializing with values from local storage

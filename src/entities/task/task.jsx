@@ -1,12 +1,12 @@
 import React, { Component } from "react";
 import { Draggable } from "react-beautiful-dnd";
 
-import { Family } from "../../../families";
+import { Family } from "../../families";
 
-import "./task.card.scss";
+import "./task.ui.scss";
 
 /* TODO: Separate model and service from view */
-export class TaskCard extends Component {
+export class Task extends Component {
     id;
 
     constructor(props) {
@@ -338,7 +338,7 @@ export class TaskCard extends Component {
             >
                 {(provided, snapshot) => (
                     <div
-                        className="TaskCard"
+                        className="Task"
                         ref={provided.innerRef}
                         {...provided.dragHandleProps}
                         {...provided.draggableProps}

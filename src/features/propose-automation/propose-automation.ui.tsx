@@ -19,7 +19,7 @@ import { signAndSendTxs } from "../../shared/lib/wallet";
 import { DateTimePicker } from "../../shared/ui/design";
 import { ChoiceField, TextField, UnitField } from "../../shared/ui/form";
 
-import "./workflow-export.ui.scss";
+import "./propose-automation.ui.scss";
 
 const Ctx = Wallet.tryContext();
 
@@ -46,9 +46,9 @@ interface State {
     token: FungibleToken;
 }
 
-const _WorkflowExport = "WorkflowExport";
+const _ProposeAutomation = "ProposeAutomation";
 
-export class WorkflowExportUI extends Component<Props, State> {
+export class ProposeAutomationUI extends Component<Props, State> {
     static contextType = Ctx;
     declare context: ContextType<typeof Ctx>;
 
@@ -278,7 +278,7 @@ export class WorkflowExportUI extends Component<Props, State> {
         if (!walletSelector.isSignedIn()) {
             return (
                 <button
-                    className={clsx(`${_WorkflowExport}-action`, `${_WorkflowExport}-action--login`)}
+                    className={clsx(`${_ProposeAutomation}-action`, `${_ProposeAutomation}-action--login`)}
                     onClick={() => window.WALLET_COMPONENT.signIn()}
                 >
                     Connect to Wallet
@@ -289,7 +289,7 @@ export class WorkflowExportUI extends Component<Props, State> {
         else if (fields(wallet.schema, "dao").noMulticall.isBad()) {
             return (
                 <button
-                    className={clsx(`${_WorkflowExport}-action`, `${_WorkflowExport}-action--propose`)}
+                    className={clsx(`${_ProposeAutomation}-action`, `${_ProposeAutomation}-action--propose`)}
                     disabled
                 >
                     {wallet.schema.message()}. <Link to="/dao">Get one now!</Link>
@@ -310,7 +310,7 @@ export class WorkflowExportUI extends Component<Props, State> {
 
             return (
                 <button
-                    className={clsx(`${_WorkflowExport}-action`, `${_WorkflowExport}-action--propose`)}
+                    className={clsx(`${_ProposeAutomation}-action`, `${_ProposeAutomation}-action--propose`)}
                     disabled={!!isProposeDisabled}
                     onClick={() => this.onSubmit({ multicallArgs })}
                 >
@@ -365,7 +365,7 @@ export class WorkflowExportUI extends Component<Props, State> {
         }
 
         return (
-            <div className={_WorkflowExport}>
+            <div className={_ProposeAutomation}>
                 <Formik
                     initialValues={this.initialValues}
                     initialTouched={Object.keys(this.state.formData).reduce((acc, k) => ({ ...acc, [k]: true }), {})}
@@ -399,7 +399,7 @@ export class WorkflowExportUI extends Component<Props, State> {
                     onSubmit={() => void null}
                 >
                     {() => (
-                        <Form className={`${_WorkflowExport}-params`}>
+                        <Form className={`${_ProposeAutomation}-params`}>
                             <TextField
                                 name="description"
                                 label="Proposal Description"
@@ -490,7 +490,7 @@ export class WorkflowExportUI extends Component<Props, State> {
                                                 <DateTimePicker
                                                     classes={{
                                                         input: clsx(
-                                                            `${_WorkflowExport}-params-scheduleTime`,
+                                                            `${_ProposeAutomation}-params-scheduleTime`,
                                                             "roundbottom"
                                                         ),
                                                     }}
@@ -539,7 +539,7 @@ export class WorkflowExportUI extends Component<Props, State> {
                 {/* Display cards' errors */}
 
                 {allErrors.length > 0 && (
-                    <div className={`${_WorkflowExport}-errors`}>
+                    <div className={`${_ProposeAutomation}-errors`}>
                         <div className="header">
                             <h3>{`Card errors (${allErrors.length})`}</h3>
                         </div>
@@ -565,7 +565,7 @@ export class WorkflowExportUI extends Component<Props, State> {
                     </div>
                 )}
 
-                <div className={`${_WorkflowExport}-section`}>
+                <div className={`${_ProposeAutomation}-section`}>
                     <div className="header">
                         {
                             //@ts-ignore Propery "collapsed" used in export.scss

@@ -3,7 +3,15 @@
 @use "sass/color";
 @use "sass/base";
 
-.TaskCardsList {
+.Task {
+    width: size.$task-width;
+    min-height: size.$task-height;
+    border-radius: size.$task-radius;
+    margin-bottom: size.$gap;
+    overflow: hidden;
+}
+
+.TaskTemplates {
     @include mixin.center-items(flex-start);
     gap: size.$gap;
 
@@ -33,7 +41,7 @@
             .tasks-wrapper {
                 flex: 1 1 0;
                 box-shadow: inset 0px 0px 30px 0px rgba(color.$white, 0.1);
-                .TaskCard:last-of-type {
+                .Task:last-of-type {
                     margin-bottom: 0 !important;
                 }
                 .icon {

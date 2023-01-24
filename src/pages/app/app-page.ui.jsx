@@ -2,11 +2,11 @@ import { Base64 } from "js-base64";
 import { Component } from "react";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 
-import { Task } from "../../entities";
-import { WorkflowEditorConfig } from "../../shared/params/workflow-editor.params";
+import { AutomationToolsParams } from "../../shared/params/automation-tools.params";
+import { Column } from "../../shared/ui/design";
 import { STORAGE } from "../../shared/lib/persistent";
 import { fromCall } from "../../shared/lib/call";
-import { WorkflowTools } from "../../widgets";
+import { AutomationTools } from "../../widgets";
 
 import "./app-page.ui.scss";
 
@@ -133,7 +133,7 @@ export default class AppPageUI extends Component {
         this.columnID = 1;
 
         window.EDITOR?.edit(null);
-        STORAGE.setLayout(WorkflowEditorConfig);
+        STORAGE.setLayout(AutomationToolsParams);
     };
 
     deleteColumn = (index) => {
@@ -517,7 +517,7 @@ export default class AppPageUI extends Component {
                                     const tasks = column.taskIds.map((taskId) => layout.tasks[taskId]);
 
                                     return (
-                                        <Task.SequenceColumn
+                                        <Column
                                             key={column.id}
                                             column={column}
                                             tasks={tasks}
@@ -532,7 +532,7 @@ export default class AppPageUI extends Component {
                     )}
                 </Droppable>
 
-                <WorkflowTools layout={this} />
+                <AutomationTools layout={this} />
             </DragDropContext>
         );
     }

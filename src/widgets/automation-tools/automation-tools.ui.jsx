@@ -2,13 +2,13 @@ import Icon from "@mui/material/Icon";
 import clsx from "clsx";
 import { Component } from "react";
 
-import { Task } from "../../entities";
-import { EditTask, WorkflowExport } from "../../features";
+import { TaskTemplates } from "../../entities";
+import { EditTask, ProposeAutomation } from "../../features";
 import { Tabs } from "../../shared/ui/design";
 
-import "./workflow-tools.ui.scss";
+import "./automation-tools.ui.scss";
 
-export class WorkflowTools extends Component {
+export class AutomationToolsUI extends Component {
     constructor(props) {
         super(props);
 
@@ -33,22 +33,22 @@ export class WorkflowTools extends Component {
         const LAYOUT = this.props.layout;
 
         return (
-            <div className={`WorkflowTools ${expanded ? "WorkflowTools--expanded" : ""}`}>
-                <div className="WorkflowTools-tabs">
+            <div className={`AutomationTools ${expanded ? "AutomationTools--expanded" : ""}`}>
+                <div className="AutomationTools-tabs">
                     <Tabs
                         invertedColors
                         activeItemIndexOverride={activeTabIndex}
                         activeItemSwitchOverride={this.activeTabSwitch}
                         classes={{
-                            root: "WorkflowTools-tabs",
-                            buttonsPanel: "WorkflowTools-tabs-buttonsPanel",
-                            contentSpace: "WorkflowTools-tabs-contentSpace",
+                            root: "AutomationTools-tabs",
+                            buttonsPanel: "AutomationTools-tabs-buttonsPanel",
+                            contentSpace: "AutomationTools-tabs-contentSpace",
                         }}
                         items={[
                             {
                                 name: "Build",
                                 ui: (
-                                    <Task.CardsList
+                                    <TaskTemplates
                                         layout={LAYOUT}
                                         menu={this}
                                     />
@@ -60,7 +60,7 @@ export class WorkflowTools extends Component {
                             },
                             {
                                 name: "Export",
-                                ui: <WorkflowExport.UI layout={LAYOUT} />,
+                                ui: <ProposeAutomation.UI layout={LAYOUT} />,
                             },
                         ]}
                     />

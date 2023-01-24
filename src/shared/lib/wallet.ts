@@ -3,7 +3,7 @@ import type { AccountView, ViewStateResult } from "near-api-js/lib/providers/pro
 import { providers } from "near-api-js";
 import { Base64 } from "js-base64";
 
-import { getNEARProtocolConfig } from "../params/near-protocol.params";
+import { getNEARConfig } from "../params/near.config";
 
 declare global {
     interface Window {
@@ -15,7 +15,7 @@ declare global {
 type Tx = Omit<Transaction, "signerId">;
 
 window.NEAR_ENV = <NetworkId>process.env.NEAR_ENV ?? "testnet";
-window.nearConfig = getNEARProtocolConfig(window.NEAR_ENV);
+window.nearConfig = getNEARConfig(window.NEAR_ENV);
 // create RPC Provider object.
 const rpcProvider = new providers.JsonRpcProvider({
     url: window.nearConfig.nodeUrl,

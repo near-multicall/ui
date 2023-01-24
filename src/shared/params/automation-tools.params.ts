@@ -1,4 +1,4 @@
-export const WorkflowEditorConfig = {
+export const AutomationToolsParams = {
     tasks: {
         "task-i1": { id: "task-i1", family: "", func: "" },
         "task-i2": { id: "task-i2", family: "near", func: "ft_transfer" },

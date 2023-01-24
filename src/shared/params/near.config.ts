@@ -1,4 +1,4 @@
-export const getNEARProtocolConfig = (env: string) => {
+export const getNEARConfig = (env: string) => {
     switch (env) {
         case "production":
         case "mainnet":

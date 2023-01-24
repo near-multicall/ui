@@ -22,3 +22,6 @@ export { DateTimePicker, type DateTimePickerProps } from "./date-time-picker";
 export { Dialog } from "./dialog";
 export { Table, type TableProps, TableRow, TableRowCompact, type TableRowProps } from "./table";
 export { Tabs } from "./tabs";
+
+/** Unspecified */
+export { Column } from "./column";

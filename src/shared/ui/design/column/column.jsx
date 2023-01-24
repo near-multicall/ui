@@ -3,10 +3,12 @@ import hash from "object-hash";
 import { Component } from "react";
 import { Draggable, Droppable } from "react-beautiful-dnd";
 
-import { TaskCard } from "./task.card.jsx";
-import "./task.sequence.scss";
+// TODO: Pass Task as a prop!
+import { Task } from "../../../../entities/task";
 
-export class TaskSequenceColumn extends Component {
+import "./column.scss";
+
+export class Column extends Component {
     render() {
         const menuColumn = this.props.column.id === "menu";
 
@@ -57,7 +59,7 @@ export class TaskSequenceColumn extends Component {
                                     {this.props.tasks.map(
                                         (task, index) =>
                                             (!menuColumn || this.props.show.includes(task.id)) && (
-                                                <TaskCard
+                                                <Task
                                                     key={hash(task, { algorithm: "md5", encoding: "base64" })}
                                                     task={task}
                                                     index={index}

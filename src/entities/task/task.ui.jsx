@@ -3,17 +3,15 @@ import debounce from "lodash.debounce";
 import { Component } from "react";
 import { Droppable } from "react-beautiful-dnd";
 
-import { TextField } from "../../../shared/ui/form";
-import { TaskParams } from "../task.params";
-
-import { TaskSequenceColumn } from "./task.sequence.jsx";
-import "./task.cards-list.scss";
+import { Column } from "../../shared/ui/design";
+import { TextField } from "../../shared/ui/form";
+import { TaskParams } from "./task.params";
 
 const normalize = (str) => str.replace("_", " ").replace("-", " ").toLowerCase();
 
-const _TaskCardsList = "TaskCardsList";
+const _TaskTemplates = "TaskTemplates";
 
-export class TaskCardsList extends Component {
+export class TaskTemplates extends Component {
     resolveDebounced = debounce((resolve) => resolve(), 400);
 
     constructor(props) {
@@ -52,7 +50,7 @@ export class TaskCardsList extends Component {
         const menuColumn = LAYOUT.getColumns()["menu"];
 
         return (
-            <div className={`${_TaskCardsList}`}>
+            <div className={`${_TaskTemplates}`}>
                 <Formik
                     initialValues={{ search: this.state.searchTerm }}
                     validate={async (values) => {
@@ -67,7 +65,7 @@ export class TaskCardsList extends Component {
                     }}
                     onSubmit={() => {}}
                 >
-                    <Form className={`${_TaskCardsList}-form`}>
+                    <Form className={`${_TaskTemplates}-form`}>
                         <TextField
                             name="search"
                             placeholder="Search"
@@ -84,12 +82,12 @@ export class TaskCardsList extends Component {
                 >
                     {(provided) => (
                         <div
-                            className={`${_TaskCardsList}-droppable`}
+                            className={`${_TaskTemplates}-droppable`}
                             {...provided.droppableProps}
                             ref={provided.innerRef}
                         >
-                            <div className={`${_TaskCardsList}-selector`}>
-                                <TaskSequenceColumn
+                            <div className={`${_TaskTemplates}-selector`}>
+                                <Column
                                     key={"menu"}
                                     column={menuColumn}
                                     tasks={menuColumn.taskIds.map((taskId) => LAYOUT.getTasks()[taskId])}
