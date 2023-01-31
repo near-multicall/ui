@@ -14,8 +14,6 @@ import { NEARIcon, Table, Tile, Tooltip } from "../../shared/ui/design";
 
 import "./configure-scheduling.ui.scss";
 
-const _ConfigureScheduling = "ConfigureScheduling";
-
 type MISchedulingSettingsDiff = Pick<Multicall, "jobBond">;
 
 interface ConfigureSchedulingUIProps extends Omit<HTMLProps<HTMLDivElement>, "onChange"> {
@@ -53,7 +51,7 @@ export const ConfigureSchedulingUI = ({ disabled, onEdit, resetTrigger }: Config
 
     return (
         <Tile
-            classes={{ root: `${_ConfigureScheduling}` }}
+            classes={{ root: "ConfigureScheduling" }}
             heading="Scheduling"
             headerSlots={{
                 end: editModeEnabled ? (

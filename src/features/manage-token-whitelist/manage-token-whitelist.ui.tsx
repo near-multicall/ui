@@ -12,10 +12,8 @@ import { MI } from "../../entities";
 
 import "./manage-token-whitelist.ui.scss";
 
-const _ManageTokenWhitelist = "ManageTokenWhitelist";
-
 type MITokenWhitelistDiff = Pick<
-    Arguments<typeof Multicall["configDiffToProposalActions"]>[0],
+    Arguments<(typeof Multicall)["configDiffToProposalActions"]>[0],
     "addTokens" | "removeTokens"
 >;
 
@@ -84,7 +82,7 @@ export const ManageTokenWhitelistUI = ({ disabled, onEdit, resetTrigger }: Manag
             validationSchema={schema}
             {...{ onReset, onSubmit }}
         >
-            <Form className={_ManageTokenWhitelist}>
+            <Form className="ManageTokenWhitelist">
                 <MI.TokenWhitelistTable
                     ItemProps={{
                         idToHighlight: (id) =>
@@ -106,7 +104,7 @@ export const ManageTokenWhitelistUI = ({ disabled, onEdit, resetTrigger }: Manag
                                 : void null,
                         },
                     }}
-                    className={`${_ManageTokenWhitelist}-controls`}
+                    className="ManageTokenWhitelist-controls"
                     headerSlots={{
                         end: editModeEnabled ? (
                             <Tooltip content="Cancel & Reset">

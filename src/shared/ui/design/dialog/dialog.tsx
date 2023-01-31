@@ -24,8 +24,6 @@ interface DialogProps extends PropsWithChildren {
     title: string;
 }
 
-const _Dialog = "Dialog";
-
 export const Dialog = ({
     cancelRename,
     children,
@@ -40,13 +38,13 @@ export const Dialog = ({
     title,
 }: DialogProps) => (
     <MUIDialog
-        className={clsx(_Dialog, className)}
+        className={clsx("Dialog", className)}
         {...{ onClose, open }}
     >
-        <MUIDialogTitle className={`${_Dialog}-title`}>{title}</MUIDialogTitle>
-        <MUIDialogContent className={`${_Dialog}-content`}>{children}</MUIDialogContent>
+        <MUIDialogTitle className="Dialog-title">{title}</MUIDialogTitle>
+        <MUIDialogContent className="Dialog-content">{children}</MUIDialogContent>
 
-        <MUIDialogActions className={`${_Dialog}-actions`}>
+        <MUIDialogActions className="Dialog-actions">
             <Button
                 color="error"
                 disabled={noCancel}

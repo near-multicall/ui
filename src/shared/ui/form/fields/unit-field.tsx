@@ -3,8 +3,6 @@ import { TextField, TextFieldProps } from "./text-field";
 import { SelectField, SelectFieldProps } from "./select-field";
 import "./unit-field.scss";
 
-const _UnitField = "UnitField";
-
 type UnitFieldProps = {
     textProps?: Omit<TextFieldProps, "name">;
     unitProps?: Omit<SelectFieldProps, "name">;
@@ -16,26 +14,26 @@ type UnitFieldProps = {
     roundbottom?: boolean;
 };
 
-export const UnitField = ({ name, unit, label, options, ...props }: UnitFieldProps) => {
+export const UnitField = ({ name, unit, label, options, roundtop, roundbottom, ...props }: UnitFieldProps) => {
     return (
         <div
-            className={clsx(_UnitField, {
-                roundtop: props?.roundtop,
-                roundbottom: props?.roundbottom,
+            className={clsx("UnitField", {
+                roundtop,
+                roundbottom,
             })}
         >
             <TextField
                 name={name}
                 label={label}
                 {...props?.textProps}
-                className={clsx(`${_UnitField}-text`, props?.textProps?.className)}
+                className={clsx("UnitField-text", props?.textProps?.className)}
             />
             <SelectField
                 name={unit}
                 hiddenLabel={true}
                 options={options}
                 {...props?.unitProps}
-                className={clsx(`${_UnitField}-unit`, props?.unitProps?.className)}
+                className={clsx("UnitField-unit", props?.unitProps?.className)}
             />
         </div>
     );

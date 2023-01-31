@@ -6,12 +6,10 @@ import "./form-radio.scss";
 
 export interface FormRadioProps extends Omit<ComponentProps<typeof FormControlLabel>, "control"> {}
 
-const _FormRadio = "FormRadio";
-
 export const FormRadio = ({ className, ...props }: FormRadioProps) => (
     <FormControlLabel
-        classes={{ root: clsx(_FormRadio, className), label: `${_FormRadio}-label` }}
-        control={<Radio classes={{ root: `${_FormRadio}-button` }} />}
+        classes={{ root: clsx("FormRadio", className), label: "FormRadio-label" }}
+        control={<Radio classes={{ root: "FormRadio-button" }} />}
         {...props}
     />
 );

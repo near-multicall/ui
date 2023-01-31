@@ -31,8 +31,6 @@ interface State {
     proposedInfo: ProposalOutput | null;
 }
 
-const _DAOPage = "DAOPage";
-
 export default class DAOPageUI extends Component<Props, State> {
     static contextType = Ctx;
     declare context: ContextType<typeof Ctx>;
@@ -405,8 +403,8 @@ export default class DAOPageUI extends Component<Props, State> {
         // TODO: only require signIn when DAO has no multicall instance (to know if user can propose or vote on existing proposal to create multicall)
         if (!walletSelector.isSignedIn()) {
             return (
-                <div className={_DAOPage}>
-                    <div className={clsx(`${_DAOPage}-content`, "error")}>Please sign in to continue</div>
+                <div className="DAOPage">
+                    <div className="DAOPage-content error">Please sign in to continue</div>
                 </div>
             );
         }
@@ -427,8 +425,8 @@ export default class DAOPageUI extends Component<Props, State> {
 
         if (displayErrors.length > 0)
             return (
-                <div className={_DAOPage}>
-                    <div className={clsx(`${_DAOPage}-content`, "error")}>
+                <div className="DAOPage">
+                    <div className="DAOPage-content error">
                         <div>{displayErrors}</div>
                         {this.createMulticall()}
                     </div>
@@ -436,8 +434,8 @@ export default class DAOPageUI extends Component<Props, State> {
             );
 
         return (
-            <div className={_DAOPage}>
-                <div className={`${_DAOPage}-header`}>
+            <div className="DAOPage">
+                <div className="DAOPage-header">
                     <div className="DaoSearch">
                         <Formik
                             initialValues={{ addr: STORAGE.addresses.dao ?? "" }}
@@ -468,9 +466,9 @@ export default class DAOPageUI extends Component<Props, State> {
 
                 <Tabs
                     classes={{
-                        root: `${_DAOPage}-tabs`,
-                        buttonsPanel: `${_DAOPage}-tabs-buttonsPanel`,
-                        contentSpace: `${_DAOPage}-tabs-contentSpace`,
+                        root: "DAOPage-tabs",
+                        buttonsPanel: "DAOPage-tabs-buttonsPanel",
+                        contentSpace: "DAOPage-tabs-contentSpace",
                     }}
                     items={[
                         {
@@ -479,7 +477,7 @@ export default class DAOPageUI extends Component<Props, State> {
                                 <SettingsManager
                                     accountId={this.state.dao.address}
                                     dao={this.state.dao}
-                                    className={`${_DAOPage}-content`}
+                                    className="DAOPage-content"
                                 />
                             ),
                         },
@@ -491,7 +489,7 @@ export default class DAOPageUI extends Component<Props, State> {
                                 <FundsOverview
                                     accountId={this.state.dao.address}
                                     accountName="DAO"
-                                    className={`${_DAOPage}-content`}
+                                    className="DAOPage-content"
                                 />
                             ),
                         },
@@ -502,7 +500,7 @@ export default class DAOPageUI extends Component<Props, State> {
                             ui: (
                                 <ScheduleOverview
                                     accountId={this.state.dao.address}
-                                    className={`${_DAOPage}-content`}
+                                    className="DAOPage-content"
                                 />
                             ),
                         },

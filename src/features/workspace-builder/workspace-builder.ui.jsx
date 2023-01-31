@@ -11,8 +11,6 @@ import "./workspace-builder.ui.scss";
 
 const normalize = (str) => str.replace("_", " ").replace("-", " ").toLowerCase();
 
-const _WorkspaceBuilder = "WorkspaceBuilder";
-
 export class WorkspaceBuilder extends Component {
     resolveDebounced = debounce((resolve) => resolve(), 400);
 
@@ -52,7 +50,7 @@ export class WorkspaceBuilder extends Component {
         const menuColumn = LAYOUT.getColumns()["menu"];
 
         return (
-            <div className={`${_WorkspaceBuilder}`}>
+            <div className="WorkspaceBuilder">
                 <Formik
                     initialValues={{ search: this.state.searchTerm }}
                     validate={async (values) => {
@@ -67,7 +65,7 @@ export class WorkspaceBuilder extends Component {
                     }}
                     onSubmit={() => {}}
                 >
-                    <Form className={`${_WorkspaceBuilder}-form`}>
+                    <Form className="WorkspaceBuilder-form">
                         <TextField
                             name="search"
                             placeholder="Search"
@@ -84,11 +82,11 @@ export class WorkspaceBuilder extends Component {
                 >
                     {(provided) => (
                         <div
-                            className={`${_WorkspaceBuilder}-droppable`}
+                            className="WorkspaceBuilder-droppable"
                             {...provided.droppableProps}
                             ref={provided.innerRef}
                         >
-                            <div className={`${_WorkspaceBuilder}-selector`}>
+                            <div className="WorkspaceBuilder-selector">
                                 <TaskList
                                     key={"menu"}
                                     column={menuColumn}

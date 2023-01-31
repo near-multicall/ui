@@ -15,8 +15,6 @@ interface IExtAuthDialog extends Pick<ComponentProps<typeof Dialog>, "className"
     method: "dao" | "multicall";
 }
 
-const _ExtAuthDialog = "ExtAuthDialog";
-
 export const ExtAuthDialog = ({ className, method, onClose, open, title }: IExtAuthDialog) => {
     const dAppURL = useMemo(() => new ArgsString(""), []);
 
@@ -39,13 +37,13 @@ export const ExtAuthDialog = ({ className, method, onClose, open, title }: IExtA
 
     return (
         <Dialog
-            className={clsx(_ExtAuthDialog, className)}
+            className={clsx("ExtAuthDialog", className)}
             doneRename="Proceed"
             noSubmit={URLInvalid.$detected}
             onSubmit={() => window.open(requestURL, "_blank")}
             {...{ onClose, open, title }}
         >
-            <ul className={`${_ExtAuthDialog}-stepByStepGuide`}>
+            <ul className="ExtAuthDialog-stepByStepGuide">
                 {ExtAuthParams.stepByStepGuide.map((step) => (
                     <li key={step.text}>
                         <span>

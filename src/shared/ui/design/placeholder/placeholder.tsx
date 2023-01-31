@@ -13,12 +13,11 @@ interface PlaceholderProps extends HTMLProps<HTMLDivElement> {
     type: keyof typeof contentByType;
     payload?: UnknownErrorContentProps["payload"];
 }
-const _Placeholder = "Placeholder";
 
 export const Placeholder = ({ className, payload, type }: PlaceholderProps) => (
-    <div className={clsx(_Placeholder, `${_Placeholder}--${type}`, className)}>
+    <div className={clsx("Placeholder", `Placeholder--${type}`, className)}>
         {h(contentByType[type], {
-            className: clsx(`${_Placeholder}-content`, `${_Placeholder}-content--${type}`),
+            className: `Placeholder-content Placeholder-content--${type}`,
             payload,
         })}
     </div>

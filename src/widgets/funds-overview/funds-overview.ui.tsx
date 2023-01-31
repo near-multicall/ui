@@ -5,8 +5,6 @@ import { FT, NEAR } from "../../entities";
 
 import "./funds-overview.ui.scss";
 
-const _FundsOverview = "FundsOverview";
-
 export interface FundsOverviewUIProps {
     accountName: string;
     className?: string;
@@ -17,9 +15,9 @@ export const FundsOverviewUI = ({ className, accountName }: FundsOverviewUIProps
         fungibleTokenBalances = FT.balancesRender({ nonZeroOnly: true });
 
     return (
-        <div className={clsx(_FundsOverview, className)}>
+        <div className={clsx("FundsOverview", className)}>
             <Tile
-                classes={{ root: `${_FundsOverview}-content` }}
+                classes={{ root: "FundsOverview-content" }}
                 heading="Token balances"
             >
                 {(nearBalances ?? fungibleTokenBalances) && (

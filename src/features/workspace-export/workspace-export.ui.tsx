@@ -46,8 +46,6 @@ interface State {
     token: FungibleToken;
 }
 
-const _WorkspaceExport = "WorkspaceExport";
-
 export class WorkspaceExport extends Component<Props, State> {
     static contextType = Ctx;
     declare context: ContextType<typeof Ctx>;
@@ -195,7 +193,7 @@ export class WorkspaceExport extends Component<Props, State> {
         if (!walletSelector.isSignedIn()) {
             return (
                 <button
-                    className={clsx(`${_WorkspaceExport}-action`, `${_WorkspaceExport}-action--login`)}
+                    className="WorkspaceExport-action WorkspaceExport-action--login"
                     onClick={() => window.WALLET_COMPONENT.signIn()}
                 >
                     Connect to Wallet
@@ -206,7 +204,7 @@ export class WorkspaceExport extends Component<Props, State> {
         else if (fields(wallet.schema, "dao").noMulticall.isBad()) {
             return (
                 <button
-                    className={clsx(`${_WorkspaceExport}-action`, `${_WorkspaceExport}-action--propose`)}
+                    className="WorkspaceExport-action WorkspaceExport-action--propose"
                     disabled
                 >
                     {wallet.schema.message()}. <Link to="/dao">Get one now!</Link>
@@ -238,7 +236,7 @@ export class WorkspaceExport extends Component<Props, State> {
 
             return (
                 <button
-                    className={clsx(`${_WorkspaceExport}-action`, `${_WorkspaceExport}-action--propose`)}
+                    className="WorkspaceExport-action WorkspaceExport-action--propose"
                     disabled={!!isProposeDisabled}
                     onClick={async () => {
                         const { currentDao: dao, currentMulticall: multicall } = window.WALLET_COMPONENT.state;
@@ -377,7 +375,7 @@ export class WorkspaceExport extends Component<Props, State> {
         }
 
         return (
-            <div className={_WorkspaceExport}>
+            <div className="WorkspaceExport">
                 <Formik
                     initialValues={this.initialValues}
                     initialTouched={Object.keys(this.state.formData).reduce((acc, k) => ({ ...acc, [k]: true }), {})}
@@ -409,7 +407,7 @@ export class WorkspaceExport extends Component<Props, State> {
                     onSubmit={() => {}}
                 >
                     {() => (
-                        <Form className={`${_WorkspaceExport}-params`}>
+                        <Form className="WorkspaceExport-params">
                             <TextField
                                 name="description"
                                 label="Proposal Description"
@@ -495,10 +493,7 @@ export class WorkspaceExport extends Component<Props, State> {
                                             <div className="spacer">
                                                 <DateTimePicker
                                                     classes={{
-                                                        input: clsx(
-                                                            `${_WorkspaceExport}-params-scheduleTime`,
-                                                            "roundbottom"
-                                                        ),
+                                                        input: "WorkspaceExport-params-scheduleTime roundbottom",
                                                     }}
                                                     label="Execution date"
                                                     value={dateTime}
@@ -542,7 +537,7 @@ export class WorkspaceExport extends Component<Props, State> {
                 {/* Display cards' errors */}
 
                 {allErrors.length > 0 && (
-                    <div className={`${_WorkspaceExport}-errors`}>
+                    <div className="WorkspaceExport-errors">
                         <div className="header">
                             <h3>{`Card errors (${allErrors.length})`}</h3>
                         </div>
@@ -567,7 +562,7 @@ export class WorkspaceExport extends Component<Props, State> {
                     </div>
                 )}
 
-                <div className={`${_WorkspaceExport}-section`}>
+                <div className="WorkspaceExport-section">
                     <div className="header">
                         {
                             //@ts-ignore Propery "collapsed" used in export.scss

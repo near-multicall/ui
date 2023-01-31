@@ -8,8 +8,6 @@ import { JobModel } from "./job.model";
 import { IJobService, JobService } from "./job.service";
 import "./job.ui.scss";
 
-const _Job = "Job";
-
 const JobStatusIcons: Record<JobModel["job"]["status"], string> = {
     inactive: "🟡",
     expired: "🔴",
@@ -42,7 +40,7 @@ export const jobAsTableRow = ({ id, job }: JobModel) => ({
 
         <>
             <DataInspector
-                classes={{ label: `${_Job}-dataInspector-label` }}
+                classes={{ label: "Job-dataInspector-label" }}
                 data={job.multicalls}
                 expandLevel={5}
             />
@@ -50,7 +48,7 @@ export const jobAsTableRow = ({ id, job }: JobModel) => ({
             {job.multicalls.length === 1 && (
                 <NavLink
                     to="/app"
-                    className={`${_Job}-action`}
+                    className="Job-action"
                     onClick={() => setTimeout(() => window.LAYOUT.fromJSON(job.multicalls[0].calls), 0)}
                 >
                     Open in Editor
@@ -58,7 +56,7 @@ export const jobAsTableRow = ({ id, job }: JobModel) => ({
             )}
 
             <button
-                className={`${_Job}-action`}
+                className="Job-action"
                 onClick={(e: React.MouseEvent) => {
                     navigator.clipboard.writeText(JSON.stringify(job.multicalls, null, 2));
                     const target = e.target as HTMLElement;
@@ -80,8 +78,6 @@ export const jobAsTableRow = ({ id, job }: JobModel) => ({
     id: id.toString(),
 });
 
-const _JobEntriesTable = "JobEntriesTable";
-
 export interface JobEntriesTableProps extends IJobService {
     className?: string;
 }
@@ -92,7 +88,7 @@ export const JobEntriesTable = ({ className, ...modelInputs }: JobEntriesTablePr
 
     return (
         <Tile
-            classes={{ root: clsx(_JobEntriesTable, className) }}
+            classes={{ root: clsx("JobEntriesTable", className) }}
             heading="All jobs"
             noData={data !== null && items.length === 0}
             {...{ error, loading }}
@@ -100,7 +96,7 @@ export const JobEntriesTable = ({ className, ...modelInputs }: JobEntriesTablePr
             <Scrollable>
                 <Table
                     RowProps={{ withTitle: true }}
-                    className={`${_JobEntriesTable}-body`}
+                    className="JobEntriesTable-body"
                     displayMode="compact"
                     header={["Status", "ID", "Start at", "Croncat hash", "Creator", "Trigger gas", "Multicalls"]}
                     rows={items.map(jobAsTableRow).reverse()}

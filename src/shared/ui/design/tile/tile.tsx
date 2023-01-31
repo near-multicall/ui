@@ -5,8 +5,6 @@ import { Placeholder } from "../placeholder";
 
 import "./tile.scss";
 
-const _Tile = "Tile";
-
 export interface TileProps extends PropsWithChildren, Omit<HTMLAttributes<HTMLDivElement>, "className"> {
     classes?: Partial<
         Record<"root" | "content" | "footer" | "header" | "subheader", HTMLAttributes<HTMLDivElement>["className"]>
@@ -33,18 +31,18 @@ export const Tile = ({
     order = "default",
     subheader,
 }: TileProps) => (
-    <div className={clsx(_Tile, `${_Tile}--${order}`, classes?.root)}>
+    <div className={clsx("Tile", `Tile--${order}`, classes?.root)}>
         {(headerSlots?.start ?? heading ?? headerSlots?.end ?? null) !== null && (
-            <span className={clsx(`${_Tile}-header`, classes?.header)}>
-                {headerSlots?.start && <span className={`${_Tile}-header-slot--start`}>{headerSlots?.start}</span>}
-                {heading && <h1 className={`${_Tile}-header-text`}>{heading}</h1>}
-                {headerSlots?.end && <span className={`${_Tile}-header-slot--end`}>{headerSlots?.end}</span>}
+            <span className={clsx("Tile-header", classes?.header)}>
+                {headerSlots?.start && <span className="Tile-header-slot--start">{headerSlots?.start}</span>}
+                {heading && <h1 className="Tile-header-text">{heading}</h1>}
+                {headerSlots?.end && <span className="Tile-header-slot--end">{headerSlots?.end}</span>}
             </span>
         )}
 
-        {subheader && <div className={clsx(`${_Tile}-subheader`, classes?.subheader)}>{subheader}</div>}
+        {subheader && <div className={clsx("Tile-subheader", classes?.subheader)}>{subheader}</div>}
 
-        <div className={clsx(`${_Tile}-content`, classes?.content)}>
+        <div className={clsx("Tile-content", classes?.content)}>
             {loading && <div className="loader" />}
             {!loading && noData && <Placeholder type="noData" />}
 
@@ -58,6 +56,6 @@ export const Tile = ({
             {!loading && !noData && !error && children}
         </div>
 
-        {footer && <div className={clsx(`${_Tile}-footer`, classes?.footer)}>{footer}</div>}
+        {footer && <div className={clsx("Tile-footer", classes?.footer)}>{footer}</div>}
     </div>
 );

@@ -8,8 +8,6 @@ import { ConfigureScheduling, ManageTokenWhitelist, ProposeSettings } from "../.
 
 import "./settings-manager.ui.scss";
 
-const _SettingsManager = "SettingsManager";
-
 export interface SettingsManagerUIProps extends HTMLProps<HTMLDivElement> {
     dao: SputnikDAO;
 }
@@ -21,7 +19,7 @@ export const SettingsManagerUI = ({ className, dao }: SettingsManagerUIProps) =>
     const canCreateProposals =
         !wallet?.accountId || dao.checkUserPermission(wallet?.accountId, "AddProposal", "FunctionCall");
 
-    const initialDiff: ComponentProps<typeof ProposeSettings["UI"]>["diff"] = {
+    const initialDiff: ComponentProps<(typeof ProposeSettings)["UI"]>["diff"] = {
         addTokens: [],
         jobBond: "",
         removeTokens: [],
@@ -62,16 +60,16 @@ export const SettingsManagerUI = ({ className, dao }: SettingsManagerUIProps) =>
     );
 
     return (
-        <div className={clsx(_SettingsManager, { "is-displayingError": multicallInstance.error !== null }, className)}>
+        <div className={clsx("SettingsManager", { "is-displayingError": multicallInstance.error !== null }, className)}>
             <Tile
-                classes={{ root: `${_SettingsManager}-error` }}
+                classes={{ root: "SettingsManager-error" }}
                 error={multicallInstance.error}
             />
 
-            {false && <MI.AdminsTable className={`${_SettingsManager}-admins`} />}
+            {false && <MI.AdminsTable className="SettingsManager-admins" />}
 
             <ManageTokenWhitelist.UI
-                className={`${_SettingsManager}-tokenWhitelist`}
+                className="SettingsManager-tokenWhitelist"
                 disabled={!canCreateProposals}
                 {...{ onEdit, resetTrigger }}
             />

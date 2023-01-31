@@ -4,8 +4,6 @@ import { Validation } from "../../../lib/validation";
 
 import "./icon-label.scss";
 
-const _IconLabel = "IconLabel";
-
 interface IconLabelProps {
     icon: string | JSX.Element;
     label: string;
@@ -14,12 +12,12 @@ interface IconLabelProps {
 
 export const IconLabel = ({ icon, label, reversed = false }: IconLabelProps) => (
     <span
-        className={clsx(_IconLabel, {
-            [`${_IconLabel}--reversed`]: reversed,
-            [`${_IconLabel}--symbolic`]: typeof icon === "string" && !Validation.isUrl(icon),
+        className={clsx("IconLabel", {
+            ["IconLabel--reversed"]: reversed,
+            ["IconLabel--symbolic"]: typeof icon === "string" && !Validation.isUrl(icon),
         })}
     >
-        <span className={`${_IconLabel}-icon`}>
+        <span className="IconLabel-icon">
             {typeof icon === "string" && Validation.isUrl(icon) ? (
                 <img
                     loading="lazy"
@@ -30,6 +28,6 @@ export const IconLabel = ({ icon, label, reversed = false }: IconLabelProps) => 
             )}
         </span>
 
-        <span className={clsx(`${_IconLabel}-label`, { "font--code": !Number.isNaN(label) })}>{label}</span>
+        <span className={clsx("IconLabel-label", { "font--code": !Number.isNaN(label) })}>{label}</span>
     </span>
 );

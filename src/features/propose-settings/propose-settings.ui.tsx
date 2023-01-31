@@ -14,9 +14,7 @@ import { MI } from "../../entities";
 
 import "./propose-settings.ui.scss";
 
-const _ProposeSettings = "ProposeSettings";
-
-type MISettingsDiff = Arguments<typeof Multicall["configDiffToProposalActions"]>[0];
+type MISettingsDiff = Arguments<(typeof Multicall)["configDiffToProposalActions"]>[0];
 
 export interface ProposeSettingsUIProps extends HTMLProps<HTMLDivElement> {
     dao: SputnikDAO;
@@ -59,38 +57,36 @@ export const ProposeSettingsUI = ({ className, dao, diff, disabled, editMode, on
         >
             <Tile
                 classes={{
-                    content: clsx(_ProposeSettings, { "is-inEditMode": Boolean(editMode) }, className),
+                    content: clsx("ProposeSettings", { "is-inEditMode": Boolean(editMode) }, className),
                 }}
                 heading={editMode ? "Summary" : null}
                 {...mi}
             >
-                <p className={`${_ProposeSettings}-hint`}>
+                <p className="ProposeSettings-hint">
                     {disabled
                         ? "Your account has no permission to create proposals"
                         : "Start editing to draft changes proposal"}
                 </p>
 
-                <div className={`${_ProposeSettings}-summary`}>
+                <div className="ProposeSettings-summary">
                     {Object.entries(MI.SettingsDiffMeta).map(
                         ([key, { color, description }]) =>
                             diff[key as keyof MISettingsDiff].length > 0 && (
                                 <div
-                                    className={`${_ProposeSettings}-summary-entry`}
+                                    className="ProposeSettings-summary-entry"
                                     {...{ key }}
                                 >
-                                    <h3 className={`${_ProposeSettings}-summary-entry-description`}>
-                                        {description + ":"}
-                                    </h3>
+                                    <h3 className="ProposeSettings-summary-entry-description">{description + ":"}</h3>
 
-                                    <ul className={`${_ProposeSettings}-summary-entry-data`}>
+                                    <ul className="ProposeSettings-summary-entry-data">
                                         {(Array.isArray(diff[key as keyof MISettingsDiff])
                                             ? Array.from(diff[key as keyof MISettingsDiff])
                                             : [diff[key as keyof MISettingsDiff]]
                                         ).map((data) => (
                                             <li
                                                 className={clsx(
-                                                    `${_ProposeSettings}-summary-entry-data-chip`,
-                                                    `${_ProposeSettings}-summary-entry-data-chip--${color}`
+                                                    "ProposeSettings-summary-entry-data-chip",
+                                                    `ProposeSettings-summary-entry-data-chip--${color}`
                                                 )}
                                                 key={data as string}
                                             >
@@ -105,7 +101,7 @@ export const ProposeSettingsUI = ({ className, dao, diff, disabled, editMode, on
                     )}
                 </div>
 
-                <Form className={`${_ProposeSettings}-submit`}>
+                <Form className="ProposeSettings-submit">
                     <div>
                         <TextField
                             invertedColors

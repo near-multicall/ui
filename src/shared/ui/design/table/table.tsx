@@ -42,8 +42,6 @@ export interface TableProps extends HTMLAttributes<HTMLDivElement>, Pick<TableRo
         | null;
 }
 
-const _Table = "Table";
-
 export const Table = ({
     RowProps,
     className,
@@ -76,9 +74,9 @@ export const Table = ({
     return (
         <>
             {classicModeRequired && (
-                <TableContainer className={clsx(_Table, className)}>
+                <TableContainer className={clsx("Table", className)}>
                     <table>
-                        <TableHead className={`${_Table}-head`}>
+                        <TableHead className="Table-head">
                             <MuiTableRow>
                                 {header.map((headerCell, index) => (
                                     <TableCell key={index}>{headerCell}</TableCell>
@@ -103,7 +101,7 @@ export const Table = ({
             )}
 
             {compactModeRequired && (
-                <div className={clsx(`${_Table}--compact`, { [`${_Table}--dense`]: dense }, className)}>
+                <div className={clsx("Table--compact", { ["Table--dense"]: dense }, className)}>
                     {rows &&
                         rows.map((row, index) => (
                             <TableRowCompact

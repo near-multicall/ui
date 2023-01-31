@@ -5,8 +5,6 @@ import { Job, MI } from "../../entities";
 
 import "./schedule-overview.ui.scss";
 
-const _ScheduleOverview = "ScheduleOverview";
-
 export interface ScheduleOverviewUIProps extends HTMLProps<HTMLDivElement> {}
 
 export const ScheduleOverviewUI = ({ className, ...props }: ScheduleOverviewUIProps) => {
@@ -14,7 +12,7 @@ export const ScheduleOverviewUI = ({ className, ...props }: ScheduleOverviewUIPr
 
     return (
         <div
-            className={clsx(_ScheduleOverview, className)}
+            className={clsx("ScheduleOverview", className)}
             {...props}
         >
             <Job.EntriesTable multicallInstance={multicallInstance.data} />

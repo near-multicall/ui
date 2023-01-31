@@ -7,11 +7,9 @@ export interface NEARLinkProps extends Omit<LinkProps, "href"> {
     address: AccountId;
 }
 
-const _NEARLink = "NEARLink";
-
 export const NEARLink = ({ address }: NEARLinkProps) => (
     <Link
-        className={_NEARLink}
+        className="NEARLink"
         href={args.string().address().intoUrl().cast(address) ?? "#"}
         label={address}
         rel="noopener noreferrer"

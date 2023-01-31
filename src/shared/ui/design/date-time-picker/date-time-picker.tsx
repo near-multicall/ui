@@ -10,8 +10,6 @@ import { DateTime } from "luxon";
 
 import "./date-time-picker.scss";
 
-const _DateTimePicker = "DateTimePicker";
-
 export interface DateTimePickerProps
     extends Omit<
         GenericDateTimePickerProps<DateTime, DateTime>,
@@ -34,8 +32,8 @@ export const DateTimePicker = ({
 }: DateTimePickerProps) => (
     <LocalizationProvider dateAdapter={AdapterLuxon}>
         <GenericDateTimePicker
-            PaperProps={{ classes: { root: clsx(`${_DateTimePicker}-modal`, classes?.modal) } }}
-            className={clsx(`${_DateTimePicker}`, classes?.root)}
+            PaperProps={{ classes: { root: clsx("DateTimePicker-modal", classes?.modal) } }}
+            className={clsx("DateTimePicker", classes?.root)}
             ampm={false}
             minDateTime={DateTime.fromJSDate(minDateTime)}
             maxDateTime={DateTime.fromJSDate(maxDateTime)}
@@ -44,7 +42,7 @@ export const DateTimePicker = ({
             renderInput={(params) => (
                 <TextField
                     {...params}
-                    className={clsx(`${_DateTimePicker}-input`, classes?.input)}
+                    className={clsx("DateTimePicker-input", classes?.input)}
                 />
             )}
             {...props}

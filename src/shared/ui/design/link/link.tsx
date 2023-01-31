@@ -13,15 +13,13 @@ export interface LinkProps extends Omit<HTMLProps<HTMLAnchorElement>, "children"
     label?: string;
 }
 
-const _Link = "Link";
-
 export const Link = ({ className, href, label, noTooltip = false, ...props }: LinkProps) => {
     const text = label && label.length > 0 ? label : href;
 
     const Element = forwardRef(
         ({ className: forwardedClassName, ...forwardedProps }: HTMLProps<HTMLAnchorElement>, ref) => (
             <a
-                className={clsx(_Link, forwardedClassName, className)}
+                className={clsx("Link", forwardedClassName, className)}
                 target="_blank"
                 ref={ref as MutableRefObject<HTMLAnchorElement>}
                 rel="noopener noreferrer"
@@ -49,10 +47,10 @@ export const Link = ({ className, href, label, noTooltip = false, ...props }: Li
     ) : (
         <Tooltip
             arrow
-            classes={{ arrow: `${_Link}-tooltip-arrow`, tooltip: `${_Link}-tooltip` }}
+            classes={{ arrow: "Link-tooltip-arrow", tooltip: "Link-tooltip" }}
             content={
                 <IconButton
-                    classes={{ root: `${_Link}-tooltip-button` }}
+                    classes={{ root: "Link-tooltip-button" }}
                     disabled={copied}
                     onClick={onCopyButtonClick}
                     size="small"

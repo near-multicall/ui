@@ -4,8 +4,6 @@ import { useField } from "formik";
 
 import "./text-field.scss";
 
-const _TextField = "TextField";
-
 export type TextFieldProps = Partial<MuiTextFieldProps> & {
     name: string;
     autocomplete?: string[];
@@ -30,8 +28,8 @@ export const TextField = ({
     return (
         <div
             className={clsx(
-                _TextField,
-                { [`${_TextField}--invertedColors`]: invertedColors, roundtop, roundbottom },
+                "TextField",
+                { ["TextField--invertedColors"]: invertedColors, roundtop, roundbottom },
                 className
             )}
         >
@@ -45,7 +43,7 @@ export const TextField = ({
                     renderInput={(params) => (
                         <MuiTextField
                             {...params}
-                            className={`${_TextField}-input`}
+                            className="TextField-input"
                             margin="dense"
                             size="small"
                             InputLabelProps={{ shrink: true }}
@@ -65,7 +63,7 @@ export const TextField = ({
                 />
             ) : (
                 <MuiTextField
-                    className={`${_TextField}-input`}
+                    className="TextField-input"
                     margin="dense"
                     size="small"
                     InputLabelProps={{ shrink: true }}
