@@ -5,7 +5,7 @@ import { JobNormalized } from "../lib/job-normalized";
 
 type JobAllEntries = {
     /** Jobs indexed by ID for easy access to each particular job */
-    data: Record<Job.DataWithStatus["id"], Job.DataWithStatus> | null;
+    data: Record<Job.Data["id"], Job.Data> | null;
     error?: Error | null;
     loading: boolean;
 };
@@ -22,7 +22,7 @@ export class JobModel {
                     data: data.reduce(
                         (jobsIndexedById, job) => ({
                             ...jobsIndexedById,
-                            [job.id]: JobNormalized.withMulticallsDataDecoded(JobNormalized.withStatus(job)),
+                            [job.id]: JobNormalized(job),
                         }),
                         {}
                     ),

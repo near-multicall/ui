@@ -7,28 +7,16 @@ export namespace Job {
     }
 
     export type Data = JobData;
-
-    export enum Status {
-        Inactive = "Inactive",
-        Expired = "Expired",
-        Active = "Active",
-        Running = "Running",
-        Unknown = "Unknown",
-    }
-
-    export type DataWithStatus = Omit<Data, "job"> & {
-        job: Data["job"] & { status: Status };
-    };
 }
 
 export class ModuleContext {
-    static readonly Status = Job.Status;
-
-    static StatusIcons = {
-        [Job.Status.Inactive]: "🟡",
-        [Job.Status.Expired]: "🔴",
-        [Job.Status.Active]: "🟢",
-        [Job.Status.Running]: "🟣",
-        [Job.Status.Unknown]: "❔",
+    static StatusIcons: Record<JobData["status"], string> = {
+        Inactive: "🟡",
+        Expired: "🔴",
+        Deleted: "🔴",
+        Active: "🟢",
+        Finished: "🟢",
+        Running: "🟣",
+        Unknown: "❔",
     };
 }
