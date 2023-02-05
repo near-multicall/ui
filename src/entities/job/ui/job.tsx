@@ -1,6 +1,4 @@
-import { Icon } from "@mui/material";
 import { NavLink } from "react-router-dom";
-
 import { Big, toTGas } from "../../../shared/lib/converter";
 import { DataInspector, IconLabel } from "../../../shared/ui/design";
 import { ModuleContext, Job } from "../context";
@@ -9,25 +7,21 @@ import "./job.scss";
 
 const _Job = "Job";
 
-const JobDisplayStatus = ({ job }: Pick<Job.DataWithStatus, "job">) => {
-    const statusTextByStatus = {
-        ...ModuleContext.Status,
-        [ModuleContext.Status.Running]: `${ModuleContext.Status.Running}: ${job.run_count + 1}/${
-            job.multicalls.length
-        }`,
-    };
+const JobDisplayStatus = ({ status, job }: Pick<Job.Data, "status" | "job">) => {
+    // If status is "Running" then add the job's run-counter.
+    const statusText = status === "Running" ? `${status}: ${job.run_count + 1}/${job.multicalls.length}` : status;
 
     return (
         <IconLabel
-            icon={ModuleContext.StatusIcons[job.status]}
-            label={statusTextByStatus[job.status]}
+            icon={ModuleContext.StatusIcons[status]}
+            label={statusText}
         />
     );
 };
 
-export const jobAsTableRow = ({ id, job }: Job.DataWithStatus) => ({
+export const jobAsTableRow = ({ id, status, job }: Job.Data) => ({
     content: [
-        <JobDisplayStatus {...{ job }} />,
+        <JobDisplayStatus {...{ status, job }} />,
         id,
         /** Multicall returns timestamp in nanoseconds, JS Date uses milliseconds */
         new Date(parseInt(Big(job.start_at).div("1000000").toFixed())).toLocaleString(),

@@ -1,27 +1,5 @@
 import { Base64 } from "js-base64";
-
-import { Big } from "../../../shared/lib/converter";
-import { ModuleContext, Job } from "../context";
-
-/**
- * Job status is:
- * - running: job is active, and was triggered at least once.
- * - active: job is active, but not triggered yet.
- * - Expired: job not active, and execution moment is in the past.
- * - Inactive: job not active, but execution moment in the future.
- */
-const jobToStatus = ({ job }: Job.Data): Job.Status => {
-    if (job.is_active) {
-        if (job.run_count > -1) return ModuleContext.Status.Running;
-        else return ModuleContext.Status.Active;
-    } else {
-        // Date.now() returns timestamp in milliseconds, we use nanoseconds
-        const currentTime = Big(Date.now()).times("1000000");
-        const jobTime = job.start_at;
-        if (currentTime.gt(jobTime)) return ModuleContext.Status.Expired;
-        else return ModuleContext.Status.Inactive;
-    }
-};
+import { Job } from "../context";
 
 /**
  * Decodes base64-encoded arguments of for every multicall's FunctionCall
@@ -29,8 +7,9 @@ const jobToStatus = ({ job }: Job.Data): Job.Status => {
  *
  * @returns Updated job data structure.
  */
-const jobToJobWithMulticallsDataDecoded = ({ id, job }: Job.Data): Job.Data => ({
+const jobToJobWithMulticallsDataDecoded = ({ id, status, job }: Job.Data): Job.Data => ({
     id,
+    status,
 
     job: {
         ...job,
@@ -53,20 +32,4 @@ const jobToJobWithMulticallsDataDecoded = ({ id, job }: Job.Data): Job.Data => (
     },
 });
 
-/**
- * Calculates the actual job status from the given data
- *	and adds it as an additional property to the new data structure.
- *
- * If a calculation error has ocurred, the `"Unknown"` status is being presented.
- *
- * @returns Extended job data structure.
- */
-const jobToJobWithStatus = (job: Job.Data): Job.DataWithStatus => ({
-    ...job,
-    job: { ...job.job, status: ModuleContext.Status[jobToStatus(job)] },
-});
-
-export const JobNormalized = {
-    withMulticallsDataDecoded: jobToJobWithMulticallsDataDecoded,
-    withStatus: jobToJobWithStatus,
-};
+export const JobNormalized = jobToJobWithMulticallsDataDecoded;

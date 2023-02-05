@@ -1,5 +1,6 @@
 import { Big, toGas, dateToCron, toYocto } from "../converter";
 import { AccountId, Base64String, U128String, U64String } from "../types";
+import { SputnikDAO } from "./sputnik-dao";
 import { viewAccount, viewState, view } from "../wallet";
 
 import type { FunctionCallAction as daoFunctionCallAction } from "./sputnik-dao";
@@ -22,9 +23,19 @@ const CONTRACT_CODE_HASHES_SELECTOR: Record<string, string[]> = {
 
 // Storage key of job count used by the contract
 const KEY_JOB_COUNT: string = "g";
-
+/**
+ * Job status is:
+ * - Inactive: This is the initial state
+ * - Active: job is active, but not triggered yet.
+ * - Running: job is active, and was triggered at least once.
+ * - Expired: job not active, and execution moment is in the past.
+ * - Finished: job finished running and was deleted (we have a mechanism similar to garbage collection)
+ * - Deleted: job was deleted without finishing execution
+ */
+type JobStatus = "Inactive" | "Active" | "Running" | "Finished" | "Deleted" | "Expired" | "Unknown";
 type JobData = {
     id: number;
+    status: JobStatus;
 
     /**
      * Job properties
@@ -42,6 +53,8 @@ type JobData = {
         multicalls: MulticallArgs[];
     };
 };
+
+type JobDataNoStatus = Omit<JobData, "status">;
 
 type FunctionCall = {
     func: string;
@@ -239,10 +252,68 @@ class Multicall {
     }
 
     /**
+     * fetch jobs from our indexer API. Supports pagination.
+     * @param start
+     * @param end
+     * @returns
+     */
+    async apiGetJobs(start: number = 0, end: number = 1_000_000): Promise<JobDataNoStatus[]> {
+        const daoAddr = this.address.replace(Multicall.FACTORY_ADDRESS, SputnikDAO.FACTORY_ADDRESS);
+        switch (window.NEAR_ENV) {
+            case "mainnet":
+                return (await fetch(`https://api.multicall.app/jobs/${daoAddr}?start=${start}&end=${end}`)).json();
+            case "testnet":
+                // we don't run a Testnet indexer now, so we just fetch on-chain jobs
+                return view(this.address, "get_jobs", {});
+            default:
+                return [];
+        }
+    }
+
+    /**
      * list all currently registered jobs
      */
     async getJobs(): Promise<JobData[]> {
-        return view(this.address, "get_jobs", {});
+        const [chainData, apiData]: [JobDataNoStatus[], JobDataNoStatus[]] = await Promise.all([
+            view(this.address, "get_jobs", {}),
+            this.apiGetJobs(),
+        ]);
+
+        // Map is better for testing membership.
+        const chainJobs = new Map(chainData.map((i) => [i.id, i]));
+
+        // API has all jobs, but we prioritize job objects from the chain, just in case.
+        const result: JobData[] = apiData.map(({ id, job }) => {
+            if (chainJobs.has(id)) {
+                const { job: jobInfo } = chainJobs.get(id)!;
+                // assign a status to the job
+                let status: JobStatus;
+                if (jobInfo.is_active) {
+                    if (jobInfo.run_count > -1) status = "Running";
+                    else status = "Active";
+                } else {
+                    // Date.now() returns timestamp in milliseconds, we use nanoseconds
+                    const currentTime = Big(Date.now()).times("1000000");
+                    const jobTime = jobInfo.start_at;
+                    if (currentTime.gt(jobTime)) status = "Expired";
+                    else status = "Inactive";
+                }
+                return {
+                    id,
+                    status,
+                    job: jobInfo,
+                };
+            } else {
+                // assign a status to the job
+                const status = job.is_active ? "Finished" : "Deleted";
+                return {
+                    id,
+                    status,
+                    job,
+                };
+            }
+        });
+        return result;
     }
 
     /**
