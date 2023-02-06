@@ -176,7 +176,6 @@ export class BuyNft extends BaseTask<FormData, Props, State> {
             depo: arx.big().intoFormatted(depoUnit).cast(cheapest.price).toFixed(),
             addr: cheapest.market_id,
         });
-        window.EDITOR.forceUpdate();
         return true;
     }
 

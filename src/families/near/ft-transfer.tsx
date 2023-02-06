@@ -198,7 +198,6 @@ export class FtTransfer extends BaseTask<FormData, Props, State> {
             token: newToken,
             needsSd: !!storageBalance && Big(storageBalance.total).lt(newToken.storageBounds.min),
         });
-        window.EDITOR.forceUpdate();
         return newToken.ready;
     }
 

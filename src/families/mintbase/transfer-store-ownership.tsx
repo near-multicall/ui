@@ -143,7 +143,6 @@ export class TransferStoreOwnership extends BaseTask<FormData, Props, State> {
         const { addr } = this.state.formData;
         const [store, storeInfo] = await Promise.all([MintbaseStore.init(addr), new MintbaseStore(addr).getInfo()]);
         this.setState({ mintbaseStore: store, mintbaseStoreInfo: storeInfo });
-        window.EDITOR.forceUpdate();
         return store.ready;
     }
 

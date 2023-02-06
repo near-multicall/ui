@@ -122,7 +122,6 @@ export class Transfer extends BaseTask<FormData> {
 
     protected override onAddressesUpdated(e: CustomEvent<{ multicall: string }>): void {
         this.setFormData({ addr: e.detail.multicall });
-        window.EDITOR.forceUpdate();
         this.forceUpdate();
     }
 

@@ -225,7 +225,6 @@ export class CreateToken extends BaseTask<FormData, Props, State> {
         } catch (e) {
             this.setFormData({ depo: "0" });
         }
-        window.EDITOR.forceUpdate();
         return true;
     }
 
@@ -243,7 +242,6 @@ export class CreateToken extends BaseTask<FormData, Props, State> {
 
     protected override onAddressesUpdated(e: CustomEvent<{ multicall: string }>): void {
         this.setFormData({ ownerId: e.detail.multicall });
-        window.EDITOR.forceUpdate();
         this.forceUpdate();
     }
 

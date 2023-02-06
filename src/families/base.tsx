@@ -140,7 +140,6 @@ export abstract class BaseTask<
 
     public updateCard() {
         this.forceUpdate();
-        window.EDITOR?.forceUpdate();
     }
 
     public async validateForm(values: TFormData): Promise<FormikErrors<TFormData>> {
@@ -205,7 +204,6 @@ export abstract class BaseTask<
                             className="edit icon"
                             onClick={() => {
                                 window.EDITOR.edit(id);
-                                window.EDITOR.forceUpdate();
                                 window.MENU.activeTabSwitch(1);
                             }}
                         />

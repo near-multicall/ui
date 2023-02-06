@@ -104,7 +104,6 @@ export class NslpAddLiquidity extends BaseTask<FormData, Props, State> {
         const { addr } = this.state.formData;
         const metaPoolAccountInfo = await new MetaPool(addr).getAccountInfo(STORAGE.addresses.multicall);
         this.setState({ metaPoolAccountInfo: metaPoolAccountInfo ?? null });
-        window.EDITOR.forceUpdate();
         return !!metaPoolAccountInfo;
     }
 

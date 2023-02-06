@@ -159,7 +159,6 @@ export class Unstake extends BaseTask<FormData, Props, State> {
             new StakingPool(addr).getAccount(STORAGE.addresses.multicall),
         ]);
         this.setState({ pool: stakingPool, stakeInfo: multicallStakeInfo });
-        window.EDITOR.forceUpdate();
         return stakingPool.ready;
     }
 

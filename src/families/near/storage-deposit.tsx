@@ -193,7 +193,6 @@ export class StorageDeposit extends BaseTask<FormData, Props, State> {
             storageManagement.storageBalanceBounds(),
         ]);
         this.setState({ storageManagement, storageBalance, storageBalanceBounds });
-        window.EDITOR.forceUpdate();
         return true;
     }
 
