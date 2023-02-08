@@ -177,7 +177,6 @@ export class NftTransferCall extends BaseTask<FormData, Props, State> {
         const { addr, tokenId } = this.state.formData;
         const newToken = await NonFungibleToken.init(addr, tokenId);
         this.setState({ nft: newToken });
-        window.EDITOR.forceUpdate();
         return newToken.ready;
     }
 

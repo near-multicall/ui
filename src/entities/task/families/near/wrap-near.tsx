@@ -127,7 +127,6 @@ export class WrapNear extends BaseTask<FormData, Props, State> {
             // P.S.: wNEAR has min=max for storage bounds
             neededStorage: Big(bounds.min).minus(balance.total).toFixed(),
         });
-        window.EDITOR.forceUpdate();
         return true;
     }
 

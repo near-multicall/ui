@@ -158,7 +158,6 @@ export class MftTransfer extends BaseTask<FormData, Props, State> {
         const { addr, tokenId } = this.state.formData;
         const newToken = await MultiFungibleToken.init(addr, tokenId);
         this.setState({ token: newToken });
-        window.EDITOR.forceUpdate();
         return newToken.ready;
     }
 

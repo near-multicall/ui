@@ -168,7 +168,6 @@ export class StorageWithdraw extends BaseTask<FormData, Props, State> {
         const storageManagement = new StorageManagement(addr);
         const storageBalance = await storageManagement.storageBalanceOf(STORAGE.addresses.multicall);
         this.setState({ storageManagement, storageBalance });
-        window.EDITOR.forceUpdate();
         return true;
     }
 

@@ -8,29 +8,33 @@ import { JobModel } from "./job.model";
 import { IJobService, JobService } from "./job.service";
 import "./job.ui.scss";
 
-const JobStatusIcons: Record<JobModel["job"]["status"], string> = {
-    inactive: "🟡",
-    expired: "🔴",
-    active: "🟢",
-    running: "🟣",
-    unknown: "❔",
+const jobStatusIcons: Record<JobModel["status"], string> = {
+    Inactive: "🟡",
+    Expired: "🔴",
+    Deleted: "🔴",
+    Active: "🟢",
+    Finished: "🟢",
+    Running: "🟣",
+    Unknown: "❔",
 };
 
-const JobDisplayStatus = ({ job }: Pick<JobModel, "job">) => {
-    const statusToLabel = (status: JobModel["job"]["status"]): JobModel["job"]["status"] | string =>
-        status === "running" ? `Running: ${job.run_count + 1}/${job.multicalls.length}` : status;
+const JobDisplayStatus = ({ status, job }: Pick<JobModel, "status" | "job">) => {
+    /*
+     * If status is "Running" we show the job's run-counter.
+     */
+    const statusText = status === "Running" ? `${status}: ${job.run_count + 1}/${job.multicalls.length}` : status;
 
     return (
         <IconLabel
-            icon={JobStatusIcons[job.status]}
-            label={statusToLabel(job.status).charAt(0).toUpperCase() + statusToLabel(job.status).slice(1)}
+            icon={jobStatusIcons[status]}
+            label={statusText}
         />
     );
 };
 
-export const jobAsTableRow = ({ id, job }: JobModel) => ({
+export const jobAsTableRow = ({ id, status, job }: JobModel) => ({
     content: [
-        <JobDisplayStatus {...{ job }} />,
+        <JobDisplayStatus {...{ status, job }} />,
         id,
         /** Multicall returns timestamp in nanoseconds, JS Date uses milliseconds */
         new Date(parseInt(Big(job.start_at).div("1000000").toFixed())).toLocaleString(),
@@ -48,7 +52,7 @@ export const jobAsTableRow = ({ id, job }: JobModel) => ({
             {job.multicalls.length === 1 && (
                 <NavLink
                     to="/app"
-                    className="Job-action"
+                    className={"Job-action"}
                     onClick={() => setTimeout(() => window.LAYOUT.fromJSON(job.multicalls[0].calls), 0)}
                 >
                     Open in Editor
@@ -56,7 +60,7 @@ export const jobAsTableRow = ({ id, job }: JobModel) => ({
             )}
 
             <button
-                className="Job-action"
+                className={"Job-action"}
                 onClick={(e: React.MouseEvent) => {
                     navigator.clipboard.writeText(JSON.stringify(job.multicalls, null, 2));
                     const target = e.target as HTMLElement;
@@ -78,28 +82,29 @@ export const jobAsTableRow = ({ id, job }: JobModel) => ({
     id: id.toString(),
 });
 
-export interface JobEntriesTableProps extends IJobService {
+interface IJobEntriesTable extends IJobService {
     className?: string;
 }
 
-export const JobEntriesTable = ({ className, ...modelInputs }: JobEntriesTableProps) => {
-    const { data, error, loading } = JobService.useAllEntriesState(modelInputs),
-        items = Object.values(data ?? {});
+export const JobEntriesTable = ({ className, ...jobServiceInputs }: IJobEntriesTable) => {
+    const { data, error, loading } = JobService.useAllEntriesState(jobServiceInputs);
 
     return (
         <Tile
-            classes={{ root: clsx("JobEntriesTable", className) }}
+            classes={{ root: clsx("JobsTable", className) }}
             heading="All jobs"
-            noData={data !== null && items.length === 0}
+            noData={data !== null && Object.values(data).length === 0}
             {...{ error, loading }}
         >
             <Scrollable>
                 <Table
                     RowProps={{ withTitle: true }}
-                    className="JobEntriesTable-body"
+                    className="JobsTable-body"
                     displayMode="compact"
                     header={["Status", "ID", "Start at", "Croncat hash", "Creator", "Trigger gas", "Multicalls"]}
-                    rows={items.map(jobAsTableRow).reverse()}
+                    rows={Object.values(data ?? {})
+                        .map(jobAsTableRow)
+                        .reverse()}
                 />
             </Scrollable>
         </Tile>

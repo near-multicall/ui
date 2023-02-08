@@ -23,7 +23,7 @@ export class JobService {
                         data: data.reduce(
                             (jobsIndexedById, job) => ({
                                 ...jobsIndexedById,
-                                [job.id]: JobLib.toDecoded(JobLib.toNormalized(job)),
+                                [job.id]: JobLib.toDecoded(job),
                             }),
                             {}
                         ),

@@ -1,10 +1,6 @@
 import { JobData } from "../../shared/lib/contracts/multicall";
 
-export type JobModel = Omit<JobData, "job"> & {
-    job: JobData["job"] & {
-        status: "inactive" | "expired" | "active" | "running" | "unknown";
-    };
-};
+export type JobModel = JobData;
 
 export const JobsSchema: {
     /**

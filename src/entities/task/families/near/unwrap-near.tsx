@@ -133,7 +133,6 @@ export class UnwrapNear extends BaseTask<FormData, Props, State> {
             wNear.ftBalanceOf(STORAGE.addresses.dao),
         ]);
         this.setState({ multicallBalance, daoBalance });
-        window.EDITOR.forceUpdate();
         return true;
     }
 

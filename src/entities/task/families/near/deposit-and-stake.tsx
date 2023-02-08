@@ -116,7 +116,6 @@ export class DepositAndStake extends BaseTask<FormData, Props, State> {
         const { addr } = this.state.formData;
         const stakingPool = await StakingPool.init(addr);
         this.setState({ pool: stakingPool });
-        window.EDITOR.forceUpdate();
         return stakingPool.ready;
     }
 

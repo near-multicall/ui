@@ -144,7 +144,6 @@ export class AddMinter extends BaseTask<FormData, Props, State> {
             new MintbaseStore(addr).listMinters(),
         ]);
         this.setState({ minters, mintbaseStore: store, mintbaseStoreInfo: storeInfo });
-        window.EDITOR.forceUpdate();
         return store.ready;
     }
 
