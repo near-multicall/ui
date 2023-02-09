@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { MouseEvent } from "react";
 import { NavLink } from "react-router-dom";
 
 import { Big, toTGas } from "../../shared/lib/converter";
@@ -42,41 +43,48 @@ export const jobAsTableRow = ({ id, status, job }: JobModel) => ({
         job.creator,
         `${toTGas(job.trigger_gas)} Tgas`,
 
-        <>
-            <DataInspector
-                classes={{ label: "Job-dataInspector-label" }}
-                data={job.multicalls}
-                expandLevel={5}
-            />
-
-            {job.multicalls.length === 1 && (
-                <NavLink
-                    to="/app"
-                    className={"Job-action"}
-                    onClick={() => setTimeout(() => window.LAYOUT.fromJSON(job.multicalls[0].calls), 0)}
-                >
-                    Open in Editor
-                </NavLink>
-            )}
-
+        <div className="Job-multicalls">
             <button
                 className={"Job-action"}
-                onClick={(e: React.MouseEvent) => {
+                onClick={(e: MouseEvent) => {
                     navigator.clipboard.writeText(JSON.stringify(job.multicalls, null, 2));
                     const target = e.target as HTMLElement;
+
                     if (target.innerHTML === "Copied!") return;
 
                     const oldIcon = target.innerHTML;
                     target.innerHTML = "Copied!";
-
-                    setTimeout(() => {
-                        target.innerHTML = oldIcon;
-                    }, 1000);
+                    setTimeout(() => (target.innerHTML = oldIcon), 1000);
                 }}
             >
-                Copy
+                Copy all
             </button>
-        </>,
+
+            <div className="Job-multicalls-inspector">
+                {job.multicalls.map((multicall, idx) => (
+                    <div
+                        className="Job-multicalls-item"
+                        key={`multicall-${idx}`}
+                    >
+                        <span className="Job-multicalls-item-label">#{idx}</span>
+
+                        <DataInspector
+                            classes={{ label: "Job-dataInspector-label" }}
+                            data={multicall}
+                            expandLevel={5}
+                        />
+
+                        <NavLink
+                            to="/app"
+                            className="Job-action"
+                            onClick={() => setTimeout(() => window.LAYOUT.fromJSON(multicall.calls), 0)}
+                        >
+                            Open in Editor
+                        </NavLink>
+                    </div>
+                ))}
+            </div>
+        </div>,
     ],
 
     id: id.toString(),
@@ -91,7 +99,7 @@ export const JobEntriesTable = ({ className, ...jobServiceInputs }: IJobEntriesT
 
     return (
         <Tile
-            classes={{ root: clsx("JobsTable", className) }}
+            classes={{ root: clsx("JobEntriesTable", className) }}
             heading="All jobs"
             noData={data !== null && Object.values(data).length === 0}
             {...{ error, loading }}
@@ -99,7 +107,7 @@ export const JobEntriesTable = ({ className, ...jobServiceInputs }: IJobEntriesT
             <Scrollable>
                 <Table
                     RowProps={{ withTitle: true }}
-                    className="JobsTable-body"
+                    className="JobEntriesTable-body"
                     displayMode="compact"
                     header={["Status", "ID", "Start at", "Croncat hash", "Creator", "Trigger gas", "Multicalls"]}
                     rows={Object.values(data ?? {})
