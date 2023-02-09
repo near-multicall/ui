@@ -514,7 +514,7 @@ export class DaoPage extends Component<Props, State> {
                 items={[
                     DaoSettingsTab.uiConnect({ className: `${_DaoPage}-content`, adapters: { dao, multicall } }),
                     DaoFundsTab.uiConnect({ className: `${_DaoPage}-content`, adapters: { dao, multicall } }),
-                    DaoJobsTab.uiConnect({ className: `${_DaoPage}-content`, adapters: { multicall } }),
+                    DaoJobsTab.uiConnect({ className: `${_DaoPage}-content`, multicallInstance: multicall }),
                 ]}
             />
         );
