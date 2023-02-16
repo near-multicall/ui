@@ -163,12 +163,13 @@ export class Export extends Component<Props, State> {
     private tryUpdateFt(): Promise<boolean> {
         const multicall = window.WALLET_COMPONENT.state.currentMulticall;
         return new Promise<boolean>((resolve) => {
-            this.schema
+            const clone = this.schema.clone().retainAll();
+            clone
                 .check(this.state.formData, {
                     context: { tokensWhitelist: multicall.ready ? multicall.tokensWhitelist : null },
                 })
                 .then(() => {
-                    const { tokenAddress } = fields(this.schema);
+                    const { tokenAddress } = fields(clone);
                     if (!tokenAddress.isBad()) {
                         this.confidentlyUpdateFt().then((ready) => resolve(ready));
                     } else {
