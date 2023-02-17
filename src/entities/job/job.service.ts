@@ -20,7 +20,16 @@ export class JobService {
                 await multicallInstance
                     .getJobs()
                     .then((data) => ({
-                        data: data.reduce((jobs, job) => ({ ...jobs, [job.id]: JobLib.toDecoded(job) }), {}),
+                        data: data.reduce(
+                            (jobs, job) => ({
+                                ...jobs,
+                                [job.id]: {
+                                    raw: job,
+                                    normalized: JobLib.toDecoded(job),
+                                },
+                            }),
+                            {}
+                        ),
                         error: null,
                         loading: false,
                     }))

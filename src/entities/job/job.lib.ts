@@ -1,6 +1,5 @@
 import { Base64 } from "js-base64";
-
-import { JobModel } from "./job.model";
+import { JobData } from "./job.model";
 
 export class JobLib {
     /**
@@ -9,7 +8,7 @@ export class JobLib {
      *
      * @returns Updated job data structure.
      */
-    public static readonly toDecoded = ({ id, status, job }: JobModel): JobModel => ({
+    public static readonly toDecoded = ({ id, status, job }: JobData): JobData => ({
         id,
         status,
 
