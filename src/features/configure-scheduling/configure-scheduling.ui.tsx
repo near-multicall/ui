@@ -26,7 +26,7 @@ export const ConfigureSchedulingUI = ({ disabled, onEdit, resetTrigger }: Config
         mi = useContext(MI.Context);
 
     const schema = args.object().shape({
-        jobBond: args.string().default(() => (mi.loading ? MI.minJobBondNEAR.toString() : toNEAR(mi.data.jobBond))),
+        jobBond: args.string().default(() => (mi.loading ? MI.minJobBondNEAR : toNEAR(mi.data.jobBond))),
     });
 
     type Schema = InferType<typeof schema>;
@@ -92,15 +92,11 @@ export const ConfigureSchedulingUI = ({ disabled, onEdit, resetTrigger }: Config
 
                                 content: [
                                     <TextField
-                                        InputProps={{
-                                            endAdornment: NEARIcon.NativeTokenCharacter,
-                                            inputProps: { min: MI.minJobBondNEAR, step: 0.001 },
-                                        }}
+                                        InputProps={{ endAdornment: NEARIcon.NativeTokenCharacter }}
                                         disabled={!editModeEnabled}
                                         fullWidth
                                         invertedColors
                                         name="jobBond"
-                                        type="number"
                                     />,
                                 ],
                             },
