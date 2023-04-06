@@ -1,0 +1,85 @@
+@use "sass/color";
+@use "sass/font";
+@use "sass/mixin";
+@use "sass/size";
+
+.Job {
+    &-action {
+        align-self: flex-end;
+        border: 2px solid color.$blue;
+        border-radius: size.$task-radius;
+        padding: 0 1em;
+        width: fit-content;
+        background-color: rgba(color.$blue, 0.2);
+        color: darken(color.$blue, 30%) !important;
+        font-size: size.$text;
+        font-weight: 800;
+
+        &:hover {
+            background-color: color.$blue;
+        }
+    }
+
+    &-dataInspector {
+        &-label {
+            width: fit-content;
+            margin-left: auto;
+        }
+    }
+
+    &-multicalls {
+        display: flex;
+        flex-flow: column nowrap;
+        gap: size.$gap * 0.5;
+
+        &-inspector {
+            display: flex;
+            flex-flow: row wrap;
+            justify-content: space-evenly;
+            gap: size.$gap * 0.5;
+        }
+
+        &-item {
+            display: flex;
+            flex-flow: column nowrap;
+            gap: size.$gap * 0.5;
+            border: 2px solid color.$white;
+            border-radius: size.$task-radius;
+            padding: size.$gap * 0.5;
+            min-width: 264px;
+            height: fit-content;
+
+            &-label {
+                position: absolute;
+            }
+        }
+    }
+}
+
+.JobEntriesTable {
+    grid-area: JobEntriesTable;
+
+    &-body {
+        .TableRow-content--compact {
+            &:not(&:first-of-type) {
+                span:last-of-type {
+                    font-family: font.$code;
+                }
+            }
+
+            &:last-of-type {
+                align-items: flex-start;
+
+                & > span {
+                    &:first-of-type {
+                        position: absolute;
+                    }
+
+                    &:last-of-type {
+                        width: 100%;
+                    }
+                }
+            }
+        }
+    }
+}

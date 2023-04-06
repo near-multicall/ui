@@ -1,8 +1,5 @@
-import { ModuleContext, Job as JobModule } from "./context";
-import { JobsTable } from "./ui/jobs-table";
+import { JobEntriesTable } from "./job.ui";
 
-export { type JobModule };
-
-export class Job extends ModuleContext {
-    static EntriesTable = JobsTable;
+export class Job {
+    static EntriesTable = JobEntriesTable;
 }
