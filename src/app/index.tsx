@@ -32,9 +32,7 @@ createRoot(appMountPoint).render(
                     element={
                         <>
                             <Sidebar full={true} />
-                            <Suspense fallback={<div>Loading...</div>}>
-                                <AppPage />
-                            </Suspense>
+                            <AppPage />
                             <DialogsLayer />
                         </>
                     }
@@ -45,9 +43,11 @@ createRoot(appMountPoint).render(
                     element={
                         <>
                             <Sidebar full={true} />
+
                             <Suspense fallback={<div>Loading...</div>}>
                                 <DAOPage />
                             </Suspense>
+
                             <DialogsLayer />
                         </>
                     }
