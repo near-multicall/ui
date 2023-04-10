@@ -187,7 +187,11 @@ export class WorkspaceExport extends Component<Props, State> {
 
     renderProposeButton(multicallArgs: MulticallArgs) {
         const { selector: walletSelector } = this.context!;
-        const wallet = window.WALLET_COMPONENT;
+
+        window.WALLET_COMPONENT.schema.check({
+            dao: STORAGE.addresses.dao,
+            user: this.context?.accountId ?? "",
+        });
 
         // if user not logged in, button will do login.
         if (!walletSelector.isSignedIn()) {
@@ -201,13 +205,13 @@ export class WorkspaceExport extends Component<Props, State> {
             );
         }
         // if specified DAO not have a multicall instance, button will re-direct to DAO page so they can get an instance.
-        else if (fields(wallet.schema, "dao").noMulticall.isBad()) {
+        else if (fields(window.WALLET_COMPONENT.schema, "dao").noMulticall.isBad()) {
             return (
                 <button
                     className="WorkspaceExport-action WorkspaceExport-action--propose"
                     disabled
                 >
-                    {wallet.schema.message()}. <Link to="/dao">Get one now!</Link>
+                    {window.WALLET_COMPONENT.schema.message()}. <Link to="/dao">Get one now!</Link>
                 </button>
             );
         }
@@ -227,7 +231,7 @@ export class WorkspaceExport extends Component<Props, State> {
             } = this.state.formData;
             const schema = fields(this.schema);
             const isProposeDisabled =
-                wallet.schema.isBad() ||
+                window.WALLET_COMPONENT.schema.isBad() ||
                 schema.depo.isBad() ||
                 schema.description.isBad() ||
                 schema.hasErrors.isBad() ||
@@ -317,7 +321,7 @@ export class WorkspaceExport extends Component<Props, State> {
                     }}
                 >
                     {`Propose on ${STORAGE.addresses.dao}`}
-                    {wallet.schema.isBad() ? <p>{wallet.schema.message()}</p> : <></>}
+                    {window.WALLET_COMPONENT.schema.isBad() ? <p>{window.WALLET_COMPONENT.schema.message()}</p> : <></>}
                 </button>
             );
         }
