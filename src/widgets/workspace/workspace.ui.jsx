@@ -53,7 +53,7 @@ export class Workspace extends Component {
 
     deleteTask = (taskId) => {
         const layout = STORAGE.layout;
-        const { columnId, taskIndex } = AppPageUI.findTaskCoordinates(taskId);
+        const { columnId, taskIndex } = Workspace.findTaskCoordinates(taskId);
 
         if (columnId == undefined || taskIndex == undefined) {
             console.error("Task not found");
@@ -81,7 +81,7 @@ export class Workspace extends Component {
 
     duplicateTask = (taskId) => {
         const layout = STORAGE.layout;
-        const { columnId, taskIndex } = AppPageUI.findTaskCoordinates(taskId);
+        const { columnId, taskIndex } = Workspace.findTaskCoordinates(taskId);
 
         if (columnId == undefined || taskIndex == undefined) {
             console.error("Task not found");
