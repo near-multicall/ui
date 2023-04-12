@@ -1,1 +1,3 @@
-export { AppPage } from "./app-page.ui";
+import { lazy } from "react";
+
+export const AppPage = lazy(() => import("./app-page.ui"));

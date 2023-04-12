@@ -1,7 +1,12 @@
+import React from "react";
 import { Workspace } from "../../widgets";
 
-export const AppPage = () => (
-    <>
-        <Workspace />
-    </>
-);
+export default class AppPage extends React.Component {
+    render() {
+        return (
+            <>
+                <Workspace />
+            </>
+        );
+    }
+}
