@@ -1,0 +1,9 @@
+.ManageTokenWhitelist {
+    grid-area: ManageTokenWhitelist;
+    display: flex;
+    flex-flow: column;
+
+    &-controls {
+        flex: auto;
+    }
+}

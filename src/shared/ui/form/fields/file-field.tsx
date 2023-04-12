@@ -3,8 +3,6 @@ import { useField } from "formik";
 import { TextField as MuiTextField, TextFieldProps as MuiTextFieldProps } from "@mui/material";
 import "./file-field.scss";
 
-const _FileField = "FileField";
-
 type FileFieldProps = MuiTextFieldProps & {
     name: string;
     roundtop?: boolean;
@@ -27,17 +25,17 @@ export const FileField = ({
     return (
         <div
             className={clsx(
-                _FileField,
+                "FileField",
                 {
-                    roundtop: roundtop,
-                    roundbottom: roundbottom,
+                    roundtop,
+                    roundbottom,
                 },
                 className
             )}
         >
             <MuiTextField
                 type="file"
-                className={`${_FileField}-input`}
+                className="FileField-input"
                 margin="dense"
                 size="small"
                 InputLabelProps={{ shrink: true }}

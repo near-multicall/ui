@@ -1,13 +1,13 @@
 import { Autocomplete, TextField as MuiTextField, TextFieldProps as MuiTextFieldProps } from "@mui/material";
 import clsx from "clsx";
 import { useField } from "formik";
-import "./text-field.scss";
 
-const _TextField = "TextField";
+import "./text-field.scss";
 
 export type TextFieldProps = Partial<MuiTextFieldProps> & {
     name: string;
     autocomplete?: string[];
+    invertedColors?: boolean;
     roundtop?: boolean;
     roundbottom?: boolean;
     className?: string;
@@ -16,6 +16,7 @@ export type TextFieldProps = Partial<MuiTextFieldProps> & {
 export const TextField = ({
     name,
     autocomplete,
+    invertedColors = false,
     roundtop,
     roundbottom,
     className,
@@ -23,14 +24,12 @@ export const TextField = ({
     ...props
 }: TextFieldProps) => {
     const [field, meta, helper] = useField(name);
+
     return (
         <div
             className={clsx(
-                _TextField,
-                {
-                    roundtop: roundtop,
-                    roundbottom: roundbottom,
-                },
+                "TextField",
+                { ["TextField--invertedColors"]: invertedColors, roundtop, roundbottom },
                 className
             )}
         >
@@ -40,13 +39,11 @@ export const TextField = ({
                     freeSolo
                     fullWidth
                     inputValue={field.value}
-                    onInputChange={(e, value) => {
-                        helper.setValue(value);
-                    }}
+                    onInputChange={(_event, value) => void helper.setValue(value)}
                     renderInput={(params) => (
                         <MuiTextField
                             {...params}
-                            className={`${_TextField}-input`}
+                            className="TextField-input"
                             margin="dense"
                             size="small"
                             InputLabelProps={{ shrink: true }}
@@ -66,7 +63,7 @@ export const TextField = ({
                 />
             ) : (
                 <MuiTextField
-                    className={`${_TextField}-input`}
+                    className="TextField-input"
                     margin="dense"
                     size="small"
                     InputLabelProps={{ shrink: true }}

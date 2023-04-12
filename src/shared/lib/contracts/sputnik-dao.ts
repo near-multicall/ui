@@ -1,16 +1,16 @@
 // TODO: use token functions in proposeMulticallFT
 
-import { view, viewAccount } from "../wallet";
+import { Base64 } from "js-base64";
+
+import { args } from "../args/args";
 import { toGas, Big } from "../converter";
 import { STORAGE } from "../persistent";
-import { Base64 } from "js-base64";
 import { FungibleToken } from "../standards/fungibleToken";
+import { Tx, view, viewAccount } from "../wallet";
 
-import type { MulticallArgs } from "./multicall";
-import type { Tx } from "../wallet";
-import { args } from "../args/args";
+import { MulticallArgs } from "./multicall";
 
-const FACTORY_ADDRESS_SELECTOR: Record<string, string> = {
+const FACTORY_ADDRESS_SELECTOR: Record<string, AccountId> = {
     mainnet: "sputnik-dao.near",
     testnet: "sputnikv2.testnet",
 };
@@ -52,7 +52,7 @@ type AstroApiDaoInfo = {
     numberOfMembers: number;
     numberOfGroups: number;
     council: string[];
-    accountIds: string[];
+    accountIds: AccountId[];
     status: string;
     activeProposalCount: number;
     totalProposalCount: number;
@@ -118,7 +118,7 @@ type ProposalAction =
 // Define structure of a proposal
 type Proposal = {
     // Original proposer.
-    proposer: string;
+    proposer: AccountId;
     // Description of this proposal.
     description: string;
     // Kind of proposal with relevant information.
@@ -185,12 +185,12 @@ type FunctionCallAction = {
 };
 
 class SputnikDAO {
-    static FACTORY_ADDRESS: string = FACTORY_ADDRESS_SELECTOR[window.NEAR_ENV];
+    static FACTORY_ADDRESS: AccountId = FACTORY_ADDRESS_SELECTOR[window.NEAR_ENV];
     static REFERENCE_UI_BASE_URL: string = REFERENCE_UI_URL_SELECTOR[window.NEAR_ENV];
     static ASTRO_UI_BASE_URL: string = ASTRO_UI_URL_SELECTOR[window.NEAR_ENV];
     static CONTRACT_CODE_HASHES: string[] = CONTRACT_CODE_HASHES_SELECTOR[window.NEAR_ENV];
 
-    address: string;
+    address: AccountId;
     // needs initialization, but start with an empty policy
     policy: Policy = {
         roles: [],
@@ -206,17 +206,17 @@ class SputnikDAO {
     ready: boolean = false;
 
     // shouldn't be used directly, use init() instead
-    constructor(daoAddress: string) {
-        this.address = daoAddress;
+    constructor(accountId: AccountId) {
+        this.address = accountId;
     }
 
     // create and initialize a DAO instance
-    static async init(daoAddress: string): Promise<SputnikDAO> {
+    static async init(accountId: AccountId): Promise<SputnikDAO> {
         // verify address is a SputnikDAO, fetch DAO info and mark it ready
-        const newDAO = new SputnikDAO(daoAddress);
+        const newDAO = new SputnikDAO(accountId);
         const [isDAO, daoPolicy, daoLastProposalId] = await Promise.all([
             // on failure set isDAO to false
-            SputnikDAO.isSputnikDAO(daoAddress).catch((err) => {
+            SputnikDAO.isSputnikDAO(accountId).catch((err) => {
                 return false;
             }),
             // on failure set policy to default policy (empty)
@@ -243,13 +243,13 @@ class SputnikDAO {
      *
      * @param accountId
      */
-    static async isSputnikDAO(accountId: string): Promise<boolean> {
+    static async isSputnikDAO(accountId: AccountId): Promise<boolean> {
         const accountInfo = await viewAccount(accountId);
         const codeHash: string = accountInfo.code_hash;
         return SputnikDAO.CONTRACT_CODE_HASHES.includes(codeHash);
     }
 
-    static async getUserDaosInfo(accountId: string): Promise<AstroApiDaoInfo[]> {
+    static async getUserDaosInfo(accountId: AccountId): Promise<AstroApiDaoInfo[]> {
         const apiURL = `https://api.${
             window.NEAR_ENV === "mainnet" ? "" : "testnet."
         }app.astrodao.com/api/v1/daos/account-daos/${accountId}`;
@@ -419,7 +419,7 @@ class SputnikDAO {
     static isProposalURLValid = (urlString: string): boolean => Boolean(SputnikDAO.getInfoFromProposalUrl(urlString));
 
     // check if user can perform some action on some proposal kind
-    checkUserPermission(userAddr: string, givenAction: ProposalAction, givenProposalKind: ProposalKind): boolean {
+    checkUserPermission(userAddr: AccountId, givenAction: ProposalAction, givenProposalKind: ProposalKind): boolean {
         if (this.ready === false) return false;
 
         // get all the user's permissions on the chosen proposal kind
@@ -440,7 +440,7 @@ class SputnikDAO {
     }
 
     // propose a generic function call to DAO.
-    async proposeFunctionCall(desc: string, pTarget: string, pActions: FunctionCallAction[]): Promise<Tx> {
+    async proposeFunctionCall(desc: string, pTarget: AccountId, pActions: FunctionCallAction[]): Promise<Tx> {
         const proposalArgs = {
             proposal: {
                 description: desc,

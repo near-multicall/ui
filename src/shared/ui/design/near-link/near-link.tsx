@@ -1,26 +1,18 @@
-import { Account } from "@near-wallet-selector/core";
-
-import { ArgsAccount } from "../../../lib/args-old";
+import { args } from "../../../lib/args/args";
 import { Link, LinkProps } from "../link";
 
 import "./near-link.scss";
 
-export interface NearLinkProps extends Omit<LinkProps, "href"> {
-    address: Account["accountId"];
+export interface NEARLinkProps extends Omit<LinkProps, "href"> {
+    address: AccountId;
 }
 
-const _NearLink = "NearLink";
-
-export const NearLink = ({ address }: NearLinkProps) => {
-    const addr = new ArgsAccount(address);
-
-    return (
-        <Link
-            className={_NearLink}
-            href={addr.toUrl()}
-            label={addr.value}
-            rel="noopener noreferrer"
-            target="_blank"
-        />
-    );
-};
+export const NEARLink = ({ address }: NEARLinkProps) => (
+    <Link
+        className="NEARLink"
+        href={args.string().address().intoUrl().cast(address) ?? "#"}
+        label={address}
+        rel="noopener noreferrer"
+        target="_blank"
+    />
+);

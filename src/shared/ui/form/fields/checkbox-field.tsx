@@ -3,8 +3,6 @@ import clsx from "clsx";
 import { useField } from "formik";
 import "./checkbox-field.scss";
 
-const _CheckboxField = "CheckboxField";
-
 export type CheckboxFieldProps = Partial<CheckboxProps> & {
     name: string;
     label: string;
@@ -18,21 +16,21 @@ export const CheckboxField = ({ name, label, roundtop, roundbottom, className, .
     return (
         <div
             className={clsx(
-                _CheckboxField,
+                "CheckboxField",
                 {
-                    roundtop: roundtop,
-                    roundbottom: roundbottom,
+                    roundtop,
+                    roundbottom,
                 },
                 className
             )}
         >
-            <FormGroup className={`${_CheckboxField}-formGroup`}>
+            <FormGroup className="CheckboxField-formGroup">
                 <FormControlLabel
-                    className={`${_CheckboxField}-label`}
+                    className="CheckboxField-label"
                     label={label}
                     control={
                         <Checkbox
-                            className={`${_CheckboxField}-checkbox`}
+                            className="CheckboxField-checkbox"
                             size="medium"
                             {...field}
                             {...props}

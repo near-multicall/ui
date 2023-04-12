@@ -1,10 +1,9 @@
 ---
 name: Chore
 about: Take note of a to-do that has to be addressed
-title: ''
-labels: 'chore'
-assignees: ''
-
+title: ""
+labels: "chore"
+assignees: ""
 ---
 
 **What needs to be done?**

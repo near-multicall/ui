@@ -1,0 +1,20 @@
+@use "sass/font";
+
+.FundsOverview {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+    grid-template-areas: "FundsOverview";
+
+    &-content {
+        grid-area: FundsOverview;
+
+        .TableRow-content--compact {
+            &:not(&:first-of-type) {
+                span:last-of-type {
+                    font-family: font.$code;
+                }
+            }
+        }
+    }
+}

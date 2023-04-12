@@ -3,8 +3,6 @@ import { useField } from "formik";
 import React, { useEffect, useState } from "react";
 import "./choice-field.scss";
 
-const _ChoiceField = "ChoiceField";
-
 type Options = {
     ids: string[];
     choose: (id: string) => void;
@@ -23,7 +21,7 @@ type ChoiceFieldProps = {
     roundbottom?: boolean;
 };
 
-export const ChoiceField = ({ roundbottom, roundtop, children, show, initial, name, ...props }: ChoiceFieldProps) => {
+export const ChoiceField = ({ roundbottom, roundtop, children, show, initial, name }: ChoiceFieldProps) => {
     const [field, meta, helper] = useField(name);
     const [ids, setIds] = useState<string[]>(initial ?? []);
     useEffect(() => {
@@ -36,15 +34,13 @@ export const ChoiceField = ({ roundbottom, roundtop, children, show, initial, na
     const isActive = (id: string) => ids.includes(id);
     return (
         <div
-            className={clsx(_ChoiceField, {
-                roundtop: roundtop,
-                roundbottom: roundbottom,
+            className={clsx("ChoiceField", {
+                roundtop,
+                roundbottom,
             })}
         >
-            <div className={clsx(`${_ChoiceField}-input`)}>
-                {children({ ids, choose, add, remove, toggle, isActive })}
-            </div>
-            <div className={clsx(`${_ChoiceField}-content`)}>{show(ids)}</div>
+            <div className="ChoiceField-input">{children({ ids, choose, add, remove, toggle, isActive })}</div>
+            <div className="ChoiceField-content">{show(ids)}</div>
         </div>
     );
 };

@@ -1,11 +1,10 @@
 import { Checkbox, TableCell, TableRow as MuiTableRow } from "@mui/material";
 import clsx from "clsx";
 import { ChangeEvent, useCallback } from "react";
-import { DesignContext } from "../context";
+
+import { Color } from "../params";
 
 import "./row.scss";
-
-const _TableRow = "TableRow";
 
 export type TableHeader = string[];
 
@@ -19,7 +18,7 @@ export interface TableRowProps {
     withTitle?: boolean;
     header: TableHeader;
     id: string;
-    idToHighlightColor?: (id: TableRowProps["id"]) => DesignContext.Color | null;
+    idToHighlight?: (id: TableRowProps["id"]) => Color | null;
     noKeys?: boolean;
     onSelect?: (selectedRow: { id: TableRowProps["id"]; checked: boolean }) => void;
     selectable: boolean;
@@ -31,7 +30,7 @@ export interface TableRowProps {
 
 export const TableRow = ({ cells, header }: TableRowProps) => (
     <>
-        <MuiTableRow className={_TableRow}>
+        <MuiTableRow className="TableRow">
             {(cells ?? header).map((cell, index) => (
                 <TableCell key={index}>{cells ? cell : "No data"}</TableCell>
             ))}
@@ -46,7 +45,7 @@ export const TableRowCompact = ({
     withTitle,
     header,
     id,
-    idToHighlightColor,
+    idToHighlight,
     noKeys,
     onSelect,
     selectable,
@@ -59,29 +58,29 @@ export const TableRowCompact = ({
 
     return (
         <div
-            className={clsx(`${_TableRow}--compact`, {
-                [`${_TableRow}--compact--dense`]: dense,
-                [`${_TableRow}--highlighted--${idToHighlightColor?.(id)}`]: Boolean(idToHighlightColor?.(id)),
+            className={clsx("TableRow--compact", {
+                ["TableRow--compact--dense"]: dense,
+                [`TableRow--highlighted--${idToHighlight?.(id)}`]: Boolean(idToHighlight?.(id)),
             })}
         >
             {header.map((headerCell, headerCellIndex) => (
                 <div
-                    className={clsx(`${_TableRow}-content--compact`, {
-                        [`${_TableRow}-content--compact--dense`]: dense,
-                        [`${_TableRow}-content--compact--withTitle`]: withTitle,
-                        [`${_TableRow}-content--compact--withTitle--centeredTitle`]: centeredTitle,
-                        [`${_TableRow}-content--compact--noKeys`]: noKeys,
+                    className={clsx("TableRow-content--compact", {
+                        ["TableRow-content--compact--dense"]: dense,
+                        ["TableRow-content--compact--withTitle"]: withTitle,
+                        ["TableRow-content--compact--withTitle--centeredTitle"]: centeredTitle,
+                        ["TableRow-content--compact--noKeys"]: noKeys,
                     })}
                     key={headerCellIndex}
                 >
                     {selectable && (
-                        <div className={`${_TableRow}-content-checkbox`}>
+                        <div className="TableRow-content-checkbox">
                             <Checkbox onChange={onSelectMemoized} />
                         </div>
                     )}
 
                     {slots?.Start && (
-                        <div className={clsx(`${_TableRow}-content-slot`, `${_TableRow}-content-slot--start`)}>
+                        <div className="TableRow-content-slot TableRow-content-slot--start">
                             <slots.Start rowId={id} />
                         </div>
                     )}
@@ -90,7 +89,7 @@ export const TableRowCompact = ({
                     <span>{cells ? cells[headerCellIndex] : "No data"}</span>
 
                     {slots?.End && (
-                        <div className={clsx(`${_TableRow}-content-slot`, `${_TableRow}-content-slot--end`)}>
+                        <div className="TableRow-content-slot TableRow-content-slot--end">
                             <slots.End rowId={id} />
                         </div>
                     )}

@@ -9,14 +9,12 @@ interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "chi
     noRender?: boolean;
 }
 
-const _Button = "Button";
-
 export const Button = ({ className, color = "default", label = "Submit", noRender = false, ...props }: ButtonProps) =>
     noRender ? null : (
         <button
-            className={clsx(_Button, `${_Button}--${color}`, className)}
+            className={clsx("Button", `Button--${color}`, className)}
             {...props}
         >
-            <span className={`${_Button}-label`}>{label}</span>
+            <span className="Button-label">{label}</span>
         </button>
     );

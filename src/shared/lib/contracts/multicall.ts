@@ -1,10 +1,8 @@
+import { args } from "../args/args";
 import { Big, toGas, dateToCron, toYocto } from "../converter";
-import { AccountId, Base64String, U128String, U64String } from "../types";
-import { SputnikDAO } from "./sputnik-dao";
-import { viewAccount, viewState, view } from "../wallet";
+import { viewAccount, viewState, view, Tx } from "../wallet";
 
-import type { FunctionCallAction as daoFunctionCallAction } from "./sputnik-dao";
-import type { Tx } from "../wallet";
+import { FunctionCallAction as daoFunctionCallAction, SputnikDAO } from "./sputnik-dao";
 
 const FACTORY_ADDRESS_SELECTOR: Record<string, AccountId> = {
     mainnet: "v1.multicall.near",
@@ -23,19 +21,20 @@ const CONTRACT_CODE_HASHES_SELECTOR: Record<string, string[]> = {
 
 // Storage key of job count used by the contract
 const KEY_JOB_COUNT: string = "g";
-/**
- * Job status is:
- * - Inactive: This is the initial state
- * - Active: job is active, but not triggered yet.
- * - Running: job is active, and was triggered at least once.
- * - Expired: job not active, and execution moment is in the past.
- * - Finished: job finished running and was deleted (we have a mechanism similar to garbage collection)
- * - Deleted: job was deleted without finishing execution
- */
-type JobStatus = "Inactive" | "Active" | "Running" | "Finished" | "Deleted" | "Expired" | "Unknown";
+
 type JobData = {
     id: number;
-    status: JobStatus;
+
+    /**
+     * Job status is:
+     * - Inactive: This is the initial state
+     * - Active: job is active, but not triggered yet.
+     * - Running: job is active, and was triggered at least once.
+     * - Expired: job not active, and execution moment is in the past.
+     * - Finished: job finished running and was deleted (we have a mechanism similar to garbage collection)
+     * - Deleted: job was deleted without finishing execution
+     */
+    status: "Inactive" | "Active" | "Running" | "Finished" | "Deleted" | "Expired" | "Unknown";
 
     /**
      * Job properties
@@ -43,11 +42,11 @@ type JobData = {
     job: {
         croncat_hash: string;
         creator: AccountId;
-        bond: U128String; // string encoded number (u128)
+        bond: U128String;
         cadence: string;
-        trigger_gas: U64String; // string encoded number (u64)
-        croncat_budget: U128String; // string encoded number (u128)
-        start_at: U64String; // string encoded number (u64)
+        trigger_gas: U64String;
+        croncat_budget: U128String;
+        start_at: U64String;
         run_count: number;
         is_active: boolean;
         multicalls: MulticallArgs[];
@@ -58,9 +57,9 @@ type JobDataNoStatus = Omit<JobData, "status">;
 
 type FunctionCall = {
     func: string;
-    args: Base64String; // base64 encoded JSON args
-    gas: U64String; // string encoded number (u64)
-    depo: U128String; // string encoded number (u128)
+    args: Base64String;
+    gas: U64String;
+    depo: U128String;
 };
 
 type BatchCall = {
@@ -72,80 +71,76 @@ type MulticallArgs = {
     calls: BatchCall[][];
 };
 
-enum MulticallSettingsParamKey {
-    croncatManager = "croncatManager",
-    jobBond = "jobBond",
-}
-
-enum MulticallTokenWhitelistDiffKey {
-    addTokens = "addTokens",
-    removeTokens = "removeTokens",
-}
-
-type MulticallSettingsDiff = {
-    [MulticallTokenWhitelistDiffKey.addTokens]: AccountId[];
-    [MulticallSettingsParamKey.croncatManager]: AccountId;
-    [MulticallSettingsParamKey.jobBond]: U128String;
-    [MulticallTokenWhitelistDiffKey.removeTokens]: AccountId[];
-};
-
 class Multicall {
     static FACTORY_ADDRESS: AccountId = FACTORY_ADDRESS_SELECTOR[window.NEAR_ENV];
     static CONTRACT_CODE_HASHES: AccountId[] = CONTRACT_CODE_HASHES_SELECTOR[window.NEAR_ENV];
-    // 0.025 NEAR is the min required by croncat for a non-recurring task. Assume trigger of 270 Tgas and 0 NEAR.
+
+    /**
+     * 0.025 NEAR is the min required by croncat for a non-recurring task. Assume trigger of 270 Tgas and 0 NEAR.
+     */
     static CRONCAT_FEE: U128String = toYocto("0.0275");
 
     address: AccountId;
+
     admins: AccountId[] = [];
-    [MulticallSettingsParamKey.croncatManager]: AccountId = "";
-    // only whitelisted tokens can be attached to multicalls or job activations.
+    croncatManager: AccountId = "";
+
+    /**
+     * Only whitelisted tokens can be attached to multicalls or job activations.
+     */
     tokensWhitelist: AccountId[] = [];
-    // job bond amount must be attached as deposit when adding new jobs.
-    // needs initialization, but start with "" because it's distinguishable from a real value (string encoded numbers).
-    [MulticallSettingsParamKey.jobBond]: U128String = "";
-    // Multicall instance is ready when info (admins...) are fetched & assigned correctly.
+
+    /**
+     * Job bond amount must be attached as deposit when adding new jobs.
+     * Needs initialization, but start with "" because it's distinguishable from a real value (string encoded numbers).
+     */
+    jobBond: U128String = "";
+
+    /**
+     * Multicall instance is ready when info (admins...) are fetched & assigned correctly.
+     */
     ready: boolean = false;
 
-    constructor(multicallAddress: AccountId) {
-        this.address = multicallAddress;
+    constructor(accountId: AccountId) {
+        this.address = accountId;
     }
 
     // used to create and initialize a Multicall instance
-    static async init(multicallAddress: AccountId): Promise<Multicall> {
+    static async init(accountId: AccountId): Promise<Multicall> {
         // verify address is a Multicall instance, fetch its info and mark it ready
-        const newMulticall = new Multicall(multicallAddress);
+        const multicallInstance = new Multicall(accountId);
         const [isMulticall, admins, croncatManager, tokensWhitelist, jobBond] = await Promise.all([
             // on failure set isMulticall to false
-            Multicall.isMulticall(multicallAddress).catch((err) => {
+            Multicall.isMulticall(accountId).catch((err) => {
                 return false;
             }),
             // on failure set admins list to be empty
-            newMulticall.getAdmins().catch((err) => {
+            multicallInstance.getAdmins().catch((err) => {
                 return [];
             }),
             //on failure set manager list to be empty
-            newMulticall.getCroncatManager().catch((err) => {
+            multicallInstance.getCroncatManager().catch((err) => {
                 return "";
             }),
             // on failure set tokens whitelist to be empty
-            newMulticall.getWhitelistedTokens().catch((err) => {
+            multicallInstance.getWhitelistedTokens().catch((err) => {
                 return [];
             }),
             // on failure set job bond to ""
-            newMulticall.getJobBond().catch((err) => {
+            multicallInstance.getJobBond().catch((err) => {
                 return "";
             }),
         ]);
 
-        newMulticall.admins = admins;
-        newMulticall.croncatManager = croncatManager;
-        newMulticall.tokensWhitelist = tokensWhitelist;
-        newMulticall.jobBond = jobBond;
+        multicallInstance.admins = admins;
+        multicallInstance.croncatManager = croncatManager;
+        multicallInstance.tokensWhitelist = tokensWhitelist;
+        multicallInstance.jobBond = jobBond;
         // set ready to true if address is a Multicall instance and it has at least 1 admin.
-        if (isMulticall === true && newMulticall.admins.length >= 1) {
-            newMulticall.ready = true;
+        if (isMulticall === true && multicallInstance.admins.length >= 1) {
+            multicallInstance.ready = true;
         }
-        return newMulticall;
+        return multicallInstance;
     }
 
     /**
@@ -176,22 +171,16 @@ class Multicall {
      * @returns actions that can be passed to JSON for DAO "add_proposal".
      */
     static configDiffToProposalActions({
-        removeTokens = [],
         addTokens = [],
         jobBond = "",
-        croncatManager = "",
-    }: MulticallSettingsDiff): daoFunctionCallAction[] {
+        removeTokens = [],
+    }: {
+        addTokens: Multicall["tokensWhitelist"];
+        jobBond: Multicall["jobBond"];
+        removeTokens: Multicall["tokensWhitelist"];
+    }): daoFunctionCallAction[] {
         const actions: daoFunctionCallAction[] = [];
 
-        // action: change croncat manager address
-        if (croncatManager !== "") {
-            actions.push({
-                method_name: "set_croncat_manager",
-                args: { address: croncatManager },
-                deposit: "1", // 1 yocto
-                gas: toGas("10"), // 10 Tgas
-            });
-        }
         // action: change amount of job bond
         if (jobBond !== "") {
             actions.push({
@@ -229,6 +218,22 @@ class Multicall {
     async getAdmins(): Promise<AccountId[]> {
         return view(this.address, "get_admins", {});
     }
+
+    static getInstanceAddress = (spawnerAccountId: AccountId): Multicall["address"] =>
+        args
+            .string()
+            .ensure()
+            .intoBaseAddress()
+            .append("." + Multicall.FACTORY_ADDRESS)
+            .cast(spawnerAccountId);
+
+    static getSputnikDAOAddress = (instanceAccountId: AccountId): SputnikDAO["address"] =>
+        args
+            .string()
+            .ensure()
+            .intoBaseAddress()
+            .append("." + SputnikDAO.FACTORY_ADDRESS)
+            .cast(instanceAccountId);
 
     /**
      * get whitelisted tokens
@@ -287,7 +292,7 @@ class Multicall {
             if (chainJobs.has(id)) {
                 const { job: jobInfo } = chainJobs.get(id)!;
                 // assign a status to the job
-                let status: JobStatus;
+                let status: JobData["status"];
                 if (jobInfo.is_active) {
                     if (jobInfo.run_count > -1) status = "Running";
                     else status = "Active";
@@ -364,5 +369,5 @@ class Multicall {
     }
 }
 
-export { Multicall, MulticallSettingsParamKey, MulticallTokenWhitelistDiffKey };
-export type { JobData, MulticallArgs, MulticallSettingsDiff };
+export { Multicall };
+export type { JobData, MulticallArgs };

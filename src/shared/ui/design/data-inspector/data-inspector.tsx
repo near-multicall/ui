@@ -2,11 +2,9 @@ import clsx from "clsx";
 import { MouseEvent, useCallback, useState, type ComponentProps } from "react";
 import { ObjectInspector } from "react-inspector";
 
-import { ModuleContext as ModuleContext } from "./context";
-import { DataInspectorNode } from "./data-inspector-node";
+import { ModuleContext as ModuleContext } from "./data-inspector.params";
+import { DataInspectorNode } from "./data-inspector.node";
 import "./data-inspector.scss";
-
-const _DataInspector = "DataInspector";
 
 interface DataInspectorProps extends ComponentProps<typeof ObjectInspector> {
     classes?: { root?: string; body?: string; label?: string };
@@ -31,17 +29,17 @@ export const DataInspector = ({ classes, expanded = false, expandLevel = 1, labe
 
     return (
         <details
-            className={clsx(_DataInspector, classes?.root)}
+            className={clsx("DataInspector", classes?.root)}
             open={rootExpanded}
         >
             <summary
-                className={clsx(`${_DataInspector}-label`, classes?.label)}
+                className={clsx("DataInspector-label", classes?.label)}
                 onClick={rootExpansionToggle}
             >
                 <span>{label ?? dynamicLabel}</span>
             </summary>
 
-            <div className={clsx(`${_DataInspector}-body`, classes?.body)}>
+            <div className={clsx("DataInspector-body", classes?.body)}>
                 <ObjectInspector
                     expandLevel={expandLevel < 1 ? 1 : expandLevel}
                     nodeRenderer={DataInspectorNode}

@@ -1,6 +1,7 @@
-export { Task } from "./task";
+export { FT } from "./ft";
 export { Job } from "./job";
-export { FT, type FTModule } from "./fungible-token";
-export { MI, type MIModule } from "./multicall-instance";
-export { NEARToken, type NEARTokenModule } from "./near-token";
+export { MI } from "./mi";
+export { NEAR } from "./near";
+export { Task } from "./task";
+export { TaskList } from "./task-list";
 export { Wallet } from "./wallet";

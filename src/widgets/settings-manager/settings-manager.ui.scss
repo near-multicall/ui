@@ -1,0 +1,38 @@
+@use "sass/mixin";
+@use "sass/size";
+
+.SettingsManager {
+    grid-area: SettingsManager;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 4fr;
+    gap: size.$gap;
+    margin: size.$gap !important;
+    border-radius: size.$task-radius;
+    padding: 0 !important;
+    overflow-y: scroll;
+    height: 100%;
+    @include mixin.no-scrollbar;
+
+    grid-template-areas:
+        "ManageTokenWhitelist ConfigureScheduling"
+        "ManageTokenWhitelist ProposeSettings";
+
+    &-error {
+        grid-area: MulticallSettingsError;
+    }
+
+    &.is-displayingError {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr;
+        grid-template-areas: "MulticallSettingsError";
+    }
+
+    &.is-displayingError > *:not(&-error) {
+        display: none;
+    }
+
+    &:not(&.is-displayingError) &-error {
+        display: none;
+    }
+}

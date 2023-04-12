@@ -15,5 +15,3 @@ export const args = {
     object: () => new ObjectSchema(),
     string: () => new StringSchema(),
 };
-
-console.log(args);
