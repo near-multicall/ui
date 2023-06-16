@@ -1,0 +1,58 @@
+@use "sass/color";
+@use "sass/font";
+@use "sass/mixin";
+@use "sass/size";
+
+.ProposalList {
+    grid-area: ProposalList;
+
+    .content {
+        display: flex;
+        flex-flow: row wrap;
+        justify-content: center;
+        gap: size.$gap;
+        border-radius: size.$task-radius;
+    }
+
+    .auto-refresh {
+        width: 5 * size.$gap;
+        height: size.$gap;
+        border-radius: size.$gap;
+        background-color: color.$white;
+        position: relative;
+        overflow: hidden;
+        & > div {
+            width: 100%;
+            height: 105%;
+            transform: translateX(-100%);
+            background-color: color.$green;
+            border-radius: size.$gap;
+            animation-name: move;
+            animation-duration: 10s;
+            animation-iteration-count: infinite;
+            animation-timing-function: ease-in;
+        }
+
+        &::after {
+            content: "Auto Refreshing...";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5 * size.$gap;
+            height: size.$gap;
+            text-align: center;
+            line-height: 100%;
+            padding-top: 5%;
+        }
+    }
+
+    @keyframes move {
+        0% {
+            transform: translateX(-100%);
+        }
+        100% {
+            transform: translateX(0%);
+            opacity: 0;
+        }
+    }
+}

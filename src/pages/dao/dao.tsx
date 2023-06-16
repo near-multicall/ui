@@ -20,6 +20,7 @@ import { DaoSettingsTab } from "./settings/settings";
 import "./dao.scss";
 import { DaoFundsTab } from "./funds/funds";
 import { DaoJobsTab } from "./jobs/jobs";
+import { DaoProposalsTab } from "./proposals/proposals";
 
 const Ctx = Wallet.trySelectorContext();
 
@@ -515,6 +516,7 @@ export class DaoPage extends Component<Props, State> {
                     DaoSettingsTab.uiConnect({ className: `${_DaoPage}-content`, adapters: { dao, multicall } }),
                     DaoFundsTab.uiConnect({ className: `${_DaoPage}-content`, adapters: { dao, multicall } }),
                     DaoJobsTab.uiConnect({ className: `${_DaoPage}-content`, multicallInstance: multicall }),
+                    DaoProposalsTab.uiConnect({ className: `${_DaoPage}-content`, dao }),
                 ]}
             />
         );

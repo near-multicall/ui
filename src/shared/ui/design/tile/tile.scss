@@ -6,7 +6,7 @@
     flex-flow: column nowrap;
     position: relative;
     border-radius: size.$task-radius;
-    padding: size.$gap * 0.5;
+    padding: size.$gap;
     gap: size.$gap * 0.5;
     background-color: color.$lightest;
     font-size: size.$small-text;

@@ -1,0 +1,87 @@
+@use "sass/size";
+@use "sass/color";
+@use "sass/font";
+
+.Proposal {
+    flex: 1 1 auto;
+    min-width: calc(50% - 2.5 * size.$gap);
+    padding: size.$gap;
+    background-color: color.$white;
+    border-radius: size.$task-radius;
+
+    .header {
+        display: flex;
+        flex-flow: row nowrap;
+        gap: 0.5 * size.$gap;
+        align-items: center;
+
+        .id {
+            justify-self: flex-start;
+        }
+
+        .MuiChip-root {
+            padding: 0;
+            & > span {
+                font-size: size.$smaller-text;
+            }
+        }
+
+        .submission-time {
+            margin-left: auto;
+            justify-self: flex-end;
+            font-family: font.$code;
+            opacity: 0.3;
+        }
+    }
+
+    .body {
+        display: flex;
+        flex-flow: column nowrap;
+        gap: 0.5 * size.$gap;
+        padding-top: 0.5 * size.$gap;
+
+        .proposer {
+            display: flex;
+            flex-flow: row nowrap;
+
+            &::before {
+                content: "Proposer:";
+                padding-right: 1ch;
+                opacity: 0.3;
+            }
+        }
+
+        .description::before {
+            content: "Description:";
+            padding-right: 1ch;
+            opacity: 0.3;
+        }
+    }
+
+    .footer {
+        display: flex;
+        flex-flow: row nowrap;
+        gap: size.$gap;
+        padding-top: 0.5 * size.$gap;
+
+        button {
+            border-radius: size.$task-radius;
+            opacity: 0.8;
+            transition: opacity 200ms ease-in-out;
+            width: 12ch;
+            padding-inline: 0;
+
+            &:hover {
+                opacity: 1;
+            }
+        }
+
+        .approve {
+            background-color: color.$green;
+        }
+
+        .reject {
+            background-color: color.$red;
+        }
+    }
+}

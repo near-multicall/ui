@@ -1,0 +1,47 @@
+@use "./default.scss" as *;
+@use "sass/font";
+@use "sass/color";
+@use "sass/size";
+
+.Proposal {
+    @extend .Proposal;
+
+    .body {
+        .method {
+            display: flex;
+            flex-flow: row nowrap;
+            gap: 1ch;
+            
+            & > span:not(.code) {
+                opacity: 0.3;
+            }
+
+            .code {
+                font-family: font.$code;
+            }
+        }
+
+        .args {
+            background-color: color.$black;
+            border-radius: size.$task-radius;
+            padding: 0.5 * size.$gap;
+            font-family: font.$code;
+            color: color.$light-text;
+        }
+
+        .attachment {
+            display: flex;
+            flex-flow: row nowrap;
+            gap: 1ch;
+    
+            span {
+                font-weight: bold;
+            }
+    
+            &::before {
+                content: "Attaching ";
+                opacity: 0.3;
+            }
+        }
+    }
+}
