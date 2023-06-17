@@ -1,2 +1,4 @@
-$menu-expand-width: 50%;
+@use "sass/size";
+
+$menu-expand-width: 1.0001 * calc(4 * size.$gap + 3 * size.$task-width);
 $menu-expand-time: 200ms;
