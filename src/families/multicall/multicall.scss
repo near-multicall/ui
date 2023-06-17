@@ -4,4 +4,7 @@
 .multicall-transfer-task {
     background: color.$darkest;
     @include base.task-theme(color.$light-text);
+    * > a {
+        color: darken(color.$blue, 20%) !important;
+    }
 }
