@@ -1,0 +1,37 @@
+@use "./default.scss" as *;
+@use "sass/font";
+@use "sass/color";
+@use "sass/size";
+
+.Proposal {
+    @extend .Proposal;
+
+    .transfer {
+        display: flex;
+        flex-flow: row nowrap;
+        gap: 1ch;
+        align-items: center;
+
+        &::before {
+            content: "Sending";
+            opacity: 0.3;
+        }
+
+        .IconLabel {
+            &-label {
+                font-family: font.$text;
+            }
+            &-icon {
+                & > img,
+                & > svg {
+                    width: 1.5em;
+                    height: 1.5em;
+                }
+            }
+        }
+
+        .to {
+            opacity: 0.3;
+        }
+    }
+}

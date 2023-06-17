@@ -12,6 +12,7 @@ import { Chip } from "@mui/material";
 import { FunctionCallProposal } from "./proposal-kinds/function-call";
 import { DefaultProposal } from "./proposal-kinds/default";
 import { Tx } from "../../shared/lib/wallet";
+import { TransferProposal } from "./proposal-kinds/transfer";
 
 type FetchState<T> = {
     data: T | null;
@@ -34,6 +35,8 @@ const Proposal = (props: ProposalProps) => {
     switch (Object.keys(props.data.kind)[0]) {
         case "FunctionCall":
             return <FunctionCallProposal {...props} />;
+        case "Transfer":
+            return <TransferProposal {...props} />;
         default:
             return <DefaultProposal {...props} />;
     }

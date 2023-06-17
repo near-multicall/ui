@@ -29,8 +29,6 @@ export const FunctionCallProposal = ({ data, approve, reject }: ProposalProps) =
         new Big(0)
     );
 
-    console.log("hi");
-
     return (
         <div className="Proposal">
             <div className="header">
