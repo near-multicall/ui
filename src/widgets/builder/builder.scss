@@ -35,10 +35,10 @@
             .tasks-wrapper {
                 flex: 1 1 0;
                 flex-flow: row wrap;
-                gap: size.$gap;
+                gap: 0 size.$gap;
                 box-shadow: none;
                 .task-wrapper {
-                    margin-bottom: 0 !important;
+                    margin-bottom: size.$gap !important;
                 }
                 .icon {
                     display: none;
