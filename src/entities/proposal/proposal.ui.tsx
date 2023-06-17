@@ -8,7 +8,7 @@ import { ProposalKind, ProposalOutput, ProposalStatus, SputnikDAO } from "../../
 
 import "./proposal.ui.scss";
 import { ModuleContext } from "./context";
-import { Chip } from "@mui/material";
+import { Chip, Pagination } from "@mui/material";
 import { FunctionCallProposal } from "./proposal-kinds/function-call";
 import { DefaultProposal } from "./proposal-kinds/default";
 import { Tx } from "../../shared/lib/wallet";
@@ -44,7 +44,8 @@ const Proposal = (props: ProposalProps) => {
 
 export const ProposalList = ({ className, dao }: ProposalListProps) => {
     const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
-    const [paginationOffset, setPaginationOffset] = useState<number>(0);
+    const [paginationOffset, setPaginationOffset] = useState<number>(1);
+    const [pageCount, setPageCount] = useState<number>(1);
     const [proposals, setProposals] = useState<FetchState<ProposalOutput[]>>({
         data: null,
         error: null,
@@ -59,10 +60,11 @@ export const ProposalList = ({ className, dao }: ProposalListProps) => {
     // refresh proposal list if dao or pagination offset has changed
     const fetchProposals = useMemo(
         () =>
-            dao.getLastProposalId().then((lastId) =>
-                dao
+            dao.getLastProposalId().then((lastId) => {
+                setPageCount(Math.ceil(lastId / ModuleContext.PROPOSALS_PER_PAGE));
+                return dao
                     .getProposals({
-                        from_index: Math.max(lastId - paginationOffset - ModuleContext.PROPOSALS_PER_PAGE, 0),
+                        from_index: Math.max(lastId - paginationOffset * ModuleContext.PROPOSALS_PER_PAGE, 0),
                         limit: ModuleContext.PROPOSALS_PER_PAGE,
                     })
                     .then((data) => ({
@@ -74,8 +76,8 @@ export const ProposalList = ({ className, dao }: ProposalListProps) => {
                         data: null,
                         error,
                         loading: false,
-                    }))
-            ),
+                    }));
+            }),
         [dao, paginationOffset]
     );
 
@@ -95,6 +97,14 @@ export const ProposalList = ({ className, dao }: ProposalListProps) => {
                     </div>
                 ),
             }}
+            footer={
+                <Pagination
+                    className="pagination"
+                    count={pageCount}
+                    page={paginationOffset}
+                    onChange={(e, value) => setPaginationOffset(value)}
+                />
+            }
             {...{ error, loading }}
         >
             {!!data && (

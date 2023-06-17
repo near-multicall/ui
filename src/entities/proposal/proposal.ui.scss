@@ -14,6 +14,10 @@
         border-radius: size.$task-radius;
     }
 
+    .pagination button {
+        font-size: size.$small-text;
+    }
+
     .auto-refresh {
         width: 5 * size.$gap;
         height: size.$gap;
