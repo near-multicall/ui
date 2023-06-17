@@ -42,7 +42,7 @@ export const TransferProposal = ({ data, approve, reject }: ProposalProps) => {
                 <div className="proposer">
                     <NearLink address={data.proposer} />
                 </div>
-                {ft.ready ? (
+                {ft.ready && (
                     <div className="transfer">
                         <IconLabel
                             icon={ft.metadata.icon ?? <NearIcon.GenericTokenFilled />}
@@ -56,8 +56,6 @@ export const TransferProposal = ({ data, approve, reject }: ProposalProps) => {
                         <span className="to">to</span>
                         <NearLink address={data.kind.Transfer.receiver_id} />
                     </div>
-                ) : (
-                    <div className="transfer loader" />
                 )}
             </div>
             {data.status === ProposalStatus.InProgress && (

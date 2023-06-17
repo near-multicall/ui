@@ -297,6 +297,26 @@ class SputnikDAO {
         return view(this.address, "get_proposals", args);
     }
 
+    async getProposalsWithExpirationCheck(args: { from_index: number; limit: number }): Promise<ProposalOutput[]> {
+        const proposals = view(this.address, "get_proposals", args);
+
+        let proposal_period: Big;
+        try {
+            proposal_period = new Big(this.policy.proposal_period);
+        } catch (e) {
+            return proposals;
+        }
+
+        const now = new Big(Date.now().toString() + "000000");
+        return (await proposals).map((p: ProposalOutput) => ({
+            ...p,
+            status:
+                p.status === ProposalStatus.InProgress && new Big(p.submission_time).plus(proposal_period).lt(now)
+                    ? ProposalStatus.Expired
+                    : p.status,
+        }));
+    }
+
     /**
      * Fetch proposal info from DAO contract
      */

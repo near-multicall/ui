@@ -63,7 +63,7 @@ export const ProposalList = ({ className, dao }: ProposalListProps) => {
             dao.getLastProposalId().then((lastId) => {
                 setPageCount(Math.ceil(lastId / ModuleContext.PROPOSALS_PER_PAGE));
                 return dao
-                    .getProposals({
+                    .getProposalsWithExpirationCheck({
                         from_index: Math.max(lastId - paginationOffset * ModuleContext.PROPOSALS_PER_PAGE, 0),
                         limit: ModuleContext.PROPOSALS_PER_PAGE,
                     })

@@ -5,8 +5,8 @@ export const translateProposalStatus: Record<ProposalStatus, string> = {
     Approved: "🟢 Approved",
     Rejected: "🔴 Rejected",
     Removed: "🔴 Removed",
-    Expired: "🔴 Rejected",
-    Moved: "🔴 Rejected",
+    Expired: "🔴 Expired",
+    Moved: "🔴 Moved",
     Failed: "🔴 Failed",
 };
 
