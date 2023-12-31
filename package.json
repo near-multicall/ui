@@ -36,10 +36,12 @@
         "@types/react-dom": "^18.0.6",
         "@typescript-eslint/parser": "^5.36.1",
         "babel-jest": "^28.0.2",
+        "crypto-browserify": "^3.12.0",
         "env-cmd": "~10.1.0",
         "eslint": "^8.23.0",
         "eslint-plugin-prettier": "^4.2.1",
         "gh-pages": "^4.0.0",
+        "https-browserify": "^1.0.0",
         "husky": "^8.0.0",
         "jest": "^28.1.2",
         "jest-environment-node": "^28.0.2",
@@ -48,10 +50,14 @@
         "nodemon": "~2.0.19",
         "prettier": "^2.7.1",
         "process": "^0.11.10",
+        "punycode": "^1.4.1",
         "react-test-renderer": "^18.0.0",
         "sass": "^1.43.3",
         "shelljs": "~0.8.4",
+        "stream-browserify": "^3.0.0",
+        "stream-http": "^3.2.0",
         "typescript": "^4.5.2",
+        "url": "^0.11.3",
         "util": "^0.12.4"
     },
     "dependencies": {
@@ -65,11 +71,14 @@
         "@mui/lab": "^5.0.0-alpha.58",
         "@mui/material": "^5.0.0",
         "@mui/x-date-pickers": "^5.0.4",
-        "@near-wallet-selector/core": "^7.3.0",
-        "@near-wallet-selector/modal-ui": "^7.3.0",
-        "@near-wallet-selector/my-near-wallet": "^7.3.0",
-        "@near-wallet-selector/near-wallet": "^7.3.0",
-        "@near-wallet-selector/sender": "^7.3.0",
+        "@near-wallet-selector/core": "^8.9.1",
+        "@near-wallet-selector/here-wallet": "^8.9.1",
+        "@near-wallet-selector/meteor-wallet": "^8.9.1",
+        "@near-wallet-selector/mintbase-wallet": "^8.9.1",
+        "@near-wallet-selector/modal-ui": "^8.9.1",
+        "@near-wallet-selector/my-near-wallet": "^8.9.1",
+        "@near-wallet-selector/near-wallet": "^8.9.1",
+        "@near-wallet-selector/sender": "^8.9.1",
         "@types/babel__generator": "^7.6.4",
         "@types/babel__template": "^7.4.1",
         "@types/luxon": "^3.0.1",
@@ -82,7 +91,7 @@
         "js-base64": "^3.7.2",
         "lodash.debounce": "^4.0.8",
         "luxon": "^3.0.4",
-        "near-api-js": "^1.1.0",
+        "near-api-js": "^3.0.1",
         "object-hash": "^3.0.0",
         "parcel": "^2.4.0",
         "react": "^18.0.0",
@@ -95,7 +104,8 @@
         "yup": "^0.32.11"
     },
     "overrides": {
-        "bn.js": "5.2.1"
+        "bn.js": "5.2.1",
+        "near-api-js": "3.0.1"
     },
     "jest": {
         "moduleNameMapper": {

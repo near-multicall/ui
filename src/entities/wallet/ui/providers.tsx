@@ -1,6 +1,8 @@
 import nearWalletIconUrl from "@near-wallet-selector/near-wallet/assets/near-wallet-icon.png";
 import senderIconUrl from "@near-wallet-selector/sender/assets/sender-icon.png";
 import myNearWalletIconUrl from "@near-wallet-selector/my-near-wallet/assets/my-near-wallet-icon.png";
+import meteorIconUrl from "@near-wallet-selector/meteor-wallet/assets/meteor-icon.png";
+import HereIconUrl from "@near-wallet-selector/here-wallet/assets/here-wallet-icon.png";
 import { setupWalletSelector } from "@near-wallet-selector/core";
 import type { WalletSelector, AccountState } from "@near-wallet-selector/core";
 import { setupModal } from "@near-wallet-selector/modal-ui";
@@ -8,6 +10,9 @@ import type { WalletSelectorModal } from "@near-wallet-selector/modal-ui";
 import { setupNearWallet } from "@near-wallet-selector/near-wallet";
 import { setupMyNearWallet } from "@near-wallet-selector/my-near-wallet";
 import { setupSender } from "@near-wallet-selector/sender";
+import { setupMeteorWallet } from "@near-wallet-selector/meteor-wallet";
+import { setupHereWallet } from "@near-wallet-selector/here-wallet";
+import { setupMintbaseWallet } from "@near-wallet-selector/mintbase-wallet";
 import React, { useCallback, useEffect, useState } from "react";
 import { map, distinctUntilChanged } from "rxjs";
 
@@ -42,6 +47,9 @@ export const WalletSelectorContextProvider: React.FC<any> = ({ children }) => {
                 setupNearWallet({ iconUrl: nearWalletIconUrl }),
                 setupSender({ iconUrl: senderIconUrl }),
                 setupMyNearWallet({ iconUrl: myNearWalletIconUrl }),
+                setupMeteorWallet({ iconUrl: meteorIconUrl }),
+                setupHereWallet({ iconUrl: HereIconUrl }),
+                setupMintbaseWallet(),
             ],
         });
 

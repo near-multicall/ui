@@ -2,9 +2,7 @@ import { FormLabel as GenericFormLabel, type FormLabelProps as GenericFromLabelP
 
 import "./form-label.scss";
 
-interface FormLabelProps extends Omit<GenericFromLabelProps, "classes"> {
-    content: string | JSX.Element;
-}
+type FormLabelProps = Omit<GenericFromLabelProps, "classes">;
 
 const _FormLabel = "FormLabel";
 

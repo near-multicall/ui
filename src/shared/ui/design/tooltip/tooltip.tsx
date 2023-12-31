@@ -4,7 +4,7 @@ import "./tooltip.scss";
 
 const _Tooltip = "Tooltip";
 
-interface TooltipProps extends Omit<MuiTooltipProps, "title"> {
+interface TooltipProps extends Omit<MuiTooltipProps, "title" | "content"> {
     content: MuiTooltipProps["title"];
 }
 
