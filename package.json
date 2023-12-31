@@ -91,7 +91,7 @@
         "js-base64": "^3.7.2",
         "lodash.debounce": "^4.0.8",
         "luxon": "^3.0.4",
-        "near-api-js": "^3.0.1",
+        "near-api-js": "3.0.1",
         "object-hash": "^3.0.0",
         "parcel": "^2.4.0",
         "react": "^18.0.0",
